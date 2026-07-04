@@ -54,7 +54,7 @@
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
 
-  --font-sans: var(--font-roboto, Roboto, ui-sans-serif, sans-serif, system-ui);
+  --font-sans: var(--font-inter, inter, ui-sans-serif, sans-serif, system-ui);
   --font-heading: var(--font-sans);
 
   --text-h1: 3rem;
@@ -142,7 +142,7 @@
   --accent: oklch(from #202020 l c h);
   --accent-foreground: var(--color-white);
   --destructive: oklch(from #ff5c4d l c h);
-  --border: oklch(1 0 0 / 8%);
+  --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(from #00d897 l c h / 50%);
   --chart-1: oklch(0.87 0 0);
@@ -163,7 +163,7 @@
   /* Project color tokens */
   --white: oklch(from #f3f3f3 l c h);
   --grey: oklch(from #737373 l c h);
-  --background: oklch(from #101010 l c h);
+  --background: oklch(from #0a0a0a l c h);
   --foreground: var(--color-white);
   --primary: oklch(from #00d897 l c h);
   --primary-foreground: oklch(from #04120d l c h);
@@ -172,8 +172,8 @@
 
   /* Semantic status tokens used across trading UI (buy/sell, up/down) */
   --up: oklch(from #00d897 l c h);
-  --down: oklch(from #ff5c4d l c h);
-  --sell: oklch(from #ff6a3d l c h);
+  --down: oklch(from #de5759 l c h);
+  --sell: oklch(from #f55832 l c h);
   --warning: oklch(from #ffab17 l c h);
   --surface-1: oklch(from #141414 l c h);
   --surface-2: oklch(from #1c1c1c l c h);
