@@ -12,8 +12,8 @@ export function TradingChartPanel() {
         <ChartToolRail />
         <div className="relative flex-1">
           <CandlestickChart data={CANDLES} />
-          <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-b-4 font-semibold text-grey/60">
-            Powered by <span className="text-grey/80">GMGN</span>
+          <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-b-4 font-semibold text-gray/60">
+            Powered by <span className="text-gray/80">GMGN</span>
           </p>
         </div>
       </div>

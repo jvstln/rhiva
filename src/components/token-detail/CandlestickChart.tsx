@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Bar,
   BarChart,
@@ -11,14 +13,15 @@ import {
 import type { Candle } from "@/data/token-detail-data";
 
 interface CandleShapeProps {
-  x: number;
-  width: number;
-  payload: Candle;
-  yAxis: { scale: (v: number) => number };
+  x?: number;
+  width?: number;
+  payload?: Candle;
+  yAxis?: { scale: (v: number) => number };
 }
 
-function CandleShape(props: unknown) {
-  const { x, width, payload, yAxis } = props as CandleShapeProps;
+function CandleShape({ x, width, payload, yAxis }: CandleShapeProps) {
+  if (x === undefined || width === undefined || !payload || !yAxis) return null;
+
   const up = payload.close >= payload.open;
   const color = up ? "var(--color-up)" : "var(--color-down)";
   const scale = yAxis.scale;
@@ -67,7 +70,7 @@ export function CandlestickChart({ data }: { data: Candle[] }) {
               domain={["dataMin - 0.00002", "dataMax + 0.00002"]}
               orientation="right"
               width={56}
-              tick={{ fill: "var(--grey)", fontSize: 10 }}
+              tick={{ fill: "var(--gray)", fontSize: 10 }}
               tickFormatter={(v: number) => v.toFixed(5)}
               axisLine={false}
               tickLine={false}
@@ -95,7 +98,7 @@ export function CandlestickChart({ data }: { data: Candle[] }) {
           >
             <XAxis
               dataKey="time"
-              tick={{ fill: "var(--grey)", fontSize: 10 }}
+              tick={{ fill: "var(--gray)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
             />

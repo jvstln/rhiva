@@ -41,7 +41,7 @@ export function TimeframeStats() {
             <p
               className={cn(
                 "text-b-4",
-                tf.change.startsWith("+") ? "text-up" : "text-grey",
+                tf.change.startsWith("+") ? "text-up" : "text-gray",
               )}
             >
               {tf.change}
@@ -53,7 +53,7 @@ export function TimeframeStats() {
       <div className="grid grid-cols-4 gap-2 text-center">
         {SUMMARY.map((s) => (
           <div key={s.label}>
-            <p className="text-b-5 text-grey">{s.label}</p>
+            <p className="text-b-5 text-gray">{s.label}</p>
             <p className="text-b-4 font-medium text-white">{s.value}</p>
           </div>
         ))}

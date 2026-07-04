@@ -1,14 +1,18 @@
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { AssistantBubble } from "@/components/layout/AssistantBubble";
-import { Navbar } from "@/components/layout/Navbar";
 import { PoolDetailChartPanel } from "@/components/liquidity-detail/PoolDetailChartPanel";
 import { PoolDetailSidebar } from "@/components/liquidity-detail/PoolDetailSidebar";
 import { PoolDetailTradeRail } from "@/components/liquidity-detail/PoolDetailTradeRail";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function LiquidityDetailPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar walletConnected walletAddress="1Ffm...bpaZ" />
-
+    <div>
+      <Link href="/liquidity" className={buttonVariants({ variant: "ghost" })}>
+        <ChevronLeft />
+        Back
+      </Link>
       <main className="flex flex-1">
         <PoolDetailSidebar />
         <PoolDetailChartPanel />

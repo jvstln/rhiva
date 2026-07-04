@@ -10,7 +10,7 @@ interface MetricChipProps {
 }
 
 const TONE_CLASSES: Record<NonNullable<MetricChipProps["tone"]>, string> = {
-  default: "text-grey",
+  default: "text-gray",
   up: "text-up",
   down: "text-down",
   warning: "text-warning",

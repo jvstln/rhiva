@@ -5,29 +5,29 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center gap-1 rounded-full border px-4 py-2 text-b-4 font-medium w-fit whitespace-nowrap shrink-0",
+  "group/badge inline-flex h-10 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-4 py-2 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-secondary text-secondary-foreground",
+        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        secondary:
+          "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
+        destructive:
+          "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
+        outline:
+          "border-primary/60 text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
+        ghost:
+          "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
+        link: "text-primary underline-offset-4 hover:underline",
         up: "border-transparent bg-up/10 text-up",
         down: "border-transparent bg-down/10 text-down",
         warning: "border-transparent bg-warning/10 text-warning",
-        neutral: "border-border/80 text-grey bg-transparent",
-        solid: "border-transparent bg-primary text-primary-foreground",
-        outline: "border-primary/60 text-foreground bg-transparent",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-b-4",
-        lg: "h-12 rounded-md px-6 text-b-2",
-        icon: "size-9",
-        pill: "h-7 rounded-full px-3 text-b-4",
+        //         neutral: "border-border/80 text-gray bg-transparent",
+        //         solid: "border-transparent bg-primary text-primary-foreground",
       },
     },
     defaultVariants: {
       variant: "default",
-      size: "default",
     },
   },
 );

@@ -33,7 +33,7 @@ export function ChartToolRail() {
         <button
           type="button"
           key={i}
-          className="flex size-6 items-center justify-center text-grey transition-colors hover:text-white"
+          className="flex size-6 items-center justify-center text-gray transition-colors hover:text-white"
         >
           <Icon className="size-4" />
         </button>

@@ -15,7 +15,7 @@ export function PriceRangeSelector() {
   return (
     <div className="space-y-4 border-t border-border/70 p-4">
       <div>
-        <p className="text-b-3 text-grey">
+        <p className="text-b-3 text-gray">
           Current Price:{" "}
           <span className="font-medium text-white">0.05329 SOL per USDC</span>
         </p>
@@ -32,7 +32,7 @@ export function PriceRangeSelector() {
             />
           ))}
         </div>
-        <div className="mt-1 flex justify-between text-b-6 text-grey">
+        <div className="mt-1 flex justify-between text-b-6 text-gray">
           <span>0.05216</span>
           <span>0.05216</span>
           <span>0.05216</span>
@@ -50,14 +50,14 @@ export function PriceRangeSelector() {
               "rounded-md border px-3 py-1.5 text-b-4 font-medium transition-colors",
               spread === p
                 ? "border-primary/60 bg-primary/10 text-white"
-                : "border-border/70 text-grey hover:text-white/80",
+                : "border-border/70 text-gray hover:text-white/80",
             )}
           >
             {p}
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2 rounded-md border border-border/70 px-3 py-1.5">
-          <span className="text-b-4 text-grey">Bins</span>
+          <span className="text-b-4 text-gray">Bins</span>
           <span className="text-b-4 font-semibold text-white">69</span>
         </div>
       </div>
@@ -77,18 +77,18 @@ export function PriceRangeSelector() {
 function PriceStepper({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="mb-1 text-b-4 text-grey">{label}</p>
+      <p className="mb-1 text-b-4 text-gray">{label}</p>
       <div className="flex items-center justify-between rounded-md border border-border/70 px-2 py-2">
         <button
           type="button"
-          className="flex size-6 items-center justify-center rounded text-grey hover:text-white"
+          className="flex size-6 items-center justify-center rounded text-gray hover:text-white"
         >
           <Plus className="size-3.5" />
         </button>
         <span className="text-b-3 font-medium text-white">{value}</span>
         <button
           type="button"
-          className="flex size-6 items-center justify-center rounded text-grey hover:text-white"
+          className="flex size-6 items-center justify-center rounded text-gray hover:text-white"
         >
           <Minus className="size-3.5" />
         </button>

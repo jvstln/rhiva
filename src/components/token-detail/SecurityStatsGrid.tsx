@@ -13,7 +13,7 @@ function StatGrid(props: {
     <div className="grid grid-cols-4 gap-2 px-4 py-3">
       {props.items.map((item) => (
         <div key={item.label}>
-          <p className="text-b-5 text-grey">{item.label}</p>
+          <p className="text-b-5 text-gray">{item.label}</p>
           <p
             className={cn(
               "text-b-3 font-semibold",
@@ -38,7 +38,7 @@ export function SecurityStatsGrid() {
       <div className="grid grid-cols-4 gap-2 px-4 pb-3">
         {SECURITY_AUDIT.map((item) => (
           <div key={item.label}>
-            <p className="text-b-5 text-grey">{item.label}</p>
+            <p className="text-b-5 text-gray">{item.label}</p>
             <p className="flex items-center gap-1 text-b-3 font-semibold text-white">
               {item.value}
               {item.ok && <CheckCircle2 className="size-3.5 text-up" />}

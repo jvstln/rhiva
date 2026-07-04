@@ -17,7 +17,7 @@ export function PoolTradeForm() {
   return (
     <div className="space-y-5 p-4">
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
-        <TabsList className="w-full justify-start gap-6 border-b border-border/70 pb-3">
+        <TabsList className="w-full">
           {MODES.map((m) => (
             <TabsTrigger key={m} value={m} className="text-b-2">
               {m}
@@ -27,19 +27,19 @@ export function PoolTradeForm() {
       </Tabs>
 
       <div>
-        <p className="mb-2 text-b-3 text-grey">Trade amount</p>
+        <p className="mb-2 text-b-3 text-gray">Trade amount</p>
         <div className="relative">
           <Input
             defaultValue="0.0"
             className="h-12 border-border/70 pr-16 text-b-1"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b-3 font-medium text-grey">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b-3 font-medium text-gray">
             SOL
           </span>
         </div>
         <div className="mt-2 flex items-center justify-between text-b-4">
-          <span className="text-grey">Balance: 0 SOL</span>
-          <span className="flex gap-3 text-grey">
+          <span className="text-gray">Balance: 0 SOL</span>
+          <span className="flex gap-3 text-gray">
             <button type="button" className="hover:text-white">
               25%
             </button>
@@ -54,14 +54,14 @@ export function PoolTradeForm() {
       </div>
 
       <div>
-        <p className="mb-2 text-b-3 text-grey">Liquidity Ratio %</p>
+        <p className="mb-2 text-b-3 text-gray">Liquidity Ratio %</p>
         <Slider
           value={[ratio]}
           onValueChange={(v) => setRatio(Array.isArray(v) ? v[0] : v)}
           max={100}
           step={1}
         />
-        <div className="mt-1 flex justify-between text-b-4 text-grey">
+        <div className="mt-1 flex justify-between text-b-4 text-gray">
           <span>{ratio}% SOL</span>
           <span>{100 - ratio}% USDC</span>
         </div>
@@ -84,14 +84,14 @@ export function PoolTradeForm() {
             <button
               type="button"
               key={p}
-              className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-grey hover:border-primary/50 hover:text-white"
+              className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-gray hover:border-primary/50 hover:text-white"
             >
               {p}
             </button>
           ))}
           <button
             type="button"
-            className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-grey"
+            className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-gray"
           >
             Custom ration
           </button>
@@ -118,7 +118,7 @@ function TokenToggle({
         "rounded-md py-2 text-b-3 font-semibold transition-colors",
         active
           ? "bg-primary text-primary-foreground"
-          : "bg-secondary text-grey",
+          : "bg-secondary text-gray",
       )}
     >
       {label}

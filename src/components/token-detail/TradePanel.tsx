@@ -19,7 +19,7 @@ export function TradePanel() {
     <div className="space-y-3 border-t border-border/70 p-4">
       <div className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
         <div className="flex items-center justify-between text-b-4">
-          <span className="text-grey">Dev's Best Token</span>
+          <span className="text-gray">Dev's Best Token</span>
           <span className="font-medium text-white">TikTok (ATH MC $231K)</span>
         </div>
       </div>
@@ -45,14 +45,14 @@ export function TradePanel() {
                 "rounded-md px-3 py-1 text-b-3 font-semibold transition-colors",
                 tier === t
                   ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-grey",
+                  : "bg-secondary text-gray",
               )}
             >
               {t}
             </button>
           ))}
         </div>
-        <button type="button" className="text-grey">
+        <button type="button" className="text-gray">
           <ChevronDown className="size-4" />
         </button>
       </div>
@@ -75,7 +75,7 @@ export function TradePanel() {
         </TabsList>
       </Tabs>
 
-      <div className="flex items-center justify-between text-b-4 text-grey">
+      <div className="flex items-center justify-between text-b-4 text-gray">
         <span>Bal: 0 SOL</span>
       </div>
 
@@ -86,7 +86,7 @@ export function TradePanel() {
           placeholder="Amount"
           className="h-12 border-border/70 pr-16 text-b-1"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b-3 font-medium text-grey">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b-3 font-medium text-gray">
           SOL
         </span>
       </div>
@@ -97,18 +97,18 @@ export function TradePanel() {
             type="button"
             key={amt}
             onClick={() => setAmount(amt)}
-            className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-grey hover:border-primary/50 hover:text-white"
+            className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-gray hover:border-primary/50 hover:text-white"
           >
             {amt}
           </button>
         ))}
       </div>
 
-      <p className="text-b-5 text-grey">1 SOL ≈ 438.7K TikTok</p>
+      <p className="text-b-5 text-gray">1 SOL ≈ 438.7K TikTok</p>
 
       <Button className="h-12 w-full text-b-1 font-semibold">Buy</Button>
 
-      <div className="flex items-center justify-between text-b-5 text-grey">
+      <div className="flex items-center justify-between text-b-5 text-gray">
         <span className="flex items-center gap-1">
           <Zap className="size-3" /> Auto
         </span>

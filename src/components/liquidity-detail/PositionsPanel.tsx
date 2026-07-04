@@ -20,7 +20,7 @@ export function PositionsPanel() {
             onClick={() => setTab(t)}
             className={cn(
               "relative pb-2 text-b-2 font-semibold transition-colors",
-              tab === t ? "text-white" : "text-grey hover:text-white/70",
+              tab === t ? "text-white" : "text-gray hover:text-white/70",
             )}
           >
             {t}
@@ -32,14 +32,14 @@ export function PositionsPanel() {
       </div>
 
       <div className="flex flex-col items-center justify-center gap-4 py-24">
-        <div className="flex size-14 items-center justify-center rounded-full bg-secondary text-grey">
+        <div className="flex size-14 items-center justify-center rounded-full bg-secondary text-gray">
           <MapPin className="size-6" />
         </div>
         <div className="text-center">
           <p className="text-b-1 font-semibold text-white">
             No Wallet Connected
           </p>
-          <p className="mt-1 text-b-3 text-grey">
+          <p className="mt-1 text-b-3 text-gray">
             Connect your wallet to view your open positions
           </p>
         </div>

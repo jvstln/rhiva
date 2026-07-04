@@ -43,7 +43,7 @@ function FeeStat({
   const isDown = change.startsWith("-");
   return (
     <div>
-      <p className="text-b-4 text-grey">{label}</p>
+      <p className="text-b-4 text-gray">{label}</p>
       <p className="mt-1 flex items-baseline gap-2">
         <span className="text-b-1 font-bold text-white">{value}</span>
         <span

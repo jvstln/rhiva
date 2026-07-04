@@ -3,17 +3,19 @@ import { cn } from "@/lib/utils";
 import type { Input } from "./input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group";
 
-export interface SearchInputProps extends React.ComponentProps<typeof Input> {
-  ref?: React.Ref<HTMLInputElement>;
+export namespace SearchInput {
+  export type Props = React.ComponentProps<typeof Input> & {
+    ref?: React.Ref<HTMLInputElement>;
+  };
 }
 
-export function SearchInput({ className, ref, ...props }: SearchInputProps) {
+export function SearchInput({ className, ref, ...props }: SearchInput.Props) {
   return (
-    <InputGroup className="w-[297px]">
+    <InputGroup className={cn("max-w-[297px] w-full rounded-full", className)}>
       <InputGroupInput
         ref={ref}
         type="search"
-        className={cn(className)}
+        placeholder={"Search"}
         {...props}
       />
       <InputGroupAddon>

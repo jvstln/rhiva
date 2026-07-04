@@ -27,30 +27,30 @@ export function ChartToolbar({ activeTimeframe = "1m" }: ChartToolbarProps) {
               "text-b-3 font-medium",
               tf === activeTimeframe
                 ? "text-white"
-                : "text-grey hover:text-white/70",
+                : "text-gray hover:text-white/70",
             )}
           >
             {tf}
           </button>
         ))}
-        <ChevronDown className="size-4 text-grey" />
+        <ChevronDown className="size-4 text-gray" />
       </div>
 
-      <SlidersHorizontal className="size-4 text-grey" />
+      <SlidersHorizontal className="size-4 text-gray" />
 
       <button
         type="button"
-        className="text-b-3 font-medium text-grey hover:text-white/70"
+        className="text-b-3 font-medium text-gray hover:text-white/70"
       >
         Indicators
       </button>
 
       <div className="flex items-center gap-1 text-b-3 font-medium">
         <span className="text-primary">Price</span>
-        <span className="text-grey">/ Mcap</span>
+        <span className="text-gray">/ Mcap</span>
       </div>
 
-      <div className="ml-auto flex items-center gap-3 text-grey">
+      <div className="ml-auto flex items-center gap-3 text-gray">
         <Undo2 className="size-4" />
         <Redo2 className="size-4" />
         <Settings className="size-4" />

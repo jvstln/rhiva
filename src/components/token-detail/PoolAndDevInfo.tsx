@@ -9,11 +9,11 @@ export function DynamicPoolInfoCard() {
         label="Total liq"
         value={
           <span className="flex items-center gap-1 font-medium">
-            $3.91K(22.82 SOL) <Lock className="size-3 text-grey" />
+            $3.91K(22.82 SOL) <Lock className="size-3 text-gray" />
           </span>
         }
       />
-      <div className="mt-2 grid grid-cols-3 gap-2 text-b-5 text-grey">
+      <div className="mt-2 grid grid-cols-3 gap-2 text-b-5 text-gray">
         <span>Pair</span>
         <span>Liq/Initial</span>
         <span className="text-right">Value</span>
@@ -40,8 +40,8 @@ export function DevInfoCard() {
         value={
           <span className="flex items-center gap-1 font-medium">
             E7KH...bzzN(113.82 SOL)
-            <Copy className="size-3 text-grey" />
-            <Search className="size-3 text-grey" />
+            <Copy className="size-3 text-gray" />
+            <Search className="size-3 text-gray" />
           </span>
         }
       />
@@ -49,7 +49,7 @@ export function DevInfoCard() {
         label="Funding"
         value={
           <span className="flex items-center gap-1 font-medium">
-            <ExternalLink className="size-3 text-grey" /> HXdq...rLRa 127.78 8d
+            <ExternalLink className="size-3 text-gray" /> HXdq...rLRa 127.78 8d
           </span>
         }
       />
@@ -67,7 +67,7 @@ export function BasicDataCard() {
         label="Pair"
         value={
           <span className="flex items-center gap-1">
-            D6BG...QZ2g <Copy className="size-3 text-grey" />
+            D6BG...QZ2g <Copy className="size-3 text-gray" />
           </span>
         }
       />

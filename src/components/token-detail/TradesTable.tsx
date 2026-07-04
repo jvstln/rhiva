@@ -28,7 +28,7 @@ export function TradesTable() {
             onClick={() => setTab(t)}
             className={cn(
               "shrink-0 text-b-2 font-semibold transition-colors",
-              tab === t ? "text-primary" : "text-grey hover:text-white/70",
+              tab === t ? "text-primary" : "text-gray hover:text-white/70",
             )}
           >
             {t}
@@ -39,7 +39,7 @@ export function TradesTable() {
       <div className="overflow-x-auto px-6 pb-6">
         <table className="w-full min-w-[900px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-border/70 text-b-4 text-grey">
+            <tr className="border-b border-border/70 text-b-4 text-gray">
               {COLUMNS.map((col) => (
                 <th
                   key={col}
@@ -55,7 +55,7 @@ export function TradesTable() {
           <tbody>
             {TRADES.map((row, i) => (
               <tr key={i} className="border-b border-border/40 text-b-4">
-                <td className="py-2 pr-6 text-grey">{row.age}</td>
+                <td className="py-2 pr-6 text-gray">{row.age}</td>
                 <td
                   className={cn(
                     "py-2 pr-6 font-medium",
@@ -74,18 +74,18 @@ export function TradesTable() {
                 >
                   {row.totalUsd}
                 </td>
-                <td className="py-2 pr-6 text-grey">{row.gas}</td>
+                <td className="py-2 pr-6 text-gray">{row.gas}</td>
                 <td className="py-2 pr-6">
                   <span className="flex items-center gap-1.5 text-white">
                     {row.trader}
-                    <Pencil className="size-3 text-grey" />
-                    <span className="text-grey">2</span>
+                    <Pencil className="size-3 text-gray" />
+                    <span className="text-gray">2</span>
                   </span>
                 </td>
-                <td className="py-2 pr-6 text-right text-grey">
+                <td className="py-2 pr-6 text-right text-gray">
                   <Filter className="ml-auto size-3.5" />
                 </td>
-                <td className="py-2 text-right text-grey">
+                <td className="py-2 text-right text-gray">
                   <Eye className="ml-auto size-3.5" />
                 </td>
               </tr>

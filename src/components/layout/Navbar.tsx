@@ -1,20 +1,32 @@
 "use client";
-import { Bell, ChevronDown, Copy, Search, Settings } from "lucide-react";
+import { Bell, Copy, Settings, XIcon } from "lucide-react";
+import type { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import logo from "@/public/logo.svg";
+import { DiscordIcon, TelegramIcon } from "../ui/icons";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "../ui/navigation-menu";
+import { SearchInput } from "../ui/search-input";
+import { ConnectWalletDialog } from "./ConnectWalletDialog";
+import { NotificationPopover } from "./NotificationPopover";
+import { SettingsDialog } from "./SettingsDialog";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
   { label: "Liquidity", url: "/liquidity" },
-  { label: "Reward", url: "/reward" },
+  { label: "Reward", url: "/rewards" },
   { label: "Portfolio", url: "/portfolio" },
-] as const;
+] as const satisfies Array<{ label: string; url: Route }>;
 
 interface NavbarProps {
   walletConnected?: boolean;
@@ -29,43 +41,67 @@ export function Navbar({
 
   return (
     <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-6 border-b border-border bg-background/95 px-6 backdrop-blur">
-      <nav className="flex items-center gap-4">
-        <Link href="/">
-          <Image src={logo} alt="Logo" className="h-5 w-fit" />
-        </Link>
-        {NAV_LINKS.map((link) => (
-          <Link
-            key={link.label}
-            href={link.url}
-            className={cn(
-              "text-b-2 font-medium transition-colors",
-              pathname.startsWith(link.url)
-                ? "text-white"
-                : "text-grey hover:text-white/80",
-            )}
-          >
-            {link.label}
-          </Link>
-        ))}
-        <button
-          type="button"
-          className="flex items-center gap-1 text-b-2 font-medium text-grey transition-colors hover:text-white/80"
-        >
-          More <ChevronDown className="size-4" />
-        </button>
-      </nav>
+      <Link href="/" className="block size-fit shrink-0">
+        <Image src={logo} alt="Logo" className="h-5 w-fit" />
+      </Link>
+
+      <NavigationMenu>
+        <NavigationMenuList>
+          {NAV_LINKS.map((link) => (
+            <NavigationMenuItem key={link.label} value={link.label}>
+              <NavigationMenuLink
+                render={<Link href={link.url} />}
+                data-active={pathname.startsWith(link.url) ? true : undefined}
+              >
+                {link.label}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          ))}
+
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>More</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul>
+                <li>
+                  <NavigationMenuLink render={<Link href="#" />}>
+                    Legal
+                  </NavigationMenuLink>
+                </li>
+                <li>
+                  <NavigationMenuLink render={<Link href="#" />}>
+                    Docs
+                  </NavigationMenuLink>
+                </li>
+                <li className="flex gap-2">
+                  <NavigationMenuLink href="https://t.co" target="_blank">
+                    <TelegramIcon />
+                  </NavigationMenuLink>
+                  <NavigationMenuLink href="" target="_blank">
+                    <DiscordIcon />
+                  </NavigationMenuLink>
+                  <NavigationMenuLink href="" target="_blank">
+                    <XIcon />
+                  </NavigationMenuLink>
+                </li>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
 
       <div className="ml-auto flex items-center gap-3">
-        <div className="relative hidden w-72 lg:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-grey" />
-          <Input
-            placeholder="Search"
-            className="h-10 border-border rounded-full bg-transparent pl-9"
-          />
-        </div>
+        <SearchInput />
 
-        <IconButton icon={Bell} />
-        <IconButton icon={Settings} />
+        <NotificationPopover>
+          <Button variant={"ghost"} size="icon">
+            <Bell />
+          </Button>
+        </NotificationPopover>
+        <SettingsDialog>
+          <Button variant={"ghost"} size="icon">
+            <Settings />
+          </Button>
+        </SettingsDialog>
 
         <Badge variant="outline" className="hidden sm:flex">
           10K XP
@@ -80,23 +116,14 @@ export function Navbar({
               $
             </span>
             {walletAddress}
-            <Copy className="size-3.5 text-grey" />
+            <Copy className="size-3.5 text-gray" />
           </button>
         ) : (
-          <Button variant="soft">Connect wallet</Button>
+          <ConnectWalletDialog>
+            <Button variant="soft">Connect wallet</Button>
+          </ConnectWalletDialog>
         )}
       </div>
     </header>
-  );
-}
-
-function IconButton({ icon: Icon }: { icon: typeof Bell }) {
-  return (
-    <button
-      type="button"
-      className="flex size-9 items-center justify-center rounded-md text-grey transition-colors hover:bg-secondary hover:text-white"
-    >
-      <Icon className="size-[18px]" />
-    </button>
   );
 }

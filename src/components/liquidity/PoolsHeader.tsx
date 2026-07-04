@@ -1,13 +1,18 @@
 import { LIQUIDITY_SUMMARY } from "@/data/liquidity-data";
+import {
+  DashboardDescription,
+  DashboardHeader,
+  DashboardSlot,
+} from "../layout/DashboardUi";
 
 export function PoolsHeader() {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-6 px-6 pt-8 pb-6">
+    <DashboardSlot>
       <div>
-        <h1 className="text-h4 font-bold text-primary">Liquidity Pools</h1>
-        <p className="mt-1 text-b-2 text-grey">
+        <DashboardHeader>Liquidity Pools</DashboardHeader>
+        <DashboardDescription>
           Provide liquidity, earn yield.
-        </p>
+        </DashboardDescription>
       </div>
 
       <div className="flex gap-10">
@@ -15,14 +20,14 @@ export function PoolsHeader() {
         <SummaryStat label="24H Volume" value={LIQUIDITY_SUMMARY.volume24h} />
         <SummaryStat label="24H Fees" value={LIQUIDITY_SUMMARY.fees24h} />
       </div>
-    </div>
+    </DashboardSlot>
   );
 }
 
 function SummaryStat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-b-3 text-grey">{label}</p>
+      <p className="text-b-3 text-gray">{label}</p>
       <p className="mt-1 text-h6 font-bold text-white">{value}</p>
     </div>
   );

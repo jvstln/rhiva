@@ -14,7 +14,7 @@ export function ColumnToolbar({ showMcToggle }: ColumnToolbarProps) {
       {showMcToggle && (
         <button
           type="button"
-          className="flex items-center gap-1 text-b-4 font-medium text-grey"
+          className="flex items-center gap-1 text-b-4 font-medium text-gray"
         >
           % MC
         </button>
@@ -25,7 +25,7 @@ export function ColumnToolbar({ showMcToggle }: ColumnToolbarProps) {
           className="h-7 rounded-md border-border/70 bg-transparent pl-2 text-b-5 placeholder:text-b-5"
         />
       </div>
-      <span className="flex items-center gap-1 rounded-md border border-border/70 px-2 py-1 text-b-5 text-grey">
+      <span className="flex items-center gap-1 rounded-md border border-border/70 px-2 py-1 text-b-5 text-gray">
         <Layers className="size-3" />0
       </span>
       {TIERS.map((tier, i) => (
@@ -34,7 +34,7 @@ export function ColumnToolbar({ showMcToggle }: ColumnToolbarProps) {
           key={tier}
           className={cn(
             "rounded-md px-1.5 py-1 text-b-5 font-semibold",
-            i === 0 ? "text-warning" : "text-grey",
+            i === 0 ? "text-warning" : "text-gray",
           )}
         >
           {tier}
@@ -42,7 +42,7 @@ export function ColumnToolbar({ showMcToggle }: ColumnToolbarProps) {
       ))}
       <button
         type="button"
-        className="flex size-6 items-center justify-center rounded-md text-grey hover:bg-secondary"
+        className="flex size-6 items-center justify-center rounded-md text-gray hover:bg-secondary"
       >
         <SlidersHorizontal className="size-3.5" />
       </button>

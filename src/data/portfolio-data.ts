@@ -26,6 +26,70 @@ export const POSITIONS: Position[] = Array.from({ length: 5 }, () => ({
   holding: "19h",
 }));
 
+export interface LpPosition {
+  pool: string;
+  timeAgo: string;
+  badge?: string;
+  pnlUsd: string;
+  pnlPct: string;
+  totalDeposit: string;
+  totalWithdraw: string;
+  totalFeesEarned: string;
+}
+
+export const LP_POSITIONS: LpPosition[] = [
+  {
+    pool: "WETH-SOL",
+    timeAgo: "2hr ago",
+    badge: "🔥",
+    pnlUsd: "$0.07",
+    pnlPct: "+2.06%",
+    totalDeposit: "$3.46",
+    totalWithdraw: "$3.48",
+    totalFeesEarned: "$0.05",
+  },
+  {
+    pool: "DBR-USDC",
+    timeAgo: "5hr ago",
+    badge: "🪙",
+    pnlUsd: "$0.07",
+    pnlPct: "+2.06%",
+    totalDeposit: "$3.46",
+    totalWithdraw: "$3.48",
+    totalFeesEarned: "$0.05",
+  },
+  {
+    pool: "DOG-USDC",
+    timeAgo: "7hr ago",
+    badge: "🌀",
+    pnlUsd: "$0.07",
+    pnlPct: "+2.06%",
+    totalDeposit: "$3.46",
+    totalWithdraw: "$3.48",
+    totalFeesEarned: "$0.05",
+  },
+  {
+    pool: "DBR-USDC",
+    timeAgo: "5hr ago",
+    badge: "🪙",
+    pnlUsd: "$0.07",
+    pnlPct: "+2.06%",
+    totalDeposit: "$3.46",
+    totalWithdraw: "$3.48",
+    totalFeesEarned: "$0.05",
+  },
+  {
+    pool: "WETH-SOL",
+    timeAgo: "2hr ago",
+    badge: "🔥",
+    pnlUsd: "$0.07",
+    pnlPct: "+2.06%",
+    totalDeposit: "$3.46",
+    totalWithdraw: "$3.48",
+    totalFeesEarned: "$0.05",
+  },
+];
+
 export const PORTFOLIO_SUMMARY = {
   totalValue: "$25.32",
   totalValueChange: "-4.49%",

@@ -11,12 +11,12 @@ export function TokenDetailHeader() {
         <div>
           <div className="flex items-center gap-1.5">
             <h1 className="text-b-1 font-bold text-white">TikTok</h1>
-            <span className="text-b-4 text-grey">TikTok coin</span>
-            <Star className="size-3.5 text-grey" />
-            <Share2 className="size-3.5 text-grey" />
+            <span className="text-b-4 text-gray">TikTok coin</span>
+            <Star className="size-3.5 text-gray" />
+            <Share2 className="size-3.5 text-gray" />
             <Bot className="size-4 text-primary" />
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 text-b-5 text-grey">
+          <div className="mt-0.5 flex items-center gap-1.5 text-b-5 text-gray">
             <span>18h</span>
             <span>AkSa...to5e</span>
             <User className="size-3" />
@@ -30,7 +30,7 @@ export function TokenDetailHeader() {
       <div className="flex flex-1 flex-wrap items-center gap-x-8 gap-y-2">
         {HEADER_STATS.map((stat) => (
           <div key={stat.label}>
-            <p className="text-b-5 text-grey">{stat.label}</p>
+            <p className="text-b-5 text-gray">{stat.label}</p>
             <p
               className={cn(
                 "text-b-2 font-semibold",

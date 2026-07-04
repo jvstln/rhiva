@@ -1,32 +1,30 @@
-"use client";
-
-import { useState } from "react";
+import type { PortfolioTab } from "@/app/(dashboard)/portfolio/page";
 import { Button } from "@/components/ui/button";
 import { PORTFOLIO_SUMMARY } from "@/data/portfolio-data";
 import { cn } from "@/lib/utils";
 
-const TABS = ["Trading Position", "Lp Positions"] as const;
+interface PositionStatsBarProps {
+  activeTab: PortfolioTab;
+  onChangeTab: (tab: PortfolioTab) => void;
+}
 
-export function PositionStatsBar() {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Trading Position");
+const TABS = ["Trading Position", "Liquidity Positions"] as const;
 
+export function PositionStatsBar({
+  activeTab,
+  onChangeTab,
+}: PositionStatsBarProps) {
   return (
     <div className="space-y-3">
       <div className="flex gap-3">
         {TABS.map((t) => (
-          <button
-            type="button"
+          <Button
             key={t}
-            onClick={() => setTab(t)}
-            className={cn(
-              "rounded-md border px-4 py-2 text-b-3 font-medium transition-colors",
-              tab === t
-                ? "border-primary/60 bg-primary/10 text-white"
-                : "border-border/70 text-grey hover:text-white/80",
-            )}
+            onClick={() => onChangeTab(t)}
+            variant={activeTab === t ? "soft" : "outline"}
           >
             {t}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -37,14 +35,18 @@ export function PositionStatsBar() {
             value={PORTFOLIO_SUMMARY.totalValue}
             change={PORTFOLIO_SUMMARY.totalValueChange}
           />
-          <Stat
-            label="UNREALIZED PNL"
-            value={PORTFOLIO_SUMMARY.unrealizedPnl}
-          />
-          <Stat
-            label="TRADEABLE BALANCE"
-            value={PORTFOLIO_SUMMARY.tradeableBalance}
-          />
+          {activeTab === "Trading Position" && (
+            <>
+              <Stat
+                label="UNREALIZED PNL"
+                value={PORTFOLIO_SUMMARY.unrealizedPnl}
+              />
+              <Stat
+                label="TRADEABLE BALANCE"
+                value={PORTFOLIO_SUMMARY.tradeableBalance}
+              />
+            </>
+          )}
         </div>
         <Button className="min-w-24">PnL</Button>
       </div>
@@ -63,7 +65,7 @@ function Stat({
 }) {
   return (
     <div>
-      <p className="text-b-4 font-medium tracking-wide text-grey">{label}</p>
+      <p className="text-b-4 font-medium tracking-wide text-gray">{label}</p>
       <p className="mt-1 flex items-baseline gap-2">
         <span className="text-h6 font-bold text-white">{value}</span>
         {change && (

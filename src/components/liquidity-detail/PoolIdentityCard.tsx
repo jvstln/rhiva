@@ -12,7 +12,7 @@ export function PoolIdentityCard() {
         <PoolPairIcon />
         <div>
           <p className="text-b-1 font-bold text-white">{POOL_DETAIL.pair}</p>
-          <p className="text-b-5 text-grey">
+          <p className="text-b-5 text-gray">
             Bin Step: {binStep} Fee: {fee}
           </p>
         </div>
@@ -33,7 +33,7 @@ export function PoolIdentityCard() {
         <div className="mb-2 flex items-center justify-between text-b-4">
           <span className="font-medium text-white">Liquidity Distribution</span>
         </div>
-        <div className="mb-2 flex items-center gap-3 text-b-5 text-grey">
+        <div className="mb-2 flex items-center gap-3 text-b-5 text-gray">
           <LegendDot className="bg-violet-500" label="USDC" />
           <LegendDot className="bg-primary" label="SOL" />
         </div>
@@ -50,7 +50,7 @@ export function PoolIdentityCard() {
             />
           ))}
           <div className="pointer-events-none absolute inset-y-0 left-[46%] flex flex-col items-center">
-            <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-grey shadow ring-1 ring-border">
+            <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-gray shadow ring-1 ring-border">
               Current price
               <br />
               0.0000223 SOL/USDC
@@ -58,7 +58,7 @@ export function PoolIdentityCard() {
             <span className="mt-1 h-full w-px flex-1 bg-white/60" />
           </div>
         </div>
-        <div className="mt-1 flex justify-between text-b-5 text-grey">
+        <div className="mt-1 flex justify-between text-b-5 text-gray">
           <span>0,0198</span>
           <span>0,0447</span>
         </div>
@@ -84,7 +84,7 @@ function TokenBalanceRow({
         </span>
         <div>
           <p className="text-b-3 font-semibold text-white">{symbol}</p>
-          <p className="text-b-5 text-grey">{meta}</p>
+          <p className="text-b-5 text-gray">{meta}</p>
         </div>
       </div>
       <p className="text-b-3 font-medium text-white">{balance}</p>

@@ -50,11 +50,11 @@ export function AvatarReusedCard({ items }: { items: typeof AVATAR_REUSED }) {
               <p className="truncate text-b-4 font-medium text-white">
                 {item.name}
               </p>
-              <p className="truncate text-b-5 text-grey">{item.wallet}</p>
+              <p className="truncate text-b-5 text-gray">{item.wallet}</p>
             </div>
             <div className="text-right">
               <p className="text-b-4 font-medium text-primary">{item.mc}</p>
-              <p className="text-b-5 text-grey">{item.age}</p>
+              <p className="text-b-5 text-gray">{item.age}</p>
             </div>
           </div>
         ))}

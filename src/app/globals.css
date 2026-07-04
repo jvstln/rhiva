@@ -43,7 +43,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-white: var(--white);
-  --color-grey: var(--grey);
+  --color-gray: var(--gray);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-up: var(--up);
@@ -53,6 +53,11 @@
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-roman: var(--roman);
+  --color-ocean-green: var(--ocean-green);
+  --color-dodger-blue: var(--dodger-blue);
+  --color-casablanca: var(--casablanca);
+  --color-silver: var(--silver);
 
   --font-sans: var(--font-inter, inter, ui-sans-serif, sans-serif, system-ui);
   --font-heading: var(--font-sans);
@@ -142,7 +147,7 @@
   --accent: oklch(from #202020 l c h);
   --accent-foreground: var(--color-white);
   --destructive: oklch(from #ff5c4d l c h);
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0 / 20%);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(from #00d897 l c h / 50%);
   --chart-1: oklch(0.87 0 0);
@@ -162,12 +167,12 @@
 
   /* Project color tokens */
   --white: oklch(from #f3f3f3 l c h);
-  --grey: oklch(from #737373 l c h);
+  --gray: oklch(from #737373 l c h);
   --background: oklch(from #0a0a0a l c h);
   --foreground: var(--color-white);
   --primary: oklch(from #00d897 l c h);
   --primary-foreground: oklch(from #04120d l c h);
-  --popover: oklch(from #1a1a1a l c h);
+  --popover: var(--color-background);
   --popover-foreground: var(--color-foreground);
 
   /* Semantic status tokens used across trading UI (buy/sell, up/down) */
@@ -178,6 +183,15 @@
   --surface-1: oklch(from #141414 l c h);
   --surface-2: oklch(from #1c1c1c l c h);
   --surface-3: oklch(from #242424 l c h);
+
+  /* Scoped to the Market "Trending" table view (Figma export) — kept
+     separate from --up/--down since this view uses a second green
+     ("Ocean Green") distinct from the primary buy/price green. */
+  --roman: oklch(from #de5759 l c h);
+  --ocean-green: oklch(from #46b87d l c h);
+  --dodger-blue: oklch(from #4ea7fa l c h);
+  --casablanca: oklch(from #f8b951 l c h);
+  --silver: oklch(from #cccccc l c h);
   --gradient-1: linear-gradient(
     180deg,
     #00ddbb 0%,

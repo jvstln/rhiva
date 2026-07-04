@@ -43,7 +43,7 @@ export function PoolVolumeAndTvl() {
               </defs>
               <XAxis
                 dataKey="day"
-                tick={{ fill: "var(--grey)", fontSize: 10 }}
+                tick={{ fill: "var(--gray)", fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={1}
@@ -63,7 +63,7 @@ export function PoolVolumeAndTvl() {
 
       <div>
         <p className="text-b-3 font-medium text-white">TVL Distribution</p>
-        <p className="mt-2 flex items-center gap-4 text-b-5 text-grey">
+        <p className="mt-2 flex items-center gap-4 text-b-5 text-gray">
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full bg-primary" /> USDC
           </span>
@@ -83,10 +83,10 @@ export function PoolVolumeAndTvl() {
         </div>
         <div className="mt-2 flex justify-between text-b-4">
           <span className="text-white">
-            {tvlUsdc.value} <span className="text-grey">{tvlUsdc.pct}</span>
+            {tvlUsdc.value} <span className="text-gray">{tvlUsdc.pct}</span>
           </span>
           <span className="text-white">
-            {tvlSol.value} <span className="text-grey">{tvlSol.pct}</span>
+            {tvlSol.value} <span className="text-gray">{tvlSol.pct}</span>
           </span>
         </div>
       </div>
@@ -102,7 +102,7 @@ export function PoolVolumeAndTvl() {
                 onClick={() => setTokenTab(t)}
                 className={cn(
                   "rounded-md px-2.5 py-1 text-b-5 font-medium",
-                  tokenTab === t ? "bg-background text-white" : "text-grey",
+                  tokenTab === t ? "bg-background text-white" : "text-gray",
                 )}
               >
                 {t}
@@ -113,7 +113,7 @@ export function PoolVolumeAndTvl() {
         <div className="grid grid-cols-4 gap-2">
           {TOKEN_INFO_COLUMNS.map((col, i) => (
             <div key={i}>
-              <p className="text-b-5 text-grey">{col.label}</p>
+              <p className="text-b-5 text-gray">{col.label}</p>
               <p className="text-b-4 font-medium text-white">{col.value}</p>
               {col.sub && (
                 <p

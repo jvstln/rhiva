@@ -14,10 +14,9 @@ import {
   User,
   Users,
 } from "lucide-react";
-
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { MarketToken } from "@/data/market-data";
-
 import { InlineStat, MetricChip } from "./MetricChip";
 import { TokenThumbnail } from "./TokenThumbnail";
 
@@ -37,21 +36,21 @@ export function TokenCard({ token }: TokenCardProps) {
               <h3 className="truncate text-b-1 font-bold text-white">
                 {token.name}
               </h3>
-              <span className="truncate text-b-4 text-grey">
+              <span className="truncate text-b-4 text-gray">
                 {token.subtitle}
               </span>
-              <Pencil className="size-3 shrink-0 text-grey" />
-              <Copy className="size-3 shrink-0 text-grey" />
+              <Pencil className="size-3 shrink-0 text-gray" />
+              <Copy className="size-3 shrink-0 text-gray" />
             </div>
             <div className="shrink-0 text-right text-b-4">
-              <span className="text-grey">V {token.volume}</span>{" "}
+              <span className="text-gray">V {token.volume}</span>{" "}
               <span className="font-semibold text-warning">
                 MC {token.marketCap}
               </span>
             </div>
           </div>
 
-          <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-grey">
+          <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-gray">
             <span className="text-b-5 font-medium text-down">{token.age}</span>
             <InlineStat icon={User} value={0} />
             <InlineStat icon={Globe} value="" />
@@ -70,11 +69,11 @@ export function TokenCard({ token }: TokenCardProps) {
           </div>
 
           <div className="mt-1 flex items-center gap-1 text-b-4">
-            <a href="#" className="truncate text-primary hover:underline">
+            <Link href="#" className="truncate text-primary hover:underline">
               {token.handle}
-            </a>
-            <Users className="size-3 text-grey" />
-            <span className="text-grey">{token.followers}</span>
+            </Link>
+            <Users className="size-3 text-gray" />
+            <span className="text-gray">{token.followers}</span>
           </div>
         </div>
       </div>
@@ -121,7 +120,7 @@ export function TokenCard({ token }: TokenCardProps) {
         </Button>
       </div>
 
-      <div className="mt-2 text-b-5 text-grey">{token.wallet}</div>
+      <div className="mt-2 text-b-5 text-gray">{token.wallet}</div>
     </article>
   );
 }

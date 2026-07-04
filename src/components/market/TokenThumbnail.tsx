@@ -24,7 +24,7 @@ export function TokenThumbnail({
         <span className="size-4 rounded-full bg-rose-500" />
       </div>
       <span className="absolute -bottom-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-surface-2 ring-1 ring-border">
-        <Bot className="size-3 text-grey" />
+        <Bot className="size-3 text-gray" />
       </span>
     </div>
   );
