@@ -41,7 +41,7 @@ export function useLivePumpStreams() {
 
 function LiveBadge() {
   return (
-    <span className="absolute top-2 left-2 rounded-md bg-primary px-1.5 py-0.5 text-b-5 font-semibold text-primary-foreground">
+    <span className="absolute top-2 left-2 rounded-md bg-primary px-1.5 py-0.5 font-semibold text-b-5 text-primary-foreground">
       LIVE
     </span>
   );
@@ -83,7 +83,7 @@ function ChannelRow({ stream }: { stream: PumpLiveStream }) {
           {stream.channelName}
         </span>
       </div>
-      <span className="shrink-0 text-b-4 font-semibold text-up">
+      <span className="shrink-0 font-semibold text-b-4 text-up">
         {formatCompactCurrency(stream.marketCap)}
       </span>
     </div>
@@ -211,7 +211,7 @@ export function PumpLiveGrid({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 p-6 lg:grid-cols-4 xl:grid-cols-5",
+        "grid grid-cols-2 gap-x-6 gap-y-8 p-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
         className,
       )}
     >

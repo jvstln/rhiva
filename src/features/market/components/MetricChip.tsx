@@ -25,7 +25,7 @@ export function MetricChip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-b-4 font-medium",
+        "inline-flex items-center gap-1 rounded-md px-1.5 py-1 font-medium text-b-4",
         filled ? "bg-secondary/60" : "",
         TONE_CLASSES[tone],
       )}

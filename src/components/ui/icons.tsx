@@ -1,4 +1,5 @@
 import type * as React from "react";
+import type { SimpleIcon as SimpleIconType } from "simple-icons";
 
 export type IconProps = React.ComponentProps<"svg">;
 
@@ -108,3 +109,21 @@ export const SolanaIcon = (props: IconProps) => (
     />
   </svg>
 );
+
+export const SimpleIcon = ({
+  icon,
+  ...props
+}: IconProps & { icon: SimpleIconType }) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="1em"
+      height="1em"
+      fill={`#${icon.hex}`}
+      {...props}
+    >
+      <title>{icon.title}</title>
+      <path d={icon.path} />
+    </svg>
+  );
+};

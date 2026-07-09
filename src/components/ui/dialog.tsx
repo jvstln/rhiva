@@ -6,6 +6,18 @@ import type * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+namespace Dialog {
+  export type Props = DialogPrimitive.Root.Props;
+  export type TriggerProps = DialogPrimitive.Trigger.Props;
+  export type CloseProps = DialogPrimitive.Close.Props;
+  export type PortalProps = DialogPrimitive.Portal.Props;
+  export type ContentProps = DialogPrimitive.Popup.Props & {
+    showCloseButton?: boolean;
+  };
+  export type TitleProps = DialogPrimitive.Title.Props;
+  export type DescriptionProps = DialogPrimitive.Description.Props;
+}
+
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
@@ -30,7 +42,7 @@ function DialogOverlay({
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "data-open:fade-in-0 data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 duration-100 data-closed:animate-out data-open:animate-in supports-backdrop-filter:backdrop-blur-xs",
         className,
       )}
       {...props}
@@ -52,7 +64,8 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 inset-s-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] overflow-y-auto max-h-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-6 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "[--padding-x:--spacing(4)]",
+          "-translate-x-1/2 -translate-y-1/2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 fixed inset-s-1/2 top-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] gap-4 overflow-y-auto rounded-xl bg-popover px-(--padding-x) py-(--padding-x) text-popover-foreground text-sm outline-none ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-open:animate-in sm:max-w-sm rtl:translate-x-1/2",
           className,
         )}
         {...props}
@@ -64,7 +77,7 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 inset-e-2"
+                className="absolute inset-e-2 top-2"
                 size="icon-sm"
               />
             }
@@ -82,7 +95,10 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn(
+        "-mx-(--padding-x) flex flex-col gap-2 border-b px-4 pb-4",
+        className,
+      )}
       {...props}
     />
   );
@@ -120,7 +136,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-base leading-none font-medium",
+        "font-heading font-medium text-base leading-none",
         className,
       )}
       {...props}
@@ -136,7 +152,7 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        "text-muted-foreground text-sm *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
         className,
       )}
       {...props}

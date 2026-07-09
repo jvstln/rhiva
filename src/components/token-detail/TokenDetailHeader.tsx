@@ -1,6 +1,6 @@
 import { Bot, Copy, Share2, Star, User } from "lucide-react";
-import { TokenThumbnail } from "@/components/market/TokenThumbnail";
 import { HEADER_STATS } from "@/data/token-detail-data";
+import { TokenThumbnail } from "@/features/market/components/TokenThumbnail";
 import { cn } from "@/lib/utils";
 
 export function TokenDetailHeader() {

@@ -1,7 +1,6 @@
 import { CheckCircle2, HelpCircle, Sparkles } from "lucide-react";
-
-import { TokenThumbnail } from "@/components/market/TokenThumbnail";
 import type { AVATAR_REUSED } from "@/data/token-detail-data";
+import { TokenThumbnail } from "@/features/market/components/TokenThumbnail";
 
 import { InfoRow, InfoSection } from "./InfoSection";
 

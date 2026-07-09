@@ -26,14 +26,14 @@ interface TokenCardProps {
 
 export function TokenCard({ token }: TokenCardProps) {
   return (
-    <article className="border-b border-border/70 px-4 py-4 last:border-none">
+    <article className="border-border/70 border-b px-4 py-4 last:border-none">
       <div className="flex gap-3">
         <TokenThumbnail />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="flex min-w-0 items-center gap-1.5">
-              <h3 className="truncate text-b-1 font-bold text-white">
+              <h3 className="truncate font-bold text-b-1 text-white">
                 {token.name}
               </h3>
               <span className="truncate text-b-4 text-gray">
@@ -51,7 +51,7 @@ export function TokenCard({ token }: TokenCardProps) {
           </div>
 
           <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-gray">
-            <span className="text-b-5 font-medium text-down">{token.age}</span>
+            <span className="font-medium text-b-5 text-down">{token.age}</span>
             <InlineStat icon={User} value={0} />
             <InlineStat icon={Globe} value="" />
             <InlineStat icon={Flag} value="" />

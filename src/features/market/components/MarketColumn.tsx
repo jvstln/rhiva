@@ -16,9 +16,9 @@ export function MarketColumn({
   showMcToggle,
 }: MarketColumnProps) {
   return (
-    <section className="flex min-w-0 flex-1 flex-col border-r border-border/70 last:border-r-0">
-      <div className="flex items-center justify-between gap-3 border-b border-border/70 px-4 py-3">
-        <h2 className="shrink-0 text-b-1 font-bold text-white">{title}</h2>
+    <section className="flex min-w-0 flex-1 flex-col border-border/70 border-r last:border-r-0">
+      <div className="flex items-center justify-between gap-3 border-border/70 border-b px-4 py-3">
+        <h2 className="shrink-0 font-bold text-b-1 text-white">{title}</h2>
         <ColumnToolbar showMcToggle={showMcToggle} />
       </div>
 

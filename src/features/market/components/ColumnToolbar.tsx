@@ -14,7 +14,7 @@ export function ColumnToolbar({ showMcToggle }: ColumnToolbarProps) {
       {showMcToggle && (
         <button
           type="button"
-          className="flex items-center gap-1 text-b-4 font-medium text-gray"
+          className="flex items-center gap-1 font-medium text-b-4 text-gray"
         >
           % MC
         </button>
@@ -33,7 +33,7 @@ export function ColumnToolbar({ showMcToggle }: ColumnToolbarProps) {
           type="button"
           key={tier}
           className={cn(
-            "rounded-md px-1.5 py-1 text-b-5 font-semibold",
+            "rounded-md px-1.5 py-1 font-semibold text-b-5",
             i === 0 ? "text-warning" : "text-gray",
           )}
         >

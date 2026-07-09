@@ -1,20 +1,36 @@
 import { Input as InputPrimitive } from "@base-ui/react/input";
+import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+const inputVariants = cva(
+  "flex w-full min-w-0 rounded-full border border-input bg-transparent text-b-2 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      size: {
+        default: "h-10 px-3 py-2",
+        sm: "h-7 px-2.5 py-1 text-[0.8rem]",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+    },
+  },
+);
+
+export interface InputProps
+  extends Omit<React.ComponentProps<"input">, "size">,
+    VariantProps<typeof inputVariants> {
+  "data-size"?: InputProps["size"];
+}
+
+function Input({ className, type, size, ...props }: InputProps) {
   return (
     <InputPrimitive
       type={type}
       data-slot="input"
-      // className={cn(
-      //   "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-      //   className
-      // )}
       className={cn(
-        "flex h-10 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-2 text-b-2 text-foreground outline-none placeholder:text-muted-foreground transition-colors",
-        "focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        inputVariants({ size: size ?? props["data-size"] }),
         className,
       )}
       {...props}
@@ -22,4 +38,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   );
 }
 
-export { Input };
+export { Input, inputVariants };

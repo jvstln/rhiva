@@ -101,17 +101,17 @@ function TokenIcon({ colors, size = 44, flagged }: TokenIconProps) {
     >
       <div className="absolute inset-0">
         <span
-          className="absolute top-1/2 size-[45%] -translate-y-1/2 rounded-full"
+          className="-translate-y-1/2 absolute top-1/2 size-[45%] rounded-full"
           style={{ backgroundColor: colors[0], left: "16%" }}
         />
         <span
-          className="absolute top-1/2 size-[45%] -translate-y-1/2 rounded-full"
+          className="-translate-y-1/2 absolute top-1/2 size-[45%] rounded-full"
           style={{ backgroundColor: colors[1], right: "16%" }}
         />
       </div>
 
       {flagged && (
-        <span className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full border border-roman/60 bg-black text-roman">
+        <span className="-bottom-1 -right-1 absolute flex size-4 items-center justify-center rounded-full border border-roman/60 bg-black text-roman">
           <AlertTriangle className="size-2.5" />
         </span>
       )}
@@ -133,7 +133,7 @@ function StarButton({ pairId: _pairId }: { pairId: string }) {
       aria-pressed={isFavorite}
       aria-label={isFavorite ? "Remove from watchlist" : "Add to watchlist"}
       className={cn(
-        "flex size-6 shrink-0 items-center justify-center rounded-md transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+        "flex size-6 shrink-0 items-center justify-center rounded-md outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50",
         isFavorite ? "text-casablanca" : "text-white/20 hover:text-white/50",
       )}
     >
@@ -249,7 +249,7 @@ function PairInfoCell({ pair }: { pair: TrendingPair }) {
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold text-white">
+          <span className="font-semibold text-sm text-white">
             {pair.tokenName}
           </span>
           <span className="text-sm text-white/40">{pair.tokenSymbol}</span>
@@ -263,7 +263,7 @@ function PairInfoCell({ pair }: { pair: TrendingPair }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-ocean-green">
+          <span className="font-medium text-ocean-green text-xs">
             {pair.age}
           </span>
           <SubIcon
@@ -313,11 +313,11 @@ interface MetricCellProps {
 function MetricCell({ value, changePercent }: MetricCellProps) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-sm font-medium text-white">{value}</span>
+      <span className="font-medium text-sm text-white">{value}</span>
       {changePercent !== undefined && (
         <span
           className={cn(
-            "text-xs font-medium",
+            "font-medium text-xs",
             changePercent >= 0 ? "text-ocean-green" : "text-roman",
           )}
         >
@@ -341,10 +341,10 @@ interface TxnsCellProps {
 function TxnsCell({ total, buys, sells }: TxnsCellProps) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-sm font-medium text-white">
+      <span className="font-medium text-sm text-white">
         {formatCompactNumber(total)}
       </span>
-      <span className="text-xs font-medium">
+      <span className="font-medium text-xs">
         <span className="text-ocean-green">{formatCompactNumber(buys)}</span>
         <span className="text-white/30"> / </span>
         <span className="text-roman">{formatCompactNumber(sells)}</span>
@@ -381,7 +381,7 @@ function MetricPill({ metric }: { metric: TrendingPairMetric }) {
     <div
       title={metric.label}
       className={cn(
-        "flex h-6 items-center gap-1 rounded-md border bg-transparent px-1.5 text-[11px] font-medium tabular-nums",
+        "flex h-6 items-center gap-1 rounded-md border bg-transparent px-1.5 font-medium text-[11px] tabular-nums",
         toneClass,
       )}
     >
@@ -514,11 +514,11 @@ export function TrendingTable({ className }: { className?: string }) {
       <table className="w-full min-w-[1400px] border-collapse">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b border-border">
+            <tr key={headerGroup.id} className="border-border border-b">
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="whitespace-nowrap px-4 py-3 text-left text-xs font-medium text-white/40"
+                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-white/40 text-xs"
                 >
                   {header.isPlaceholder
                     ? null
@@ -535,7 +535,7 @@ export function TrendingTable({ className }: { className?: string }) {
         <tbody>
           {tableLoading &&
             arrayWithId(6).map(({ id }) => (
-              <tr key={id} className="border-b border-border/60">
+              <tr key={id} className="border-border/60 border-b">
                 <td colSpan={trendingColumns.length} className="px-4 py-4">
                   <div className="h-11 w-full animate-pulse rounded-md bg-white/3" />
                 </td>
@@ -546,7 +546,7 @@ export function TrendingTable({ className }: { className?: string }) {
             table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                className="border-b border-border/60 transition-colors hover:bg-white/[0.02]"
+                className="border-border/60 border-b transition-colors hover:bg-white/[0.02]"
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
