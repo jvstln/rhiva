@@ -5,7 +5,6 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  Row,
   type TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
@@ -20,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { cn } from "@/lib/utils";
+import { ScrollArea, ScrollBar } from "../scroll-area";
 import { Spinner } from "../spinner";
 
 type TableClassNames = Partial<
@@ -213,115 +213,112 @@ export function DataTable<TData>({
   );
 
   return (
-    <div
-      className={cn(
-        "w-full min-w-0 space-y-4 overflow-hidden",
-        classNames.root,
-      )}
+    <ScrollArea
+    // className={cn(
+    //   "w-full min-w-0 space-y-4 overflow-hidden",
+    //   classNames.root,
+    // )}
     >
-      <div>
-        <Table
-          ref={tableRef}
-          className={cn(classNames.table)}
-          style={{
-            ...columnSizeVars,
-          }}
-        >
-          {caption && (
-            <caption className={cn(classNames.caption)}>{caption}</caption>
-          )}
-          {colgroup}
-          <TableHeader className={cn(classNames.thead)}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className={cn(
-                  classNames.trh,
-                  "border-border/40 border-b hover:bg-transparent",
-                )}
-              >
-                {headerGroup.headers.map((header) => {
-                  const isSortable = header.column.getCanSort();
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={cn(
-                        isSortable && "cursor-pointer select-none",
-                        classNames.th,
-                      )}
-                      style={{
-                        width: `var(--header-${header?.id}-size)`,
-                      }}
-                      onClick={() => {
-                        if (!isSortable || header.column.getIsResizing())
-                          return;
-                        if (header.column.getIsSorted() === "desc") {
-                          header.column.clearSorting();
-                        } else {
-                          header.column.toggleSorting();
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                        {/* Sortable indicator */}
-                        {isSortable &&
-                          (header.column.getIsSorted() === "asc" ? (
-                            <ArrowUp className="inline size-3.5 shrink-0 text-primary" />
-                          ) : header.column.getIsSorted() === "desc" ? (
-                            <ArrowDown className="inline size-3.5 shrink-0 text-primary" />
-                          ) : (
-                            <ArrowUpDown className="inline size-3.5 shrink-0 text-muted-foreground/60" />
-                          ))}
-                        {/* Resize handle */}
-                        {header.column.getCanResize() && (
-                          // biome-ignore lint/a11y/noStaticElementInteractions: Resize handle is a standard React Table mouse-drag wrapper
-                          <div
-                            onMouseDown={header.getResizeHandler()}
-                            onTouchStart={header.getResizeHandler()}
-                            onDoubleClick={() =>
-                              autoSizeColumn(header.column.id)
-                            }
-                            className={cn(
-                              "absolute top-0 right-0 h-full w-1 cursor-col-resize touch-none select-none bg-gray-300 opacity-0 hover:opacity-100",
-                              header.column.getIsResizing() &&
-                                "bg-primary opacity-100",
-                            )}
-                            data-slot="resize-handle"
-                          />
-                        )}
-                      </div>
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.map((row) => (
-              <TableRow key={row.id} className={cn(classNames.tr)}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(classNames.td)}
+      {/* <div> */}
+      <Table
+        ref={tableRef}
+        className={cn(classNames.table)}
+        style={{
+          ...columnSizeVars,
+        }}
+      >
+        {caption && (
+          <caption className={cn(classNames.caption)}>{caption}</caption>
+        )}
+        {colgroup}
+        <TableHeader className={cn(classNames.thead)}>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow
+              key={headerGroup.id}
+              className={cn(
+                classNames.trh,
+                "border-border/40 border-b hover:bg-transparent",
+              )}
+            >
+              {headerGroup.headers.map((header) => {
+                const isSortable = header.column.getCanSort();
+                return (
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      isSortable && "cursor-pointer select-none",
+                      classNames.th,
+                    )}
                     style={{
-                      width: `var(--col-${cell.column.id}-size)`,
+                      width: `var(--header-${header?.id}-size)`,
                     }}
-                    data-column-id={cell.column.id}
+                    onClick={() => {
+                      if (!isSortable || header.column.getIsResizing()) return;
+                      if (header.column.getIsSorted() === "desc") {
+                        header.column.clearSorting();
+                      } else {
+                        header.column.toggleSorting();
+                      }
+                    }}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                    <div className="flex items-center gap-2">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                      {/* Sortable indicator */}
+                      {isSortable &&
+                        (header.column.getIsSorted() === "asc" ? (
+                          <ArrowUp className="inline size-3.5 shrink-0 text-primary" />
+                        ) : header.column.getIsSorted() === "desc" ? (
+                          <ArrowDown className="inline size-3.5 shrink-0 text-primary" />
+                        ) : (
+                          <ArrowUpDown className="inline size-3.5 shrink-0 text-muted-foreground/60" />
+                        ))}
+                      {/* Resize handle */}
+                      {header.column.getCanResize() && (
+                        // biome-ignore lint/a11y/noStaticElementInteractions: Resize handle is a standard React Table mouse-drag wrapper
+                        <div
+                          onMouseDown={header.getResizeHandler()}
+                          onTouchStart={header.getResizeHandler()}
+                          onDoubleClick={() => autoSizeColumn(header.column.id)}
+                          className={cn(
+                            "absolute top-0 right-0 h-full w-1 cursor-col-resize touch-none select-none bg-gray-300 opacity-0 hover:opacity-100",
+                            header.column.getIsResizing() &&
+                              "bg-primary opacity-100",
+                          )}
+                          data-slot="resize-handle"
+                        />
+                      )}
+                    </div>
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.map((row) => (
+            <TableRow key={row.id} className={cn(classNames.tr)}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell
+                  key={cell.id}
+                  className={cn(classNames.td)}
+                  style={{
+                    width: `var(--col-${cell.column.id}-size)`,
+                  }}
+                  data-column-id={cell.column.id}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {/* </div> */}
 
       {table.getRowModel().rows?.length === 0 && (
         <div
@@ -332,6 +329,7 @@ export function DataTable<TData>({
           <div className="text-muted-foreground text-sm">No data available</div>
         </div>
       )}
-    </div>
+      <ScrollBar />
+    </ScrollArea>
   );
 }

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
   AlertCircle,
   AlertTriangle,
@@ -27,58 +22,19 @@ import {
 } from "lucide-react";
 import type * as React from "react";
 import { useMemo, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { mockTrendingPairs } from "@/data/market-trending-data";
+import { SolanaIcon } from "@/components/ui/icons";
+import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
-  arrayWithId,
   cn,
   formatCompactCurrency,
   formatCompactNumber,
   formatSignedPercent,
 } from "@/lib/utils";
-
-export interface TrendingPairMetric {
-  id: string;
-  label: string;
-  value: number;
-  tone: "safe" | "risk" | string;
-  suffix?: string;
-}
-
-export interface TrendingPair {
-  id: string;
-  tokenName: string;
-  tokenSymbol: string;
-  pairAddress: string;
-  iconColors: string[];
-  flagged: boolean;
-  age: string;
-  hasDevActivity: boolean;
-  hasAlert: boolean;
-  hasWebsite: boolean;
-  hasNote: boolean;
-  watcherCount: number;
-  chart: { t: number; v: number }[];
-  changePercent: number;
-  marketCap: number;
-  liquidity: number;
-  volume: number;
-  txnsTotal: number;
-  txnsBuys: number;
-  txnsSells: number;
-  metrics: TrendingPairMetric[];
-}
-
-/* ------------------------------------------------------------------ */
-/* Data fetching / Mock provider                                      */
-/* ------------------------------------------------------------------ */
-
-export function useTrendingPairs() {
-  return {
-    data: mockTrendingPairs as TrendingPair[],
-    isLoading: false,
-  };
-}
+import { getInitials } from "../../../lib/utils";
+import { useBirdeyeWS, useTrendingTokens } from "../market.hook";
+import type { Token } from "../market.type";
 
 /* ------------------------------------------------------------------ */
 /* Token avatar (dual overlapping circles + caution badge)             */
@@ -240,19 +196,24 @@ function SubIcon({ icon: Icon, active, activeClassName, label }: SubIconProps) {
   );
 }
 
-function PairInfoCell({ pair }: { pair: TrendingPair }) {
+function PairInfoCell({ token }: { token: Token }) {
   return (
     <div className="flex items-center gap-3">
-      <StarButton pairId={pair.id} />
+      <StarButton pairId={token.address} />
 
-      <TokenIcon colors={pair.iconColors} flagged={pair.flagged} />
+      {/* TODO: extract colors from logo, handle flagged status */}
+      <TokenIcon colors={["#27272a", "#3f3f46"]} flagged={false} />
+      <Avatar variant="square" size="lg">
+        <AvatarImage src={token.logo_uri ?? ""} />
+        <AvatarFallback className="shimmer uppercase">
+          {getInitials(token.name)}
+        </AvatarFallback>
+      </Avatar>
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-sm text-white">
-            {pair.tokenName}
-          </span>
-          <span className="text-sm text-white/40">{pair.tokenSymbol}</span>
+          <span className="font-semibold text-sm text-white">{token.name}</span>
+          <span className="text-sm text-white/40">{token.symbol}</span>
           <button
             type="button"
             aria-label="Copy token address"
@@ -264,22 +225,30 @@ function PairInfoCell({ pair }: { pair: TrendingPair }) {
 
         <div className="flex items-center gap-2">
           <span className="font-medium text-ocean-green text-xs">
-            {pair.age}
+            {/* TODO: calculate age */}
+            {token.recent_listing_time ? "24h" : "N/A"}
           </span>
+          {/* TODO: dev activity */}
           <SubIcon
             icon={UserRound}
-            active={pair.hasDevActivity}
+            active={false}
             activeClassName="text-dodger-blue"
             label="Dev activity"
           />
+          {/* TODO: alerts */}
           <SubIcon
             icon={AlertCircle}
-            active={pair.hasAlert}
+            active={false}
             activeClassName="text-casablanca"
             label="Alerts"
           />
-          <SubIcon icon={Globe} active={pair.hasWebsite} label="Website" />
-          <SubIcon icon={Flag} active={pair.hasNote} label="Add note" />
+          <SubIcon
+            icon={Globe}
+            active={!!token.extensions?.website}
+            label="Website"
+          />
+          {/* TODO: notes */}
+          <SubIcon icon={Flag} active={false} label="Add note" />
           <SubIcon icon={Search} active label="Inspect pair" />
         </div>
       </div>
@@ -294,7 +263,7 @@ function PairInfoCell({ pair }: { pair: TrendingPair }) {
         </button>
         <div className="mt-auto flex items-center gap-1 text-[11px] text-white/30">
           <Eye className="size-3" />
-          {pair.watcherCount}
+          {/* TODO: watcher count */}0
         </div>
       </div>
     </div>
@@ -370,6 +339,14 @@ const METRIC_ICONS: Record<
   lpBurned: Sprout,
 };
 
+export interface TrendingPairMetric {
+  id: string;
+  label: string;
+  value: number;
+  tone: "risk" | "safe";
+  suffix?: string;
+}
+
 function MetricPill({ metric }: { metric: TrendingPairMetric }) {
   const Icon = METRIC_ICONS[metric.id] ?? UserRoundCheck;
   const toneClass =
@@ -381,7 +358,7 @@ function MetricPill({ metric }: { metric: TrendingPairMetric }) {
     <div
       title={metric.label}
       className={cn(
-        "flex h-6 items-center gap-1 rounded-md border bg-transparent px-1.5 font-medium text-[11px] tabular-nums",
+        "flex h-6 w-max shrink-0 items-center gap-1 rounded-md border bg-transparent px-1.5 font-medium text-[11px] tabular-nums",
         toneClass,
       )}
     >
@@ -394,14 +371,14 @@ function MetricPill({ metric }: { metric: TrendingPairMetric }) {
 
 function TokenSecurityBadges({ metrics }: { metrics: TrendingPairMetric[] }) {
   return (
-    <div className="grid grid-cols-4 gap-1.5">
+    <div className="grid w-max grid-cols-4 gap-1.5">
       {metrics.map((metric) => (
         <MetricPill key={metric.id} metric={metric} />
       ))}
       <button
         type="button"
         aria-label="View token security details"
-        className="flex size-6 items-center justify-center rounded-md border border-roman/40 text-roman transition-colors hover:bg-roman/10"
+        className="flex h-6 w-full items-center justify-center rounded-md border border-roman/40 text-roman transition-colors hover:bg-roman/10"
       >
         <Crosshair className="size-3" />
       </button>
@@ -430,19 +407,20 @@ function ActionButtons() {
 /* Column definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-const trendingColumns: ColumnDef<TrendingPair>[] = [
+const trendingColumns: ColumnDef<Token>[] = [
   {
     id: "pairInfo",
     header: "Pair Info",
-    cell: ({ row }) => <PairInfoCell pair={row.original} />,
+    cell: ({ row }) => <PairInfoCell token={row.original} />,
   },
   {
     id: "chart",
     header: () => <span className="sr-only">Chart</span>,
     cell: ({ row }) => (
+      /* TODO: fetch chart data */
       <Sparkline
-        data={row.original.chart.map((p) => p.v)}
-        positive={row.original.changePercent >= 0}
+        data={[]}
+        positive={(row.original.price_change_24h_percent ?? 0) >= 0}
       />
     ),
   },
@@ -451,8 +429,8 @@ const trendingColumns: ColumnDef<TrendingPair>[] = [
     header: "Market Cap",
     cell: ({ row }) => (
       <MetricCell
-        value={formatCompactCurrency(row.original.marketCap)}
-        changePercent={row.original.changePercent}
+        value={formatCompactCurrency(row.original.market_cap)}
+        changePercent={row.original.price_change_24h_percent ?? undefined}
       />
     ),
   },
@@ -467,7 +445,7 @@ const trendingColumns: ColumnDef<TrendingPair>[] = [
     id: "volume",
     header: "Volume",
     cell: ({ row }) => (
-      <MetricCell value={formatCompactCurrency(row.original.volume)} />
+      <MetricCell value={formatCompactCurrency(row.original.volume_24h_usd)} />
     ),
   },
   {
@@ -475,16 +453,17 @@ const trendingColumns: ColumnDef<TrendingPair>[] = [
     header: "TXNS",
     cell: ({ row }) => (
       <TxnsCell
-        total={row.original.txnsTotal}
-        buys={row.original.txnsBuys}
-        sells={row.original.txnsSells}
+        total={row.original.trade_24h_count}
+        buys={row.original.buy_24h}
+        sells={row.original.sell_24h}
       />
     ),
   },
   {
     id: "tokenInfo",
     header: "Token Info",
-    cell: ({ row }) => <TokenSecurityBadges metrics={row.original.metrics} />,
+    /* TODO: compute metrics */
+    cell: ({ row }) => <TokenSecurityBadges metrics={[]} />,
   },
   {
     id: "action",
@@ -497,80 +476,21 @@ const trendingColumns: ColumnDef<TrendingPair>[] = [
 /* Table shell                                                          */
 /* ------------------------------------------------------------------ */
 
-export function TrendingTable({ className }: { className?: string }) {
-  const localQuery = useTrendingPairs();
-  const tableData = localQuery.data ?? [];
-  const tableLoading = localQuery.isLoading ?? false;
+export function TrendingTable() {
+  // const ws = useBirdeyeWS("token-stats");
+  const trendingTokens = useTrendingTokens();
+  console.log(trendingTokens);
 
-  const table = useReactTable({
-    data: tableData,
+  const table = useDataTable({
+    data: trendingTokens.data?.items ?? [],
     columns: trendingColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.id,
   });
 
   return (
-    <div className={cn("w-full overflow-x-auto", className)}>
-      <table className="w-full min-w-[1400px] border-collapse">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-border border-b">
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-white/40 text-xs"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-
-        <tbody>
-          {tableLoading &&
-            arrayWithId(6).map(({ id }) => (
-              <tr key={id} className="border-border/60 border-b">
-                <td colSpan={trendingColumns.length} className="px-4 py-4">
-                  <div className="h-11 w-full animate-pulse rounded-md bg-white/3" />
-                </td>
-              </tr>
-            ))}
-
-          {!tableLoading &&
-            table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-border/60 border-b transition-colors hover:bg-white/[0.02]"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="whitespace-nowrap px-4 py-4 align-middle"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-
-          {!tableLoading && tableData.length === 0 && (
-            <tr>
-              <td
-                colSpan={trendingColumns.length}
-                className="px-4 py-12 text-center text-sm text-white/30"
-              >
-                No pairs match this filter yet.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      table={table}
+      isLoading={trendingTokens.isLoading}
+      error={trendingTokens.error?.message}
+    />
   );
 }

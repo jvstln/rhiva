@@ -18,21 +18,20 @@ const inputVariants = cva(
   },
 );
 
+type Variants = VariantProps<typeof inputVariants>;
+
 export interface InputProps
   extends Omit<React.ComponentProps<"input">, "size">,
-    VariantProps<typeof inputVariants> {
-  "data-size"?: InputProps["size"];
+    Omit<Variants, "size"> {
+  "data-size"?: Variants["size"];
 }
 
-function Input({ className, type, size, ...props }: InputProps) {
+function Input({ className, type, "data-size": size, ...props }: InputProps) {
   return (
     <InputPrimitive
       type={type}
       data-slot="input"
-      className={cn(
-        inputVariants({ size: size ?? props["data-size"] }),
-        className,
-      )}
+      className={cn(inputVariants({ size: size }), className)}
       {...props}
     />
   );
