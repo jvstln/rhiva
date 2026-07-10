@@ -8,12 +8,12 @@ import {
   Crosshair,
   Crown,
   Eye,
+  Fish,
   Flag,
-  Gift,
   Globe,
-  Landmark,
   Layers,
-  Leaf,
+  Microscope,
+  Rat,
   Search,
   Sprout,
   Star,
@@ -24,56 +24,18 @@ import type * as React from "react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
   cn,
+  formatAge,
   formatCompactCurrency,
   formatCompactNumber,
   formatSignedPercent,
 } from "@/lib/utils";
 import { getInitials } from "../../../lib/utils";
-import { useBirdeyeWS, useTrendingTokens } from "../market.hook";
-import type { Token } from "../market.type";
-
-/* ------------------------------------------------------------------ */
-/* Token avatar (dual overlapping circles + caution badge)             */
-/* ------------------------------------------------------------------ */
-
-interface TokenIconProps {
-  colors: string[];
-  size?: number;
-  flagged?: boolean;
-}
-
-function TokenIcon({ colors, size = 44, flagged }: TokenIconProps) {
-  return (
-    <div
-      className={cn(
-        "relative shrink-0 rounded-lg border bg-black",
-        flagged ? "border-roman/60" : "border-white/10",
-      )}
-      style={{ width: size, height: size }}
-    >
-      <div className="absolute inset-0">
-        <span
-          className="-translate-y-1/2 absolute top-1/2 size-[45%] rounded-full"
-          style={{ backgroundColor: colors[0], left: "16%" }}
-        />
-        <span
-          className="-translate-y-1/2 absolute top-1/2 size-[45%] rounded-full"
-          style={{ backgroundColor: colors[1], right: "16%" }}
-        />
-      </div>
-
-      {flagged && (
-        <span className="-bottom-1 -right-1 absolute flex size-4 items-center justify-center rounded-full border border-roman/60 bg-black text-roman">
-          <AlertTriangle className="size-2.5" />
-        </span>
-      )}
-    </div>
-  );
-}
+import { useTrendingTokens } from "../market.hook";
+import { useMarketStore } from "../market.store";
+import type { TrendingToken } from "../market.type";
 
 /* ------------------------------------------------------------------ */
 /* Favorite / watchlist star toggle                                    */
@@ -153,19 +115,11 @@ function Sparkline({
     >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+          <stop offset="0%" stopColor={color} stopOpacity={1} />
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
       </defs>
       <path d={areaPath} fill={`url(#${gradientId})`} stroke="none" />
-      <path
-        d={linePath}
-        fill="none"
-        stroke={color}
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
     </svg>
   );
 }
@@ -196,49 +150,44 @@ function SubIcon({ icon: Icon, active, activeClassName, label }: SubIconProps) {
   );
 }
 
-function PairInfoCell({ token }: { token: Token }) {
+import { TokenHoverTooltip } from "./TokenHoverTooltip";
+
+function PairInfoCell({ token }: { token: TrendingToken }) {
   return (
     <div className="flex items-center gap-3">
       <StarButton pairId={token.address} />
 
-      {/* TODO: extract colors from logo, handle flagged status */}
-      <TokenIcon colors={["#27272a", "#3f3f46"]} flagged={false} />
-      <Avatar variant="square" size="lg">
-        <AvatarImage src={token.logo_uri ?? ""} />
-        <AvatarFallback className="shimmer uppercase">
-          {getInitials(token.name)}
-        </AvatarFallback>
-      </Avatar>
+      <TokenHoverTooltip token={token}>
+        <Avatar variant="square" size="lg">
+          <AvatarImage src={token.logo_uri ?? ""} />
+          <AvatarFallback className="shimmer uppercase">
+            {getInitials(token.name)}
+          </AvatarFallback>
+        </Avatar>
+      </TokenHoverTooltip>
 
-      <div className="flex flex-col gap-1.5">
+      <div className="mr-auto flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
           <span className="font-semibold text-sm text-white">{token.name}</span>
           <span className="text-sm text-white/40">{token.symbol}</span>
-          <button
-            type="button"
-            aria-label="Copy token address"
-            className="text-white/30 transition-colors hover:text-silver"
-          >
-            <Copy className="size-3" />
-          </button>
+          <Button size={"icon-xs"} variant="ghost">
+            <Copy />
+          </Button>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="font-medium text-ocean-green text-xs">
-            {/* TODO: calculate age */}
-            {token.recent_listing_time ? "24h" : "N/A"}
+            {formatAge(token.recent_listing_time)}
           </span>
-          {/* TODO: dev activity */}
           <SubIcon
             icon={UserRound}
-            active={false}
+            active={!!token.extensions?.github}
             activeClassName="text-dodger-blue"
             label="Dev activity"
           />
-          {/* TODO: alerts */}
           <SubIcon
             icon={AlertCircle}
-            active={false}
+            active={false} // No direct alerts field in Token
             activeClassName="text-casablanca"
             label="Alerts"
           />
@@ -247,25 +196,23 @@ function PairInfoCell({ token }: { token: Token }) {
             active={!!token.extensions?.website}
             label="Website"
           />
-          {/* TODO: notes */}
-          <SubIcon icon={Flag} active={false} label="Add note" />
+          <SubIcon
+            icon={Flag}
+            active={!!token.extensions?.description}
+            label="Add note"
+          />
           <SubIcon icon={Search} active label="Inspect pair" />
+        </div>
+        <div className="mt-auto flex items-center gap-1 text-[11px] text-white/30">
+          <Eye className="size-3" />
+          {formatCompactNumber(token.holder)}
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-2 self-stretch">
-        <button
-          type="button"
-          aria-label="Copy pair address"
-          className="text-white/25 transition-colors hover:text-silver"
-        >
-          <Copy className="size-3.5" />
-        </button>
-        <div className="mt-auto flex items-center gap-1 text-[11px] text-white/30">
-          <Eye className="size-3" />
-          {/* TODO: watcher count */}0
-        </div>
-      </div>
+      <Sparkline
+        data={[20, 25, 22, 28, 24, 32, 28, 36, 32, 40]}
+        positive={(token.price_change_24h_percent ?? 0) >= 0}
+      />
     </div>
   );
 }
@@ -332,10 +279,10 @@ const METRIC_ICONS: Record<
 > = {
   holders: UserRoundCheck,
   top10: Crown,
-  airdrop: Gift,
+  airdrop: Rat,
   bundlers: Layers,
-  devSold: Landmark,
-  freshWallets: Leaf,
+  devSold: Microscope,
+  freshWallets: Fish,
   lpBurned: Sprout,
 };
 
@@ -391,14 +338,21 @@ function TokenSecurityBadges({ metrics }: { metrics: TrendingPairMetric[] }) {
 /* ------------------------------------------------------------------ */
 
 function ActionButtons() {
+  const quickBuy = useMarketStore((state) => state.trendingFilters.quickBuy);
+  const quickSell = useMarketStore((state) => state.trendingFilters.quickSell);
+
   return (
     <div className="flex items-center gap-2">
-      <Button variant="sell" size="sm">
-        Sell
-      </Button>
-      <Button variant="default" size="sm">
-        Buy
-      </Button>
+      {quickSell !== null && (
+        <Button variant="sell" size="sm">
+          Sell {quickSell > 0 ? `(${quickSell}%)` : ""}
+        </Button>
+      )}
+      {quickBuy !== null && (
+        <Button variant="default" size="sm">
+          Buy {quickBuy > 0 ? `(${quickBuy} SOL)` : ""}
+        </Button>
+      )}
     </div>
   );
 }
@@ -407,22 +361,21 @@ function ActionButtons() {
 /* Column definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-const trendingColumns: ColumnDef<Token>[] = [
+const MOCK_SECURITY_METRICS: TrendingPairMetric[] = [
+  { id: "holders", label: "Holders", value: 99, tone: "risk" },
+  { id: "top10", label: "Top 10", value: 99, tone: "risk", suffix: "7d" },
+  { id: "airdrop", label: "Snipers", value: 0, tone: "safe" },
+  { id: "bundlers", label: "Bundlers", value: 0, tone: "safe" },
+  { id: "devSold", label: "Audit", value: 0, tone: "safe" },
+  { id: "freshWallets", label: "Whales", value: 0, tone: "safe" },
+  { id: "lpBurned", label: "LP Burned", value: 98.71, tone: "risk" },
+];
+
+const trendingColumns: ColumnDef<TrendingToken>[] = [
   {
     id: "pairInfo",
     header: "Pair Info",
     cell: ({ row }) => <PairInfoCell token={row.original} />,
-  },
-  {
-    id: "chart",
-    header: () => <span className="sr-only">Chart</span>,
-    cell: ({ row }) => (
-      /* TODO: fetch chart data */
-      <Sparkline
-        data={[]}
-        positive={(row.original.price_change_24h_percent ?? 0) >= 0}
-      />
-    ),
   },
   {
     id: "marketCap",
@@ -462,8 +415,8 @@ const trendingColumns: ColumnDef<Token>[] = [
   {
     id: "tokenInfo",
     header: "Token Info",
-    /* TODO: compute metrics */
-    cell: ({ row }) => <TokenSecurityBadges metrics={[]} />,
+    /* TODO: replace with real backend metrics when available */
+    cell: ({ row }) => <TokenSecurityBadges metrics={MOCK_SECURITY_METRICS} />,
   },
   {
     id: "action",
@@ -477,9 +430,8 @@ const trendingColumns: ColumnDef<Token>[] = [
 /* ------------------------------------------------------------------ */
 
 export function TrendingTable() {
-  // const ws = useBirdeyeWS("token-stats");
-  const trendingTokens = useTrendingTokens();
-  console.log(trendingTokens);
+  const trendingFilters = useMarketStore((state) => state.trendingFilters);
+  const trendingTokens = useTrendingTokens(trendingFilters);
 
   const table = useDataTable({
     data: trendingTokens.data?.items ?? [],
@@ -489,7 +441,7 @@ export function TrendingTable() {
   return (
     <DataTable
       table={table}
-      isLoading={trendingTokens.isLoading}
+      isLoading={trendingTokens.isPending}
       error={trendingTokens.error?.message}
     />
   );

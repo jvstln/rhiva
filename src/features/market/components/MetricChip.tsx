@@ -1,12 +1,18 @@
 import type { LucideIcon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { cn } from "@/lib/utils";
 
 interface MetricChipProps {
   icon: LucideIcon;
-  value: string | number;
-  tone?: "default" | "up" | "down" | "warning";
+  value?: string | number | null;
+  tone?: "default" | "up" | "down" | "warning" | "info";
   filled?: boolean;
+  tooltip?: React.ReactNode;
 }
 
 const TONE_CLASSES: Record<NonNullable<MetricChipProps["tone"]>, string> = {
@@ -14,6 +20,7 @@ const TONE_CLASSES: Record<NonNullable<MetricChipProps["tone"]>, string> = {
   up: "text-up",
   down: "text-down",
   warning: "text-warning",
+  info: "text-blue-500",
 };
 
 export function MetricChip({
@@ -21,8 +28,9 @@ export function MetricChip({
   value,
   tone = "default",
   filled,
+  tooltip,
 }: MetricChipProps) {
-  return (
+  const content = (
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-md px-1.5 py-1 font-medium text-b-4",
@@ -31,15 +39,27 @@ export function MetricChip({
       )}
     >
       <Icon className="size-3" />
-      {value}
+      {value != null && value !== "" && <span>{value}</span>}
     </span>
+  );
+
+  if (!tooltip) return content;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>{content}</TooltipTrigger>
+      <TooltipContent side="bottom" align="center">
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
 interface InlineStatProps {
   icon: LucideIcon;
-  value: string | number;
+  value?: string | number | null;
   tone?: MetricChipProps["tone"];
+  tooltip?: React.ReactNode;
 }
 
 /** Ultra-compact variant used in the single-line stat strip. */
@@ -47,8 +67,9 @@ export function InlineStat({
   icon: Icon,
   value,
   tone = "default",
+  tooltip,
 }: InlineStatProps) {
-  return (
+  const content = (
     <span
       className={cn(
         "inline-flex items-center gap-0.5 text-b-5",
@@ -56,7 +77,18 @@ export function InlineStat({
       )}
     >
       <Icon className="size-2.5" />
-      {value}
+      {value != null && value !== "" && <span>{value}</span>}
     </span>
+  );
+
+  if (!tooltip) return content;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>{content}</TooltipTrigger>
+      <TooltipContent side="bottom" align="center">
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dna, Flame, Globe, Zap } from "lucide-react";
+import { Flame, Globe, Zap } from "lucide-react";
 import type * as React from "react";
 import { Button } from "@/components/ui/button";
 import { mockPumpLiveStreams } from "@/data/pump-live-data";
@@ -17,8 +17,12 @@ export interface PumpLiveStream {
   channelName: string;
   channelAvatarEmoji: string;
   channelAvatarColor: string;
+  channelAvatarUrl?: string;
   marketCap: number;
   reactions: string[];
+  description?: string;
+  commentsCount?: number;
+  timeAgo?: string;
   hasAudit: boolean;
   isHot: boolean;
   hasWebsite: boolean;
@@ -41,7 +45,7 @@ export function useLivePumpStreams() {
 
 function LiveBadge() {
   return (
-    <span className="absolute top-2 left-2 rounded-md bg-primary px-1.5 py-0.5 font-semibold text-b-5 text-primary-foreground">
+    <span className="absolute bottom-2 left-2 rounded bg-up px-1.5 py-0.5 font-bold text-[10px] text-black">
       LIVE
     </span>
   );
@@ -53,7 +57,7 @@ function LiveBadge() {
 
 function StreamThumbnail({ stream }: { stream: PumpLiveStream }) {
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-surface-2">
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-2">
       {/* biome-ignore lint: plain img keeps this independent of next/image remote-pattern config */}
       <img
         src={stream.thumbnailUrl}
@@ -69,40 +73,64 @@ function StreamThumbnail({ stream }: { stream: PumpLiveStream }) {
 /* Channel row (avatar, name, market cap)                              */
 /* ------------------------------------------------------------------ */
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 function ChannelRow({ stream }: { stream: PumpLiveStream }) {
   return (
-    <div className="mt-2 flex items-center justify-between gap-2">
-      <div className="flex min-w-0 items-center gap-2">
-        <span
-          className="flex size-6 shrink-0 items-center justify-center rounded-full text-xs"
-          style={{ backgroundColor: stream.channelAvatarColor }}
-        >
-          {stream.channelAvatarEmoji}
-        </span>
-        <span className="truncate text-b-4 text-muted-foreground">
+    <div className="mt-3 flex items-center justify-between gap-2">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <Avatar className="size-7">
+          <AvatarImage src={stream.channelAvatarUrl ?? ""} />
+          <AvatarFallback
+            style={{ backgroundColor: stream.channelAvatarColor }}
+            className="flex items-center justify-center text-xs"
+          >
+            {stream.channelAvatarEmoji}
+          </AvatarFallback>
+        </Avatar>
+        <span className="truncate font-bold text-b-3 text-white">
           {stream.channelName}
         </span>
       </div>
-      <span className="shrink-0 font-semibold text-b-4 text-up">
-        {formatCompactCurrency(stream.marketCap)}
-      </span>
+      <div className="flex shrink-0 items-center gap-1.5">
+        <span className="text-b-4 text-gray">MC</span>
+        <span className="font-bold text-b-3 text-up">
+          {formatCompactCurrency(stream.marketCap)}
+        </span>
+      </div>
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Reaction row                                                         */
+/* Description row                                                      */
 /* ------------------------------------------------------------------ */
 
-function ReactionRow({ reactions }: { reactions: string[] }) {
-  if (reactions.length === 0) return null;
-
+function DescriptionRow({ stream }: { stream: PumpLiveStream }) {
   return (
-    <div className="mt-2 flex items-center gap-1 text-b-3 leading-none">
-      {reactions.map((emoji, index) => (
-        // biome-ignore lint: emoji reactions have no stable id in mock data
-        <span key={index}>{emoji}</span>
-      ))}
+    <div className="mt-2.5 line-clamp-2 text-b-4 text-gray">
+      {stream.description || `${stream.channelName} - Live Stream on Pump!`}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Stats row                                                            */
+/* ------------------------------------------------------------------ */
+
+import { Clock, MessageCircle } from "lucide-react";
+
+function StatsRow({ stream }: { stream: PumpLiveStream }) {
+  return (
+    <div className="mt-2.5 flex items-center gap-3 text-b-4 text-gray">
+      <span className="flex items-center gap-1.5">
+        <MessageCircle className="size-3.5" />
+        {stream.commentsCount ?? 0}
+      </span>
+      <span className="flex items-center gap-1.5">
+        <Clock className="size-3.5" />
+        {stream.timeAgo ?? "1 h ago"}
+      </span>
     </div>
   );
 }
@@ -127,8 +155,8 @@ function StatusIcon({
   return (
     <span
       className={cn(
-        "flex size-5 items-center justify-center",
-        active ? activeClassName : "text-muted-foreground/30",
+        "flex size-4 items-center justify-center",
+        active ? activeClassName : "text-gray/50",
       )}
     >
       <Icon className="size-full" aria-label={label} />
@@ -140,20 +168,22 @@ function StatusIcon({
 /* Actions row (status icons + buy button)                              */
 /* ------------------------------------------------------------------ */
 
+import { Pill } from "lucide-react";
+
 function StreamActionsRow({ stream }: { stream: PumpLiveStream }) {
   return (
     <div className="mt-3 flex items-center justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3.5">
         <StatusIcon
-          icon={Dna}
+          icon={Pill}
           active={stream.hasAudit}
-          activeClassName="text-ocean-green"
+          activeClassName="text-up"
           label="Contract audited"
         />
         <StatusIcon
           icon={Flame}
           active={stream.isHot}
-          activeClassName="text-warning"
+          activeClassName="text-[#ff6b6b]"
           label="Trending"
         />
         <StatusIcon
@@ -164,8 +194,11 @@ function StreamActionsRow({ stream }: { stream: PumpLiveStream }) {
         />
       </div>
 
-      <Button variant="secondary" size="sm" className="gap-1">
-        <Zap className="size-3.5 text-primary" fill="currentColor" />
+      <Button
+        size="sm"
+        className="h-7 gap-1.5 rounded-full bg-surface-2 px-3 text-up hover:bg-surface-3 hover:text-up"
+      >
+        <Zap className="size-3 text-up" fill="currentColor" />
         Buy
       </Button>
     </div>
@@ -181,7 +214,8 @@ function PumpLiveCard({ stream }: { stream: PumpLiveStream }) {
     <div className="flex flex-col">
       <StreamThumbnail stream={stream} />
       <ChannelRow stream={stream} />
-      <ReactionRow reactions={stream.reactions} />
+      <DescriptionRow stream={stream} />
+      <StatsRow stream={stream} />
       <StreamActionsRow stream={stream} />
     </div>
   );
@@ -194,9 +228,20 @@ function PumpLiveCard({ stream }: { stream: PumpLiveStream }) {
 function PumpLiveCardSkeleton() {
   return (
     <div className="flex flex-col">
-      <div className="aspect-video w-full animate-pulse rounded-lg bg-surface-2" />
-      <div className="mt-2 h-4 w-2/3 animate-pulse rounded bg-surface-2" />
-      <div className="mt-3 h-8 w-full animate-pulse rounded bg-surface-2" />
+      <div className="aspect-[4/3] w-full animate-pulse rounded-xl bg-surface-2" />
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="size-7 animate-pulse rounded-full bg-surface-2" />
+          <div className="h-4 w-20 animate-pulse rounded bg-surface-2" />
+        </div>
+        <div className="h-4 w-16 animate-pulse rounded bg-surface-2" />
+      </div>
+      <div className="mt-2.5 h-8 w-full animate-pulse rounded bg-surface-2" />
+      <div className="mt-2.5 flex gap-3">
+        <div className="h-3 w-8 animate-pulse rounded bg-surface-2" />
+        <div className="h-3 w-12 animate-pulse rounded bg-surface-2" />
+      </div>
+      <div className="mt-3 h-7 w-full animate-pulse rounded bg-surface-2" />
     </div>
   );
 }

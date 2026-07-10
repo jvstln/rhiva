@@ -5,7 +5,7 @@ import { MarketView } from "@/features/market/market.schema";
 import { MarketToolbar } from "./MarketToolbar";
 import { PumpLiveGrid } from "./PumpLiveView";
 import { RadarView } from "./RadarView";
-import SurgeTable from "./SurgeView";
+import { SurgeTable } from "./SurgeView";
 import { TrendingTable } from "./TrendingView";
 
 const MarketPage = () => {
@@ -13,7 +13,7 @@ const MarketPage = () => {
   const view = MarketView.parse(searchParams.get("view"));
 
   return (
-    <div>
+    <div className="flex size-full flex-col">
       <MarketToolbar />
 
       {view === "watchlist" && <TrendingTable />}

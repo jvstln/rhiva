@@ -9,9 +9,17 @@ export namespace SearchInput {
   };
 }
 
-export function SearchInput({ className, ref, ...props }: SearchInput.Props) {
+export function SearchInput({
+  className,
+  ref,
+  "data-size": size,
+  ...props
+}: SearchInput.Props) {
   return (
-    <InputGroup className={cn("max-w-[297px] w-full rounded-full", className)}>
+    <InputGroup
+      size={size}
+      className={cn("w-full max-w-[297px] rounded-full", className)}
+    >
       <InputGroupInput
         ref={ref}
         type="search"

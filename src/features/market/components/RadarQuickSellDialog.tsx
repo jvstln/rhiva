@@ -19,22 +19,16 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useMarketStore } from "@/features/market/market.store";
 import { capitalize } from "@/lib/utils";
-import { QuickSell, RadarColumns } from "../market.schema";
+import { RadarColumns } from "../market.schema";
 
 export function RadarQuickSellDialog({
   children,
 }: Dialog.Props & { children: React.ReactElement }) {
-  const quickSellSettings = useMarketStore(
-    (state) => state.radarSettings.quickSell,
-  );
-  const setQuickSellSettings = useMarketStore(
-    (state) => state.radarSettings.setQuickSell,
-  );
+  const radarFilters = useMarketStore((state) => state.radarFilters);
+  const setRadarFilters = useMarketStore((state) => state.setRadarFilters);
 
-  const activeColumns = Object.keys(quickSellSettings).filter(
-    (column) =>
-      quickSellSettings[column as keyof typeof quickSellSettings].value !==
-      null,
+  const activeColumns = RadarColumns.options.filter(
+    (column) => radarFilters[column].quickSell !== null,
   );
   const isOff = activeColumns.length === 0;
 
@@ -50,11 +44,11 @@ export function RadarQuickSellDialog({
           <ToggleGroup
             value={[isOff ? "off" : "on"]}
             onValueChange={([value]) => {
-              setQuickSellSettings(
+              setRadarFilters(
                 Object.fromEntries(
                   RadarColumns.options.map((col) => [
                     col,
-                    { value: value === "off" ? null : 0 },
+                    { quickSell: value === "off" ? null : 0 },
                   ]),
                 ),
               );
@@ -86,8 +80,8 @@ export function RadarQuickSellDialog({
                       key={column}
                       value={column}
                       onPressedChange={(pressed) => {
-                        setQuickSellSettings({
-                          [column]: { value: pressed ? 0 : null },
+                        setRadarFilters({
+                          [column]: { quickSell: pressed ? 0 : null },
                         });
                       }}
                     >
@@ -101,8 +95,12 @@ export function RadarQuickSellDialog({
 
           {/* Input Sections */}
           <div className="space-y-4">
-            {Object.entries(quickSellSettings).map(([column, settings]) => {
-              if (settings.value === null) return null;
+            {activeColumns.map((column) => {
+              const settings = radarFilters[column];
+              const initialSettings =
+                useMarketStore.getInitialState().radarFilters[column];
+
+              if (settings.quickSell === null) return null;
 
               return (
                 <Field key={column}>
@@ -111,27 +109,34 @@ export function RadarQuickSellDialog({
                     <ToggleGroup
                       spacing={0}
                       size={"sm"}
-                      value={[settings.unit]}
-                      onValueChange={(value) => {
-                        setQuickSellSettings({ [column]: { unit: value[0] } });
+                      value={[
+                        initialSettings.quickSell === settings.quickSell
+                          ? "init"
+                          : "percent",
+                      ]}
+                      onValueChange={([value]) => {
+                        if (value === "init") {
+                          setRadarFilters({
+                            [column]: { quickSell: initialSettings.quickSell },
+                          });
+                        }
                       }}
                     >
-                      <ToggleGroupItem
-                        value={QuickSell.shape.unit.enum.percent}
-                      >
+                      <ToggleGroupItem value={"percent"}>
                         <PercentIcon /> Percent
                       </ToggleGroupItem>
-                      <ToggleGroupItem value={QuickSell.shape.unit.enum.init}>
+                      <ToggleGroupItem value={"init"}>
                         <Undo2Icon /> Init
                       </ToggleGroupItem>
                     </ToggleGroup>
                   </FieldContent>
                   <InputGroup>
                     <InputGroupInput
-                      value={settings.value}
+                      min={0}
+                      value={settings.quickSell}
                       onChange={(e) => {
-                        setQuickSellSettings({
-                          [column]: { value: e.target.value },
+                        setRadarFilters({
+                          [column]: { quickSell: Number(e.target.value) },
                         });
                       }}
                     />
@@ -139,11 +144,7 @@ export function RadarQuickSellDialog({
                       <InputGroupText>Quick sell</InputGroupText>
                     </InputGroupAddon>
                     <InputGroupAddon align={"inline-end"}>
-                      {settings.unit === "percent" ? (
-                        <PercentIcon />
-                      ) : (
-                        <Undo2Icon />
-                      )}
+                      <PercentIcon />
                     </InputGroupAddon>
                   </InputGroup>
                 </Field>

@@ -2,7 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { getTrendingTokens } from "./market.api";
+import {
+  getRadarFreshTokens,
+  getRadarGraduatedTokens,
+  getRadarHeatedUpTokens,
+  getSurgeGraduatedTokens,
+  getTrendingTokens,
+} from "./market.api";
+import type {
+  RadarFilters,
+  SurgeFilters,
+  TrendingFilters,
+} from "./market.type";
 
 export function useBirdeyeWS(channel: string) {
   const [wsData, setWsData] = useState<any[]>([]);
@@ -57,9 +68,39 @@ export function useBirdeyeWS(channel: string) {
   return wsData;
 }
 
-export function useTrendingTokens(filters?: {}) {
+export function useTrendingTokens(filters: TrendingFilters) {
   return useQuery({
-    queryKey: ["market", "trending"],
-    queryFn: getTrendingTokens,
+    queryKey: ["market", "trending", filters.timeframe, filters.preset],
+    queryFn: () => getTrendingTokens(filters),
+  });
+}
+
+export function useRadarFreshTokens(filters: RadarFilters["fresh"]) {
+  return useQuery({
+    queryKey: ["market", "radar", "fresh"],
+    queryFn: () => getRadarFreshTokens(filters),
+  });
+}
+
+export function useRadarHeatedUpTokens(filters: RadarFilters["heatingUp"]) {
+  return useQuery({
+    queryKey: ["market", "radar", "heatingUp"],
+    queryFn: () => getRadarHeatedUpTokens(filters),
+  });
+}
+
+export function useRadarGraduatedTokens(filters: RadarFilters["graduated"]) {
+  return useQuery({
+    queryKey: ["market", "radar", "graduated"],
+    queryFn: () => getRadarGraduatedTokens(filters),
+  });
+}
+
+export function useSurgeTokens(filters: SurgeFilters) {
+  const { quickBuy, ...rest } = filters;
+
+  return useQuery({
+    queryKey: ["market", "surge", rest],
+    queryFn: () => getSurgeGraduatedTokens(filters),
   });
 }

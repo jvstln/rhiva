@@ -14,9 +14,9 @@ const avatarVariants = cva(
         square: "rounded-sm",
       },
       size: {
-        default: "size-8",
+        default: "size-9",
         sm: "size-6",
-        lg: "size-10",
+        lg: "size-16",
       },
     },
     defaultVariants: {

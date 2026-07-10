@@ -7,59 +7,83 @@ import type { MarketState } from "./market.type";
 export const useMarketStore = create<MarketState>()(
   devtools(
     persist(
-      immer((set) => ({
-        radarSettings: {
-          quickSell: {
+      immer(
+        (set): MarketState => ({
+          radarFilters: {
             fresh: {
-              unit: "percent",
-              value: 0,
+              search: "",
+              bondingCurve: "p1",
+              quickBuy: null,
+              quickSell: null,
             },
             heatingUp: {
-              unit: "percent",
-              value: 0,
+              search: "",
+              bondingCurve: "p1",
+              quickBuy: null,
+              quickSell: null,
             },
             graduated: {
-              unit: "percent",
-              value: 0,
+              search: "",
+              bondingCurve: "p1",
+              quickBuy: null,
+              quickSell: null,
             },
           },
-          setQuickSell(columns) {
+          setRadarFilters(columns) {
             set((state) => {
-              merge(state.radarSettings.quickSell, columns);
+              merge(state.radarFilters, columns);
             });
           },
-        },
-        trendingSettings: {
-          quickSell: {
-            unit: "percent",
-            value: 0,
+
+          // ------------------------------------------------------------------------
+          trendingFilters: {
+            timeframe: "1h",
+            quickSell: null,
+            quickBuy: null,
+            preset: "p1",
           },
-          setQuickSell(settings) {
+          setTrendingFilters(filters) {
             set((state) => {
-              merge(state.trendingSettings.quickSell, settings);
+              merge(state.trendingFilters, filters);
             });
           },
-          quickBuy: 0,
-        },
-        pumpLiveSettings: {
-          sort: {
-            marketCap: null,
-            time: null,
+          // ------------------------------------------------------------------------
+
+          pumpLiveSettings: {
+            sort: {
+              marketCap: null,
+              time: null,
+            },
+            setSort(columns) {
+              set((state) => {
+                merge(
+                  state.pumpLiveSettings.sort,
+                  typeof columns === "function"
+                    ? columns(state.pumpLiveSettings.sort)
+                    : columns,
+                );
+              });
+            },
           },
-          setSort(columns) {
+
+          // ------------------------------------------------------------------------
+          surgeFilters: {
+            timeframe: "1h",
+            mcMin: null,
+            mcMax: null,
+            quickBuy: null,
+            preset: "p1",
+          },
+          setSurgeFilters(filters) {
             set((state) => {
-              merge(
-                state.pumpLiveSettings.sort,
-                typeof columns === "function"
-                  ? columns(state.pumpLiveSettings.sort)
-                  : columns,
-              );
+              merge(state.surgeFilters, filters);
             });
           },
-        },
-      })),
+          // ------------------------------------------------------------------------
+        }),
+      ),
       {
-        name: "rhiva-market",
+        name: "rhiva.market",
         storage: createJSONStorage(() => localStorage),
       },
     ),

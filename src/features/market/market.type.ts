@@ -1,21 +1,14 @@
-import type { QuickSell, RadarColumns } from "./market.schema";
+import type { BondingCurve, RadarColumns, Timeframe } from "./market.schema";
 
 type Sort = "asc" | "desc" | null;
 
 export type MarketState = {
-  radarSettings: {
-    quickSell: {
-      [k in RadarColumns]: QuickSell;
-    };
-    setQuickSell: (
-      columns: Partial<Record<RadarColumns, Partial<QuickSell>>>,
-    ) => void;
-  };
-  trendingSettings: {
-    quickSell: QuickSell;
-    setQuickSell: (setting: Partial<QuickSell>) => void;
-    quickBuy: number;
-  };
+  radarFilters: RadarFilters;
+  setRadarFilters: (columns: Partial<RadarFilters>) => void;
+
+  trendingFilters: TrendingFilters;
+  setTrendingFilters: (filters: Partial<TrendingFilters>) => void;
+
   pumpLiveSettings: {
     sort: Record<"marketCap" | "time", Sort>;
     setSort: (
@@ -26,6 +19,34 @@ export type MarketState = {
           ) => MarketState["pumpLiveSettings"]["sort"]),
     ) => void;
   };
+
+  surgeFilters: SurgeFilters;
+  setSurgeFilters: (filters: Partial<SurgeFilters>) => void;
+};
+
+export type TrendingFilters = {
+  timeframe: Timeframe;
+  quickSell: number | null;
+  quickBuy: number | null;
+  preset: BondingCurve;
+};
+
+export type RadarFilters = Record<
+  RadarColumns,
+  {
+    search: string;
+    bondingCurve: BondingCurve;
+    quickBuy: number | null;
+    quickSell: number | null;
+  }
+>;
+
+export type SurgeFilters = {
+  timeframe: Timeframe;
+  mcMin: number | null;
+  mcMax: number | null;
+  quickBuy: number | null;
+  preset: BondingCurve;
 };
 
 export * from "./market.token.type";

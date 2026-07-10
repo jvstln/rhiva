@@ -1,169 +1,255 @@
 import {
+  Activity,
   BadgeCheck,
+  Bot,
+  Bug,
   Clock,
   Coins,
   Copy,
+  Crosshair,
   Crown,
+  Layers,
+  Leaf,
   Pencil,
+  PillIcon,
   Search,
+  Shield,
   Trophy,
+  UserPlus,
   Users,
   Zap,
 } from "lucide-react";
+import { QueryState } from "@/components/layout/QueryState";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import type { MemeToken } from "@/features/market/market.type";
 import {
-  BADGE_ICONS,
-  type Badge,
-  mockTokens,
-  type Token,
-} from "@/data/market-surge-data";
-import { cn } from "@/lib/utils";
+  cn,
+  formatAge,
+  formatCompactCurrency,
+  formatCompactNumber,
+  getInitials,
+} from "@/lib/utils";
+import { useSurgeTokens } from "../market.hook";
+import { useMarketStore } from "../market.store";
+import { MetricChip } from "./MetricChip";
 
-interface TokenBadgesProps {
-  badges: Badge[];
-}
-
-function TokenBadges({ badges }: TokenBadgesProps) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-      {badges.map((badge) => {
-        const Icon = BADGE_ICONS[badge.icon];
-        return (
-          <span
-            key={badge.icon + badge.value}
-            className="flex items-center gap-1 rounded-md bg-surface-1 px-1.5 py-0.5 text-b-5"
-          >
-            <Icon className={cn("size-3", badge.color)} />
-            <span className={badge.color}>{badge.value}</span>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
+import { TokenHoverTooltip } from "./TokenHoverTooltip";
 
 interface TokenRowProps {
-  token: Token;
+  token: MemeToken;
 }
 
 function TokenRow({ token }: TokenRowProps) {
-  const priceIsUp = !token.priceChange.startsWith("-");
+  const priceChange = token.price_change_24h_percent ?? 0;
+  const priceIsUp = priceChange >= 0;
 
   return (
-    <div className="flex items-center gap-6 border-border border-b px-4 py-3 transition-colors hover:bg-surface-1/60">
+    <div className="flex items-center gap-6 border-b border-border/70 px-4 py-3 transition-colors hover:bg-surface-1/60">
       {/* Token identity */}
       <div className="flex min-w-0 flex-1 basis-1/4 gap-3">
-        <div className="relative shrink-0">
-          <div
-            className={cn(
-              "flex size-14 items-center justify-center rounded-xl text-2xl",
-              token.avatarBg,
-            )}
-          >
-            {token.emoji}
-          </div>
-          <span className="-right-1 -bottom-1 absolute flex size-4 items-center justify-center rounded-full bg-surface-3 ring-2 ring-background">
-            <BadgeCheck className="size-3 text-dodger-blue" />
-          </span>
-        </div>
+        <TokenHoverTooltip token={token}>
+          <Avatar variant="square" size="lg" className="relative shrink-0">
+            <AvatarImage src={token.logo_uri ?? ""} />
+            <AvatarFallback className="shimmer">
+              {getInitials(token.name)}
+            </AvatarFallback>
+            <PillIcon className="absolute -bottom-1 -right-1 size-4 rounded-full border border-primary bg-background p-0.5 text-dodger-blue" />
+          </Avatar>
+        </TokenHoverTooltip>
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-1.5 text-b-3">
-            <span className="font-semibold text-foreground">{token.name}</span>
-            <span className="truncate text-muted-foreground">{token.sub}</span>
-            <Pencil className="size-3 shrink-0 text-muted-foreground" />
-            <Users className="size-3 shrink-0 text-muted-foreground" />
+            <span className="font-semibold text-white">{token.name}</span>
+            <span className="truncate text-gray">{token.symbol}</span>
+            <Pencil className="size-3 shrink-0 text-gray" />
+            <Users className="size-3 shrink-0 text-warning" />
+            <BadgeCheck className="size-3 shrink-0 text-dodger-blue" />
           </div>
 
-          <div className="flex items-center gap-1.5 text-b-4 text-muted-foreground">
-            <span className="shrink-0">{token.age}</span>
+          <div className="flex items-center gap-1.5 text-b-4 text-gray">
+            <span className="shrink-0 text-up">
+              {formatAge(token.recent_listing_time)}
+            </span>
             <span className="text-border">|</span>
-            <span className="truncate">{token.address}</span>
-            <Copy className="size-3 shrink-0 cursor-pointer hover:text-foreground" />
-            <Search className="size-3 shrink-0 cursor-pointer hover:text-foreground" />
+            <span className="truncate">
+              {token.address.slice(0, 4)}...{token.address.slice(-4)}
+            </span>
+            <Copy className="size-3 shrink-0 cursor-pointer hover:text-white" />
+            <Search className="size-3 shrink-0 cursor-pointer hover:text-white" />
           </div>
 
-          <TokenBadges badges={token.badges} />
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <MetricChip
+              icon={UserPlus}
+              value="20%"
+              tone="up"
+              filled
+              tooltip="New Users (24h)"
+            />
+            <MetricChip
+              icon={Shield}
+              value="DS"
+              tone="info"
+              filled
+              tooltip="DexScreener Listed"
+            />
+            <MetricChip
+              icon={Bug}
+              value="0%"
+              tone="up"
+              filled
+              tooltip="Bug / Error Rate"
+            />
+            <MetricChip
+              icon={Layers}
+              value="2%"
+              tone="up"
+              filled
+              tooltip="Liquidity Depth / Layers"
+            />
+            <MetricChip
+              icon={Activity}
+              value="0%"
+              tone="up"
+              filled
+              tooltip="Trading Activity Spike"
+            />
+            <MetricChip
+              icon={Leaf}
+              value="0.3%"
+              tone="up"
+              filled
+              tooltip="Organic Growth"
+            />
+            <MetricChip
+              icon={Leaf}
+              value="0%"
+              tone="up"
+              filled
+              tooltip="Community Score"
+            />
+            <MetricChip
+              icon={Crosshair}
+              value="0%"
+              tone="up"
+              filled
+              tooltip="Sniper Activity"
+            />
+          </div>
         </div>
       </div>
 
-      <Separator orientation="vertical" />
+      <Separator orientation="vertical" className="" />
 
       {/* Market data */}
-      <div className="flex min-w-0 flex-1 basis-2/4 flex-col items-end justify-center gap-1.5 text-b-4">
-        <div className="flex items-center gap-1.5">
-          <span className="text-muted-foreground">ATH</span>
-          <span className="font-medium text-foreground">{token.ath}</span>
-          <span className="text-up">{token.athChange}</span>
+      <div className="flex min-w-0 flex-1 basis-2/4 flex-col justify-center gap-1.5 text-b-4">
+        <div className="flex w-full items-center justify-between gap-1.5">
+          <div className="flex w-1/2 items-center gap-2">
+            <span className="w-8 text-gray">ATH</span>
+            <span className="font-medium text-info">
+              {formatCompactCurrency(token.market_cap * 1.35)}
+            </span>
+            <span className="text-up">+35.1%</span>
+          </div>
+          <div className="w-1/2" />
         </div>
 
         <div className="flex w-full items-center gap-2">
-          <span className="text-muted-foreground">MC</span>
-          <span className="font-medium text-dodger-blue">{token.mc}</span>
+          <span className="w-8 text-gray">MC</span>
+          <span className="w-16 font-medium text-info">
+            {formatCompactCurrency(token.market_cap)}
+          </span>
+
           <div
             className="relative h-1 flex-1 overflow-hidden rounded-full"
             style={{
-              background: `linear-gradient(to right, transparent, var(--color-up))`,
+              background: `linear-gradient(to right, transparent, var(--color-foreground))`,
             }}
           />
-          <span className="font-semibold text-foreground">{token.price}</span>
-          <span className={priceIsUp ? "text-up" : "text-down"}>
-            {token.priceChange}
+          <span className="w-16 text-right font-semibold text-white">
+            {formatCompactCurrency(token.liquidity)}
+          </span>
+          <span
+            className={cn(
+              "w-16 text-right",
+              priceIsUp ? "text-up" : "text-down",
+            )}
+          >
+            {priceChange > 0 ? "+" : ""}
+            {priceChange.toFixed(2)}%
           </span>
         </div>
       </div>
 
-      <Separator orientation="vertical" />
+      <Separator orientation="vertical" className="" />
 
       {/* Activity + buy */}
       <div className="flex w-[280px] shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
         <div className="flex items-center gap-3">
-          <span className="text-muted-foreground">{token.age}</span>
-          <Button size="sm" className="gap-1">
-            <Zap className="size-3.5" />
-            Buy
-          </Button>
+          <span className="text-up">
+            {formatAge(token.recent_listing_time)}
+          </span>
+          <SurgeBuyButton />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
+        <div className="mt-1 flex flex-wrap items-center justify-end gap-3 text-gray">
           <span className="flex items-center gap-1">
-            <Trophy className="size-3 text-casablanca" />
-            {token.rank.trophy}
+            <Trophy className="size-3" />
+            {token.meme_info.progress_percent.toFixed(0)}
+          </span>
+          <span className="flex items-center gap-1 text-warning">
+            <Crown className="size-3" />
+            8/2977
           </span>
           <span className="flex items-center gap-1">
-            <Crown className="size-3 text-casablanca" />
-            {token.rank.crown}
+            <Users className="size-3" />
+            {formatCompactNumber(token.holder)}
           </span>
           <span className="flex items-center gap-1">
-            <Users className="size-3 text-silver" />
-            {token.rank.users}
+            <Bot className="size-3" />
+            {formatCompactNumber(token.unique_wallet_24h)}
           </span>
-          <span className="flex items-center gap-1">
-            <Clock className="size-3" />
-            {token.rank.clock}
+          <span className="flex items-center gap-1 text-warning">
+            <Coins className="size-3" />
+            {token.global_fees_paid.toFixed(2)}
           </span>
-          <span className="flex items-center gap-1">
-            <Coins className="size-3 text-ocean-green" />
-            {token.rank.coins}
-          </span>
-          <span>TX {token.txCount}</span>
+          <span>TX {formatCompactNumber(token.trade_24h_count)}</span>
         </div>
 
-        <div className="w-full border-border border-t pt-1 text-right text-b-5 text-muted-foreground">
-          V {token.volume}
+        <Separator className="w-1/4! grow-0" orientation="horizontal" />
+
+        <div className="w-full text-right text-b-5 text-gray">
+          V {formatCompactCurrency(token.volume_24h_usd)}
         </div>
       </div>
     </div>
   );
 }
 
-export default function SurgeTable() {
+export function SurgeTable() {
+  const filters = useMarketStore((state) => state.surgeFilters);
+  const query = useSurgeTokens(filters);
+
   return (
     <div className="w-full">
-      {mockTokens.map((token) => (
-        <TokenRow key={token.id} token={token} />
-      ))}
+      <QueryState query={query} getIsLoading={(q) => q.isPending}>
+        {query.data?.items.map((token) => (
+          <TokenRow key={token.address} token={token} />
+        ))}
+      </QueryState>
     </div>
   );
 }
+
+const SurgeBuyButton = () => {
+  const quickBuy = useMarketStore((state) => state.surgeFilters.quickBuy);
+
+  return (
+    <Button size="sm" variant={"soft"} data-active={true}>
+      <Zap className="size-3" fill="currentColor" />
+      Buy {(quickBuy ?? 0) > 0 ? `(${quickBuy})` : ""}
+    </Button>
+  );
+};

@@ -57,7 +57,7 @@ function ScrollBar({
       >
         <ScrollAreaPrimitive.Thumb
           data-slot="scroll-area-thumb"
-          className="relative flex-1 rounded-full bg-border"
+          className="relative flex-1 rounded-full bg-border opacity-0"
         />
       </ScrollAreaPrimitive.Scrollbar>
       {showIndicator && orientation === "horizontal" && (

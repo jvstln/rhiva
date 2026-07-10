@@ -1,14 +1,33 @@
-import { Ban, Filter, Settings } from "lucide-react";
+import {
+  ArrowDownUp,
+  Ban,
+  Filter,
+  PercentIcon,
+  Settings,
+  XIcon,
+} from "lucide-react";
 import { SettingsDialog } from "@/components/layout/SettingsDialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "../../../components/ui/button";
 import { useMarketStore } from "../market.store";
 import { BlacklistDialog } from "./BlacklistDialog";
-import {
-  BondingStageToggle,
-  QuickBuyInput,
-  QuickSellInput,
-} from "./ToolbarItems";
+import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
 
 const TIMEFRAMES = ["1m", "5m", "1h", "6h", "24h"] as const;
 
@@ -35,32 +54,33 @@ export const TrendingToolbar = () => {
           Filter
         </Button>
 
-        <TrendingQuickBuyInput />
-
-        <TrendingQuickSellInput />
-
         <SettingsDialog defaultTab="trading-settings">
           <Button variant="ghost" size="sm">
             <Settings className="text-purple-500" />
             Settings
           </Button>
         </SettingsDialog>
+
+        <TrendingQuickSellInput />
+
+        <TrendingQuickBuyInput />
       </div>
 
-      <BondingStageToggle />
+      <BondingCurveToggle />
     </div>
   );
 };
 
 export const TrendingQuickBuyInput = () => {
-  const quickBuy = useMarketStore((state) => state.trendingSettings.quickBuy);
+  const quickBuy = useMarketStore((state) => state.trendingFilters.quickBuy);
 
   return (
     <QuickBuyInput
-      value={quickBuy}
+      variant="minimal"
+      value={quickBuy ?? ""}
       onValueChange={(value) => {
         useMarketStore.setState((state) => {
-          state.trendingSettings.quickBuy = value;
+          state.trendingFilters.quickBuy = value;
         });
       }}
     />
@@ -68,16 +88,71 @@ export const TrendingQuickBuyInput = () => {
 };
 
 export const TrendingQuickSellInput = () => {
-  const quickSell = useMarketStore((state) => state.trendingSettings.quickSell);
+  const quickSell = useMarketStore((state) => state.trendingFilters.quickSell);
+  const setFilters = useMarketStore((state) => state.setTrendingFilters);
 
   return (
-    <QuickSellInput
-      value={quickSell.value ?? ""}
-      onValueChange={(value) => {
-        useMarketStore.setState((state) => {
-          state.trendingSettings.quickSell.value = value;
-        });
-      }}
-    />
+    <Dialog>
+      <DialogTrigger render={<Button variant="ghost" size="sm" />}>
+        <ArrowDownUp className="text-blue-500" />
+        Quick sell
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Quick Sell Settings</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          <ToggleGroup
+            value={[quickSell === null ? "off" : "on"]}
+            onValueChange={([value]) => {
+              setFilters({ quickSell: value === "off" ? null : 0 });
+            }}
+          >
+            <ToggleGroupItem value="off">
+              <XIcon />
+              Off
+            </ToggleGroupItem>
+            <ToggleGroupItem variant={"sell"} value="on">
+              <ArrowDownUp />
+              Sell
+            </ToggleGroupItem>
+          </ToggleGroup>
+
+          {quickSell !== null && (
+            <Field>
+              <FieldContent className="flex-row justify-between">
+                <FieldLabel>Quick sell</FieldLabel>
+              </FieldContent>
+              <InputGroup>
+                <InputGroupInput
+                  min={0}
+                  value={quickSell ?? ""}
+                  onChange={(e) => {
+                    setFilters({
+                      quickSell: Number(e.target.value),
+                    });
+                  }}
+                />
+                <InputGroupAddon>
+                  <InputGroupText className="text-sell">
+                    Quick sell
+                  </InputGroupText>
+                </InputGroupAddon>
+                <InputGroupAddon align={"inline-end"}>
+                  <PercentIcon />
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+          )}
+        </div>
+
+        <DialogFooter>
+          <DialogClose render={<Button className={"w-full"} />}>
+            Done
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

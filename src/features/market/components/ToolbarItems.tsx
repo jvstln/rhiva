@@ -15,29 +15,32 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { BondingCurve } from "../market.schema";
 
-const PRIORITY_TABS = ["P1", "P2", "P3"] as const;
-
-type PriorityTab = (typeof PRIORITY_TABS)[number];
-
-export const BondingStageToggle = ({
+export const BondingCurveToggle = ({
   value,
   onValueChange,
 }: {
-  onValueChange?: (value: PriorityTab) => void;
-  value?: PriorityTab;
+  onValueChange?: (value: BondingCurve) => void;
+  value?: BondingCurve;
 }) => {
   return (
     <ToggleGroup
       value={value ? [value] : undefined}
-      onValueChange={([value]) => onValueChange?.(value as PriorityTab)}
+      onValueChange={([value]) => onValueChange?.(value as BondingCurve)}
       size={"sm"}
+      spacing={0}
       className={"flex-1"}
     >
-      {PRIORITY_TABS.map((pt) => (
-        <Tooltip key={pt}>
+      {BondingCurve.options.map((p) => (
+        <Tooltip key={p}>
           <TooltipTrigger
-            render={<ToggleGroupItem value={pt}>{pt}</ToggleGroupItem>}
+            render={
+              <ToggleGroupItem className="uppercase" value={p}>
+                {p}
+              </ToggleGroupItem>
+            }
           />
           <TooltipContent side="bottom" className={"flex-col items-start"}>
             <div className="flex items-center gap-3">
@@ -62,63 +65,80 @@ export const BondingStageToggle = ({
     </ToggleGroup>
   );
 };
+
+type QuickBuyOrSellInputProps = {
+  value: string | number;
+  onValueChange: (value: number | null) => void;
+  variant?: "default" | "minimal";
+  className?: string;
+};
+
 export const QuickBuyInput = ({
   value,
   onValueChange,
-}: {
-  value: string | number;
-  onValueChange: (value: number) => void;
-}) => {
+  variant = "default",
+  className,
+}: QuickBuyOrSellInputProps) => {
   const [internalValue, setInternalValue] = useState(String(value));
 
   return (
-    <InputGroup size="sm" className="w-40">
+    <InputGroup size="sm" className={cn("w-40", className)}>
       <InputGroupInput
         type="number"
         value={internalValue}
         onChange={(e) => {
           setInternalValue(e.target.value);
           debounce(() => {
-            onValueChange(Number(e.target.value));
+            onValueChange(
+              e.target.value === "" ? null : Number(e.target.value),
+            );
           }, 500)();
         }}
+        className="min-w-6"
       />
-      <InputGroupAddon align="inline-end">
+      <InputGroupAddon align={variant === "default" ? "inline-end" : undefined}>
         <SolanaIcon />
       </InputGroupAddon>
-      <InputGroupAddon>
-        <InputGroupText>Quick buy</InputGroupText>
-      </InputGroupAddon>
+      {variant === "default" && (
+        <InputGroupAddon>
+          <InputGroupText>Quick buy</InputGroupText>
+        </InputGroupAddon>
+      )}
     </InputGroup>
   );
 };
+
 export const QuickSellInput = ({
   value,
   onValueChange,
-}: {
-  value: string | number;
-  onValueChange: (value: number) => void;
-}) => {
+  variant = "default",
+  className,
+}: QuickBuyOrSellInputProps) => {
   const [internalValue, setInternalValue] = useState(String(value));
 
   return (
-    <InputGroup size="sm" className="w-40">
+    <InputGroup size="sm" className={cn("w-40", className)}>
       <InputGroupInput
         type="number"
         value={internalValue}
         onChange={(e) => {
           setInternalValue(e.target.value);
           debounce(() => {
-            onValueChange(Number(e.target.value));
+            onValueChange(
+              e.target.value === "" ? null : Number(e.target.value),
+            );
           }, 500)();
         }}
+        className="min-w-6"
       />
-      <InputGroupAddon align="inline-end">
+      <InputGroupAddon align={variant === "default" ? "inline-end" : undefined}>
         <PercentIcon />
       </InputGroupAddon>
-      <InputGroupAddon>
-        <InputGroupText className="text-sell">Quick sell</InputGroupText>
-      </InputGroupAddon>
+      {variant === "default" && (
+        <InputGroupAddon>
+          <InputGroupText className="text-sell">Quick sell</InputGroupText>
+        </InputGroupAddon>
+      )}
     </InputGroup>
   );
 };

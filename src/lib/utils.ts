@@ -79,5 +79,6 @@ export function getInitials(name: string) {
   return initials;
 }
 
+export * from "./error.util";
 /** "$73.5k", "$1.2m", "$980" */
 export * from "./finance.util";
