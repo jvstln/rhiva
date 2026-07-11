@@ -1,9 +1,9 @@
 "use client";
 
-import { Filter, Funnel, Rocket } from "lucide-react";
+import { Filter, Rocket } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { SettingsDialog } from "@/components/layout/SettingsDialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SolanaIcon } from "@/components/ui/icons";
@@ -13,10 +13,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
-import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { POOL_TABS } from "@/data/liquidity-data";
-import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
 import { Timeframe } from "@/features/market/market.schema";
 import { capitalize } from "@/lib/utils";
 import { PoolColumns } from "../liquidity.schema";

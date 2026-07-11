@@ -17,14 +17,14 @@ interface ChartToolbarProps {
 
 export function ChartToolbar({ activeTimeframe = "1m" }: ChartToolbarProps) {
   return (
-    <div className="flex items-center gap-4 border-b border-border/70 px-4 py-2.5">
+    <div className="flex items-center gap-4 border-border/70 border-b px-4 py-2.5">
       <div className="flex items-center gap-3">
         {TIMEFRAMES.map((tf) => (
           <button
             type="button"
             key={tf}
             className={cn(
-              "text-b-3 font-medium",
+              "font-medium text-b-3",
               tf === activeTimeframe
                 ? "text-white"
                 : "text-gray hover:text-white/70",
@@ -40,12 +40,12 @@ export function ChartToolbar({ activeTimeframe = "1m" }: ChartToolbarProps) {
 
       <button
         type="button"
-        className="text-b-3 font-medium text-gray hover:text-white/70"
+        className="font-medium text-b-3 text-gray hover:text-white/70"
       >
         Indicators
       </button>
 
-      <div className="flex items-center gap-1 text-b-3 font-medium">
+      <div className="flex items-center gap-1 font-medium text-b-3">
         <span className="text-primary">Price</span>
         <span className="text-gray">/ Mcap</span>
       </div>

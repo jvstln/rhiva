@@ -1,4 +1,4 @@
-import { BadgeCheck, CalendarDays, ExternalLink, Pencil } from "lucide-react";
+import { BadgeCheck, CalendarDays, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { XIcon } from "@/components/ui/icons";

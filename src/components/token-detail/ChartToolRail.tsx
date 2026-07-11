@@ -28,7 +28,7 @@ const TOOLS = [
 
 export function ChartToolRail() {
   return (
-    <div className="hidden w-9 shrink-0 flex-col items-center gap-4 border-r border-border/70 py-3 md:flex">
+    <div className="hidden w-9 shrink-0 flex-col items-center gap-4 border-border/70 border-r py-3 md:flex">
       {TOOLS.map((Icon, i) => (
         <button
           type="button"

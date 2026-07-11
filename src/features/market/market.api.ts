@@ -24,7 +24,7 @@ export const getTrendingTokens = async (filters: TrendingFilters) => {
   return response.data.data;
 };
 
-export const getRadarFreshTokens = async (filters: RadarFilters["fresh"]) => {
+export const getRadarFreshTokens = async (_filters: RadarFilters["fresh"]) => {
   const response = await api.get<{ data: MemeTokenResponseData }>(
     "/defi/v3/token/meme/list",
     {
@@ -41,7 +41,7 @@ export const getRadarFreshTokens = async (filters: RadarFilters["fresh"]) => {
 };
 
 export const getRadarHeatedUpTokens = async (
-  filters: RadarFilters["heatingUp"],
+  _filters: RadarFilters["heatingUp"],
 ) => {
   const response = await api.get<{ data: MemeTokenResponseData }>(
     "/defi/v3/token/meme/list",
@@ -61,7 +61,7 @@ export const getRadarHeatedUpTokens = async (
 };
 
 export const getRadarGraduatedTokens = async (
-  filters: RadarFilters["graduated"],
+  _filters: RadarFilters["graduated"],
 ) => {
   const response = await api.get<{ data: MemeTokenResponseData }>(
     "/defi/v3/token/meme/list",

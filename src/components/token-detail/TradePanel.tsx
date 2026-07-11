@@ -3,7 +3,6 @@
 import { ChevronDown, Repeat, Settings, Zap } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
 import { SettingsDialog } from "../layout/SettingsDialog";

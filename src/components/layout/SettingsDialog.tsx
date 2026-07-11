@@ -75,7 +75,7 @@ function SegmentedControl<T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 text-sm font-medium transition-colors",
+              "flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 font-medium text-sm transition-colors",
               !isActive && "text-muted-foreground hover:text-foreground",
               isActive &&
                 tone === "solid" &&
@@ -113,7 +113,7 @@ function ValueInputRow({
   return (
     <div className={className}>
       {label && (
-        <p className="mb-2 text-sm font-semibold text-foreground">{label}</p>
+        <p className="mb-2 font-semibold text-foreground text-sm">{label}</p>
       )}
       <div className="flex items-center gap-2 rounded-lg border border-border px-4 py-3">
         <span className="shrink-0 text-muted-foreground">{placeholder}</span>
@@ -150,7 +150,7 @@ function TextInputRow({
 }
 
 function SectionDivider() {
-  return <div className="border-t border-border" />;
+  return <div className="border-border border-t" />;
 }
 
 /** Small stand-in for a token/quote-token glyph (three tinted bars). */
@@ -182,7 +182,7 @@ function TransactionTab() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mb-3 text-sm text-muted-foreground">
+        <p className="mb-3 text-muted-foreground text-sm">
           Transaction Broadcasting
         </p>
         <SegmentedControl
@@ -194,7 +194,7 @@ function TransactionTab() {
             { value: "mixed", label: "Mixed" },
           ]}
         />
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="mt-3 text-muted-foreground text-sm">
           Rhiva submits your transaction through Jito Bundle only
         </p>
       </div>
@@ -202,7 +202,7 @@ function TransactionTab() {
       <SectionDivider />
 
       <div>
-        <p className="mb-3 text-sm text-muted-foreground">Priority Level</p>
+        <p className="mb-3 text-muted-foreground text-sm">Priority Level</p>
         <SegmentedControl
           value={priorityLevel}
           onChange={setPriorityLevel}
@@ -277,7 +277,7 @@ function SlippagePresetField({
 
   return (
     <div>
-      <p className="mb-3 text-sm font-semibold text-foreground">{label}</p>
+      <p className="mb-3 font-semibold text-foreground text-sm">{label}</p>
       <SegmentedControl
         tone="neutral"
         value={preset}
@@ -319,7 +319,7 @@ function ZapInTab() {
           <Info className="size-4" />
           <p className="font-semibold">What is Zap In?</p>
         </div>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-muted-foreground text-sm">
           Create a liquidity position instantly with one token and one
           click—using your preferred settings.
         </p>
@@ -333,7 +333,7 @@ function ZapInTab() {
       />
 
       <div>
-        <p className="mb-2 text-sm font-semibold text-foreground">Slippage</p>
+        <p className="mb-2 font-semibold text-foreground text-sm">Slippage</p>
         <div className="space-y-3">
           <ValueInputRow placeholder="Liquidity Slippage" defaultValue="3 %" />
           <ValueInputRow placeholder="Swap Slippage" defaultValue="3 %" />
@@ -359,7 +359,7 @@ function ZapInTab() {
 
       <div className="flex items-center justify-end gap-2 rounded-lg border border-border px-4 py-3">
         <span className="size-3 rounded-sm bg-primary" />
-        <span className="text-sm text-foreground">quote token</span>
+        <span className="text-foreground text-sm">quote token</span>
       </div>
 
       <div className="flex gap-3">
@@ -465,7 +465,7 @@ function OthersTab() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">Message Notifications</p>
+      <p className="text-muted-foreground text-sm">Message Notifications</p>
       <div className="space-y-5">
         {settings.map((setting) => (
           <div key={setting.id} className="flex items-center justify-between">
@@ -501,10 +501,10 @@ export function SettingsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger render={children} />}
-      <DialogContent className="gap-0 sm:max-w-auto w-fit border-border bg-background p-6">
+      <DialogContent className="w-fit gap-0 border-border bg-background p-6 sm:max-w-auto">
         <DialogTitle className="sr-only">Settings</DialogTitle>
 
-        <div className="flex items-center justify-between border-b border-border pb-4">
+        <div className="flex items-center justify-between border-border border-b pb-4">
           <div className="flex items-center gap-6">
             {SETTINGS_TABS.map((tab) => (
               <Button

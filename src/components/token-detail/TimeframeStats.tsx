@@ -37,7 +37,7 @@ export function TimeframeStats() {
                 : "border-transparent",
             )}
           >
-            <p className="text-b-3 font-semibold text-white">{tf.key}</p>
+            <p className="font-semibold text-b-3 text-white">{tf.key}</p>
             <p
               className={cn(
                 "text-b-4",
@@ -54,7 +54,7 @@ export function TimeframeStats() {
         {SUMMARY.map((s) => (
           <div key={s.label}>
             <p className="text-b-5 text-gray">{s.label}</p>
-            <p className="text-b-4 font-medium text-white">{s.value}</p>
+            <p className="font-medium text-b-4 text-white">{s.value}</p>
           </div>
         ))}
       </div>

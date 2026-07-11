@@ -9,7 +9,7 @@ export interface TrendingToken {
   name: string;
   symbol: string;
   decimals: number;
-  extensions: TrendingTokenExtensions;
+  extensions?: TrendingTokenExtensions;
   market_cap: number;
   fdv: number;
   total_supply: number;

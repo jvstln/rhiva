@@ -30,7 +30,7 @@ export function TokenAuditCard() {
           }
         />
       ))}
-      <div className="mt-3 flex items-center gap-1.5 text-b-3 font-medium text-white">
+      <div className="mt-3 flex items-center gap-1.5 font-medium text-b-3 text-white">
         <Sparkles className="size-4 text-primary" />
         GoPlus
       </div>
@@ -46,13 +46,13 @@ export function AvatarReusedCard({ items }: { items: typeof AVATAR_REUSED }) {
           <div key={i} className="flex items-center gap-2">
             <TokenThumbnail badge={undefined} className="size-8" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-b-4 font-medium text-white">
+              <p className="truncate font-medium text-b-4 text-white">
                 {item.name}
               </p>
               <p className="truncate text-b-5 text-gray">{item.wallet}</p>
             </div>
             <div className="text-right">
-              <p className="text-b-4 font-medium text-primary">{item.mc}</p>
+              <p className="font-medium text-b-4 text-primary">{item.mc}</p>
               <p className="text-b-5 text-gray">{item.age}</p>
             </div>
           </div>

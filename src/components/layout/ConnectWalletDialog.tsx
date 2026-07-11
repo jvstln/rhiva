@@ -59,7 +59,7 @@ function FallbackGlyph({
   label: string;
   className?: string;
 }) {
-  return <span className={cn("text-sm font-bold", className)}>{label}</span>;
+  return <span className={cn("font-bold text-sm", className)}>{label}</span>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -90,7 +90,7 @@ function WalletTile({ entry }: { entry: WalletEntry }) {
         {entry.icon}
       </span>
       {entry.name && (
-        <span className="text-sm text-foreground">{entry.name}</span>
+        <span className="text-foreground text-sm">{entry.name}</span>
       )}
     </button>
   );
@@ -120,8 +120,8 @@ function WalletSection({
 }) {
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-foreground">{title}</p>
-      <div className="flex flex-wrap gap-4 *:w-fit *:max-w-23 *:items-center *:grow-0">
+      <p className="font-medium text-foreground text-sm">{title}</p>
+      <div className="flex flex-wrap gap-4 *:w-fit *:max-w-23 *:grow-0 *:items-center">
         {children}
       </div>
     </div>
@@ -269,7 +269,7 @@ function WalletListStep({ onSelectSocials }: { onSelectSocials: () => void }) {
       </WalletSection>
 
       <div className="space-y-3">
-        <p className="text-sm font-medium text-foreground">More Wallets</p>
+        <p className="font-medium text-foreground text-sm">More Wallets</p>
         <div className="flex flex-wrap gap-3">
           {moreWallets.map((entry) => (
             <WalletTileCompact key={entry.id} entry={entry} />
@@ -329,7 +329,7 @@ function SocialLoginStep({ onGetStarted }: { onGetStarted: () => void }) {
       <GoogleButton />
       <XAndAppleButtons />
 
-      <p className="pt-2 text-center text-sm text-muted-foreground">
+      <p className="pt-2 text-center text-muted-foreground text-sm">
         Haven't got a wallet?{" "}
         <button
           type="button"
@@ -364,17 +364,17 @@ function EmailStep() {
 
       <div className="flex items-center gap-3 py-1">
         <span className="h-px flex-1 bg-border" />
-        <span className="text-sm text-muted-foreground">or</span>
+        <span className="text-muted-foreground text-sm">or</span>
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-muted-foreground text-sm">
         Looking for a self-custody wallet?
       </p>
 
       <button
         type="button"
-        className="mx-auto flex items-center gap-2 rounded-full bg-surface-2 px-5 py-2.5 text-sm text-foreground transition-colors hover:bg-surface-3"
+        className="mx-auto flex items-center gap-2 rounded-full bg-surface-2 px-5 py-2.5 text-foreground text-sm transition-colors hover:bg-surface-3"
       >
         <Waves className="size-4" />
         Find on WalletGuide
@@ -433,14 +433,14 @@ export function ConnectWalletDialog({
             <span />
           )}
 
-          <DialogTitle className="text-center text-xl font-semibold text-foreground">
+          <DialogTitle className="text-center font-semibold text-foreground text-xl">
             Connect Wallet
           </DialogTitle>
         </div>
 
         {step === "wallets" && (
           <>
-            <p className="mb-5 text-sm text-muted-foreground">
+            <p className="mb-5 text-muted-foreground text-sm">
               By connecting your wallet, you are confirming that you understand
               and accept the{" "}
               <button

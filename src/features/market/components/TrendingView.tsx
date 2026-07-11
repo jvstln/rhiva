@@ -3,9 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   AlertCircle,
-  AlertTriangle,
   Copy,
-  Crosshair,
   Crown,
   Eye,
   Fish,
@@ -173,7 +171,7 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
             tooltip={
               <InfoBadgeTooltipRow
                 label="X Connection"
-                value={token.extensions.twitter ?? "N/A"}
+                value={token.extensions?.twitter ?? "N/A"}
               />
             }
           />
@@ -185,9 +183,9 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
               <InfoBadgeTooltipRow
                 label="Website"
                 value={
-                  token.extensions.website ? (
-                    <a href={token.extensions.website} target="_blank">
-                      {token.extensions.website}
+                  token.extensions?.website ? (
+                    <a href={token.extensions?.website} target="_blank">
+                      {token.extensions?.website}
                     </a>
                   ) : (
                     "N/A"
@@ -299,7 +297,7 @@ export interface TrendingPairMetric {
 
 function TokenSecurityBadges({ metrics }: { metrics: TrendingPairMetric[] }) {
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="grid grid-cols-4 gap-1">
       {metrics.map((metric) => (
         <InfoBadge
           key={metric.id}

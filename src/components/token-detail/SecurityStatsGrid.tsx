@@ -16,7 +16,7 @@ function StatGrid(props: {
           <p className="text-b-5 text-gray">{item.label}</p>
           <p
             className={cn(
-              "text-b-3 font-semibold",
+              "font-semibold text-b-3",
               item.tone === "down" && "text-down",
               item.tone === "warning" && "text-warning",
               !item.tone && "text-white",
@@ -32,14 +32,14 @@ function StatGrid(props: {
 
 export function SecurityStatsGrid() {
   return (
-    <div className="border-t border-border/70">
+    <div className="border-border/70 border-t">
       <StatGrid items={SECURITY_PRIMARY} />
       <StatGrid items={SECURITY_SECONDARY} />
       <div className="grid grid-cols-4 gap-2 px-4 pb-3">
         {SECURITY_AUDIT.map((item) => (
           <div key={item.label}>
             <p className="text-b-5 text-gray">{item.label}</p>
-            <p className="flex items-center gap-1 text-b-3 font-semibold text-white">
+            <p className="flex items-center gap-1 font-semibold text-b-3 text-white">
               {item.value}
               {item.ok && <CheckCircle2 className="size-3.5 text-up" />}
             </p>

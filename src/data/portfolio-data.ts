@@ -109,7 +109,10 @@ export const PNL_CALENDAR_METRICS = {
   totalLoss: "$0.0050",
 };
 
-export const PNL_CALENDAR_DAYS: Record<string, { pnl: number; positions: number }> = {
+export const PNL_CALENDAR_DAYS: Record<
+  string,
+  { pnl: number; positions: number }
+> = {
   "2025-07-02": { pnl: 41.16, positions: 3 },
   "2025-07-03": { pnl: 41.16, positions: 3 },
   "2025-07-05": { pnl: -0.51, positions: 3 },

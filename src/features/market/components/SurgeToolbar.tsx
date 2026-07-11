@@ -1,23 +1,15 @@
-import { Activity, Coins, Filter, Fuel, Rocket, Shield } from "lucide-react";
+import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SolanaIcon } from "@/components/ui/icons";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
-import { Toggle } from "@/components/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useMarketStore } from "../market.store";
 import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
 
-const PRIORITY_TABS = ["P1", "P2", "P3"] as const;
+const _PRIORITY_TABS = ["P1", "P2", "P3"] as const;
 
 export const SurgeToolbar = () => {
   return (

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Bot,
-  ChevronLeft,
-  Component,
-  Gift,
-  Repeat,
-  XSquare,
-} from "lucide-react";
+import { ChevronLeft, Component, Gift, Repeat, XSquare } from "lucide-react";
 import Link from "next/link";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

@@ -9,9 +9,9 @@ interface InfoSectionProps {
 
 export function InfoSection({ title, aside, children }: InfoSectionProps) {
   return (
-    <div className="border-t border-border/70 px-4 py-3">
+    <div className="border-border/70 border-t px-4 py-3">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-b-2 font-semibold text-white">{title}</h3>
+        <h3 className="font-semibold text-b-2 text-white">{title}</h3>
         <div className="flex items-center gap-2 text-b-4 text-gray">
           {aside}
           <ChevronUp className="size-4" />

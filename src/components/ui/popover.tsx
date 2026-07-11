@@ -37,7 +37,7 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
-            "z-50 flex w-85 origin-(--transform-origin) flex-col gap-2.5 rounded-lg bg-popover [--padding:--spacing(2.5)] p-(--padding) text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-start-2 data-[side=inline-start]:slide-in-from-end-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+            "data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-start-2 data-[side=inline-start]:slide-in-from-end-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 z-50 flex w-85 origin-(--transform-origin) flex-col gap-2.5 rounded-lg bg-popover p-(--padding) text-popover-foreground text-sm shadow-md outline-hidden ring-1 ring-foreground/10 duration-100 [--padding:--spacing(2.5)] data-closed:animate-out data-open:animate-in",
             className,
           )}
           {...props}
@@ -52,7 +52,7 @@ function PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="popover-header"
       className={cn(
-        "flex flex-col -mt-(--padding) -mx-(--padding) p-(--padding) gap-0.5 text-sm border-b",
+        "-mt-(--padding) -mx-(--padding) flex flex-col gap-0.5 border-b p-(--padding) text-sm",
         className,
       )}
       {...props}

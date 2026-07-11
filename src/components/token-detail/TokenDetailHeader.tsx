@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils";
 
 export function TokenDetailHeader() {
   return (
-    <div className="flex flex-wrap items-center gap-8 border-b border-border/70 px-6 py-4">
+    <div className="flex flex-wrap items-center gap-8 border-border/70 border-b px-6 py-4">
       <div className="flex items-center gap-3">
         <TokenThumbnail badge={undefined} className="size-11" />
         <div>
           <div className="flex items-center gap-1.5">
-            <h1 className="text-b-1 font-bold text-white">TikTok</h1>
+            <h1 className="font-bold text-b-1 text-white">TikTok</h1>
             <span className="text-b-4 text-gray">TikTok coin</span>
             <Star className="size-3.5 text-gray" />
             <Share2 className="size-3.5 text-gray" />
@@ -25,7 +25,7 @@ export function TokenDetailHeader() {
         </div>
       </div>
 
-      <div className="text-h5 font-bold text-white">$194.23K</div>
+      <div className="font-bold text-h5 text-white">$194.23K</div>
 
       <div className="flex flex-1 flex-wrap items-center gap-x-8 gap-y-2">
         {HEADER_STATS.map((stat) => (
@@ -33,7 +33,7 @@ export function TokenDetailHeader() {
             <p className="text-b-5 text-gray">{stat.label}</p>
             <p
               className={cn(
-                "text-b-2 font-semibold",
+                "font-semibold text-b-2",
                 stat.tone === "down" ? "text-down" : "text-white",
               )}
             >

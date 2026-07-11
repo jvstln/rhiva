@@ -11,7 +11,7 @@ export function PositionsPanel() {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Positions");
 
   return (
-    <div className="flex-1 border-t border-border/70">
+    <div className="flex-1 border-border/70 border-t">
       <div className="flex items-center gap-6 px-4 py-3">
         {TABS.map((t) => (
           <button
@@ -19,13 +19,13 @@ export function PositionsPanel() {
             key={t}
             onClick={() => setTab(t)}
             className={cn(
-              "relative pb-2 text-b-2 font-semibold transition-colors",
+              "relative pb-2 font-semibold text-b-2 transition-colors",
               tab === t ? "text-white" : "text-gray hover:text-white/70",
             )}
           >
             {t}
             {tab === t && (
-              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />
+              <span className="-bottom-px absolute inset-x-0 h-0.5 bg-primary" />
             )}
           </button>
         ))}
@@ -36,7 +36,7 @@ export function PositionsPanel() {
           <MapPin className="size-6" />
         </div>
         <div className="text-center">
-          <p className="text-b-1 font-semibold text-white">
+          <p className="font-semibold text-b-1 text-white">
             No Wallet Connected
           </p>
           <p className="mt-1 text-b-3 text-gray">

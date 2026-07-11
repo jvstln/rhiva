@@ -19,7 +19,7 @@ export function TradesTable() {
   const [tab, setTab] = useState<(typeof TRADE_TABS)[number]>("Trades");
 
   return (
-    <section className="border-t border-border/70">
+    <section className="border-border/70 border-t">
       <div className="flex items-center gap-6 overflow-x-auto px-6 py-3">
         {TRADE_TABS.map((t) => (
           <button
@@ -27,7 +27,7 @@ export function TradesTable() {
             key={t}
             onClick={() => setTab(t)}
             className={cn(
-              "shrink-0 text-b-2 font-semibold transition-colors",
+              "shrink-0 font-semibold text-b-2 transition-colors",
               tab === t ? "text-primary" : "text-gray hover:text-white/70",
             )}
           >
@@ -39,7 +39,7 @@ export function TradesTable() {
       <div className="overflow-x-auto px-6 pb-6">
         <table className="w-full min-w-[900px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-border/70 text-b-4 text-gray">
+            <tr className="border-border/70 border-b text-b-4 text-gray">
               {COLUMNS.map((col) => (
                 <th
                   key={col}
@@ -54,7 +54,7 @@ export function TradesTable() {
           </thead>
           <tbody>
             {TRADES.map((row, i) => (
-              <tr key={i} className="border-b border-border/40 text-b-4">
+              <tr key={i} className="border-border/40 border-b text-b-4">
                 <td className="py-2 pr-6 text-gray">{row.age}</td>
                 <td
                   className={cn(

@@ -17,8 +17,8 @@ export function PoolVolumeAndTvl() {
   return (
     <div className="space-y-5 p-4">
       <div>
-        <p className="text-b-3 font-medium text-white">Volume</p>
-        <p className="mt-1 text-h6 font-bold text-white">
+        <p className="font-medium text-b-3 text-white">Volume</p>
+        <p className="mt-1 font-bold text-h6 text-white">
           {POOL_DETAIL.volume}
         </p>
         <div className="mt-2 h-24 w-full">
@@ -62,7 +62,7 @@ export function PoolVolumeAndTvl() {
       </div>
 
       <div>
-        <p className="text-b-3 font-medium text-white">TVL Distribution</p>
+        <p className="font-medium text-b-3 text-white">TVL Distribution</p>
         <p className="mt-2 flex items-center gap-4 text-b-5 text-gray">
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full bg-primary" /> USDC
@@ -93,7 +93,7 @@ export function PoolVolumeAndTvl() {
 
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-b-3 font-medium text-white">Token Info</p>
+          <p className="font-medium text-b-3 text-white">Token Info</p>
           <div className="flex rounded-md bg-secondary p-0.5">
             {(["USDC", "SOL"] as const).map((t) => (
               <button
@@ -101,7 +101,7 @@ export function PoolVolumeAndTvl() {
                 key={t}
                 onClick={() => setTokenTab(t)}
                 className={cn(
-                  "rounded-md px-2.5 py-1 text-b-5 font-medium",
+                  "rounded-md px-2.5 py-1 font-medium text-b-5",
                   tokenTab === t ? "bg-background text-white" : "text-gray",
                 )}
               >
@@ -114,7 +114,7 @@ export function PoolVolumeAndTvl() {
           {TOKEN_INFO_COLUMNS.map((col, i) => (
             <div key={i}>
               <p className="text-b-5 text-gray">{col.label}</p>
-              <p className="text-b-4 font-medium text-white">{col.value}</p>
+              <p className="font-medium text-b-4 text-white">{col.value}</p>
               {col.sub && (
                 <p
                   className={cn(

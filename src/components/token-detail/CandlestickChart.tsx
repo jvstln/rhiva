@@ -90,7 +90,7 @@ export function CandlestickChart({ data }: { data: Candle[] }) {
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[90px] w-full border-t border-border/70">
+      <div className="h-[90px] w-full border-border/70 border-t">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}

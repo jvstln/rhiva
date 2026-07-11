@@ -9,7 +9,8 @@ export const mockPumpLiveStreams = [
     channelAvatarUrl: "https://picsum.photos/seed/avatar-1/64/64",
     marketCap: 4650,
     reactions: ["🏳️‍🌈", "💦"],
-    description: "Launched on PumpSmart.org Oy Gay!\n🏳️‍🌈💦 Oy Vey... Make it Gay! The gays...",
+    description:
+      "Launched on PumpSmart.org Oy Gay!\n🏳️‍🌈💦 Oy Vey... Make it Gay! The gays...",
     commentsCount: 0,
     timeAgo: "3 h ago",
     hasAudit: true,

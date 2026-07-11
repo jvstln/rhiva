@@ -1,5 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { ArrowUpDown, Copy, EyeOff, Share, Share2 } from "lucide-react";
+import { ArrowUpDown, EyeOff, Share } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/button/copy-button";
 import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
-import { PORTFOLIO_SUMMARY, POSITIONS } from "@/data/portfolio-data";
+import { POSITIONS } from "@/data/portfolio-data";
 import { capitalize, cn } from "@/lib/utils";
 
 const columnHelper = createColumnHelper<(typeof POSITIONS)[0]>();

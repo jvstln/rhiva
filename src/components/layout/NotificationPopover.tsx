@@ -32,7 +32,7 @@ export const NotificationPopover = ({
           )}
         </PopoverHeader>
 
-        <div className="flex-1 overflow-y-auto -m-(--padding)">
+        <div className="-m-(--padding) flex-1 overflow-y-auto">
           {MOCK_NOTIFICATIONS.length === 0 ? (
             <p className="px-5 py-10 text-center text-b-3 text-gray">
               You're all caught up.
@@ -43,22 +43,22 @@ export const NotificationPopover = ({
                 type="button"
                 key={n.id}
                 // onClick={() => onSelect?.(n.id)}
-                className="flex w-full items-start gap-3 border-b border-white/5 px-2 py-4 text-left transition-colors last:border-none hover:bg-muted"
+                className="flex w-full items-start gap-3 border-white/5 border-b px-2 py-4 text-left transition-colors last:border-none hover:bg-muted"
               >
                 <Avatar>
                   <AvatarFallback>US</AvatarFallback>
                 </Avatar>
 
                 <div className="min-w-0">
-                  <h3 className="text-b-2 font-semibold text-white">
+                  <h3 className="font-semibold text-b-2 text-white">
                     {n.title}
                   </h3>
-                  <p className="mt-1 text-b-3 leading-snug text-muted-foreground">
+                  <p className="mt-1 text-b-3 text-muted-foreground leading-snug">
                     {n.description}
                   </p>
                 </div>
                 {!n.read && (
-                  <span className="ml-auto mt-1.5 size-2 shrink-0 rounded-full bg-primary" />
+                  <span className="mt-1.5 ml-auto size-2 shrink-0 rounded-full bg-primary" />
                 )}
               </button>
             ))

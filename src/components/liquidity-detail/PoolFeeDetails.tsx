@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export function PoolFeeDetails() {
   return (
-    <div className="space-y-4 border-b border-border/70 p-4">
+    <div className="space-y-4 border-border/70 border-b p-4">
       <div className="grid grid-cols-2 gap-4">
         <FeeStat
           label="24h Fees"
@@ -45,10 +45,10 @@ function FeeStat({
     <div>
       <p className="text-b-4 text-gray">{label}</p>
       <p className="mt-1 flex items-baseline gap-2">
-        <span className="text-b-1 font-bold text-white">{value}</span>
+        <span className="font-bold text-b-1 text-white">{value}</span>
         <span
           className={cn(
-            "text-b-4 font-medium",
+            "font-medium text-b-4",
             isDown ? "text-down" : "text-up",
           )}
         >
