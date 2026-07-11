@@ -8,6 +8,19 @@ import { cn } from "@/lib/utils";
 
 const MODES = ["Spot", "Curve", "Bid-Ask"] as const;
 const RATIO_PRESETS = ["50:50", "75:25", "40:60"] as const;
+const BINS = Array.from({ length: 42 }, (_, i) => i);
+
+const getBinHeight = (bin: number, mode: string) => {
+  const mid = 20.5;
+  if (mode === "Spot") return 100;
+  if (mode === "Curve") {
+    return Math.max(5, 100 * Math.exp(-((bin - mid) ** 2) / 80));
+  }
+  if (mode === "Bid-Ask") {
+    return Math.min(100, 30 + Math.abs(bin - mid) * 3.5);
+  }
+  return 50;
+};
 
 export function PoolTradeForm() {
   const [mode, setMode] = useState<(typeof MODES)[number]>("Spot");
@@ -17,9 +30,9 @@ export function PoolTradeForm() {
   return (
     <div className="space-y-5 p-4">
       <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
-        <TabsList className="w-full">
+        <TabsList className="w-full" variant={"line"}>
           {MODES.map((m) => (
-            <TabsTrigger key={m} value={m} className="text-b-2">
+            <TabsTrigger key={m} value={m}>
               {m}
             </TabsTrigger>
           ))}
@@ -33,7 +46,7 @@ export function PoolTradeForm() {
             defaultValue="0.0"
             className="h-12 border-border/70 pr-16 text-b-1"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-b-3 font-medium text-gray">
+          <span className="-translate-y-1/2 absolute top-1/2 right-3 font-medium text-b-3 text-gray">
             SOL
           </span>
         </div>
@@ -84,17 +97,60 @@ export function PoolTradeForm() {
             <button
               type="button"
               key={p}
-              className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-gray hover:border-primary/50 hover:text-white"
+              className="rounded-md border border-border/70 py-1.5 font-medium text-b-4 text-gray hover:border-primary/50 hover:text-white"
             >
               {p}
             </button>
           ))}
           <button
             type="button"
-            className="rounded-md border border-border/70 py-1.5 text-b-4 font-medium text-gray"
+            className="rounded-md border border-border/70 py-1.5 font-medium text-b-4 text-gray"
           >
             Custom ration
           </button>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-center text-b-3 text-gray">
+          Current Price:{" "}
+          <span className="font-medium text-white">
+            0.05329 {mode === "Spot" ? "SOL per USDC" : ""}
+          </span>
+        </p>
+
+        <div className="relative mt-4">
+          <div className="flex h-16 items-end gap-[1px]">
+            {BINS.map((bin) => (
+              <span
+                key={bin}
+                className={cn(
+                  "flex-1",
+                  bin <= 20 ? "bg-violet-600" : "bg-primary",
+                )}
+                style={{ height: `${getBinHeight(bin, mode)}%` }}
+              />
+            ))}
+          </div>
+          {/* Center line */}
+          <div className="-translate-x-1/2 absolute top-[-10px] bottom-0 left-1/2 w-0.5 bg-white" />
+
+          {/* Bottom solid bar */}
+          <div className="h-1 w-full bg-primary" />
+
+          {/* End markers */}
+          <div className="absolute bottom-[-4px] left-0 h-3 w-0.5 bg-white" />
+          <div className="absolute right-0 bottom-[-4px] h-3 w-0.5 bg-white" />
+        </div>
+
+        <div className="mt-1 flex justify-between text-b-6 text-gray">
+          <span>0.05216</span>
+          <span>0.05216</span>
+          <span>0.05216</span>
+          <span>0.05216</span>
+          <span>0.05216</span>
+          <span>0.05216</span>
+          <span>0.05216</span>
         </div>
       </div>
     </div>
@@ -115,7 +171,7 @@ function TokenToggle({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-md py-2 text-b-3 font-semibold transition-colors",
+        "rounded-md py-2 font-semibold text-b-3 transition-colors",
         active
           ? "bg-primary text-primary-foreground"
           : "bg-secondary text-gray",

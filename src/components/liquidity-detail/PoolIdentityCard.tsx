@@ -1,4 +1,3 @@
-import { PoolPairIcon } from "@/components/liquidity/PoolTableCells";
 import { LIQUIDITY_BINS, POOL_DETAIL } from "@/data/liquidity-detail-data";
 import { cn } from "@/lib/utils";
 
@@ -7,11 +6,18 @@ export function PoolIdentityCard() {
   const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
 
   return (
-    <div className="space-y-4 border-b border-border/70 p-4">
+    <div className="space-y-4 border-border/70 border-b p-4">
       <div className="flex items-center gap-3">
-        <PoolPairIcon />
+        <div className="relative flex size-9 shrink-0 items-center">
+          <span className="z-10 flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-b-6 text-white ring-2 ring-card">
+            S
+          </span>
+          <span className="-ml-2.5 flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 font-bold text-b-6 text-white ring-2 ring-card">
+            U
+          </span>
+        </div>
         <div>
-          <p className="text-b-1 font-bold text-white">{POOL_DETAIL.pair}</p>
+          <p className="font-bold text-b-1 text-white">{POOL_DETAIL.pair}</p>
           <p className="text-b-5 text-gray">
             Bin Step: {binStep} Fee: {fee}
           </p>
@@ -79,15 +85,15 @@ function TokenBalanceRow({
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-b-6 font-bold text-white">
+        <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-b-6 text-white">
           {symbol[0]}
         </span>
         <div>
-          <p className="text-b-3 font-semibold text-white">{symbol}</p>
+          <p className="font-semibold text-b-3 text-white">{symbol}</p>
           <p className="text-b-5 text-gray">{meta}</p>
         </div>
       </div>
-      <p className="text-b-3 font-medium text-white">{balance}</p>
+      <p className="font-medium text-b-3 text-white">{balance}</p>
     </div>
   );
 }

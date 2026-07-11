@@ -97,3 +97,21 @@ export const PORTFOLIO_SUMMARY = {
   tradeableBalance: "$0",
   todaysPnl: "$0.00 (0.00%)",
 };
+
+export const PNL_CALENDAR_METRICS = {
+  totalNetWorth: "$0.0050",
+  totalInvested: "$0.0050",
+  feeEarned: "$0.0050",
+  totalClosed: "0",
+  monthsProfit: "$0.0050",
+  winRate: "$0.0050",
+  totalProfit: "$0.0050",
+  totalLoss: "$0.0050",
+};
+
+export const PNL_CALENDAR_DAYS: Record<string, { pnl: number; positions: number }> = {
+  "2025-07-02": { pnl: 41.16, positions: 3 },
+  "2025-07-03": { pnl: 41.16, positions: 3 },
+  "2025-07-05": { pnl: -0.51, positions: 3 },
+  "2025-07-08": { pnl: 41.16, positions: 3 },
+};

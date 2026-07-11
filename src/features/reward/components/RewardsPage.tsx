@@ -17,6 +17,11 @@ import {
 import Image from "next/image";
 import type * as React from "react";
 import { useMemo, useState } from "react";
+import {
+  DashboardDescription,
+  DashboardHeader,
+  DashboardSlot,
+} from "@/components/layout/DashboardUi";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   mockRewardAccount,
   mockRewardQuests,
@@ -32,11 +38,6 @@ import {
   type RewardTier,
 } from "@/data/reward-data";
 import { cn, formatCompactNumber } from "@/lib/utils";
-import {
-  DashboardDescription,
-  DashboardHeader,
-  DashboardSlot,
-} from "../layout/DashboardUi";
 
 /* ------------------------------------------------------------------ */
 /* Tier progress helper                                                 */
@@ -108,20 +109,20 @@ function CurrentTierCard() {
 
   return (
     <div className="relative overflow-hidden rounded-lg bg-surface-1 p-6">
-      <div className="pointer-events-none absolute left-1/2 top-0 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary blur-[100px]" />
+      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-32 rounded-full bg-primary blur-[100px]" />
 
       <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
         <div className="flex shrink-0 flex-col items-center gap-1">
           <TierBadge tier={currentTier} locked={false} size={110} />
-          <span className="text-lg text-foreground/80">1x</span>
-          <span className="text-sm text-muted-foreground/60">
+          <span className="text-foreground/80 text-lg">1x</span>
+          <span className="text-muted-foreground/60 text-sm">
             10% Referral Rate
           </span>
         </div>
 
         <div className="w-full flex-1 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Next Tier:{" "}
               <span className="font-semibold text-foreground">
                 {nextTier?.name ?? "MAX"}
@@ -137,7 +138,7 @@ function CurrentTierCard() {
             </Button>
           </div>
 
-          <p className="text-xl font-medium text-foreground/90">
+          <p className="font-medium text-foreground/90 text-xl">
             {formatCompactNumber(mockRewardAccount.currentXp)} of{" "}
             {formatCompactNumber(nextTier?.minXp ?? currentTier.minXp)} XP
           </p>
@@ -149,7 +150,7 @@ function CurrentTierCard() {
             />
           </div>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {nextTier
               ? `You're almost there! Trade ${xpToNext} SOL to reach ${nextTier.name}`
               : "You've reached the highest tier!"}
@@ -191,11 +192,11 @@ function StatCard({
           <Icon className={cn("size-3.5", iconClassName)} />
         </span>
         <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-lg font-semibold text-foreground">{value}</p>
+          <p className="text-muted-foreground text-sm">{label}</p>
+          <p className="font-semibold text-foreground text-lg">{value}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">{helper}</p>
+      <p className="mt-4 text-muted-foreground text-sm">{helper}</p>
     </div>
   );
 }
@@ -238,19 +239,26 @@ function StatsRow() {
 function RoadmapStep({
   tier,
   unlocked,
-  isLast,
+  index,
 }: {
   tier: RewardTier;
   unlocked: boolean;
   isLast: boolean;
+  index: number;
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center gap-2">
+    <div
+      className={cn(
+        "flex flex-1 flex-col items-center gap-2",
+        index === 3 && "hidden sm:flex",
+        index === 4 && "hidden md:flex",
+      )}
+    >
       <TierBadge tier={tier} locked={!unlocked} size={100} />
       <div className="flex flex-col items-center gap-0.5">
         <span
           className={cn(
-            "text-lg font-medium",
+            "font-medium text-lg",
             unlocked ? "text-primary" : "text-muted-foreground",
           )}
         >
@@ -276,8 +284,8 @@ function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
     <div className="space-y-7 rounded-lg border border-border p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-lg font-medium text-foreground">Tier Roadmap</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="font-medium text-foreground text-lg">Tier Roadmap</p>
+          <p className="text-muted-foreground text-sm">
             Progress through the ranks and unlock exclusive badges
           </p>
         </div>
@@ -285,36 +293,39 @@ function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
           size="sm"
           variant="ghost"
           onClick={onViewAll}
-          className="rounded-full bg-primary/10 text-xs text-foreground hover:bg-primary/20"
+          className="rounded-full bg-primary/10 text-foreground text-xs hover:bg-primary/20"
         >
           View All Tiers
         </Button>
       </div>
 
-      <div className="relative flex items-start">
-        {visibleTiers.map((tier, index) => {
-          const unlocked = mockRewardAccount.currentXp >= tier.minXp;
-          return (
-            <RoadmapStep
-              key={tier.id}
-              tier={tier}
-              unlocked={unlocked}
-              isLast={index === visibleTiers.length - 1}
-            />
-          );
-        })}
-
-        {/* connecting line, sits behind the badges */}
-        <div className="absolute left-[10%] right-[10%] top-[50px] -z-10 h-px bg-white/10" />
-      </div>
+      <ScrollArea>
+        <div className="relative flex items-start">
+          {visibleTiers.map((tier, index) => {
+            const unlocked = mockRewardAccount.currentXp >= tier.minXp;
+            return (
+              <RoadmapStep
+                key={tier.id}
+                tier={tier}
+                unlocked={unlocked}
+                isLast={index === visibleTiers.length - 1}
+                index={index}
+              />
+            );
+          })}
+          {/* connecting line, sits behind the badges */}
+          <div className="-z-10 absolute top-[50px] right-[10%] left-[10%] h-px bg-white/10" />
+        </div>
+        <ScrollBar orientation="horizontal" showIndicator />
+      </ScrollArea>
 
       <div className="flex items-center gap-3 rounded-lg bg-primary/4 p-4">
         <Trophy className="size-9 shrink-0 text-casablanca" />
         <div>
-          <p className="text-sm font-semibold text-foreground/80">
+          <p className="font-semibold text-foreground/80 text-sm">
             Climb the ranks, earn more XP, and unlock exclusive rewards!
           </p>
-          <p className="text-xs text-muted-foreground/60">
+          <p className="text-muted-foreground/60 text-xs">
             The more you engage, the higher you go.
           </p>
         </div>
@@ -349,7 +360,7 @@ function TierRoadmapDialog({
                 <TierBadge tier={tier} locked={!unlocked} size={84} />
                 <span
                   className={cn(
-                    "text-sm font-medium",
+                    "font-medium text-sm",
                     unlocked ? "text-primary" : "text-muted-foreground",
                   )}
                 >
@@ -393,18 +404,18 @@ function ReferralCard() {
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-primary/20 p-6">
-      <div className="pointer-events-none absolute left-1/2 top-0 size-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/60 blur-[120px]" />
+      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-56 rounded-full bg-primary/60 blur-[120px]" />
 
       <div className="relative space-y-6">
         <div>
-          <p className="text-lg font-medium text-foreground">Referral</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="font-medium text-foreground text-lg">Referral</p>
+          <p className="text-muted-foreground text-sm">
             Share your access code with your friends and earn 10% of their fees.
           </p>
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">
+          <p className="font-medium text-foreground text-sm">
             Your Referral Link
           </p>
           <div className="flex items-center overflow-hidden rounded-lg border border-primary/10">
@@ -433,7 +444,7 @@ function ReferralCard() {
               </span>
             </div>
             <p className="text-lg text-muted-foreground">Total Invited</p>
-            <p className="text-2xl font-medium text-foreground">
+            <p className="font-medium text-2xl text-foreground">
               {mockRewardAccount.totalInvited}
             </p>
           </div>
@@ -445,13 +456,13 @@ function ReferralCard() {
               </span>
             </div>
             <p className="text-lg text-muted-foreground">Total Earnings</p>
-            <p className="text-2xl font-medium text-foreground">
+            <p className="font-medium text-2xl text-foreground">
               {mockRewardAccount.totalEarnings} SOL
             </p>
           </div>
         </div>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-muted-foreground text-sm">
           Minimum claim amount is {mockRewardAccount.minClaimAmount} SOL
         </p>
 
@@ -543,11 +554,11 @@ function QuestRing({
         className={colorClassName}
       >
         <Icon className={cn("size-5", colorClassName)} />
-        <span className="text-sm font-semibold text-foreground">
+        <span className="font-semibold text-foreground text-sm">
           +{rewardXp.toLocaleString()}
         </span>
       </RadialProgress>
-      <p className="max-w-[160px] text-center text-sm text-muted-foreground">
+      <p className="max-w-[160px] text-center text-muted-foreground text-sm">
         {label}
       </p>
     </div>
@@ -577,7 +588,7 @@ function QuestsCard() {
 /* Page                                                                 */
 /* ------------------------------------------------------------------ */
 
-export function RewardsView() {
+export function RewardsPage() {
   const [tierDialogOpen, setTierDialogOpen] = useState(false);
 
   return (
@@ -589,7 +600,7 @@ export function RewardsView() {
         </DashboardDescription>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-6">
           <CurrentTierCard />
           <StatsRow />

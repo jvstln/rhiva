@@ -63,7 +63,9 @@ export const capitalize = (str: string) => {
   );
 };
 
-export function getInitials(name: string) {
+export function getInitials(name: string | null) {
+  if (!name) return "--";
+
   let initials = name
     .split(" ")
     .map((n) => n[0])

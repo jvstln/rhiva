@@ -19,12 +19,12 @@ export function PortfolioHero() {
       </p>
 
       <div className="mt-2 flex items-center gap-2">
-        <span className="text-h2 font-bold text-white">
+        <span className="font-bold text-h2 text-white">
           {PORTFOLIO_SUMMARY.totalValue}
         </span>
         <button
           type="button"
-          className="flex items-center gap-0.5 text-b-2 font-medium text-gray"
+          className="flex items-center gap-0.5 font-medium text-b-2 text-gray"
         >
           USD <ChevronDown className="size-4" />
         </button>
@@ -34,7 +34,7 @@ export function PortfolioHero() {
         Today's PnL {PORTFOLIO_SUMMARY.todaysPnl}
       </p>
 
-      <div className="mt-6 flex *:grow min-w-xs items-center gap-3">
+      <div className="mt-6 flex min-w-xs items-center gap-3 *:grow">
         <TokenDialog>
           <Button variant="outline">Token</Button>
         </TokenDialog>

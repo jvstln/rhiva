@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
-import type { MemeToken, TrendingToken } from "../market.token.type";
+import type { MemeToken, TrendingToken } from "../../market.token.type";
 
 interface TokenHoverTooltipProps {
   token: MemeToken | TrendingToken;

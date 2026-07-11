@@ -20,6 +20,7 @@ import {
   UserRound,
   UserRoundCheck,
 } from "lucide-react";
+import Link from "next/link";
 import type * as React from "react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,6 +37,7 @@ import { getInitials } from "../../../lib/utils";
 import { useTrendingTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import type { TrendingToken } from "../market.type";
+import { SocialHoverTooltip } from "./tooltips/SocialHoverTooltip";
 
 /* ------------------------------------------------------------------ */
 /* Favorite / watchlist star toggle                                    */
@@ -128,29 +130,10 @@ function Sparkline({
 /* Pair info cell (star, avatar, name, sub-icons, watcher count)       */
 /* ------------------------------------------------------------------ */
 
-interface SubIconProps {
-  icon: React.ComponentType<{ className?: string }>;
-  active?: boolean;
-  activeClassName?: string;
-  label?: string;
-}
+// SubIcon logic replaced with InfoBadge variant="icon"
 
-function SubIcon({ icon: Icon, active, activeClassName, label }: SubIconProps) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      className={cn(
-        "flex size-3.5 items-center justify-center transition-colors hover:text-silver",
-        active ? (activeClassName ?? "text-silver") : "text-white/15",
-      )}
-    >
-      <Icon className="size-full" />
-    </button>
-  );
-}
-
-import { TokenHoverTooltip } from "./TokenHoverTooltip";
+import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
+import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
 
 function PairInfoCell({ token }: { token: TrendingToken }) {
   return (
@@ -160,9 +143,7 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
       <TokenHoverTooltip token={token}>
         <Avatar variant="square" size="lg">
           <AvatarImage src={token.logo_uri ?? ""} />
-          <AvatarFallback className="shimmer uppercase">
-            {getInitials(token.name)}
-          </AvatarFallback>
+          <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
         </Avatar>
       </TokenHoverTooltip>
 
@@ -175,33 +156,53 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <span className="font-medium text-ocean-green text-xs">
             {formatAge(token.recent_listing_time)}
           </span>
-          <SubIcon
+          <InfoBadge
+            variant="icon"
             icon={UserRound}
-            active={!!token.extensions?.github}
-            activeClassName="text-dodger-blue"
-            label="Dev activity"
+            aria-label="Dev activity"
+            tooltip={<SocialHoverTooltip token={token} />}
           />
-          <SubIcon
+          <InfoBadge
+            variant="icon"
             icon={AlertCircle}
-            active={false} // No direct alerts field in Token
-            activeClassName="text-casablanca"
-            label="Alerts"
+            aria-label="Alerts"
+            tooltip={
+              <InfoBadgeTooltipRow
+                label="X Connection"
+                value={token.extensions.twitter ?? "N/A"}
+              />
+            }
           />
-          <SubIcon
+          <InfoBadge
+            variant="icon"
             icon={Globe}
-            active={!!token.extensions?.website}
-            label="Website"
+            aria-label="Website"
+            tooltip={
+              <InfoBadgeTooltipRow
+                label="Website"
+                value={
+                  token.extensions.website ? (
+                    <a href={token.extensions.website} target="_blank">
+                      {token.extensions.website}
+                    </a>
+                  ) : (
+                    "N/A"
+                  )
+                }
+              />
+            }
           />
-          <SubIcon
+          <InfoBadge
+            variant="icon"
             icon={Flag}
-            active={!!token.extensions?.description}
-            label="Add note"
+            tooltip={token.extensions?.description}
+            aria-label="Add note"
           />
-          <SubIcon icon={Search} active label="Inspect pair" />
+          <InfoBadge variant="icon" icon={Search} aria-label="Inspect pair" />
         </div>
         <div className="mt-auto flex items-center gap-1 text-[11px] text-white/30">
           <Eye className="size-3" />
@@ -294,41 +295,28 @@ export interface TrendingPairMetric {
   suffix?: string;
 }
 
-function MetricPill({ metric }: { metric: TrendingPairMetric }) {
-  const Icon = METRIC_ICONS[metric.id] ?? UserRoundCheck;
-  const toneClass =
-    metric.tone === "risk"
-      ? "text-roman border-roman/40"
-      : "text-ocean-green border-ocean-green/40";
-
-  return (
-    <div
-      title={metric.label}
-      className={cn(
-        "flex h-6 w-max shrink-0 items-center gap-1 rounded-md border bg-transparent px-1.5 font-medium text-[11px] tabular-nums",
-        toneClass,
-      )}
-    >
-      <Icon className="size-3 shrink-0" />
-      <span>{metric.value}%</span>
-      {metric.suffix && <span className="text-white/30">{metric.suffix}</span>}
-    </div>
-  );
-}
+// MetricPill replaced with InfoBadge variant="badge"
 
 function TokenSecurityBadges({ metrics }: { metrics: TrendingPairMetric[] }) {
   return (
-    <div className="grid w-max grid-cols-4 gap-1.5">
+    <div className="flex flex-wrap gap-1">
       {metrics.map((metric) => (
-        <MetricPill key={metric.id} metric={metric} />
+        <InfoBadge
+          key={metric.id}
+          variant="badge"
+          tone={metric.tone === "risk" ? "down" : "up"}
+          icon={METRIC_ICONS[metric.id] ?? UserRoundCheck}
+          label={
+            <>
+              {metric.value}%
+              {metric.suffix && (
+                <span className="pl-0.5 text-white/30">{metric.suffix}</span>
+              )}
+            </>
+          }
+          tooltip={metric.label}
+        />
       ))}
-      <button
-        type="button"
-        aria-label="View token security details"
-        className="flex h-6 w-full items-center justify-center rounded-md border border-roman/40 text-roman transition-colors hover:bg-roman/10"
-      >
-        <Crosshair className="size-3" />
-      </button>
     </div>
   );
 }
@@ -371,52 +359,76 @@ const MOCK_SECURITY_METRICS: TrendingPairMetric[] = [
   { id: "lpBurned", label: "LP Burned", value: 98.71, tone: "risk" },
 ];
 
+const LinkWrapper = ({
+  ...props
+}: Partial<React.ComponentProps<typeof Link>>) => (
+  <Link {...props} href="/token" className={cn("block", props.className)} />
+);
+
 const trendingColumns: ColumnDef<TrendingToken>[] = [
   {
     id: "pairInfo",
     header: "Pair Info",
-    cell: ({ row }) => <PairInfoCell token={row.original} />,
+    cell: ({ row }) => (
+      <LinkWrapper>
+        <PairInfoCell token={row.original} />
+      </LinkWrapper>
+    ),
   },
   {
     id: "marketCap",
     header: "Market Cap",
     cell: ({ row }) => (
-      <MetricCell
-        value={formatCompactCurrency(row.original.market_cap)}
-        changePercent={row.original.price_change_24h_percent ?? undefined}
-      />
+      <LinkWrapper>
+        <MetricCell
+          value={formatCompactCurrency(row.original.market_cap)}
+          changePercent={row.original.price_change_24h_percent ?? undefined}
+        />
+      </LinkWrapper>
     ),
   },
   {
     id: "liquidity",
     header: "Liquidity",
     cell: ({ row }) => (
-      <MetricCell value={formatCompactCurrency(row.original.liquidity)} />
+      <LinkWrapper>
+        <MetricCell value={formatCompactCurrency(row.original.liquidity)} />
+      </LinkWrapper>
     ),
   },
   {
     id: "volume",
     header: "Volume",
     cell: ({ row }) => (
-      <MetricCell value={formatCompactCurrency(row.original.volume_24h_usd)} />
+      <LinkWrapper>
+        <MetricCell
+          value={formatCompactCurrency(row.original.volume_24h_usd)}
+        />
+      </LinkWrapper>
     ),
   },
   {
     id: "txns",
     header: "TXNS",
     cell: ({ row }) => (
-      <TxnsCell
-        total={row.original.trade_24h_count}
-        buys={row.original.buy_24h}
-        sells={row.original.sell_24h}
-      />
+      <LinkWrapper>
+        <TxnsCell
+          total={row.original.trade_24h_count}
+          buys={row.original.buy_24h}
+          sells={row.original.sell_24h}
+        />
+      </LinkWrapper>
     ),
   },
   {
     id: "tokenInfo",
     header: "Token Info",
     /* TODO: replace with real backend metrics when available */
-    cell: ({ row }) => <TokenSecurityBadges metrics={MOCK_SECURITY_METRICS} />,
+    cell: ({ row }) => (
+      <LinkWrapper>
+        <TokenSecurityBadges metrics={MOCK_SECURITY_METRICS} />
+      </LinkWrapper>
+    ),
   },
   {
     id: "action",

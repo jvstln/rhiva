@@ -1,19 +1,18 @@
-import { AssistantBubble } from "@/components/layout/AssistantBubble";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { TokenDetailHeader } from "@/components/token-detail/TokenDetailHeader";
 import { TokenDetailRail } from "@/components/token-detail/TokenDetailRail";
 import { TradesTable } from "@/components/token-detail/TradesTable";
 import { TradingChartPanel } from "@/components/token-detail/TradingChartPanel";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 
 export default function TokenDetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Link
         href="/portfolio"
-        className={cn(buttonVariants({ variant: "ghost" }), "self-start ml-2")}
+        className={cn(buttonVariants({ variant: "ghost" }), "ml-2 self-start")}
       >
         <ChevronLeft /> Back
       </Link>
@@ -25,7 +24,6 @@ export default function TokenDetailPage() {
       </main>
 
       <TradesTable />
-      <AssistantBubble />
     </div>
   );
 }

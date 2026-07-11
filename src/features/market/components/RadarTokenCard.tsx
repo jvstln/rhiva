@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { InfoBadge } from "@/components/ui/info-badge";
 import type { MemeToken } from "@/features/market/market.type";
 import {
   formatAge,
@@ -30,8 +31,7 @@ import {
 } from "@/lib/utils";
 import type { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
-import { InlineStat, MetricChip } from "./MetricChip";
-import { TokenHoverTooltip } from "./TokenHoverTooltip";
+import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
 
 interface TokenCardProps {
   token: MemeToken;
@@ -84,30 +84,69 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
             <span className="font-medium text-b-5 text-down">
               {formatAge(token.recent_listing_time)}
             </span>
-            <InlineStat
+            <InfoBadge
+              variant="inline"
               icon={User}
               tone="info"
-              value={token.meme_info.creator?.slice(0, 4)}
+              label={token.meme_info.creator?.slice(0, 4)}
               tooltip="Creator"
             />
             {token.extensions?.website && (
-              <InlineStat icon={AlertTriangle} tone="warning" tooltip="Risky Website" />
+              <InfoBadge
+                variant="inline"
+                icon={AlertTriangle}
+                tone="warning"
+                tooltip="Risky Website"
+              />
             )}
-            {token.extensions?.website && <InlineStat icon={Globe} tooltip="Website" />}
-            {token.extensions?.telegram && <InlineStat icon={MessageCircle} tooltip="Telegram" />}
-            {token.extensions?.twitter && <InlineStat icon={Search} tooltip="Twitter" />}
-            <InlineStat icon={Trophy} value={0} tooltip="Trophy Score" />
-            <InlineStat icon={User} value="0" tooltip="User Score" />
-            <InlineStat icon={Crown} value="16/17" tone="warning" tooltip="Rank" />
-            <InlineStat
+            {token.extensions?.website && (
+              <InfoBadge variant="inline" icon={Globe} tooltip="Website" />
+            )}
+            {token.extensions?.telegram && (
+              <InfoBadge
+                variant="inline"
+                icon={MessageCircle}
+                tooltip="Telegram"
+              />
+            )}
+            {token.extensions?.twitter && (
+              <InfoBadge variant="inline" icon={Search} tooltip="Twitter" />
+            )}
+            <InfoBadge
+              variant="inline"
+              icon={Trophy}
+              label={0}
+              tooltip="Trophy Score"
+            />
+            <InfoBadge
+              variant="inline"
+              icon={User}
+              label="0"
+              tooltip="User Score"
+            />
+            <InfoBadge
+              variant="inline"
+              icon={Crown}
+              label="16/17"
+              tone="warning"
+              tooltip="Rank"
+            />
+            <InfoBadge
+              variant="inline"
               icon={Users}
-              value={formatCompactNumber(token.holder)}
+              label={formatCompactNumber(token.holder)}
               tooltip="Holders"
             />
-            <InlineStat icon={Bot} value="0/0%" tooltip="Bot Activity" />
-            <InlineStat
+            <InfoBadge
+              variant="inline"
+              icon={Bot}
+              label="0/0%"
+              tooltip="Bot Activity"
+            />
+            <InfoBadge
+              variant="inline"
               icon={Eye}
-              value={formatCompactNumber(token.unique_wallet_24h)}
+              label={formatCompactNumber(token.unique_wallet_24h)}
               tooltip="Unique Wallets (24h)"
             />
             <span className="ml-auto whitespace-nowrap text-b-5">
@@ -123,62 +162,70 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
           <div className="mt-3 flex items-end justify-between gap-1.5">
             <div className="flex flex-col gap-1.5">
               <div className="flex flex-wrap gap-1.5">
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={UserPlus}
-                  value={formatCompactNumber(token.holder)}
+                  label={formatCompactNumber(token.holder)}
                   tone="down"
                   filled
                   tooltip="Total Holders"
                 />
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={ChefHat}
-                  value={`${token.meme_info.progress_percent.toFixed(1)}%`}
+                  label={`${token.meme_info.progress_percent.toFixed(1)}%`}
                   tone="up"
                   filled
                   tooltip="Bonding Curve Progress"
                 />
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={Ghost}
-                  value={formatCompactCurrency(token.liquidity)}
+                  label={formatCompactCurrency(token.liquidity)}
                   tone="up"
                   filled
                   tooltip="Liquidity"
                 />
               </div>
               <div className="flex flex-wrap gap-1.5">
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={Layers}
-                  value={formatCompactNumber(token.trade_24h_count)}
+                  label={formatCompactNumber(token.trade_24h_count)}
                   tone="up"
                   filled
                   tooltip="Trades (24h)"
                 />
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={Activity}
-                  value={formatCompactCurrency(token.volume_buy_24h_usd)}
+                  label={formatCompactCurrency(token.volume_buy_24h_usd)}
                   tone="up"
                   filled
                   tooltip="Buy Volume (24h)"
                 />
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={Leaf}
-                  value={formatCompactCurrency(token.volume_sell_24h_usd)}
+                  label={formatCompactCurrency(token.volume_sell_24h_usd)}
                   tone="up"
                   filled
                   tooltip="Sell Volume (24h)"
                 />
               </div>
               <div className="flex flex-wrap gap-1.5">
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={Leaf}
-                  value={`${token.sell_24h}`}
+                  label={`${token.sell_24h}`}
                   tone="down"
                   filled
                   tooltip="Sell Count (24h)"
                 />
-                <MetricChip
+                <InfoBadge
+                  variant="badge"
                   icon={Crosshair}
-                  value={`${token.unique_wallet_24h}`}
+                  label={`${token.unique_wallet_24h}`}
                   tooltip="Unique Traders (24h)"
                   tone="down"
                   filled

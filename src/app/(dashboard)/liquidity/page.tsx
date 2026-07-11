@@ -1,15 +1,5 @@
-import { AssistantBubble } from "@/components/layout/AssistantBubble";
-import { PoolsHeader } from "@/components/liquidity/PoolsHeader";
-import { PoolsTable } from "@/components/liquidity/PoolsTable";
-import { PoolsToolbar } from "@/components/liquidity/PoolsToolbar";
+import { LiquidityPage } from "@/features/liquidity/components/LiquidityPage";
 
-export default function LiquidityPage() {
-  return (
-    <>
-      <PoolsHeader />
-      <PoolsToolbar />
-      <PoolsTable />
-      <AssistantBubble />
-    </>
-  );
+export default function LiquidityRoute() {
+  return <LiquidityPage />;
 }

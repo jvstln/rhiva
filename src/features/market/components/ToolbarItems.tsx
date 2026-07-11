@@ -21,9 +21,11 @@ import { BondingCurve } from "../market.schema";
 export const BondingCurveToggle = ({
   value,
   onValueChange,
+  className,
 }: {
   onValueChange?: (value: BondingCurve) => void;
   value?: BondingCurve;
+  className?: string;
 }) => {
   return (
     <ToggleGroup
@@ -31,7 +33,7 @@ export const BondingCurveToggle = ({
       onValueChange={([value]) => onValueChange?.(value as BondingCurve)}
       size={"sm"}
       spacing={0}
-      className={"flex-1"}
+      className={className}
     >
       {BondingCurve.options.map((p) => (
         <Tooltip key={p}>

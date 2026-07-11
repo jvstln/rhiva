@@ -7,15 +7,19 @@ import { Input, inputVariants } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
+type Variants = VariantProps<typeof inputVariants>;
+
 const InputGroupContext = React.createContext<{
-  size?: VariantProps<typeof inputVariants>["size"];
+  size?: Variants["size"];
 }>({});
 
 function InputGroup({
   className,
   size,
+  "data-size": dataSize,
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof inputVariants>) {
+}: React.ComponentProps<"div"> &
+  Variants & { "data-size"?: Variants["size"] }) {
   return (
     <InputGroupContext.Provider value={{ size }}>
       <div
@@ -23,7 +27,7 @@ function InputGroup({
         role="group"
         className={cn(
           "group/input-group",
-          inputVariants({ size }),
+          inputVariants({ size: size ?? dataSize }),
           "relative items-center p-0 px-0 py-0", // group overrides to remove inner padding
           "focus-visible:border-input focus-visible:ring-0", // group wrapper shouldn't show focus ring itself
           "has-[[data-slot=input-group-control]:focus-visible]:border-primary has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-ring",

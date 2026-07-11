@@ -1,25 +1,5 @@
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
-import { AssistantBubble } from "@/components/layout/AssistantBubble";
-import { PoolDetailChartPanel } from "@/components/liquidity-detail/PoolDetailChartPanel";
-import { PoolDetailSidebar } from "@/components/liquidity-detail/PoolDetailSidebar";
-import { PoolDetailTradeRail } from "@/components/liquidity-detail/PoolDetailTradeRail";
-import { buttonVariants } from "@/components/ui/button";
+import LiquidityPoolPage from "@/features/liquidity/components/LiquidityPoolPage";
 
-export default function LiquidityDetailPage() {
-  return (
-    <div>
-      <Link href="/liquidity" className={buttonVariants({ variant: "ghost" })}>
-        <ChevronLeft />
-        Back
-      </Link>
-      <main className="flex flex-1">
-        <PoolDetailSidebar />
-        <PoolDetailChartPanel />
-        <PoolDetailTradeRail />
-      </main>
-
-      <AssistantBubble />
-    </div>
-  );
+export default function LiquidityPoolRoute() {
+  return <LiquidityPoolPage />;
 }

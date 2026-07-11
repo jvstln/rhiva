@@ -5,7 +5,7 @@ import { PriceRangeSelector } from "./PriceRangeSelector";
 
 export function PoolDetailTradeRail() {
   return (
-    <aside className="w-[420px] shrink-0 border-l border-border/70">
+    <aside className="w-[420px] shrink-0 border-border/70 border-l">
       <ScrollArea>
         <PoolTradeForm />
         <PriceRangeSelector />

@@ -3,7 +3,6 @@ import {
   BadgeCheck,
   Bot,
   Bug,
-  Clock,
   Coins,
   Copy,
   Crosshair,
@@ -22,6 +21,7 @@ import {
 import { QueryState } from "@/components/layout/QueryState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { InfoBadge } from "@/components/ui/info-badge";
 import { Separator } from "@/components/ui/separator";
 import type { MemeToken } from "@/features/market/market.type";
 import {
@@ -33,9 +33,8 @@ import {
 } from "@/lib/utils";
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
-import { MetricChip } from "./MetricChip";
 
-import { TokenHoverTooltip } from "./TokenHoverTooltip";
+import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
 
 interface TokenRowProps {
   token: MemeToken;
@@ -46,7 +45,7 @@ function TokenRow({ token }: TokenRowProps) {
   const priceIsUp = priceChange >= 0;
 
   return (
-    <div className="flex items-center gap-6 border-b border-border/70 px-4 py-3 transition-colors hover:bg-surface-1/60">
+    <div className="flex items-center gap-6 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60">
       {/* Token identity */}
       <div className="flex min-w-0 flex-1 basis-1/4 gap-3">
         <TokenHoverTooltip token={token}>
@@ -55,7 +54,7 @@ function TokenRow({ token }: TokenRowProps) {
             <AvatarFallback className="shimmer">
               {getInitials(token.name)}
             </AvatarFallback>
-            <PillIcon className="absolute -bottom-1 -right-1 size-4 rounded-full border border-primary bg-background p-0.5 text-dodger-blue" />
+            <PillIcon className="-bottom-1 -right-1 absolute size-4 rounded-full border border-primary bg-background p-0.5 text-dodger-blue" />
           </Avatar>
         </TokenHoverTooltip>
 
@@ -81,58 +80,66 @@ function TokenRow({ token }: TokenRowProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={UserPlus}
-              value="20%"
+              label="20%"
               tone="up"
               filled
               tooltip="New Users (24h)"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Shield}
-              value="DS"
+              label="DS"
               tone="info"
               filled
               tooltip="DexScreener Listed"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Bug}
-              value="0%"
+              label="0%"
               tone="up"
               filled
               tooltip="Bug / Error Rate"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Layers}
-              value="2%"
+              label="2%"
               tone="up"
               filled
               tooltip="Liquidity Depth / Layers"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Activity}
-              value="0%"
+              label="0%"
               tone="up"
               filled
               tooltip="Trading Activity Spike"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Leaf}
-              value="0.3%"
+              label="0.3%"
               tone="up"
               filled
               tooltip="Organic Growth"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Leaf}
-              value="0%"
+              label="0%"
               tone="up"
               filled
               tooltip="Community Score"
             />
-            <MetricChip
+            <InfoBadge
+              variant="badge"
               icon={Crosshair}
-              value="0%"
+              label="0%"
               tone="up"
               filled
               tooltip="Sniper Activity"
@@ -247,7 +254,7 @@ const SurgeBuyButton = () => {
   const quickBuy = useMarketStore((state) => state.surgeFilters.quickBuy);
 
   return (
-    <Button size="sm" variant={"soft"} data-active={true}>
+    <Button size="sm" variant={"soft"}>
       <Zap className="size-3" fill="currentColor" />
       Buy {(quickBuy ?? 0) > 0 ? `(${quickBuy})` : ""}
     </Button>

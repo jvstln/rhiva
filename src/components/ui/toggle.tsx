@@ -10,7 +10,7 @@ const toggleVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-transparent data-pressed:bg-primary/10",
+        default: "bg-transparent data-pressed:bg-primary/20",
         sell: "data-pressed:bg-sell/15",
         outline:
           "[--accent:var(--foreground)] border border-accent/50 text-accent/50 data-pressed:text-accent data-pressed:bg-accent/10 hover:text-accent",

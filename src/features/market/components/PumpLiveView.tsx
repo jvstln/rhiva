@@ -1,7 +1,6 @@
 "use client";
 
 import { Flame, Globe, Zap } from "lucide-react";
-import type * as React from "react";
 import { Button } from "@/components/ui/button";
 import { mockPumpLiveStreams } from "@/data/pump-live-data";
 import { arrayWithId, cn, formatCompactCurrency } from "@/lib/utils";
@@ -57,7 +56,7 @@ function LiveBadge() {
 
 function StreamThumbnail({ stream }: { stream: PumpLiveStream }) {
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-2">
+    <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl bg-surface-2">
       {/* biome-ignore lint: plain img keeps this independent of next/image remote-pattern config */}
       <img
         src={stream.thumbnailUrl}
@@ -139,58 +138,36 @@ function StatsRow({ stream }: { stream: PumpLiveStream }) {
 /* Status icon (audit / hot / website)                                  */
 /* ------------------------------------------------------------------ */
 
-interface StatusIconProps {
-  icon: React.ComponentType<{ className?: string }>;
-  active: boolean;
-  activeClassName: string;
-  label: string;
-}
-
-function StatusIcon({
-  icon: Icon,
-  active,
-  activeClassName,
-  label,
-}: StatusIconProps) {
-  return (
-    <span
-      className={cn(
-        "flex size-4 items-center justify-center",
-        active ? activeClassName : "text-gray/50",
-      )}
-    >
-      <Icon className="size-full" aria-label={label} />
-    </span>
-  );
-}
+// StatusIcon logic replaced with InfoBadge variant="icon"
 
 /* ------------------------------------------------------------------ */
 /* Actions row (status icons + buy button)                              */
 /* ------------------------------------------------------------------ */
 
 import { Pill } from "lucide-react";
+import { InfoBadge } from "@/components/ui/info-badge";
 
 function StreamActionsRow({ stream }: { stream: PumpLiveStream }) {
   return (
     <div className="mt-3 flex items-center justify-between">
       <div className="flex items-center gap-3.5">
-        <StatusIcon
+        <InfoBadge
+          variant="icon"
           icon={Pill}
-          active={stream.hasAudit}
-          activeClassName="text-up"
-          label="Contract audited"
+          tone={stream.hasAudit ? "up" : undefined}
+          aria-label="Contract audited"
         />
-        <StatusIcon
+        <InfoBadge
+          variant="icon"
           icon={Flame}
-          active={stream.isHot}
-          activeClassName="text-[#ff6b6b]"
-          label="Trending"
+          tone={stream.isHot ? "down" : undefined}
+          aria-label="Trending"
         />
-        <StatusIcon
+        <InfoBadge
+          variant="icon"
           icon={Globe}
-          active={stream.hasWebsite}
-          activeClassName="text-silver"
-          label="Website"
+          tone={!stream.hasWebsite ? "muted" : undefined}
+          aria-label="Website"
         />
       </div>
 
@@ -228,7 +205,7 @@ function PumpLiveCard({ stream }: { stream: PumpLiveStream }) {
 function PumpLiveCardSkeleton() {
   return (
     <div className="flex flex-col">
-      <div className="aspect-[4/3] w-full animate-pulse rounded-xl bg-surface-2" />
+      <div className="aspect-4/3 w-full animate-pulse rounded-xl bg-surface-2" />
       <div className="mt-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <div className="size-7 animate-pulse rounded-full bg-surface-2" />

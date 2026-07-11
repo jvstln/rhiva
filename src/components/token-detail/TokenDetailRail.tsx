@@ -12,7 +12,7 @@ import { TradePanel } from "./TradePanel";
 
 export function TokenDetailRail() {
   return (
-    <aside className="w-[380px] shrink-0 border-l border-border/70">
+    <aside className="w-[380px] shrink-0 border-border/70 border-l">
       <ScrollArea className="h-[calc(100vh-4rem)]">
         <TimeframeStats />
         <TradePanel />
