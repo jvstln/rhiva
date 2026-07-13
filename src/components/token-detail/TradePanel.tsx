@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
+import { cn } from "@/lib/utils";
 import { SettingsDialog } from "../layout/SettingsDialog";
 import { XIcon } from "../ui/icons";
 import {
@@ -50,7 +51,11 @@ export function TradePanel() {
       <Tabs value={side} onValueChange={(v) => setSide(v as typeof side)}>
         <TabsList variant={"soft"} className={"w-full"}>
           {(["Buy", "Sell"] as const).map((s) => (
-            <TabsTrigger key={s} value={s.toLowerCase()}>
+            <TabsTrigger
+              key={s}
+              value={s.toLowerCase()}
+              className={cn(s === "Sell" && "data-active:bg-sell/20")}
+            >
               {s}
             </TabsTrigger>
           ))}

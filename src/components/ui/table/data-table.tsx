@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/table/table";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "../scroll-area";
-import { Spinner } from "../spinner";
 
 type TableClassNames = Partial<
   Record<
@@ -192,8 +191,6 @@ export function DataTable<TData>({
     },
     {} as typeof _classNames,
   );
-
-  console.log(columnSizeVars);
 
   return (
     <ScrollArea

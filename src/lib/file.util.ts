@@ -39,10 +39,14 @@ interface FileSystemFileHandle {
 }
 
 interface WindowWithFilePicker extends Window {
-  showOpenFilePicker?: (options?: OpenFilePickerOptions) => Promise<FileSystemFileHandle[]>;
+  showOpenFilePicker?: (
+    options?: OpenFilePickerOptions,
+  ) => Promise<FileSystemFileHandle[]>;
 }
 
-export const selectFile = (options: SelectFileOptions = {}): Promise<File[]> => {
+export const selectFile = (
+  options: SelectFileOptions = {},
+): Promise<File[]> => {
   return new Promise((resolve, reject) => {
     // Try window.showOpenFilePicker
     if (typeof window !== "undefined") {
@@ -54,7 +58,9 @@ export const selectFile = (options: SelectFileOptions = {}): Promise<File[]> => 
 
         if (options.accept) {
           const acceptMap: Record<string, Record<string, string[]>> = {
-            "image/*": { "image/*": [".png", ".gif", ".jpeg", ".jpg", ".webp", ".svg"] },
+            "image/*": {
+              "image/*": [".png", ".gif", ".jpeg", ".jpg", ".webp", ".svg"],
+            },
             "video/*": { "video/*": [".mp4", ".webm", ".ogg"] },
             "audio/*": { "audio/*": [".mp3", ".wav", ".ogg"] },
             "application/pdf": { "application/pdf": [".pdf"] },
@@ -63,7 +69,7 @@ export const selectFile = (options: SelectFileOptions = {}): Promise<File[]> => 
           const accept = acceptMap[options.accept] || { "*/*": [] };
           pickerOptions.types = [
             {
-              description: options.accept.split("/")[0] + " files",
+              description: `${options.accept.split("/")[0]} files`,
               accept,
             },
           ];
@@ -93,7 +99,7 @@ export const selectFile = (options: SelectFileOptions = {}): Promise<File[]> => 
 const fallbackInputSelect = (
   options: SelectFileOptions,
   resolve: (value: File[]) => void,
-  reject: (reason?: unknown) => void
+  reject: (reason?: unknown) => void,
 ) => {
   const input = document.createElement("input");
   input.type = "file";

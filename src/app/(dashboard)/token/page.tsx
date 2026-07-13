@@ -10,16 +10,20 @@ import { cn } from "@/lib/utils";
 export default function TokenDetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Link
-        href="/portfolio"
-        className={cn(buttonVariants({ variant: "ghost" }), "ml-2 self-start")}
-      >
-        <ChevronLeft /> Back
-      </Link>
-      <TokenDetailHeader />
-
       <main className="flex flex-1">
-        <TradingChartPanel />
+        <div>
+          <Link
+            href="/portfolio"
+            className={cn(
+              buttonVariants({ variant: "ghost" }),
+              "ml-2 self-start",
+            )}
+          >
+            <ChevronLeft /> Back
+          </Link>
+          <TokenDetailHeader />
+          <TradingChartPanel />
+        </div>
         <TokenDetailRail />
       </main>
 

@@ -41,7 +41,7 @@ function ScrollBar({
   className,
   orientation = "vertical",
   showIndicator = true,
-  showScrollBar = true,
+  showScrollBar = false,
   ...props
 }: ScrollAreaPrimitive.Scrollbar.Props & {
   showIndicator?: boolean;

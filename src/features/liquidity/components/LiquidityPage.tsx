@@ -4,6 +4,7 @@ import {
   DashboardHeader,
   DashboardSlot,
 } from "@/components/layout/DashboardUi";
+import { Separator } from "@/components/ui/separator";
 import { LIQUIDITY_SUMMARY } from "@/data/liquidity-data";
 import { PoolsTable } from "@/features/liquidity/components/PoolsTable";
 import { PoolsToolbar } from "./PoolsToolbar";
@@ -18,12 +19,14 @@ const LiquidityPage = () => {
             Provide liquidity, earn yield.
           </DashboardDescription>
         </div>
-        <div className="flex gap-10">
+        <div className="flex gap-5">
           <SummaryStat
             label="Total Value Locked"
             value={LIQUIDITY_SUMMARY.tvl}
           />
+          <Separator orientation="vertical" />
           <SummaryStat label="24H Volume" value={LIQUIDITY_SUMMARY.volume24h} />
+          <Separator orientation="vertical" />
           <SummaryStat label="24H Fees" value={LIQUIDITY_SUMMARY.fees24h} />
         </div>
       </div>

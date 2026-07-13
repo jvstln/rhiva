@@ -46,7 +46,7 @@ export const DashboardSlot = ({
     defaultTagName: "div",
     props: mergeProps(
       {
-        className: cn("flex flex-col gap-6 px-6 pt-8 pb-6", className),
+        className: cn("flex flex-col gap-6 px-6 pt-9 pb-6", className),
       },
       props,
     ),

@@ -8,11 +8,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
 /* ------------------------------------------------------------------ */
 /* Shared types                                                         */
@@ -501,31 +504,37 @@ export function SettingsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger render={children} />}
-      <DialogContent className="w-fit gap-0 border-border bg-background p-6 sm:max-w-auto">
-        <DialogTitle className="sr-only">Settings</DialogTitle>
+      <DialogContent className="flex h-[85vh] w-full flex-col sm:max-w-xl">
+        <Tabs className={"h-full min-h-0"}>
+          <DialogHeader className="p-0">
+            <DialogTitle className="sr-only">Settings</DialogTitle>
+            <TabsList variant={"line"}>
+              {SETTINGS_TABS.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab}
+                  onClick={() => setActiveTab(tab.id)}
+                  data-active={activeTab === tab.id ? true : undefined}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </DialogHeader>
 
-        <div className="flex items-center justify-between border-border border-b pb-4">
-          <div className="flex items-center gap-6">
-            {SETTINGS_TABS.map((tab) => (
-              <Button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                variant="ghost"
-                data-active={activeTab === tab.id ? true : undefined}
-              >
-                {tab.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="pt-6">
-          {activeTab === "transaction" && <TransactionTab />}
-          {activeTab === "dlmm" && <DlmmTab />}
-          {activeTab === "zap-in" && <ZapInTab />}
-          {activeTab === "trading-settings" && <TradingSettingsTab />}
-          {activeTab === "others" && <OthersTab />}
-        </div>
+          <ScrollArea
+            className={"-mx-(--padding-x) h-full min-h-0 px-(--padding-x)"}
+          >
+            <div>
+              {activeTab === "transaction" && <TransactionTab />}
+              {activeTab === "dlmm" && <DlmmTab />}
+              {activeTab === "zap-in" && <ZapInTab />}
+              {activeTab === "trading-settings" && <TradingSettingsTab />}
+              {activeTab === "others" && <OthersTab />}
+            </div>
+            <ScrollBar showScrollBar />
+          </ScrollArea>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

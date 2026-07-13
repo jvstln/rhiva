@@ -1,9 +1,10 @@
 "use client";
 
+import { debounce } from "lodash";
 import { Filter, Rocket } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { SettingsDialog } from "@/components/layout/SettingsDialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SolanaIcon } from "@/components/ui/icons";
@@ -17,12 +18,15 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Timeframe } from "@/features/market/market.schema";
 import { capitalize } from "@/lib/utils";
 import { PoolColumns } from "../liquidity.schema";
+import { useLiquidityStore } from "../liquidity.store";
+import { PoolFiltersDialog } from "./PoolFiltersDialog";
 
 export function PoolsToolbar() {
   const searchParams = useSearchParams();
   const activeView = PoolColumns.catch("trending").parse(
     searchParams.get("view"),
   );
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-2">
@@ -31,7 +35,7 @@ export function PoolsToolbar() {
           <React.Fragment key={col}>
             <Link
               href={`?view=${col}`}
-              className={buttonVariants({ variant: "ghost", size: "sm" })}
+              className={buttonVariants({ variant: "ghost" })}
               data-active={activeView === col ? true : undefined}
             >
               {capitalize(col).replace(/rwa/i, "RWA")}
@@ -43,19 +47,7 @@ export function PoolsToolbar() {
 
       {/* Filters */}
       <div className="inline-flex items-center gap-2">
-        <SettingsDialog defaultTab="zap-in">
-          <Button size="sm" variant="ghost">
-            <Rocket className="text-emerald-400" />
-            Zap In
-          </Button>
-        </SettingsDialog>
-
-        <InputGroup size="sm" className="max-w-20">
-          <InputGroupInput />
-          <InputGroupAddon align={"inline-end"}>
-            <SolanaIcon />
-          </InputGroupAddon>
-        </InputGroup>
+        <ApeInInput onSettingsDialogOpen={() => setSettingsDialogOpen(true)} />
 
         <ToggleGroup>
           {Timeframe.options.slice(-5, -1).map((tf) => (
@@ -65,11 +57,58 @@ export function PoolsToolbar() {
           ))}
         </ToggleGroup>
 
-        <Button variant="ghost" size="sm">
-          <Filter className="text-muted-foreground" />
-          Filter
-        </Button>
+        <PoolFiltersDialog>
+          <Button variant="ghost" size="sm">
+            <Filter className="text-muted-foreground" />
+            Filter
+          </Button>
+        </PoolFiltersDialog>
       </div>
+
+      {settingsDialogOpen && (
+        <SettingsDialog
+          defaultTab="zap-in"
+          open={true}
+          onOpenChange={() => setSettingsDialogOpen(false)}
+        />
+      )}
     </div>
   );
 }
+
+const ApeInInput = ({
+  onSettingsDialogOpen,
+}: {
+  onSettingsDialogOpen?: () => void;
+}) => {
+  const apeIn = useLiquidityStore((state) => state.liquidityFilters.apeIn);
+  const setFilters = useLiquidityStore((state) => state.setLiquidityFilters);
+
+  const [internalValue, setInternalValue] = useState(apeIn?.toString() || "");
+
+  return (
+    <InputGroup className="w-36">
+      <InputGroupInput
+        value={internalValue}
+        onChange={(e) => {
+          setInternalValue(e.target.value);
+          debounce(() => {
+            setFilters({
+              apeIn: e.target.value ? Number(e.target.value) : null,
+            });
+          }, 800)();
+        }}
+      />
+      <InputGroupAddon align={"inline-end"}>
+        <SolanaIcon />
+      </InputGroupAddon>
+
+      <InputGroupAddon>
+        <Button size="sm" variant="ghost" onClick={onSettingsDialogOpen}>
+          <Rocket className="text-emerald-400" />
+          Ape in
+        </Button>
+      </InputGroupAddon>
+    </InputGroup>
+  );
+};

@@ -3,7 +3,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   AlertCircle,
-  Copy,
   Crown,
   Eye,
   Fish,
