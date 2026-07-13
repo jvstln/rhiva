@@ -13,7 +13,7 @@ const MarketPage = () => {
   const view = MarketView.parse(searchParams.get("view"));
 
   return (
-    <div className="flex size-full flex-col">
+    <div className="mx-auto flex size-full min-h-0 flex-1 flex-col xl:container">
       <MarketToolbar />
 
       {view === "watchlist" && <TrendingTable />}

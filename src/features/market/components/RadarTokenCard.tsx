@@ -3,7 +3,6 @@ import {
   AlertTriangle,
   Bot,
   ChefHat,
-  Copy,
   Crosshair,
   Crown,
   Eye,
@@ -21,9 +20,11 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/button/copy-button";
 import { InfoBadge } from "@/components/ui/info-badge";
 import type { MemeToken } from "@/features/market/market.type";
 import {
+  cn,
   formatAge,
   formatCompactCurrency,
   formatCompactNumber,
@@ -45,192 +46,147 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
         {/* LEFT COLUMN: Avatar and Address */}
         <div className="flex shrink-0 flex-col items-center gap-2">
           <TokenHoverTooltip token={token}>
-            <Avatar variant="square" size={"lg"} className="relative shrink-0">
+            <Avatar variant="square" size="lg">
               <AvatarImage src={token.logo_uri ?? ""} />
-              <AvatarFallback className="shimmer">
-                {getInitials(token.name)}
-              </AvatarFallback>
+              <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
             </Avatar>
           </TokenHoverTooltip>
-          <span className="text-b-5 text-gray">
+          <span className="text-[10px] text-gray">
             {token.address.slice(0, 4)}...{token.address.slice(-4)}
           </span>
         </div>
 
         {/* RIGHT COLUMN */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-1.5">
-              <h3 className="truncate font-bold text-b-1 text-white">
-                {token.name}
-              </h3>
+          <div className="flex items-start justify-between">
+            <div className="flex min-w-0 items-center gap-1">
+              <h3 className="truncate font-bold text-white">{token.name}</h3>
               <span className="truncate text-b-4 text-gray">
                 {token.symbol}
               </span>
-              <Pencil className="size-3 shrink-0 text-gray" />
-              <Copy className="size-3 shrink-0 text-gray" />
+              <InfoBadge>
+                <Pencil />
+              </InfoBadge>
+              <CopyButton />
             </div>
-            <div className="shrink-0 text-right text-b-4">
-              <span className="text-gray">
+
+            <div className="flex gap-1">
+              <InfoBadge>
                 V {formatCompactCurrency(token.volume_24h_usd)}
-              </span>{" "}
-              <span className="font-semibold text-warning">
+              </InfoBadge>
+              <InfoBadge className="[--accent:var(--color-warn)]">
                 MC {formatCompactCurrency(token.market_cap)}
-              </span>
+              </InfoBadge>
             </div>
           </div>
 
-          <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-gray">
+          <div className="flex flex-wrap items-center gap-x-1">
             <span className="font-medium text-b-5 text-down">
               {formatAge(token.recent_listing_time)}
             </span>
-            <InfoBadge
-              variant="inline"
-              icon={User}
-              tone="info"
-              label={token.meme_info.creator?.slice(0, 4)}
-              tooltip="Creator"
-            />
+            <InfoBadge tooltip="Creator">
+              <User />
+              {token.meme_info.creator?.slice(0, 4)}
+            </InfoBadge>
             {token.extensions?.website && (
               <InfoBadge
-                variant="inline"
-                icon={AlertTriangle}
-                tone="warning"
+                className="[--accent:var(--color-warn)]"
                 tooltip="Risky Website"
-              />
+              >
+                <AlertTriangle />
+              </InfoBadge>
             )}
             {token.extensions?.website && (
-              <InfoBadge variant="inline" icon={Globe} tooltip="Website" />
+              <InfoBadge tooltip="Website">
+                <Globe />
+              </InfoBadge>
             )}
             {token.extensions?.telegram && (
-              <InfoBadge
-                variant="inline"
-                icon={MessageCircle}
-                tooltip="Telegram"
-              />
+              <InfoBadge tooltip="Telegram">
+                <MessageCircle />
+              </InfoBadge>
             )}
             {token.extensions?.twitter && (
-              <InfoBadge variant="inline" icon={Search} tooltip="Twitter" />
+              <InfoBadge tooltip="Twitter">
+                <Search />
+              </InfoBadge>
             )}
-            <InfoBadge
-              variant="inline"
-              icon={Trophy}
-              label={0}
-              tooltip="Trophy Score"
-            />
-            <InfoBadge
-              variant="inline"
-              icon={User}
-              label="0"
-              tooltip="User Score"
-            />
-            <InfoBadge
-              variant="inline"
-              icon={Crown}
-              label="16/17"
-              tone="warning"
-              tooltip="Rank"
-            />
-            <InfoBadge
-              variant="inline"
-              icon={Users}
-              label={formatCompactNumber(token.holder)}
-              tooltip="Holders"
-            />
-            <InfoBadge
-              variant="inline"
-              icon={Bot}
-              label="0/0%"
-              tooltip="Bot Activity"
-            />
-            <InfoBadge
-              variant="inline"
-              icon={Eye}
-              label={formatCompactNumber(token.unique_wallet_24h)}
-              tooltip="Unique Wallets (24h)"
-            />
-            <span className="ml-auto whitespace-nowrap text-b-5">
-              <span className="text-gray">N </span>
-              <span className="text-up">
+            <InfoBadge tooltip="Trophy Score">
+              <Trophy /> {0}
+            </InfoBadge>
+            <InfoBadge tooltip="User Score">
+              <User /> {0}
+            </InfoBadge>
+            <InfoBadge tooltip="Rank" className="[--accent:var(--color-warn)]">
+              <Crown /> {"16/17"}
+            </InfoBadge>
+
+            <InfoBadge tooltip="Holders">
+              <Users />
+              {formatCompactNumber(token.holder)}
+            </InfoBadge>
+            <InfoBadge tooltip="Bot Activity">
+              <Bot />
+              0/0%
+            </InfoBadge>
+            <InfoBadge tooltip="Unique Wallets (24h)">
+              <Eye />
+              {formatCompactNumber(token.unique_wallet_24h)}
+            </InfoBadge>
+            <InfoBadge className="ml-auto">
+              <span>N </span>
+              <span className="[--accent:var(--color-up)]">
                 +{formatCompactNumber(token.buy_24h)} B
               </span>{" "}
-              TX {formatCompactNumber(token.trade_24h_count)}{" "}
-              <span className="text-down">—</span>
-            </span>
+              TX
+              <span className="[--accent:var(--color-down)]">
+                {formatCompactNumber(token.trade_24h_count)} —
+              </span>
+            </InfoBadge>
           </div>
 
-          <div className="mt-3 flex items-end justify-between gap-1.5">
-            <div className="flex flex-col gap-1.5">
-              <div className="flex flex-wrap gap-1.5">
-                <InfoBadge
-                  variant="badge"
-                  icon={UserPlus}
-                  label={formatCompactNumber(token.holder)}
-                  tone="down"
-                  filled
-                  tooltip="Total Holders"
-                />
-                <InfoBadge
-                  variant="badge"
-                  icon={ChefHat}
-                  label={`${token.meme_info.progress_percent.toFixed(1)}%`}
-                  tone="up"
-                  filled
-                  tooltip="Bonding Curve Progress"
-                />
-                <InfoBadge
-                  variant="badge"
-                  icon={Ghost}
-                  label={formatCompactCurrency(token.liquidity)}
-                  tone="up"
-                  filled
-                  tooltip="Liquidity"
-                />
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <InfoBadge
-                  variant="badge"
-                  icon={Layers}
-                  label={formatCompactNumber(token.trade_24h_count)}
-                  tone="up"
-                  filled
-                  tooltip="Trades (24h)"
-                />
-                <InfoBadge
-                  variant="badge"
-                  icon={Activity}
-                  label={formatCompactCurrency(token.volume_buy_24h_usd)}
-                  tone="up"
-                  filled
-                  tooltip="Buy Volume (24h)"
-                />
-                <InfoBadge
-                  variant="badge"
-                  icon={Leaf}
-                  label={formatCompactCurrency(token.volume_sell_24h_usd)}
-                  tone="up"
-                  filled
-                  tooltip="Sell Volume (24h)"
-                />
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <InfoBadge
-                  variant="badge"
-                  icon={Leaf}
-                  label={`${token.sell_24h}`}
-                  tone="down"
-                  filled
-                  tooltip="Sell Count (24h)"
-                />
-                <InfoBadge
-                  variant="badge"
-                  icon={Crosshair}
-                  label={`${token.unique_wallet_24h}`}
-                  tooltip="Unique Traders (24h)"
-                  tone="down"
-                  filled
-                />
-              </div>
+          <div className="flex items-end justify-between gap-1">
+            <div className="flex flex-wrap gap-x-1">
+              <InfoBadge variant="badge" tone="down" tooltip="Total Holders">
+                <UserPlus />
+                {formatCompactNumber(token.holder)}
+              </InfoBadge>
+              <InfoBadge
+                variant="badge"
+                tone="up"
+                tooltip="Bonding Curve Progress"
+              >
+                <ChefHat />
+                {`${token.meme_info.progress_percent.toFixed(1)}%`}
+              </InfoBadge>
+              <InfoBadge variant="badge" tone="up" tooltip="Liquidity">
+                <Ghost />
+                {formatCompactCurrency(token.liquidity)}
+              </InfoBadge>
+              <InfoBadge variant="badge" tone="up" tooltip="Trades (24h)">
+                <Layers />
+                {formatCompactNumber(token.trade_24h_count)}
+              </InfoBadge>
+              <InfoBadge variant="badge" tone="up" tooltip="Buy Volume (24h)">
+                <Activity />
+                {formatCompactCurrency(token.volume_buy_24h_usd)}
+              </InfoBadge>
+              <InfoBadge variant="badge" tone="up" tooltip="Sell Volume (24h)">
+                <Leaf />
+                {formatCompactCurrency(token.volume_sell_24h_usd)}
+              </InfoBadge>
+              <InfoBadge variant="badge" tone="down" tooltip="Sell Count (24h)">
+                <Leaf />
+                {`${token.sell_24h}`}
+              </InfoBadge>
+              <InfoBadge
+                variant="badge"
+                tooltip="Unique Traders (24h)"
+                tone="down"
+              >
+                <Crosshair />
+                {`${token.unique_wallet_24h}`}
+              </InfoBadge>
             </div>
 
             <div className="flex shrink-0 gap-1.5">
@@ -252,17 +208,31 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
   );
 
   return (
-    <>
+    <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
         <Button variant="sell" size="sm">
-          Sell {quickSell > 0 ? `(${quickSell}%)` : ""}
+          <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
+            Sell
+          </span>
+          {quickSell > 0 && (
+            <span className="hidden group-hover/button:inline">
+              {quickSell}%
+            </span>
+          )}
         </Button>
       )}
       {quickBuy !== null && (
-        <Button variant="default" size="sm">
-          Buy {quickBuy > 0 ? `(${quickBuy}%)` : ""}
+        <Button size="sm">
+          <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
+            Buy
+          </span>
+          {quickBuy > 0 && (
+            <span className="hidden group-hover/button:inline">
+              {quickBuy} SOL
+            </span>
+          )}
         </Button>
       )}
-    </>
+    </div>
   );
 };

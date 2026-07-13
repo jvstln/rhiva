@@ -73,10 +73,9 @@ const PROTOCOLS = [
 
 export function RadarFilterDialog({
   children,
-}: Dialog.Props & { children: React.ReactElement }) {
-  const [activeTab, setActiveTab] = React.useState<string>(
-    RadarColumns.options[0],
-  );
+  defaultTab = RadarColumns.options[0],
+}: Dialog.Props & { children: React.ReactElement; defaultTab?: RadarColumns }) {
+  const [activeTab, setActiveTab] = React.useState<string>(defaultTab);
 
   return (
     <Dialog>

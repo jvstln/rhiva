@@ -10,6 +10,7 @@ import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { POSITIONS } from "@/data/portfolio-data";
 import { capitalize, cn } from "@/lib/utils";
+import { PnlExportDialog } from "./PnlExportDialog";
 
 const columnHelper = createColumnHelper<(typeof POSITIONS)[0]>();
 
@@ -91,12 +92,14 @@ const columns = [
         <Button tooltip="Hide" variant="ghost" size="icon-sm">
           <EyeOff className="text-gray" />
         </Button>
-        <Button tooltip="Sort" variant="ghost" size="icon-sm">
+        <Button tooltip="Sell" variant="ghost" size="icon-sm">
           <ArrowUpDown className="text-gray" />
         </Button>
-        <Button tooltip="Share" variant="ghost" size="icon-sm">
-          <Share className="text-gray" />
-        </Button>
+        <PnlExportDialog>
+          <Button tooltip="Share" variant="ghost" size="icon-sm">
+            <Share className="text-gray" />
+          </Button>
+        </PnlExportDialog>
       </div>
     ),
   }),

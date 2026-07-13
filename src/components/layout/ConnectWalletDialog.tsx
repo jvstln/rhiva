@@ -197,13 +197,13 @@ function WalletListStep({ onSelectSocials }: { onSelectSocials: () => void }) {
     },
     {
       id: "arrows-1",
-      bgClassName: "bg-gradient-to-br from-dodger-blue to-ocean-green",
+      bgClassName: "bg-gradient-to-br from-info to-ocean-green",
       icon: <FallbackGlyph label="⇄" className="text-black" />,
     },
     {
       id: "tiplink",
       bgClassName: "bg-[#0B1728]",
-      icon: <FallbackGlyph label="TL" className="text-dodger-blue text-xs" />,
+      icon: <FallbackGlyph label="TL" className="text-info text-xs" />,
     },
     {
       id: "magic-eden",
@@ -212,7 +212,7 @@ function WalletListStep({ onSelectSocials }: { onSelectSocials: () => void }) {
     },
     {
       id: "arrows-2",
-      bgClassName: "bg-gradient-to-br from-dodger-blue to-ocean-green",
+      bgClassName: "bg-gradient-to-br from-info to-ocean-green",
       icon: <FallbackGlyph label="⇄" className="text-black" />,
     },
     {

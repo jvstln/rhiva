@@ -73,7 +73,7 @@ export const mockTokens: Token[] = [
     priceChange: "-81.77%",
     badges: [
       { icon: "users", value: "20%", color: "text-silver" },
-      { icon: "shield", value: "DS", color: "text-dodger-blue" },
+      { icon: "shield", value: "DS", color: "text-info" },
       { icon: "zap", value: "0%", color: "text-muted-foreground" },
       { icon: "layers", value: "2%", color: "text-ocean-green" },
       { icon: "droplet", value: "0%", color: "text-muted-foreground" },
@@ -101,7 +101,7 @@ export const mockTokens: Token[] = [
     priceChange: "-47.2%",
     badges: [
       { icon: "users", value: "34%", color: "text-silver" },
-      { icon: "shield", value: "DS", color: "text-dodger-blue" },
+      { icon: "shield", value: "DS", color: "text-info" },
       { icon: "zap", value: "3%", color: "text-roman" },
       { icon: "layers", value: "0%", color: "text-muted-foreground" },
       { icon: "droplet", value: "12%", color: "text-casablanca" },
@@ -135,7 +135,7 @@ export const mockTokens: Token[] = [
     priceChange: "-55.4%",
     badges: [
       { icon: "users", value: "8%", color: "text-silver" },
-      { icon: "shield", value: "DS", color: "text-dodger-blue" },
+      { icon: "shield", value: "DS", color: "text-info" },
       { icon: "zap", value: "0%", color: "text-muted-foreground" },
       { icon: "layers", value: "5%", color: "text-ocean-green" },
       { icon: "droplet", value: "0%", color: "text-muted-foreground" },
@@ -163,7 +163,7 @@ export const mockTokens: Token[] = [
     priceChange: "-28.9%",
     badges: [
       { icon: "users", value: "18%", color: "text-silver" },
-      { icon: "shield", value: "DS", color: "text-dodger-blue" },
+      { icon: "shield", value: "DS", color: "text-info" },
       { icon: "zap", value: "1%", color: "text-roman" },
       { icon: "layers", value: "4%", color: "text-ocean-green" },
       { icon: "droplet", value: "20%", color: "text-casablanca" },
@@ -197,7 +197,7 @@ export const mockTokens: Token[] = [
     priceChange: "-33.6%",
     badges: [
       { icon: "users", value: "41%", color: "text-roman" },
-      { icon: "shield", value: "DS", color: "text-dodger-blue" },
+      { icon: "shield", value: "DS", color: "text-info" },
       { icon: "zap", value: "6%", color: "text-roman" },
       { icon: "layers", value: "0%", color: "text-muted-foreground" },
       { icon: "droplet", value: "0%", color: "text-muted-foreground" },
@@ -225,7 +225,7 @@ export const mockTokens: Token[] = [
     priceChange: "-19.2%",
     badges: [
       { icon: "users", value: "15%", color: "text-silver" },
-      { icon: "shield", value: "DS", color: "text-dodger-blue" },
+      { icon: "shield", value: "DS", color: "text-info" },
       { icon: "zap", value: "0%", color: "text-muted-foreground" },
       { icon: "layers", value: "3%", color: "text-ocean-green" },
       { icon: "droplet", value: "8%", color: "text-casablanca" },

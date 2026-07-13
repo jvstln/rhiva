@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import React from "react";
+import { QueryState } from "@/components/layout/QueryState";
 import {
   Table,
   TableBody,
@@ -170,33 +171,13 @@ export function DataTable<TData>({
     }));
   };
 
-  if (isLoading) {
+  if (isLoading || error) {
     return (
-      <div
-        className={cn(
-          "flex h-48 w-full items-center justify-center rounded-lg border border-border/40 bg-muted/40",
-          !error && "animate-pulse",
-        )}
-      >
-        <div className="flex items-center gap-4 text-muted-foreground text-sm">
-          Loading data...
-          <Spinner />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div
-        className={cn(
-          "flex h-48 w-full items-center justify-center rounded-lg border border-border/40 bg-muted/40",
-        )}
-      >
-        <div className="text-destructive text-sm">
-          Error loading table data. Please refresh the page to try again.
-        </div>
-      </div>
+      <QueryState
+        query={{ data: [] }}
+        getIsLoading={() => isLoading}
+        getIsError={() => error}
+      />
     );
   }
 
@@ -211,6 +192,8 @@ export function DataTable<TData>({
     },
     {} as typeof _classNames,
   );
+
+  console.log(columnSizeVars);
 
   return (
     <ScrollArea

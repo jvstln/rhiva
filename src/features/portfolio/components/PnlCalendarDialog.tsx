@@ -57,7 +57,7 @@ export function PnlCalendarDialog({
   return (
     <Dialog>
       {children && <DialogTrigger render={children} />}
-      <DialogContent className="h-full p-0 sm:max-w-auto">
+      <DialogContent className="p-0 sm:max-w-5xl">
         <DialogHeader className="sr-only">
           <DialogTitle>PnL Schedule Calendar</DialogTitle>
           <DialogDescription>
@@ -67,7 +67,7 @@ export function PnlCalendarDialog({
 
         <div className="flex min-h-0 w-full flex-col sm:flex-row">
           {/* Sidebar */}
-          <div className="flex w-full shrink-0 flex-col gap-8 border-border border-r bg-surface-1/30 p-(--padding) [--padding:--spacing(6)] sm:w-[300px]">
+          <div className="flex shrink-0 flex-col gap-8 border-border border-r bg-surface-1/30 p-(--padding) [--padding:--spacing(6)] sm:w-1/4">
             <div className="space-y-1.5">
               <p className="text-gray text-sm">Total Net Worth</p>
               <p className="font-bold text-xl">

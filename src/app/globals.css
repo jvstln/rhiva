@@ -50,13 +50,13 @@
   --color-up: var(--up);
   --color-down: var(--down);
   --color-sell: var(--sell);
-  --color-warning: var(--warning);
+  --color-warn: var(--warn);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
   --color-roman: var(--roman);
   --color-ocean-green: var(--ocean-green);
-  --color-dodger-blue: var(--dodger-blue);
+  --color-info: var(--info);
   --color-casablanca: var(--casablanca);
   --color-silver: var(--silver);
 
@@ -180,7 +180,7 @@
   --up: oklch(from #00d897 l c h);
   --down: oklch(from #de5759 l c h);
   --sell: oklch(from #f55832 l c h);
-  --warning: oklch(from #ffab17 l c h);
+  --warn: oklch(from #ffab17 l c h);
   --surface-1: oklch(from #141414 l c h);
   --surface-2: oklch(from #1c1c1c l c h);
   --surface-3: oklch(from #242424 l c h);
@@ -190,7 +190,7 @@
      ("Ocean Green") distinct from the primary buy/price green. */
   --roman: oklch(from #de5759 l c h);
   --ocean-green: oklch(from #46b87d l c h);
-  --dodger-blue: oklch(from #4ea7fa l c h);
+  --info: oklch(from #4ea7fa l c h);
   --casablanca: oklch(from #f8b951 l c h);
   --silver: oklch(from #cccccc l c h);
   --gradient-1: linear-gradient(

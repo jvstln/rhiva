@@ -4,6 +4,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchInput } from "@/components/ui/search-input";
 import type { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
+import { RadarFilterDialog } from "./RadarFilterDialog";
 import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
 
 interface ColumnToolbarProps {
@@ -27,13 +28,17 @@ export function RadarColumnToolbar({ column }: ColumnToolbarProps) {
         <QuickBuyInput
           variant="minimal"
           value={quickBuy ?? ""}
-          onValueChange={(value) => setFilters({ [column]: value })}
+          onValueChange={(value) =>
+            setFilters({ [column]: { quickBuy: value } })
+          }
           className="rounded-md"
         />
         <BondingCurveToggle />
-        <Button size="icon-sm" variant={"ghost"}>
-          <Filter />
-        </Button>
+        <RadarFilterDialog defaultTab={column}>
+          <Button size="icon-sm" variant={"ghost"}>
+            <Filter />
+          </Button>
+        </RadarFilterDialog>
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

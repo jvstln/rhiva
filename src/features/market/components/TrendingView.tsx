@@ -23,6 +23,8 @@ import type * as React from "react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/button/copy-button";
+import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
   cn,
@@ -36,6 +38,7 @@ import { useTrendingTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import type { TrendingToken } from "../market.type";
 import { SocialHoverTooltip } from "./tooltips/SocialHoverTooltip";
+import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
 
 /* ------------------------------------------------------------------ */
 /* Favorite / watchlist star toggle                                    */
@@ -130,28 +133,23 @@ function Sparkline({
 
 // SubIcon logic replaced with InfoBadge variant="icon"
 
-import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
-import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
-
 function PairInfoCell({ token }: { token: TrendingToken }) {
   return (
     <div className="flex items-center gap-3">
       <StarButton pairId={token.address} />
 
       <TokenHoverTooltip token={token}>
-        <Avatar variant="square" size="lg">
+        <Avatar variant="square">
           <AvatarImage src={token.logo_uri ?? ""} />
           <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
         </Avatar>
       </TokenHoverTooltip>
 
-      <div className="mr-auto flex flex-col gap-1.5">
+      <div className="flex w-[200px] flex-col">
         <div className="flex items-center gap-1.5">
           <span className="font-semibold text-sm text-white">{token.name}</span>
           <span className="text-sm text-white/40">{token.symbol}</span>
-          <Button size={"icon-xs"} variant="ghost">
-            <Copy />
-          </Button>
+          <CopyButton />
         </div>
 
         <div className="flex items-center gap-1">
@@ -159,25 +157,25 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
             {formatAge(token.recent_listing_time)}
           </span>
           <InfoBadge
-            variant="icon"
-            icon={UserRound}
             aria-label="Dev activity"
             tooltip={<SocialHoverTooltip token={token} />}
-          />
+            className="[--accent:var(--color-info)]"
+          >
+            <UserRound />
+          </InfoBadge>
           <InfoBadge
-            variant="icon"
-            icon={AlertCircle}
             aria-label="Alerts"
+            className="[--accent:var(--color-warn)]"
             tooltip={
               <InfoBadgeTooltipRow
                 label="X Connection"
                 value={token.extensions?.twitter ?? "N/A"}
               />
             }
-          />
+          >
+            <AlertCircle />
+          </InfoBadge>
           <InfoBadge
-            variant="icon"
-            icon={Globe}
             aria-label="Website"
             tooltip={
               <InfoBadgeTooltipRow
@@ -193,18 +191,22 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
                 }
               />
             }
-          />
+          >
+            <Globe />
+          </InfoBadge>
           <InfoBadge
-            variant="icon"
-            icon={Flag}
             tooltip={token.extensions?.description}
             aria-label="Add note"
-          />
-          <InfoBadge variant="icon" icon={Search} aria-label="Inspect pair" />
-        </div>
-        <div className="mt-auto flex items-center gap-1 text-[11px] text-white/30">
-          <Eye className="size-3" />
-          {formatCompactNumber(token.holder)}
+          >
+            <Flag />
+          </InfoBadge>
+          <InfoBadge aria-label="Inspect pair">
+            <Search />
+          </InfoBadge>
+          <InfoBadge>
+            <Eye className="size-3" />
+            {formatCompactNumber(token.holder)}
+          </InfoBadge>
         </div>
       </div>
 
@@ -227,17 +229,18 @@ interface MetricCellProps {
 
 function MetricCell({ value, changePercent }: MetricCellProps) {
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col">
       <span className="font-medium text-sm text-white">{value}</span>
       {changePercent !== undefined && (
-        <span
+        <InfoBadge
           className={cn(
-            "font-medium text-xs",
-            changePercent >= 0 ? "text-ocean-green" : "text-roman",
+            changePercent >= 0
+              ? "[--accent:var(--color-up)]"
+              : "[--accent:var(--color-down)]",
           )}
         >
           {formatSignedPercent(changePercent)}
-        </span>
+        </InfoBadge>
       )}
     </div>
   );
@@ -297,24 +300,22 @@ export interface TrendingPairMetric {
 
 function TokenSecurityBadges({ metrics }: { metrics: TrendingPairMetric[] }) {
   return (
-    <div className="grid grid-cols-4 gap-1">
-      {metrics.map((metric) => (
-        <InfoBadge
-          key={metric.id}
-          variant="badge"
-          tone={metric.tone === "risk" ? "down" : "up"}
-          icon={METRIC_ICONS[metric.id] ?? UserRoundCheck}
-          label={
-            <>
-              {metric.value}%
-              {metric.suffix && (
-                <span className="pl-0.5 text-white/30">{metric.suffix}</span>
-              )}
-            </>
-          }
-          tooltip={metric.label}
-        />
-      ))}
+    <div className="flex flex-wrap gap-1">
+      {metrics.map((metric) => {
+        const Icon = METRIC_ICONS[metric.id] ?? UserRoundCheck;
+
+        return (
+          <InfoBadge
+            key={metric.id}
+            variant="badge"
+            tone={metric.tone === "risk" ? "down" : "up"}
+            tooltip={metric.label}
+          >
+            <Icon />
+            {metric.value}%{metric.suffix && <span>{metric.suffix}</span>}
+          </InfoBadge>
+        );
+      })}
     </div>
   );
 }
@@ -328,15 +329,29 @@ function ActionButtons() {
   const quickSell = useMarketStore((state) => state.trendingFilters.quickSell);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
         <Button variant="sell" size="sm">
-          Sell {quickSell > 0 ? `(${quickSell}%)` : ""}
+          <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
+            Sell
+          </span>
+          {quickSell > 0 && (
+            <span className="hidden group-hover/button:inline">
+              {quickSell}%
+            </span>
+          )}
         </Button>
       )}
       {quickBuy !== null && (
-        <Button variant="default" size="sm">
-          Buy {quickBuy > 0 ? `(${quickBuy} SOL)` : ""}
+        <Button size="sm">
+          <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
+            Buy
+          </span>
+          {quickBuy > 0 && (
+            <span className="hidden group-hover/button:inline">
+              {quickBuy} SOL
+            </span>
+          )}
         </Button>
       )}
     </div>
@@ -372,6 +387,7 @@ const trendingColumns: ColumnDef<TrendingToken>[] = [
         <PairInfoCell token={row.original} />
       </LinkWrapper>
     ),
+    size: 500,
   },
   {
     id: "marketCap",
@@ -427,6 +443,7 @@ const trendingColumns: ColumnDef<TrendingToken>[] = [
         <TokenSecurityBadges metrics={MOCK_SECURITY_METRICS} />
       </LinkWrapper>
     ),
+    size: 300,
   },
   {
     id: "action",
@@ -451,6 +468,7 @@ export function TrendingTable() {
   return (
     <DataTable
       table={table}
+      classNames={{ table: "table-fixed" }}
       isLoading={trendingTokens.isPending}
       error={trendingTokens.error?.message}
     />

@@ -40,9 +40,13 @@ function ScrollArea({
 function ScrollBar({
   className,
   orientation = "vertical",
-  showIndicator = false,
+  showIndicator = true,
+  showScrollBar = true,
   ...props
-}: ScrollAreaPrimitive.Scrollbar.Props & { showIndicator?: boolean }) {
+}: ScrollAreaPrimitive.Scrollbar.Props & {
+  showIndicator?: boolean;
+  showScrollBar?: boolean;
+}) {
   return (
     <>
       <ScrollAreaPrimitive.Scrollbar
@@ -57,7 +61,10 @@ function ScrollBar({
       >
         <ScrollAreaPrimitive.Thumb
           data-slot="scroll-area-thumb"
-          className="relative flex-1 rounded-full bg-border opacity-0"
+          className={cn(
+            "relative flex-1 rounded-full bg-border",
+            !showScrollBar && "opacity-0",
+          )}
         />
       </ScrollAreaPrimitive.Scrollbar>
       {showIndicator && orientation === "horizontal" && (

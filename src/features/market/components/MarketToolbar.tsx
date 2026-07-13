@@ -20,12 +20,15 @@ export function MarketToolbar() {
     <div
       className={cn("flex w-full items-center justify-between p-4 md:gap-16")}
     >
-      <nav className="flex items-center gap-0.5" aria-label="Market sections">
+      <nav
+        className="flex items-center gap-0.5 py-2"
+        aria-label="Market sections"
+      >
         {MarketView.unwrap().options.map((tab, i) => (
           <React.Fragment key={tab}>
             <Link
               href={`?view=${tab}`}
-              className={buttonVariants({ variant: "ghost", size: "sm" })}
+              className={buttonVariants({ variant: "ghost" })}
               aria-current={view === tab ? "page" : undefined}
               data-active={view === tab ? true : undefined}
             >

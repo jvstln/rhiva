@@ -4,7 +4,6 @@ import {
   Bot,
   Bug,
   Coins,
-  Copy,
   Crosshair,
   Crown,
   Layers,
@@ -21,6 +20,7 @@ import {
 import { QueryState } from "@/components/layout/QueryState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/button/copy-button";
 import { InfoBadge } from "@/components/ui/info-badge";
 import { Separator } from "@/components/ui/separator";
 import type { MemeToken } from "@/features/market/market.type";
@@ -33,7 +33,6 @@ import {
 } from "@/lib/utils";
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
-
 import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
 
 interface TokenRowProps {
@@ -54,17 +53,23 @@ function TokenRow({ token }: TokenRowProps) {
             <AvatarFallback className="shimmer">
               {getInitials(token.name)}
             </AvatarFallback>
-            <PillIcon className="-bottom-1 -right-1 absolute size-4 rounded-full border border-primary bg-background p-0.5 text-dodger-blue" />
+            <PillIcon className="-bottom-1 -right-1 absolute size-4 rounded-full border border-primary bg-background p-0.5 text-info" />
           </Avatar>
         </TokenHoverTooltip>
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-1.5 text-b-3">
-            <span className="font-semibold text-white">{token.name}</span>
+            <span className="font-semibold">{token.name}</span>
             <span className="truncate text-gray">{token.symbol}</span>
-            <Pencil className="size-3 shrink-0 text-gray" />
-            <Users className="size-3 shrink-0 text-warning" />
-            <BadgeCheck className="size-3 shrink-0 text-dodger-blue" />
+            <InfoBadge>
+              <Pencil />
+            </InfoBadge>
+            <InfoBadge>
+              <Users className="[--accent:var(--color-warn)]" />
+            </InfoBadge>
+            <InfoBadge>
+              <BadgeCheck className="[--accent:var(--color-info)]" />
+            </InfoBadge>
           </div>
 
           <div className="flex items-center gap-1.5 text-b-4 text-gray">
@@ -75,75 +80,77 @@ function TokenRow({ token }: TokenRowProps) {
             <span className="truncate">
               {token.address.slice(0, 4)}...{token.address.slice(-4)}
             </span>
-            <Copy className="size-3 shrink-0 cursor-pointer hover:text-white" />
-            <Search className="size-3 shrink-0 cursor-pointer hover:text-white" />
+            <CopyButton />
+            <InfoBadge>
+              <Search />
+            </InfoBadge>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+          <div className="flex flex-wrap items-center gap-x-1">
             <InfoBadge
               variant="badge"
-              icon={UserPlus}
-              label="20%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="New Users (24h)"
-            />
+            >
+              <UserPlus />
+              20%
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Shield}
-              label="DS"
-              tone="info"
-              filled
+              className="[--accent:var(--color-info)]"
               tooltip="DexScreener Listed"
-            />
+            >
+              <Shield />
+              DS
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Bug}
-              label="0%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="Bug / Error Rate"
-            />
+            >
+              <Bug />
+              0%
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Layers}
-              label="2%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="Liquidity Depth / Layers"
-            />
+            >
+              <Layers />
+              2%
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Activity}
-              label="0%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="Trading Activity Spike"
-            />
+            >
+              <Activity />
+              0%
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Leaf}
-              label="0.3%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="Organic Growth"
-            />
+            >
+              <Leaf />
+              0.3%
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Leaf}
-              label="0%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="Community Score"
-            />
+            >
+              <Leaf />
+              0%
+            </InfoBadge>
             <InfoBadge
               variant="badge"
-              icon={Crosshair}
-              label="0%"
-              tone="up"
-              filled
+              className="[--accent:var(--color-up)]"
               tooltip="Sniper Activity"
-            />
+            >
+              <Crosshair />
+              0%
+            </InfoBadge>
           </div>
         </div>
       </div>
@@ -201,28 +208,33 @@ function TokenRow({ token }: TokenRowProps) {
           <SurgeBuyButton />
         </div>
 
-        <div className="mt-1 flex flex-wrap items-center justify-end gap-3 text-gray">
-          <span className="flex items-center gap-1">
-            <Trophy className="size-3" />
+        <div className="flex flex-wrap items-center justify-end gap-x-1">
+          <InfoBadge tooltip="Bonding Curve Progress">
+            <Trophy />
             {token.meme_info.progress_percent.toFixed(0)}
-          </span>
-          <span className="flex items-center gap-1 text-warning">
-            <Crown className="size-3" />
+          </InfoBadge>
+          <InfoBadge className="[--accent:var(--color-warn)]" tooltip="Rank">
+            <Crown />
             8/2977
-          </span>
-          <span className="flex items-center gap-1">
-            <Users className="size-3" />
+          </InfoBadge>
+          <InfoBadge tooltip="Holders">
+            <Users />
             {formatCompactNumber(token.holder)}
-          </span>
-          <span className="flex items-center gap-1">
-            <Bot className="size-3" />
+          </InfoBadge>
+          <InfoBadge tooltip="Unique Wallets">
+            <Bot />
             {formatCompactNumber(token.unique_wallet_24h)}
-          </span>
-          <span className="flex items-center gap-1 text-warning">
-            <Coins className="size-3" />
+          </InfoBadge>
+          <InfoBadge
+            className="[--accent:var(--color-warn)]"
+            tooltip="Fees Paid"
+          >
+            <Coins />
             {token.global_fees_paid.toFixed(2)}
-          </span>
-          <span>TX {formatCompactNumber(token.trade_24h_count)}</span>
+          </InfoBadge>
+          <InfoBadge tooltip="Trades (24h)">
+            TX {formatCompactNumber(token.trade_24h_count)}
+          </InfoBadge>
         </div>
 
         <Separator className="w-1/4! grow-0" orientation="horizontal" />
@@ -254,9 +266,16 @@ const SurgeBuyButton = () => {
   const quickBuy = useMarketStore((state) => state.surgeFilters.quickBuy);
 
   return (
-    <Button size="sm" variant={"soft"}>
-      <Zap className="size-3" fill="currentColor" />
-      Buy {(quickBuy ?? 0) > 0 ? `(${quickBuy})` : ""}
-    </Button>
+    quickBuy !== null && (
+      <Button size="sm" variant={"soft"}>
+        <Zap className="size-3" fill="currentColor" />
+
+        <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
+          Buy
+        </span>
+
+        <span className="hidden group-hover/button:inline">{quickBuy} SOL</span>
+      </Button>
+    )
   );
 };

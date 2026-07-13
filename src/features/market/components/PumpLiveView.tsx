@@ -152,23 +152,23 @@ function StreamActionsRow({ stream }: { stream: PumpLiveStream }) {
     <div className="mt-3 flex items-center justify-between">
       <div className="flex items-center gap-3.5">
         <InfoBadge
-          variant="icon"
-          icon={Pill}
           tone={stream.hasAudit ? "up" : undefined}
           aria-label="Contract audited"
-        />
+        >
+          <Pill />
+        </InfoBadge>
         <InfoBadge
-          variant="icon"
-          icon={Flame}
           tone={stream.isHot ? "down" : undefined}
           aria-label="Trending"
-        />
+        >
+          <Flame />
+        </InfoBadge>
         <InfoBadge
-          variant="icon"
-          icon={Globe}
           tone={!stream.hasWebsite ? "muted" : undefined}
           aria-label="Website"
-        />
+        >
+          <Globe />
+        </InfoBadge>
       </div>
 
       <Button

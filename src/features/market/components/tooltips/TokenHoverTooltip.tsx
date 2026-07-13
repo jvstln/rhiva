@@ -86,7 +86,7 @@ export function TokenHoverTooltip({ token, children }: TokenHoverTooltipProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-white">Global Fees</span>
-                  <span className="text-warning">
+                  <span className="text-warn">
                     {token.global_fees_paid?.toFixed(2) || "0.00"}
                   </span>
                 </div>

@@ -40,7 +40,7 @@ export function Navbar({
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
+    <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
       <Link href="/" className="block size-fit shrink-0">
         <Image src={logo} alt="Logo" className="h-5 w-fit" />
       </Link>
@@ -110,9 +110,9 @@ export function Navbar({
         {walletConnected ? (
           <button
             type="button"
-            className="flex items-center gap-2 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 font-medium text-b-3 text-white"
+            className="flex items-center gap-2 rounded-md border border-warn/40 bg-warn/10 px-3 py-2 font-medium text-b-3 text-white"
           >
-            <span className="flex size-5 items-center justify-center rounded-sm bg-warning font-bold text-b-6 text-black">
+            <span className="flex size-5 items-center justify-center rounded-sm bg-warn font-bold text-b-6 text-black">
               $
             </span>
             {walletAddress}

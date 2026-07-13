@@ -22,7 +22,7 @@ export function TokenAuditCard() {
             <span className="flex items-center gap-1">
               {row.value}
               {row.warn ? (
-                <HelpCircle className="size-3.5 text-warning" />
+                <HelpCircle className="size-3.5 text-warn" />
               ) : (
                 <CheckCircle2 className="size-3.5 text-up" />
               )}

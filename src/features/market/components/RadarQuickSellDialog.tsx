@@ -28,8 +28,9 @@ export function RadarQuickSellDialog({
   const setRadarFilters = useMarketStore((state) => state.setRadarFilters);
 
   const activeColumns = RadarColumns.options.filter(
-    (column) => radarFilters[column].quickSell !== null,
+    (column) => radarFilters[column]?.quickSell !== null,
   );
+
   const isOff = activeColumns.length === 0;
 
   return (

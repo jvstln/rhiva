@@ -222,8 +222,8 @@ function StatsRow() {
       />
       <StatCard
         icon={Zap}
-        iconClassName="text-dodger-blue"
-        iconBgClassName="bg-dodger-blue/10"
+        iconClassName="text-info"
+        iconBgClassName="bg-info/10"
         label="Total XP"
         value={mockRewardAccount.currentXp.toLocaleString()}
         helper={`+${mockRewardAccount.xpPerDay} XP per day`}

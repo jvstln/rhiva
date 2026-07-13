@@ -21,7 +21,7 @@ const badgeVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         up: "border-transparent bg-up/10 text-up",
         down: "border-transparent bg-down/10 text-down",
-        warning: "border-transparent bg-warning/10 text-warning",
+        warning: "border-transparent bg-warn/10 text-warn",
         //         neutral: "border-border/80 text-gray bg-transparent",
         //         solid: "border-transparent bg-primary text-primary-foreground",
       },

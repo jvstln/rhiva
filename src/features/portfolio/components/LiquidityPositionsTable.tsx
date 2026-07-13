@@ -11,6 +11,7 @@ import { LP_POSITIONS } from "@/data/portfolio-data";
 import { POOLS } from "@/features/liquidity/liquidity.schema";
 import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
 import { capitalize, cn } from "@/lib/utils";
+import { PnlExportDialog } from "./PnlExportDialog";
 
 const columnHelper = createColumnHelper<(typeof LP_POSITIONS)[0]>();
 
@@ -59,9 +60,11 @@ const ActionCell = () => {
           </Button>
         </>
       ) : (
-        <Button tooltip="Share" variant="ghost" size="icon-sm">
-          <Share className="text-gray" />
-        </Button>
+        <PnlExportDialog>
+          <Button tooltip="Share" variant="ghost" size="icon-sm">
+            <Share className="text-gray" />
+          </Button>
+        </PnlExportDialog>
       )}
     </div>
   );
@@ -71,15 +74,19 @@ const columns = [
   columnHelper.accessor((row) => row, {
     header: "POSITION/POOL",
     cell: ({ row }) => (
-      <LinkWrapper className="group flex items-center gap-3 transition-opacity hover:opacity-80">
-        <Avatar>
-          <AvatarImage />
-          <AvatarFallback>
-            <SolanaIcon className="size-4" />
-          </AvatarFallback>
-        </Avatar>
+      <div className="group flex items-center gap-3 transition-opacity hover:opacity-80">
+        <Link href="/token">
+          <Avatar>
+            <AvatarImage />
+            <AvatarFallback>
+              <SolanaIcon className="size-4" />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
         <div>
-          <p className="font-bold text-b-2">{row.original.pool}</p>
+          <Link href="/token" className="font-bold text-b-2">
+            {row.original.pool}
+          </Link>
           <div className="flex items-center gap-1.5">
             <p className="text-b-5 text-gray">{row.original.timeAgo}</p>
             {(() => {
@@ -88,7 +95,7 @@ const columns = [
             })()}
           </div>
         </div>
-      </LinkWrapper>
+      </div>
     ),
   }),
   columnHelper.accessor((row) => row, {

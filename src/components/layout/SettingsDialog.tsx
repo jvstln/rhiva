@@ -157,7 +157,7 @@ function SectionDivider() {
 function TokenGlyph({ className }: { className?: string }) {
   return (
     <span className={cn("flex items-end gap-0.5", className)}>
-      <span className="h-2.5 w-1 rounded-full bg-dodger-blue" />
+      <span className="h-2.5 w-1 rounded-full bg-info" />
       <span className="h-3.5 w-1 rounded-full bg-primary" />
       <span className="h-2 w-1 rounded-full bg-casablanca" />
     </span>

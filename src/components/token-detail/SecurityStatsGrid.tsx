@@ -18,7 +18,7 @@ function StatGrid(props: {
             className={cn(
               "font-semibold text-b-3",
               item.tone === "down" && "text-down",
-              item.tone === "warning" && "text-warning",
+              item.tone === "warning" && "text-warn",
               !item.tone && "text-white",
             )}
           >

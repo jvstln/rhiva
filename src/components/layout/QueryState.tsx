@@ -28,7 +28,7 @@ type QueryStateProps<
       ) => React.ReactNode);
 
   getIsLoading?: (query: TQuery) => boolean | React.ReactNode;
-  getIsError?: (query: TQuery) => boolean | string;
+  getIsError?: (query: TQuery) => boolean | string | undefined;
   getIsEmpty?: (
     query: Extract<TQuery, { data: NonNullable<TData> }>,
   ) => boolean | string | EmptyStateProps;

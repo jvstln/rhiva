@@ -1,5 +1,5 @@
 import { QueryState } from "@/components/layout/QueryState";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { capitalize } from "@/lib/utils";
 import {
   useRadarFreshTokens,
@@ -19,7 +19,7 @@ export const RadarView = () => {
   const graduatedQuery = useRadarGraduatedTokens(radarFilters.graduated);
 
   return (
-    <div className="mx-1 flex min-h-0 flex-1 rounded-xl border">
+    <div className="flex h-full min-h-0 flex-1 rounded-xl border">
       {RadarColumns.options.map((column) => {
         const query =
           column === "fresh"
@@ -31,7 +31,7 @@ export const RadarView = () => {
         return (
           <section
             key={column}
-            className="flex min-h-0 min-w-0 flex-1 flex-col border-border/70 border-r last:border-r-0"
+            className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-border/70 border-r last:border-r-0"
           >
             <div className="flex items-center justify-between gap-4 border-border/70 border-b px-4 py-3">
               <h2 className="shrink-0 font-bold text-b-1 text-white">
@@ -40,7 +40,7 @@ export const RadarView = () => {
               <RadarColumnToolbar column={column} />
             </div>
 
-            <ScrollArea className="flex-1">
+            <ScrollArea className="h-full min-h-0 flex-1">
               <QueryState query={query} getIsLoading={(q) => q.isPending}>
                 {query.data?.items.map((token) => (
                   <RadarTokenCard
@@ -50,6 +50,7 @@ export const RadarView = () => {
                   />
                 ))}
               </QueryState>
+              <ScrollBar showScrollBar showIndicator />
             </ScrollArea>
           </section>
         );
