@@ -1,6 +1,11 @@
 "use client";
 
-import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
+import {
+  type ColumnDef,
+  createColumnHelper,
+  type Row,
+  type SortingState,
+} from "@tanstack/react-table";
 import { Rocket, Star } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -103,6 +108,8 @@ export function LinkWrapper({
   );
 }
 
+const columnHelper = createColumnHelper<PoolRow>();
+
 export function PoolsTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pool, setPool] = React.useState<Pool | "all">("all");
@@ -128,10 +135,14 @@ export function PoolsTable() {
         },
         cell: ({ row }) => {
           const poolRow = row.original;
+          const currentDex =
+            pool === "all"
+              ? (["meteora", "orca", "raydium"] as const)[row.index % 3]
+              : pool;
           const Icon =
-            pool === "orca"
+            currentDex === "orca"
               ? OrcaIcon
-              : pool === "raydium"
+              : currentDex === "raydium"
                 ? RaydiumIcon
                 : MeteoraIcon;
 
@@ -146,7 +157,7 @@ export function PoolsTable() {
               </Button>
 
               <LinkWrapper
-                href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+                href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
                 className="flex items-center gap-3"
               >
                 <Avatar className="size-9 ring-2 ring-background">
@@ -179,7 +190,7 @@ export function PoolsTable() {
         header: "Market Cap",
         cell: ({ row }) => (
           <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
           >
             <ValueChangeCell
               value={row.original.marketCap}
@@ -195,7 +206,7 @@ export function PoolsTable() {
         header: "TVL",
         cell: ({ row }) => (
           <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
           >
             <ValueChangeCell
               value={row.original.tvl}
@@ -211,7 +222,7 @@ export function PoolsTable() {
         header: "Active TVL",
         cell: ({ row }) => (
           <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
           >
             <ValueChangeCell
               value={row.original.activeTvl}
@@ -227,7 +238,7 @@ export function PoolsTable() {
         header: "Fees",
         cell: ({ row }) => (
           <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
           >
             <ValueChangeCell
               value={row.original.fees}
@@ -243,7 +254,7 @@ export function PoolsTable() {
         header: "Fees/Active TVL",
         cell: ({ row }) => (
           <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
           >
             <ValueChangeCell
               value={row.original.feesRatio}
@@ -259,7 +270,7 @@ export function PoolsTable() {
         header: "Volume",
         cell: ({ row }) => (
           <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
           >
             <ValueChangeCell
               value={row.original.volume}
@@ -275,14 +286,21 @@ export function PoolsTable() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <LinkWrapper
-              href={`/liquidity/pool?dex=${pool === "all" ? "meteora" : pool}`}
+              href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
             >
               <ValueChangeCell
                 value={row.original.volumeRatio}
                 change={row.original.volumeRatioChange}
               />
             </LinkWrapper>
-
+          </div>
+        ),
+        sortingFn: numericSort,
+      },
+      columnHelper.display({
+        id: "more",
+        cell() {
+          return (
             <Popover>
               <PopoverTrigger
                 openOnHover
@@ -315,18 +333,18 @@ export function PoolsTable() {
                 </div>
               </PopoverContent>
             </Popover>
-          </div>
-        ),
-        sortingFn: numericSort,
-      },
+          );
+        },
+        size: 50,
+      }),
       {
         id: "actions",
         header: "",
         cell: () => (
           <div className="flex w-24 items-center justify-center gap-4">
             <Button
-              aria-label="Ape in"
-              variant={"ghost"}
+              aria-label="Zap in"
+              variant={"secondary"}
               onMouseEnter={(e) => {
                 gsap.context(() => {
                   gsap.to("[data-slot='action-value']", {
@@ -351,7 +369,7 @@ export function PoolsTable() {
                 data-slot="action-value"
                 className="w-0 scale-0 overflow-hidden transition-[width]"
               >
-                {0.3}
+                {0.3} SOL
               </span>
             </Button>
           </div>

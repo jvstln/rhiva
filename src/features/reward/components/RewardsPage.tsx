@@ -23,6 +23,7 @@ import {
   DashboardSlot,
 } from "@/components/layout/DashboardUi";
 import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/button/copy-button";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   mockRewardAccount,
@@ -108,8 +114,13 @@ function CurrentTierCard() {
     : 0;
 
   return (
-    <div className="relative overflow-hidden rounded-lg bg-surface-1 p-6">
-      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-32 rounded-full bg-primary blur-[100px]" />
+    <div
+      className="relative overflow-hidden rounded-lg bg-surface-1 p-6"
+      style={{
+        boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
+      }}
+    >
+      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-32 rounded-full bg-foreground/30 blur-[100px]" />
 
       <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
         <div className="flex shrink-0 flex-col items-center gap-1">
@@ -128,12 +139,9 @@ function CurrentTierCard() {
                 {nextTier?.name ?? "MAX"}
               </span>
             </p>
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1.5 rounded-full border-primary/20 text-xs"
-            >
-              <Share2 className="size-3" />
+
+            <Button size="sm" variant="outline">
+              <Share2 />
               Share
             </Button>
           </div>
@@ -181,7 +189,12 @@ function StatCard({
   helper: string;
 }) {
   return (
-    <div className="flex flex-col justify-between rounded-lg border border-primary/10 p-4">
+    <div
+      className="flex flex-col justify-between rounded-lg border p-4"
+      style={{
+        boxShadow: `inset 1px -1px 0 rgba(255, 255, 255, 0.6)`,
+      }}
+    >
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -403,8 +416,13 @@ function ReferralCard() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-primary/20 p-6">
-      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-56 rounded-full bg-primary/60 blur-[120px]" />
+    <div
+      className="relative overflow-hidden rounded-lg border p-6"
+      style={{
+        boxShadow: `0 4px 32px rgba(255, 255, 255, 0.08), inset -1px -1px 0 rgba(255, 255, 255, 0.6)`,
+      }}
+    >
+      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-56 rounded-full bg-foreground/20 blur-[120px]" />
 
       <div className="relative space-y-6">
         <div>
@@ -418,26 +436,19 @@ function ReferralCard() {
           <p className="font-medium text-foreground text-sm">
             Your Referral Link
           </p>
-          <div className="flex items-center overflow-hidden rounded-lg border border-primary/10">
-            <span className="flex-1 truncate px-4 py-3.5 text-foreground/70">
-              {mockRewardAccount.referralLink}
-            </span>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="flex h-full items-center justify-center bg-primary/20 px-6 py-3.5 text-foreground transition-colors hover:bg-primary/30"
-            >
-              {copied ? (
-                <Check className="size-5" />
-              ) : (
-                <Copy className="size-5" />
-              )}
-            </button>
-          </div>
+          <InputGroup>
+            <InputGroupInput readOnly value={mockRewardAccount.referralLink} />
+            <InputGroupAddon align={"inline-end"}>
+              <CopyButton
+                size="icon-lg"
+                copy={mockRewardAccount.referralLink}
+              />
+            </InputGroupAddon>
+          </InputGroup>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-primary/20 bg-primary/3 p-5">
+          <div className="rounded-2xl border bg-foreground/3 p-5">
             <div className="mb-2 flex items-center gap-1.5">
               <span className="flex size-6 items-center justify-center rounded-full bg-up/10">
                 <Repeat className="size-3.5 text-up" />
@@ -449,7 +460,7 @@ function ReferralCard() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-primary/20 bg-primary/3 p-5">
+          <div className="rounded-2xl border bg-foreground/3 p-5">
             <div className="mb-2 flex items-center gap-1.5">
               <span className="flex size-6 items-center justify-center rounded-full bg-casablanca/10">
                 <Coins className="size-3.5 text-casablanca" />
@@ -466,9 +477,9 @@ function ReferralCard() {
           Minimum claim amount is {mockRewardAccount.minClaimAmount} SOL
         </p>
 
-        <Button className="w-full gap-3 py-6 text-lg">
+        <Button className="w-full" size="lg">
           Claim Earnings
-          <ArrowRight className="size-5" />
+          <ArrowRight />
         </Button>
       </div>
     </div>

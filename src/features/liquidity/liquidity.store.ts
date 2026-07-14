@@ -6,7 +6,7 @@ import type { LiquidityState } from "./liquidity.type";
 export const useLiquidityStore = create(
   immer<LiquidityState>((set) => ({
     liquidityFilters: {
-      apeIn: null,
+      zapIn: null,
     },
     setLiquidityFilters(filters) {
       set((state) => {

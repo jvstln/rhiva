@@ -18,7 +18,9 @@ export function MarketToolbar() {
 
   return (
     <div
-      className={cn("flex w-full items-center justify-between p-4 md:gap-16")}
+      className={cn(
+        "flex w-full items-center justify-between border-b px-4 pt-2 md:gap-16",
+      )}
     >
       <nav
         className="flex items-center gap-0.5 py-2"

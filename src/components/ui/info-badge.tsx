@@ -2,15 +2,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const infoBadgeVariants = cva(
-  "inline-flex items-center shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 text-[11px] leading-4 font-medium [&_svg]:not-[class*=size-]:size-3.25 [&_svg]:not-[class*=shrink-]:shrink-0 gap-1 text-accent tabular-nums",
+  "inline-flex group/info-badge items-center shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 text-[10px] leading-4 font-medium [&_svg]:not-[class*=size-]:size-3 [&_svg]:not-[class*=shrink-]:shrink-0 gap-1 text-accent **:[[class*=--accent]]:text-accent tabular-nums font-geist",
   {
     variants: {
       variant: {
         inline: "",
         badge:
-          "rounded-md px-1 py-0.25 font-medium border border-accent/80 bg-accent/7",
+          "rounded-md px-1 py-0.25 text-[11px] font-medium border border-accent/80 bg-accent/5",
       },
       tone: {
         default: "[--accent:var(--color-gray)]",
@@ -44,7 +45,12 @@ export const InfoBadge = ({
 }: InfoBadgeProps) => {
   const content = (
     <span
-      className={cn(infoBadgeVariants({ variant, tone }), className)}
+      data-slot="info-badge"
+      className={cn(
+        infoBadgeVariants({ variant, tone }),
+        className,
+        "cursor-default",
+      )}
       {...props}
     >
       {children}
@@ -53,27 +59,31 @@ export const InfoBadge = ({
 
   if (!tooltip) return content;
 
+  // return (
+  //   <HoverCard>
+  //     <HoverCardTrigger delay={300}>{content}</HoverCardTrigger>
+  //     <HoverCardContent
+  //       side="bottom"
+  //       align="center"
+  //       className={"w-fit max-w-[280px]"}
+  //     >
+  //       {tooltip}
+  //     </HoverCardContent>
+  //   </HoverCard>
+  // );
+
   return (
-    <HoverCard>
-      <HoverCardTrigger delay={300}>{content}</HoverCardTrigger>
-      <HoverCardContent
+    <Tooltip>
+      <TooltipTrigger>{content}</TooltipTrigger>
+      <TooltipContent
         side="bottom"
         align="center"
-        className={"w-fit max-w-[280px]"}
+        className="max-w-[280px] font-geist"
       >
         {tooltip}
-      </HoverCardContent>
-    </HoverCard>
+      </TooltipContent>
+    </Tooltip>
   );
-
-  // return (
-  // <Tooltip>
-  //   <TooltipTrigger>{content}</TooltipTrigger>
-  //   <TooltipContent side="bottom" align="center" className="max-w-[280px]">
-  //     {tooltip}
-  //   </TooltipContent>
-  // </Tooltip>
-  // );
 };
 
 /* ------------------------------------------------------------------ */

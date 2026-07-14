@@ -4,6 +4,7 @@ import {
   Bot,
   Bug,
   Coins,
+  Copy,
   Crosshair,
   Crown,
   Layers,
@@ -21,7 +22,13 @@ import { QueryState } from "@/components/layout/QueryState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/button/copy-button";
-import { InfoBadge } from "@/components/ui/info-badge";
+import {
+  InfoBadge,
+  InfoBadgeTooltipGrid,
+  InfoBadgeTooltipHeader,
+  InfoBadgeTooltipRow,
+} from "@/components/ui/info-badge";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import type { MemeToken } from "@/features/market/market.type";
 import {
@@ -46,7 +53,7 @@ function TokenRow({ token }: TokenRowProps) {
   return (
     <div className="flex items-center gap-6 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60">
       {/* Token identity */}
-      <div className="flex min-w-0 flex-1 basis-1/4 gap-3">
+      <div className="flex min-w-0 max-w-100 flex-1 basis-3/10 gap-3">
         <TokenHoverTooltip token={token}>
           <Avatar variant="square" size="lg" className="relative shrink-0">
             <AvatarImage src={token.logo_uri ?? ""} />
@@ -57,10 +64,12 @@ function TokenRow({ token }: TokenRowProps) {
           </Avatar>
         </TokenHoverTooltip>
 
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-1.5 text-b-3">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-center gap-1 text-sm">
             <span className="font-semibold">{token.name}</span>
-            <span className="truncate text-gray">{token.symbol}</span>
+            <span className="truncate text-muted-foreground">
+              {token.symbol}
+            </span>
             <InfoBadge>
               <Pencil />
             </InfoBadge>
@@ -76,7 +85,7 @@ function TokenRow({ token }: TokenRowProps) {
             <span className="shrink-0 text-up">
               {formatAge(token.recent_listing_time)}
             </span>
-            <span className="text-border">|</span>
+            <Separator orientation="vertical" className="h-4/5 self-center" />
             <span className="truncate">
               {token.address.slice(0, 4)}...{token.address.slice(-4)}
             </span>
@@ -86,72 +95,195 @@ function TokenRow({ token }: TokenRowProps) {
             </InfoBadge>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-1">
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="New Users (24h)"
-            >
-              <UserPlus />
-              20%
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-info)]"
-              tooltip="DexScreener Listed"
-            >
-              <Shield />
-              DS
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="Bug / Error Rate"
-            >
-              <Bug />
-              0%
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="Liquidity Depth / Layers"
-            >
-              <Layers />
-              2%
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="Trading Activity Spike"
-            >
-              <Activity />
-              0%
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="Organic Growth"
-            >
-              <Leaf />
-              0.3%
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="Community Score"
-            >
-              <Leaf />
-              0%
-            </InfoBadge>
-            <InfoBadge
-              variant="badge"
-              className="[--accent:var(--color-up)]"
-              tooltip="Sniper Activity"
-            >
-              <Crosshair />
-              0%
-            </InfoBadge>
-          </div>
+          <ScrollArea className="">
+            <div className="flex items-center gap-x-1">
+              <InfoBadge
+                variant="badge"
+                className="[--accent:var(--color-up)]"
+                tooltip={
+                  <div>
+                    <InfoBadgeTooltipHeader>
+                      New Users (24h)
+                    </InfoBadgeTooltipHeader>
+                    <InfoBadgeTooltipGrid>
+                      <InfoBadgeTooltipRow
+                        label="Total Unique"
+                        value={formatCompactNumber(token.unique_wallet_24h)}
+                      />
+                      <InfoBadgeTooltipRow
+                        label="New Wallets"
+                        value={formatCompactNumber(
+                          Math.floor(token.unique_wallet_24h * 0.2),
+                        )}
+                        valueClassName="text-up"
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Returning"
+                        value={formatCompactNumber(
+                          Math.floor(token.unique_wallet_24h * 0.8),
+                        )}
+                      />
+                    </InfoBadgeTooltipGrid>
+                  </div>
+                }
+              >
+                <UserPlus />+
+                {formatCompactNumber(Math.floor(token.unique_wallet_24h * 0.2))}
+              </InfoBadge>
+              <InfoBadge
+                variant="badge"
+                className="[--accent:var(--color-info)]"
+                tooltip={
+                  <div>
+                    <InfoBadgeTooltipHeader>
+                      Dev Sell All
+                    </InfoBadgeTooltipHeader>
+                    <InfoBadgeTooltipGrid>
+                      <InfoBadgeTooltipRow
+                        label="Dev Wallet"
+                        value={
+                          <span>
+                            {token.address.slice(0, 4)}...
+                            {token.address.slice(-4)}{" "}
+                          </span>
+                        }
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Bought"
+                        value={`${formatCompactCurrency(token.volume_buy_24h_usd * 0.05)} / ${Math.floor(token.buy_24h * 0.1)}TXs`}
+                        valueClassName="text-up"
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Sold"
+                        value={`${formatCompactCurrency(token.volume_sell_24h_usd * 0.08)} / ${Math.floor(token.sell_24h * 0.1)}TXs`}
+                        valueClassName="text-down"
+                      />
+                      <InfoBadgeTooltipRow label="Balance" value="$0" />
+                      <InfoBadgeTooltipRow
+                        label="Funding"
+                        value={
+                          <span>
+                            {token.address.slice(4, 8)}...
+                            {token.address.slice(-8, -4)}{" "}
+                          </span>
+                        }
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Transfer In"
+                        value={`${(token.liquidity % 10).toFixed(2)} SOL`}
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Time"
+                        value={
+                          token.recent_listing_time
+                            ? new Date(
+                                token.recent_listing_time * 1000,
+                              ).toLocaleDateString()
+                            : "N/A"
+                        }
+                      />
+                    </InfoBadgeTooltipGrid>
+                  </div>
+                }
+              >
+                <Shield />
+                DS
+              </InfoBadge>
+              <InfoBadge
+                variant="badge"
+                className="[--accent:var(--color-warn)]"
+                tooltip={
+                  <div>
+                    <InfoBadgeTooltipHeader>
+                      Top 10 Holders
+                    </InfoBadgeTooltipHeader>
+                    <InfoBadgeTooltipGrid>
+                      <InfoBadgeTooltipRow
+                        label="Total Supply Held"
+                        value={`${(30 + (token.liquidity % 15)).toFixed(1)}%`}
+                        valueClassName="text-warn"
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Creator Balance"
+                        value={`${(token.liquidity % 3).toFixed(1)}%`}
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Largest Wallet"
+                        value={`${(3 + (token.liquidity % 4)).toFixed(1)}%`}
+                      />
+                    </InfoBadgeTooltipGrid>
+                  </div>
+                }
+              >
+                <Users />
+                {(30 + (token.liquidity % 15)).toFixed(1)}%
+              </InfoBadge>
+              <InfoBadge
+                variant="badge"
+                className="[--accent:var(--color-up)]"
+                tooltip={
+                  <div>
+                    <InfoBadgeTooltipHeader>
+                      Liquidity Depth
+                    </InfoBadgeTooltipHeader>
+                    <InfoBadgeTooltipGrid>
+                      <InfoBadgeTooltipRow
+                        label="Total Liquidity"
+                        value={`${formatCompactCurrency(token.liquidity)}`}
+                      />
+                      <InfoBadgeTooltipRow
+                        label="+2% Depth"
+                        value={`${formatCompactCurrency(token.liquidity * 0.1)}`}
+                        valueClassName="text-up"
+                      />
+                      <InfoBadgeTooltipRow
+                        label="-2% Depth"
+                        value={formatCompactCurrency(token.liquidity * 0.12)}
+                        valueClassName="text-down"
+                      />
+                    </InfoBadgeTooltipGrid>
+                  </div>
+                }
+              >
+                <Layers />${formatCompactCurrency(token.liquidity * 0.1)}
+              </InfoBadge>
+              <InfoBadge
+                variant="badge"
+                className="[--accent:var(--color-down)]"
+                tooltip={
+                  <div>
+                    <InfoBadgeTooltipHeader>
+                      Sniper Activity
+                    </InfoBadgeTooltipHeader>
+                    <InfoBadgeTooltipGrid>
+                      <InfoBadgeTooltipRow
+                        label="Total Snipers"
+                        value={Math.floor(token.trade_24h_count * 0.02)}
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Snipers Holding"
+                        value={Math.floor(token.trade_24h_count * 0.005)}
+                        valueClassName="text-down"
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Snipers Sold"
+                        value={Math.floor(token.trade_24h_count * 0.015)}
+                      />
+                      <InfoBadgeTooltipRow
+                        label="Avg Profit"
+                        value={`+${(token.volume_24h_usd % 5).toFixed(1)} SOL`}
+                        valueClassName="text-up"
+                      />
+                    </InfoBadgeTooltipGrid>
+                  </div>
+                }
+              >
+                <Crosshair />
+                {Math.floor(token.trade_24h_count * 0.02)}
+              </InfoBadge>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
       </div>
 
@@ -200,7 +332,7 @@ function TokenRow({ token }: TokenRowProps) {
       <Separator orientation="vertical" className="" />
 
       {/* Activity + buy */}
-      <div className="flex w-[280px] shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
+      <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
         <div className="flex items-center gap-3">
           <span className="text-up">
             {formatAge(token.recent_listing_time)}

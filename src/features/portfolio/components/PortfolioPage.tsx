@@ -1,4 +1,5 @@
 "use client";
+import { Calendar } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -19,7 +20,7 @@ const PortfolioPage = () => {
   );
 
   return (
-    <DashboardSlot>
+    <DashboardSlot className="mx-auto xl:container">
       <PortfolioHero />
 
       <div className="space-y-3">
@@ -83,8 +84,11 @@ const PortfolioPage = () => {
                 ),
             )}
           </div>
-          <PnlCalendarDialog>
-            <Button className="min-w-24">PnL</Button>
+          <PnlCalendarDialog liquidityType={activeView}>
+            <Button className="min-w-24">
+              <Calendar />
+              PnL
+            </Button>
           </PnlCalendarDialog>
         </div>
       </div>

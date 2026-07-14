@@ -33,12 +33,15 @@ import { Separator } from "@/components/ui/separator";
 import { PNL_CALENDAR_DAYS, PNL_CALENDAR_METRICS } from "@/data/portfolio-data";
 import { Timeframe } from "@/features/market/market.schema";
 import { cn } from "@/lib/utils";
+import type { PortfolioTab } from "../portfolio.schema";
 import { PnlExportDialog } from "./PnlExportDialog";
 
 export function PnlCalendarDialog({
   children,
+  liquidityType = "liquidityPosition",
 }: {
-  children: React.ReactElement;
+  liquidityType?: PortfolioTab;
+  children?: React.ReactElement;
 }) {
   // Use July 2025 by default as per the mock design
   const [currentDate, setCurrentDate] = useState(new Date(2025, 6, 1));
@@ -227,7 +230,10 @@ export function PnlCalendarDialog({
                                   : "text-red-500/80",
                               )}
                             >
-                              {dayData.positions} Positions
+                              {dayData.positions}{" "}
+                              {liquidityType === "tradingPosition"
+                                ? "Trades"
+                                : "Positions"}
                             </span>
                           </div>
                         ) : (
@@ -253,7 +259,7 @@ export function PnlCalendarDialog({
 
 const SharePnl = () => {
   return (
-    <div className="mb-4 flex justify-end gap-4">
+    <div className="mb-4 flex justify-end gap-4 pr-4">
       <Select defaultValue={Timeframe.options.at(-1)}>
         <SelectTrigger size="sm" className={"w-fit"}>
           <Clock />
@@ -261,7 +267,7 @@ const SharePnl = () => {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {Timeframe.options.map((tf) => (
+            {Timeframe.options.slice(-4).map((tf) => (
               <SelectItem key={tf} value={tf}>
                 {tf}
               </SelectItem>

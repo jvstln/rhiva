@@ -465,11 +465,13 @@ export function TrendingTable() {
   });
 
   return (
-    <DataTable
-      table={table}
-      classNames={{ table: "table-fixed" }}
-      isLoading={trendingTokens.isPending}
-      error={trendingTokens.error?.message}
-    />
+    <div className="mx-auto xl:container">
+      <DataTable
+        table={table}
+        classNames={{ table: "table-fixed" }}
+        isLoading={trendingTokens.isPending}
+        error={trendingTokens.error?.message}
+      />
+    </div>
   );
 }

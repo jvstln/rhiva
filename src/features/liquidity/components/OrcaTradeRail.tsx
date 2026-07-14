@@ -52,11 +52,32 @@ function InfoRow({
   );
 }
 
-function YieldDepositCard() {
+function YieldDepositCard({
+  currencies = ["SOL", "USDC"],
+}: {
+  currencies?: Array<"SOL" | "USDC">;
+}) {
+  const solPercent =
+    currencies.length > 1
+      ? "50.0%"
+      : currencies.includes("SOL")
+        ? "100.0%"
+        : "0.0%";
+
+  const usdcPercent =
+    currencies.length > 1
+      ? "50.0%"
+      : currencies.includes("USDC")
+        ? "100.0%"
+        : "0.0%";
+
   return (
     <div className="space-y-3 rounded-xl border border-border/70 p-4">
       <InfoRow label="Estimated Yield" value="0.028%" isTag />
-      <InfoRow label="Deposit" value="50.0% SOL / 50.0% USDC" />
+      <InfoRow
+        label="Deposit"
+        value={`${solPercent} SOL / ${usdcPercent} USDC`}
+      />
     </div>
   );
 }
@@ -121,6 +142,11 @@ function OrcaFullTab() {
 }
 
 function OrcaCustomTab() {
+  const [tradeType, setTradeType] = useState<"full" | "single">("full");
+  const [selectedCurrency, setSelectedCurrency] = useState<"SOL" | "USDC">(
+    "SOL",
+  );
+
   return (
     <div className="fade-in animate-in space-y-6 duration-300">
       <div className="text-center text-b-5 text-white">
@@ -164,7 +190,12 @@ function OrcaCustomTab() {
       <div className="mt-6 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-b-4 text-gray">Trade amount</span>
-          <ToggleGroup size="sm" defaultValue={["full"]} spacing={0}>
+          <ToggleGroup
+            size="sm"
+            value={[tradeType]}
+            onValueChange={([value]) => setTradeType(value as typeof tradeType)}
+            spacing={0}
+          >
             <ToggleGroupItem value="full">Full-sided</ToggleGroupItem>
             <ToggleGroupItem value="single">Single-sided</ToggleGroupItem>
           </ToggleGroup>
@@ -196,13 +227,35 @@ function OrcaCustomTab() {
         </div>
 
         <div className="flex gap-3 pt-2 *:flex-1">
-          <Button>SOL</Button>
-          <Button>USDC</Button>
+          <Button
+            variant={
+              selectedCurrency.includes("SOL") || tradeType === "full"
+                ? "default"
+                : "outline"
+            }
+            onClick={() => setSelectedCurrency("SOL")}
+          >
+            SOL
+          </Button>
+          <Button
+            variant={
+              selectedCurrency.includes("USDC") || tradeType === "full"
+                ? "default"
+                : "outline"
+            }
+            onClick={() => setSelectedCurrency("USDC")}
+          >
+            USDC
+          </Button>
         </div>
       </div>
 
       <div className="pt-2">
-        <YieldDepositCard />
+        <YieldDepositCard
+          currencies={
+            tradeType === "full" ? ["SOL", "USDC"] : [selectedCurrency]
+          }
+        />
       </div>
 
       <SummaryFees />

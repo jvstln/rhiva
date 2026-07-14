@@ -105,11 +105,11 @@ const columns = [
   }),
 ];
 
-const filters = ["activePositions", "history", "top100"];
+const filters = ["activePositions", "history"];
 
 export const TradingPositionsTable = () => {
   const table = useDataTable({ data: POSITIONS, columns });
-  const [activeFilter, setActiveFilter] = useState("top100");
+  const [activeFilter, setActiveFilter] = useState("activePositions");
 
   return (
     <div className="space-y-4">

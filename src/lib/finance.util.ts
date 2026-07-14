@@ -1,6 +1,20 @@
+import {
+  NetworkBitcoin,
+  NetworkEthereum,
+  NetworkSolana,
+} from "@web3icons/react";
+import {
+  Coins,
+  DollarSign,
+  Euro,
+  IndianRupee,
+  JapaneseYen,
+  PoundSterling,
+  SwissFranc,
+} from "lucide-react";
+
 export function formatCompactCurrency(value: number | null): string {
   if (value === null) return "N/A";
-
   const abs = Math.abs(value);
   if (abs >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}b`;
   if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}m`;
@@ -40,3 +54,16 @@ export function formatAge(unixTime: number | null): string {
   if (diffMinutes > 0) return `${diffMinutes}m`;
   return `${diffSeconds}s`;
 }
+
+export const currencies = [
+  { value: "USD", symbol: "$", icon: DollarSign, label: "US Dollar" },
+  { value: "SOL", symbol: "SOL", icon: NetworkSolana, label: "Solana" },
+  { value: "NGN", symbol: "₦", icon: Coins, label: "Nigerian Naira" },
+  { value: "EUR", symbol: "€", icon: Euro, label: "Euro" },
+  { value: "GBP", symbol: "£", icon: PoundSterling, label: "British Pound" },
+  { value: "JPY", symbol: "¥", icon: JapaneseYen, label: "Japanese Yen" },
+  { value: "INR", symbol: "₹", icon: IndianRupee, label: "Indian Rupee" },
+  { value: "CHF", symbol: "Fr", icon: SwissFranc, label: "Swiss Franc" },
+  { value: "BTC", symbol: "BTC", icon: NetworkBitcoin, label: "Bitcoin" },
+  { value: "ETH", symbol: "ETH", icon: NetworkEthereum, label: "Ethereum" },
+];

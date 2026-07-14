@@ -1,6 +1,6 @@
 export type LiquidityState = {
   liquidityFilters: {
-    apeIn: number | null;
+    zapIn: number | null;
   };
   setLiquidityFilters: (
     filters: Partial<LiquidityState["liquidityFilters"]>,

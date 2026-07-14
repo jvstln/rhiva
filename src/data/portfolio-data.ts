@@ -91,11 +91,11 @@ export const LP_POSITIONS: LpPosition[] = [
 ];
 
 export const PORTFOLIO_SUMMARY = {
-  totalValue: "$25.32",
+  totalValue: "25.32",
   totalValueChange: "-4.49%",
   unrealizedPnl: "$0",
   tradeableBalance: "$0",
-  todaysPnl: "$0.00 (0.00%)",
+  todaysPnl: "0.00 (0.00%)",
 };
 
 export const PNL_CALENDAR_METRICS = {

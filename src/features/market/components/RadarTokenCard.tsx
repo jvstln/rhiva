@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/button/copy-button";
 import { InfoBadge } from "@/components/ui/info-badge";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import type { MemeToken } from "@/features/market/market.type";
 import {
   cn,
@@ -42,7 +43,7 @@ interface TokenCardProps {
 export function RadarTokenCard({ token, column }: TokenCardProps) {
   return (
     <article className="border-border/70 border-b px-4 py-4 last:border-none">
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3">
         {/* LEFT COLUMN: Avatar and Address */}
         <div className="flex shrink-0 flex-col items-center gap-2">
           <TokenHoverTooltip token={token}>
@@ -146,48 +147,59 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
           </div>
 
           <div className="flex items-end justify-between gap-1">
-            <div className="flex flex-wrap gap-x-1">
-              <InfoBadge variant="badge" tone="down" tooltip="Total Holders">
-                <UserPlus />
-                {formatCompactNumber(token.holder)}
-              </InfoBadge>
-              <InfoBadge
-                variant="badge"
-                tone="up"
-                tooltip="Bonding Curve Progress"
-              >
-                <ChefHat />
-                {`${token.meme_info.progress_percent.toFixed(1)}%`}
-              </InfoBadge>
-              <InfoBadge variant="badge" tone="up" tooltip="Liquidity">
-                <Ghost />
-                {formatCompactCurrency(token.liquidity)}
-              </InfoBadge>
-              <InfoBadge variant="badge" tone="up" tooltip="Trades (24h)">
-                <Layers />
-                {formatCompactNumber(token.trade_24h_count)}
-              </InfoBadge>
-              <InfoBadge variant="badge" tone="up" tooltip="Buy Volume (24h)">
-                <Activity />
-                {formatCompactCurrency(token.volume_buy_24h_usd)}
-              </InfoBadge>
-              <InfoBadge variant="badge" tone="up" tooltip="Sell Volume (24h)">
-                <Leaf />
-                {formatCompactCurrency(token.volume_sell_24h_usd)}
-              </InfoBadge>
-              <InfoBadge variant="badge" tone="down" tooltip="Sell Count (24h)">
-                <Leaf />
-                {`${token.sell_24h}`}
-              </InfoBadge>
-              <InfoBadge
-                variant="badge"
-                tooltip="Unique Traders (24h)"
-                tone="down"
-              >
-                <Crosshair />
-                {`${token.unique_wallet_24h}`}
-              </InfoBadge>
-            </div>
+            <ScrollArea className="min-w-0 grow">
+              <div className="flex gap-x-1">
+                <InfoBadge variant="badge" tone="down" tooltip="Total Holders">
+                  <UserPlus />
+                  {formatCompactNumber(token.holder)}
+                </InfoBadge>
+                <InfoBadge
+                  variant="badge"
+                  tone="up"
+                  tooltip="Bonding Curve Progress"
+                >
+                  <ChefHat />
+                  {`${token.meme_info.progress_percent.toFixed(1)}%`}
+                </InfoBadge>
+                <InfoBadge variant="badge" tone="up" tooltip="Liquidity">
+                  <Ghost />
+                  {formatCompactCurrency(token.liquidity)}
+                </InfoBadge>
+                <InfoBadge variant="badge" tone="up" tooltip="Trades (24h)">
+                  <Layers />
+                  {formatCompactNumber(token.trade_24h_count)}
+                </InfoBadge>
+                <InfoBadge variant="badge" tone="up" tooltip="Buy Volume (24h)">
+                  <Activity />
+                  {formatCompactCurrency(token.volume_buy_24h_usd)}
+                </InfoBadge>
+                <InfoBadge
+                  variant="badge"
+                  tone="up"
+                  tooltip="Sell Volume (24h)"
+                >
+                  <Leaf />
+                  {formatCompactCurrency(token.volume_sell_24h_usd)}
+                </InfoBadge>
+                <InfoBadge
+                  variant="badge"
+                  tone="down"
+                  tooltip="Sell Count (24h)"
+                >
+                  <Leaf />
+                  {`${token.sell_24h}`}
+                </InfoBadge>
+                <InfoBadge
+                  variant="badge"
+                  tooltip="Unique Traders (24h)"
+                  tone="down"
+                >
+                  <Crosshair />
+                  {`${token.unique_wallet_24h}`}
+                </InfoBadge>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
 
             <div className="flex shrink-0 gap-1.5">
               <BuyAndSellActions column={column} />

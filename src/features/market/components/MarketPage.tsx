@@ -1,7 +1,9 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { MarketView } from "@/features/market/market.schema";
+import { MarketStatusBar } from "./MarketStatusBar";
 import { MarketToolbar } from "./MarketToolbar";
 import { PumpLiveGrid } from "./PumpLiveView";
 import { RadarView } from "./RadarView";
@@ -13,7 +15,8 @@ const MarketPage = () => {
   const view = MarketView.parse(searchParams.get("view"));
 
   return (
-    <div className="mx-auto flex size-full min-h-0 flex-1 flex-col xl:container">
+    <DashboardSlot className="px-0 pt-0">
+      <MarketStatusBar />
       <MarketToolbar />
 
       {view === "watchlist" && <TrendingTable />}
@@ -21,7 +24,7 @@ const MarketPage = () => {
       {view === "surge" && <SurgeTable />}
       {view === "pumpLive" && <PumpLiveGrid />}
       {view === "radar" && <RadarView />}
-    </div>
+    </DashboardSlot>
   );
 };
 

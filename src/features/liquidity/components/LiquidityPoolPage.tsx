@@ -2,32 +2,42 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { PoolDetailChartPanel } from "@/components/liquidity-detail/PoolDetailChartPanel";
 import { PoolDetailSidebar } from "@/components/liquidity-detail/PoolDetailSidebar";
-import { PoolDetailTradeRail } from "@/components/liquidity-detail/PoolDetailTradeRail";
 import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { MeteoraTradeRail } from "@/features/liquidity/components/MeteoraTradeRail";
 import { OrcaTradeRail } from "@/features/liquidity/components/OrcaTradeRail";
 import { RaydiumTradeRail } from "@/features/liquidity/components/RaydiumTradeRail";
 import type { Pool } from "@/features/liquidity/liquidity.schema";
+import { cn } from "@/lib/utils";
 
 export default function LiquidityPoolPage({ dex = "meteora" }: { dex?: Pool }) {
   return (
-    <div>
-      <Link href="/liquidity" className={buttonVariants({ variant: "ghost" })}>
+    <div className="flex h-full min-h-0 flex-col">
+      <Link
+        href="/liquidity"
+        className={cn(buttonVariants({ variant: "ghost" }), "self-start")}
+      >
         <ChevronLeft />
         Back
       </Link>
-      <main className="flex flex-1">
-        <PoolDetailSidebar />
-        <PoolDetailChartPanel />
-        <aside className="w-[420px] shrink-0 border-border/70 border-l p-4">
-          <ScrollArea>
-            {dex === "meteora" && <PoolDetailTradeRail />}
-            {dex === "orca" && <OrcaTradeRail />}
-            {dex === "raydium" && <RaydiumTradeRail />}
+      <main className="flex min-h-0 flex-1">
+        <ScrollArea>
+          <PoolDetailSidebar />
+          <ScrollBar showScrollBar />
+        </ScrollArea>
 
-            <ScrollBar />
-          </ScrollArea>
-        </aside>
+        <ScrollArea className={"grow"}>
+          <PoolDetailChartPanel />
+          <ScrollBar showScrollBar />
+        </ScrollArea>
+
+        <ScrollArea className={"w-full max-w-[370px] border-l px-2 pr-4"}>
+          {dex === "meteora" && <MeteoraTradeRail />}
+          {dex === "orca" && <OrcaTradeRail />}
+          {dex === "raydium" && <RaydiumTradeRail />}
+
+          <ScrollBar showScrollBar />
+        </ScrollArea>
       </main>
     </div>
   );

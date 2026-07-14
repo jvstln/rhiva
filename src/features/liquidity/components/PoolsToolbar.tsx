@@ -47,7 +47,7 @@ export function PoolsToolbar() {
 
       {/* Filters */}
       <div className="inline-flex items-center gap-2">
-        <ApeInInput onSettingsDialogOpen={() => setSettingsDialogOpen(true)} />
+        <ZapInInput onSettingsDialogOpen={() => setSettingsDialogOpen(true)} />
 
         <ToggleGroup>
           {Timeframe.options.slice(-5, -1).map((tf) => (
@@ -76,15 +76,15 @@ export function PoolsToolbar() {
   );
 }
 
-const ApeInInput = ({
+const ZapInInput = ({
   onSettingsDialogOpen,
 }: {
   onSettingsDialogOpen?: () => void;
 }) => {
-  const apeIn = useLiquidityStore((state) => state.liquidityFilters.apeIn);
+  const zapIn = useLiquidityStore((state) => state.liquidityFilters.zapIn);
   const setFilters = useLiquidityStore((state) => state.setLiquidityFilters);
 
-  const [internalValue, setInternalValue] = useState(apeIn?.toString() || "");
+  const [internalValue, setInternalValue] = useState(zapIn?.toString() || "");
 
   return (
     <InputGroup className="w-36">
@@ -94,7 +94,7 @@ const ApeInInput = ({
           setInternalValue(e.target.value);
           debounce(() => {
             setFilters({
-              apeIn: e.target.value ? Number(e.target.value) : null,
+              zapIn: e.target.value ? Number(e.target.value) : null,
             });
           }, 800)();
         }}
@@ -103,10 +103,10 @@ const ApeInInput = ({
         <SolanaIcon />
       </InputGroupAddon>
 
-      <InputGroupAddon>
-        <Button size="sm" variant="ghost" onClick={onSettingsDialogOpen}>
+      <InputGroupAddon className="h-full">
+        <Button size="sm" variant="secondary" onClick={onSettingsDialogOpen}>
           <Rocket className="text-emerald-400" />
-          Ape in
+          Zap in
         </Button>
       </InputGroupAddon>
     </InputGroup>

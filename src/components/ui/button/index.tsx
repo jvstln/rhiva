@@ -54,10 +54,12 @@ const buttonVariants = cva(
   },
 );
 
-type CustomButtonProps = ButtonPrimitive.Props &
-  VariantProps<typeof buttonVariants> & {
-    tooltip?: React.ReactNode;
-  };
+export namespace Button {
+  export type Props = ButtonPrimitive.Props &
+    VariantProps<typeof buttonVariants> & {
+      tooltip?: React.ReactNode;
+    };
+}
 
 function Button({
   className,
@@ -66,7 +68,7 @@ function Button({
   ref,
   tooltip,
   ...props
-}: CustomButtonProps) {
+}: Button.Props) {
   const button = (
     <ButtonPrimitive
       ref={ref}

@@ -3,7 +3,7 @@
 import { toPng } from "html-to-image";
 import { Download, PlusCircle, Share } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +37,7 @@ interface PnlExportDialogProps extends Dialog.Props {
   position?: LpPosition;
 }
 
-export const PnlExportDialog = ({
+const PnlExportDialog = ({
   children,
   position,
   ...props
@@ -217,3 +217,11 @@ export const PnlExportDialog = ({
     </Dialog>
   );
 };
+
+const PnlExportDialogWithSuspense = () => (
+  <Suspense>
+    <PnlExportDialog />
+  </Suspense>
+);
+
+export { PnlExportDialogWithSuspense as PnlExportDialog };

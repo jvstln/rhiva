@@ -39,9 +39,7 @@ export function PriceRangeSelector() {
         <PriceStepper label="Max Price" value="109.493575" />
       </div>
 
-      <Button className="h-12 w-full font-semibold text-b-1">
-        Open Position
-      </Button>
+      <Button className="w-full">Open Position</Button>
     </div>
   );
 }
