@@ -1,7 +1,9 @@
 import { Bot, Copy, Share2, Star, User } from "lucide-react";
+import React from "react";
 import { HEADER_STATS } from "@/data/token-detail-data";
 import { TokenThumbnail } from "@/features/market/components/TokenThumbnail";
 import { cn } from "@/lib/utils";
+import { Separator } from "../ui/separator";
 
 export function TokenDetailHeader() {
   return (
@@ -27,19 +29,22 @@ export function TokenDetailHeader() {
 
       <div className="font-bold text-h5 text-white">$194.23K</div>
 
-      <div className="flex flex-1 flex-wrap items-center gap-x-8 gap-y-2">
-        {HEADER_STATS.map((stat) => (
-          <div key={stat.label}>
-            <p className="text-b-5 text-gray">{stat.label}</p>
-            <p
-              className={cn(
-                "font-semibold text-b-2",
-                stat.tone === "down" ? "text-down" : "text-white",
-              )}
-            >
-              {stat.value}
-            </p>
-          </div>
+      <div className="flex flex-1 flex-wrap items-center gap-x-7 gap-y-2">
+        {HEADER_STATS.map((stat, i) => (
+          <React.Fragment key={stat.label}>
+            {i !== 0 && <Separator orientation="vertical" />}
+            <div>
+              <p className="text-b-5 text-gray">{stat.label}</p>
+              <p
+                className={cn(
+                  "font-semibold text-b-2",
+                  stat.tone === "down" ? "text-down" : "text-white",
+                )}
+              >
+                {stat.value}
+              </p>
+            </div>
+          </React.Fragment>
         ))}
       </div>
     </div>

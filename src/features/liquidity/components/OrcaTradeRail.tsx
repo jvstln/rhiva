@@ -42,7 +42,7 @@ function InfoRow({
       <div className="flex items-center gap-2 text-gray">
         {label}
         {isTag && (
-          <span className="rounded bg-primary/10 bg-white/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+          <span className="rounded bg-white/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
             24H
           </span>
         )}
@@ -86,7 +86,7 @@ function SummaryFees() {
   return (
     <div className="space-y-3 pt-2">
       <InfoRow label="Estimated Yield" value="-" isTag />
-      <div className="my-4 h-[1px] w-full bg-border/40" />
+      <div className="my-4 h-px w-full bg-border/40" />
       <div className="flex items-center justify-between text-b-4 text-gray">
         <span className="underline decoration-dashed underline-offset-4">
           Non-Refundable Fees
@@ -124,7 +124,7 @@ function OrcaFullTab() {
               className="w-full bg-transparent font-semibold text-2xl text-white outline-none"
             />
             <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-purple-500 to-cyan-500 font-bold text-[10px] text-white shadow-sm">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-tr from-purple-500 to-cyan-500 font-bold text-[10px] text-white shadow-sm">
                 S
               </div>
               <span className="font-semibold text-sm text-white">SOL</span>
@@ -136,7 +136,9 @@ function OrcaFullTab() {
 
       <SummaryFees />
 
-      <Button className="w-full">Open Position</Button>
+      <div className="sticky bottom-4 bg-background py-2">
+        <Button className="w-full">Open Position</Button>
+      </div>
     </div>
   );
 }
@@ -260,7 +262,9 @@ function OrcaCustomTab() {
 
       <SummaryFees />
 
-      <Button className="w-full">Open Position</Button>
+      <div className="sticky bottom-4 bg-background py-2">
+        <Button className="w-full">Open Position</Button>
+      </div>
     </div>
   );
 }

@@ -76,7 +76,6 @@ export const TrendingQuickBuyInput = () => {
 
   return (
     <QuickBuyInput
-      variant="minimal"
       value={quickBuy ?? ""}
       onValueChange={(value) => {
         useMarketStore.setState((state) => {

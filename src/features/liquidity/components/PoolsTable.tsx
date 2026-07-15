@@ -83,7 +83,7 @@ const numericSort = (
 function ValueChangeCell({ value, change }: { value: string; change: string }) {
   const isDown = change.trim().startsWith("-");
   return (
-    <div>
+    <div data-slot="value-change-cell">
       <p className="font-medium text-b-3 text-white">{value}</p>
       <p className={cn("text-b-5", isDown ? "text-down" : "text-up")}>
         {change}
@@ -182,7 +182,7 @@ export function PoolsTable() {
             </div>
           );
         },
-        size: 240,
+        size: 270,
       },
       {
         id: "marketCap",
@@ -199,6 +199,7 @@ export function PoolsTable() {
           </LinkWrapper>
         ),
         sortingFn: numericSort,
+        size: 100,
       },
       {
         id: "tvl",
@@ -215,6 +216,7 @@ export function PoolsTable() {
           </LinkWrapper>
         ),
         sortingFn: numericSort,
+        size: 100,
       },
       {
         id: "activeTvl",
@@ -231,6 +233,7 @@ export function PoolsTable() {
           </LinkWrapper>
         ),
         sortingFn: numericSort,
+        size: 100,
       },
       {
         id: "fees",
@@ -247,6 +250,7 @@ export function PoolsTable() {
           </LinkWrapper>
         ),
         sortingFn: numericSort,
+        size: 100,
       },
       {
         id: "feesRatio",
@@ -263,7 +267,7 @@ export function PoolsTable() {
           </LinkWrapper>
         ),
         sortingFn: numericSort,
-        size: 200,
+        size: 100,
       },
       {
         accessorKey: "volume",
@@ -279,23 +283,23 @@ export function PoolsTable() {
           </LinkWrapper>
         ),
         sortingFn: numericSort,
+        size: 100,
       },
       {
         accessorKey: "volumeRatio",
         header: "Volume/Active TVL",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <LinkWrapper
-              href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-            >
-              <ValueChangeCell
-                value={row.original.volumeRatio}
-                change={row.original.volumeRatioChange}
-              />
-            </LinkWrapper>
-          </div>
+          <LinkWrapper
+            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
+          >
+            <ValueChangeCell
+              value={row.original.volumeRatio}
+              change={row.original.volumeRatioChange}
+            />
+          </LinkWrapper>
         ),
         sortingFn: numericSort,
+        size: 100,
       },
       columnHelper.display({
         id: "more",
@@ -388,6 +392,13 @@ export function PoolsTable() {
   });
 
   return (
-    <DataTable table={table} classNames={{ table: "table-fixed w-full" }} />
+    <DataTable
+      table={table}
+      classNames={{
+        table: "table-fixed w-max",
+        th: "normal-case",
+        td: "has-data-[slot=value-change-cell]:text-center",
+      }}
+    />
   );
 }

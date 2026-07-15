@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronLeft, Component, Gift, Repeat, XSquare } from "lucide-react";
+import type { ReactNode } from "react";
+import { ChevronLeft, Component, Gift, Repeat, XSquare, CircleDollarSign, Wallet, Coins } from "lucide-react";
 import Link from "next/link";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -63,7 +64,7 @@ export const LiquidityDetailPage = () => {
               </div>
             </div>
 
-            <div className="relative flex h-32 items-end gap-[1px]">
+            <div className="relative flex h-32 items-end gap-px">
               {LIQUIDITY_BINS.map((bin) => (
                 <span
                   key={bin.bin}
@@ -134,9 +135,18 @@ export const LiquidityDetailPage = () => {
               label="Current pool price"
               value="0.047651517"
               meta="WETH/SOL ⇄"
+              icon={<CircleDollarSign className="size-4" />}
             />
-            <StatCard label="Total Liquidity" value="$211.45" />
-            <StatCard label="Fees Earned (Claimed)" value="$17.02" />
+            <StatCard 
+              label="Total Liquidity" 
+              value="$211.45" 
+              icon={<Wallet className="size-4" />}
+            />
+            <StatCard 
+              label="Fees Earned (Claimed)" 
+              value="$17.02" 
+              icon={<Coins className="size-4" />}
+            />
           </div>
 
           {/* Position Details Panel */}
@@ -220,16 +230,22 @@ function StatCard({
   label,
   value,
   meta,
+  icon,
 }: {
   label: string;
   value: string;
   meta?: string;
+  icon?: ReactNode;
 }) {
   return (
     <div className="flex min-h-[100px] flex-col justify-between rounded-xl border border-border/70 bg-card/30 p-4">
       <span className="text-gray text-xs">{label}</span>
       <div className="mt-2 flex items-end justify-between">
-        <div className="mb-1 size-4 shrink-0 rounded-sm bg-white/20" />
+        {icon ? (
+          <div className="mb-1 shrink-0 text-gray">{icon}</div>
+        ) : (
+          <div className="mb-1 size-4 shrink-0 rounded-sm bg-white/20" />
+        )}
         <div className="text-right">
           <p className="font-bold text-sm text-white">{value}</p>
           {meta && <p className="mt-0.5 text-[10px] text-gray">{meta}</p>}

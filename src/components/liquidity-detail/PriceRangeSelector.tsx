@@ -39,7 +39,9 @@ export function PriceRangeSelector() {
         <PriceStepper label="Max Price" value="109.493575" />
       </div>
 
-      <Button className="w-full">Open Position</Button>
+      <div className="sticky bottom-4 bg-background py-2">
+        <Button className="w-full">Open Position</Button>
+      </div>
     </div>
   );
 }

@@ -11,7 +11,7 @@ export default function TokenDetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <main className="flex flex-1">
-        <div>
+        <div className="grow">
           <Link
             href="/portfolio"
             className={cn(
@@ -24,6 +24,7 @@ export default function TokenDetailPage() {
           <TokenDetailHeader />
           <TradingChartPanel />
         </div>
+
         <TokenDetailRail />
       </main>
 

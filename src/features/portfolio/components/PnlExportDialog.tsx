@@ -26,7 +26,7 @@ import {
   PNL_PROFIT_IMAGES,
   PortfolioTab,
 } from "../portfolio.schema";
-import { LpCard, TokenCard } from "./PnlCards";
+import { LpCard, PnlSummaryCard, TokenCard } from "./PnlCards";
 
 /* ------------------------------------------------------------------ */
 /* Export Dialog                                                        */
@@ -35,11 +35,12 @@ import { LpCard, TokenCard } from "./PnlCards";
 interface PnlExportDialogProps extends Dialog.Props {
   children?: React.ReactElement;
   position?: LpPosition;
+  type?: "summary";
 }
 
 const PnlExportDialog = ({
   children,
-  position,
+  type,
   ...props
 }: PnlExportDialogProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -52,27 +53,23 @@ const PnlExportDialog = ({
     searchParams.get("view"),
   );
 
-  const mockPosition: LpPosition = position ?? {
-    pool: "ANSEM-SOL",
-    timeAgo: "-494,707,087:59:55",
-    pnlUsd: "+$0.08",
-    pnlPct: "+16.60%",
-    totalDeposit: "$0.49",
-    totalWithdraw: "$1.46",
-    totalFeesEarned: "$0.05",
-  };
-
-  const isProfit = mockPosition.pnlPct.startsWith("+");
-  const allImages = isProfit ? PNL_PROFIT_IMAGES : PNL_LOSS_IMAGES;
+  const allImages = PNL_PROFIT_IMAGES;
 
   const [selectedBg, setSelectedBg] = useState(allImages[0]);
   const [customImages, setCustomImages] = useState<string[]>([]);
 
-  const toggles = [
-    { label: "Hide Profit", value: hideProfit, onChange: setHideProfit },
-    { label: "Hide Balance", value: hideBalance, onChange: setHideBalance },
-    { label: "Hide Time", value: hideTime, onChange: setHideTime },
-  ];
+  const toggles =
+    type === "summary"
+      ? []
+      : [
+          { label: "Hide Profit", value: hideProfit, onChange: setHideProfit },
+          {
+            label: "Hide Balance",
+            value: hideBalance,
+            onChange: setHideBalance,
+          },
+          { label: "Hide Time", value: hideTime, onChange: setHideTime },
+        ];
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
@@ -123,7 +120,18 @@ const PnlExportDialog = ({
 
           {/* LP Card Preview */}
           <div className="h-full min-h-0 grow">
-            {activeView === "liquidityPosition" ? (
+            {type === "summary" ? (
+              <PnlSummaryCard
+                ref={cardRef}
+                image={selectedBg}
+                value="+0.00%"
+                realized="+0.00%"
+                unrealized="+0.00%"
+                biggestWin="0"
+                winRate="0%"
+                timeframe="7 Days"
+              />
+            ) : activeView === "liquidityPosition" ? (
               <LpCard
                 ref={cardRef}
                 image={selectedBg}
@@ -218,9 +226,9 @@ const PnlExportDialog = ({
   );
 };
 
-const PnlExportDialogWithSuspense = () => (
+const PnlExportDialogWithSuspense = (props: PnlExportDialogProps) => (
   <Suspense>
-    <PnlExportDialog />
+    <PnlExportDialog {...props} />
   </Suspense>
 );
 

@@ -276,7 +276,7 @@ const SharePnl = () => {
         </SelectContent>
       </Select>
 
-      <PnlExportDialog>
+      <PnlExportDialog type="summary">
         <Button variant="outline" size="sm">
           <Share />
           Share

@@ -142,7 +142,9 @@ export function RaydiumTradeRail() {
 
           <SummaryFees />
 
-          <Button className="w-full">Open Position</Button>
+          <div className="sticky bottom-4 bg-background py-2">
+            <Button className="w-full">Open Position</Button>
+          </div>
         </div>
       </TabsContent>
     </Tabs>
