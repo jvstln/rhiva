@@ -267,7 +267,7 @@ const SharePnl = () => {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {Timeframe.options.slice(-4).map((tf) => (
+            {["1d", "7d", "30d"].map((tf) => (
               <SelectItem key={tf} value={tf}>
                 {tf}
               </SelectItem>

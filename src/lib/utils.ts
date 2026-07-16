@@ -81,6 +81,9 @@ export function getInitials(name: string | null) {
   return initials;
 }
 
+export async function share(params: Parameters<typeof navigator.share>[0]) {
+  await navigator.share(params);
+}
+
 export * from "./error.util";
-/** "$73.5k", "$1.2m", "$980" */
 export * from "./finance.util";

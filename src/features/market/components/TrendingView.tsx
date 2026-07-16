@@ -3,26 +3,33 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   AlertCircle,
+  Copy,
   Crown,
   Eye,
   Fish,
   Flag,
   Globe,
   Layers,
+  Leaf,
   Microscope,
   Rat,
   Search,
   Sprout,
   Star,
-  UserRound,
   UserRoundCheck,
 } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
 import { useMemo, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { siGoogle } from "simple-icons";
 import { Button } from "@/components/ui/button";
-import CopyButton from "@/components/ui/button/copy-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SimpleIcon } from "@/components/ui/icons";
 import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
@@ -32,12 +39,11 @@ import {
   formatCompactNumber,
   formatSignedPercent,
 } from "@/lib/utils";
-import { getInitials } from "../../../lib/utils";
 import { useTrendingTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import type { TrendingToken } from "../market.type";
 import { SocialHoverTooltip } from "./tooltips/SocialHoverTooltip";
-import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
+import { TokenAvatar } from "./tooltips/TokenAvatar";
 
 /* ------------------------------------------------------------------ */
 /* Favorite / watchlist star toggle                                    */
@@ -137,30 +143,50 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
     <div className="flex items-center gap-3">
       <StarButton pairId={token.address} />
 
-      <TokenHoverTooltip token={token}>
-        <Avatar variant="square">
-          <AvatarImage src={token.logo_uri ?? ""} />
-          <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
-        </Avatar>
-      </TokenHoverTooltip>
+      <TokenAvatar token={token} />
 
-      <div className="flex w-[200px] flex-col">
-        <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-sm text-white">{token.name}</span>
-          <span className="text-sm text-white/40">{token.symbol}</span>
-          <CopyButton />
-        </div>
+      <div className="flex w-[200px] flex-col gap-1">
+        <DropdownMenu>
+          <div className="flex items-center gap-1 text-base">
+            <span className="truncate font-semibold">{token.name}</span>
+            <DropdownMenuTrigger
+              render={
+                <span className="flex items-center gap-1 text-muted-foreground" />
+              }
+              openOnHover
+              delay={0}
+            >
+              <span className="truncate">{token.symbol}</span>
+              <Copy className="size-3.5" />
+            </DropdownMenuTrigger>
+          </div>
 
-        <div className="flex items-center gap-1">
-          <span className="font-medium text-ocean-green text-xs">
+          <DropdownMenuContent align="center" className="w-fit max-w-[250px]">
+            <DropdownMenuItem>
+              <Copy />
+              Copy
+              <span className="truncate">{token.address}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="truncate">
+              <Copy /> Copy <span className="truncate">{token.name}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="truncate">
+              <SimpleIcon icon={siGoogle} /> Google for{" "}
+              <span className="truncate">{token.name}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="flex items-center gap-2 *:data-[slot=info-badge]:[&_svg]:size-4">
+          <InfoBadge className="text-sm [--accent:var(--color-up)]">
             {formatAge(token.recent_listing_time)}
-          </span>
+          </InfoBadge>
           <InfoBadge
             aria-label="Dev activity"
             tooltip={<SocialHoverTooltip token={token} />}
             className="[--accent:var(--color-info)]"
           >
-            <UserRound />
+            <Leaf />
           </InfoBadge>
           <InfoBadge
             aria-label="Alerts"
@@ -446,8 +472,9 @@ const trendingColumns: ColumnDef<TrendingToken>[] = [
   },
   {
     id: "action",
-    header: () => <span className="sr-only">Action</span>,
+    header: () => <span className="">Action</span>,
     cell: () => <ActionButtons />,
+    size: 300,
   },
 ];
 
@@ -464,11 +491,19 @@ export function TrendingTable() {
     columns: trendingColumns,
   });
 
+  const pinnedColumnClassName = cn(
+    "data-[column-id=action]:sticky data-[column-id=action]:right-0  bg-background",
+  );
+
   return (
-    <div className="mx-auto xl:container">
+    <div className="mx-auto w-full min-w-0 2xl:container">
       <DataTable
         table={table}
-        classNames={{ table: "table-fixed" }}
+        classNames={{
+          table: "table-fixed w-max",
+          td: pinnedColumnClassName,
+          th: pinnedColumnClassName,
+        }}
         isLoading={trendingTokens.isPending}
         error={trendingTokens.error?.message}
       />

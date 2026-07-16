@@ -28,6 +28,7 @@ import { Button } from "../../../components/ui/button";
 import { useMarketStore } from "../market.store";
 import { BlacklistDialog } from "./BlacklistDialog";
 import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
+import { TrendingFilterDialog } from "./TrendingFilterDialog";
 
 const TIMEFRAMES = ["1m", "5m", "1h", "6h", "24h"] as const;
 
@@ -49,10 +50,12 @@ export const TrendingToolbar = () => {
             Blacklist
           </Button>
         </BlacklistDialog>
-        <Button variant="ghost" size="sm">
-          <Filter className="text-muted-foreground" />
-          Filter
-        </Button>
+        <TrendingFilterDialog>
+          <Button variant="ghost" size="sm">
+            <Filter className="text-muted-foreground" />
+            Filter
+          </Button>
+        </TrendingFilterDialog>
 
         <SettingsDialog defaultTab="trading-settings">
           <Button variant="ghost" size="sm">

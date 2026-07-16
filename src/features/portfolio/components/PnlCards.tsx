@@ -1,4 +1,4 @@
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, Globe } from "lucide-react";
 import type React from "react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,10 @@ const CorePnlCard = ({ ref, image, children }: CorePnlCardProps) => {
         />
       </picture>
       {children}
+      <div className="absolute bottom-4 left-4 flex items-center gap-1 text-xs">
+        <Globe className="size-4" />
+        {origin}
+      </div>
     </div>
   );
 };
@@ -170,7 +174,7 @@ export const PnlSummaryCard = (props: PnlSummaryCardProps) => {
   return (
     <CorePnlCard {...props}>
       <div
-        className="absolute inset-y-0 left-0 z-10 flex h-[100cqb] flex-col p-5 text-left"
+        className="absolute inset-y-0 right-0 z-10 flex h-[100cqb] flex-col items-end p-5 text-right"
         style={
           {
             background:
@@ -178,7 +182,7 @@ export const PnlSummaryCard = (props: PnlSummaryCardProps) => {
             "--accent": isProfit ? "var(--color-up)" : "var(--color-down)",
             maskImage: "linear-gradient(to left, transparent 0%, black 30%)",
             WebkitMaskImage:
-              "linear-gradient(to left, transparent 0%, black 30%)",
+              "linear-gradient(to right, transparent 0%, black 30%)",
           } as React.CSSProperties
         }
       >

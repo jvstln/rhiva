@@ -42,7 +42,7 @@ export function BlacklistDialog({
 
           <Tabs defaultValue={TABS[0]} className="-mx-(--padding-x)">
             <ScrollArea className={""} showIndicator>
-              <TabsList variant="line" className="border-b">
+              <TabsList variant="line" className="w-full border-b">
                 {arrayWithId(TABS).map(({ id, value: tab }) => (
                   <TabsTrigger key={id} value={tab}>
                     {tab}

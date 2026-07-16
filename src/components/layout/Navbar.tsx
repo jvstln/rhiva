@@ -4,8 +4,8 @@ import type { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import logo from "@/public/logo.svg";
 import { DiscordIcon, TelegramIcon } from "../ui/icons";
 import {
@@ -103,9 +103,15 @@ export function Navbar({
           </Button>
         </SettingsDialog>
 
-        <Badge variant="outline" className="hidden sm:flex">
+        <Link
+          href="/rewards"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "hidden border-primary sm:flex",
+          )}
+        >
           10K XP
-        </Badge>
+        </Link>
 
         {walletConnected ? (
           <button

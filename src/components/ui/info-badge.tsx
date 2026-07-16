@@ -1,7 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const infoBadgeVariants = cva(
@@ -11,7 +10,7 @@ const infoBadgeVariants = cva(
       variant: {
         inline: "",
         badge:
-          "rounded-md px-1 py-0.25 text-[11px] font-medium border border-accent/80 bg-accent/5",
+          "rounded-md px-1 py-0.25 text-[11px] font-medium border border-border/30 bg-accent/5",
       },
       tone: {
         default: "[--accent:var(--color-gray)]",

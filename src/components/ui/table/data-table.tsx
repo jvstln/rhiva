@@ -193,13 +193,7 @@ export function DataTable<TData>({
   );
 
   return (
-    <ScrollArea
-    // className={cn(
-    //   "w-full min-w-0 space-y-4 overflow-hidden",
-    //   classNames.root,
-    // )}
-    >
-      {/* <div> */}
+    <ScrollArea className={cn("w-full min-w-0 space-y-4", classNames.root)}>
       <Table
         ref={tableRef}
         className={cn(classNames.table)}
@@ -219,12 +213,15 @@ export function DataTable<TData>({
                 classNames.trh,
                 "border-border/40 border-b hover:bg-transparent",
               )}
+              data-header-id={headerGroup.id}
             >
               {headerGroup.headers.map((header) => {
                 const isSortable = header.column.getCanSort();
                 return (
                   <TableHead
                     key={header.id}
+                    data-header-id={header.id}
+                    data-column-id={header.column.id}
                     className={cn(
                       isSortable && "cursor-pointer select-none",
                       classNames.th,
@@ -298,7 +295,6 @@ export function DataTable<TData>({
           ))}
         </TableBody>
       </Table>
-      {/* </div> */}
 
       {table.getRowModel().rows?.length === 0 && (
         <div
@@ -309,7 +305,7 @@ export function DataTable<TData>({
           <div className="text-muted-foreground text-sm">No data available</div>
         </div>
       )}
-      <ScrollBar />
+      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
 }

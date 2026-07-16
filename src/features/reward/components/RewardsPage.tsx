@@ -2,9 +2,7 @@
 
 import {
   ArrowRight,
-  Check,
   Coins,
-  Copy,
   Globe,
   LineChart,
   Repeat,
@@ -44,6 +42,7 @@ import {
   type RewardTier,
 } from "@/data/reward-data";
 import { cn, formatCompactNumber } from "@/lib/utils";
+import { TierExportDialog } from "./TierExportDialog";
 
 /* ------------------------------------------------------------------ */
 /* Tier progress helper                                                 */
@@ -140,10 +139,12 @@ function CurrentTierCard() {
               </span>
             </p>
 
-            <Button size="sm" variant="outline">
-              <Share2 />
-              Share
-            </Button>
+            <TierExportDialog tier={currentTier}>
+              <Button size="sm" variant="outline">
+                <Share2 />
+                Share
+              </Button>
+            </TierExportDialog>
           </div>
 
           <p className="font-medium text-foreground/90 text-xl">
@@ -302,12 +303,7 @@ function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
             Progress through the ranks and unlock exclusive badges
           </p>
         </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={onViewAll}
-          className="rounded-full bg-primary/10 text-foreground text-xs hover:bg-primary/20"
-        >
+        <Button size="sm" variant="outline" onClick={onViewAll}>
           View All Tiers
         </Button>
       </div>
@@ -403,9 +399,9 @@ function TierRoadmapDialog({
 /* ------------------------------------------------------------------ */
 
 function ReferralCard() {
-  const [copied, setCopied] = useState(false);
+  const [_copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const _handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(mockRewardAccount.referralLink);
       setCopied(true);
@@ -447,27 +443,39 @@ function ReferralCard() {
           </InputGroup>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-2xl border bg-foreground/3 p-5">
-            <div className="mb-2 flex items-center gap-1.5">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="flex flex-col gap-2 rounded-2xl border bg-foreground/3 p-4">
+            <div className="flex items-center gap-1.5">
               <span className="flex size-6 items-center justify-center rounded-full bg-up/10">
                 <Repeat className="size-3.5 text-up" />
               </span>
             </div>
-            <p className="text-lg text-muted-foreground">Total Invited</p>
-            <p className="font-medium text-2xl text-foreground">
+            <p className="text-muted-foreground">Total Invited</p>
+            <p className="mt-auto font-medium text-2xl text-foreground">
               {mockRewardAccount.totalInvited}
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-foreground/3 p-5">
-            <div className="mb-2 flex items-center gap-1.5">
+          <div className="flex flex-col gap-2 rounded-2xl border bg-foreground/3 p-4">
+            <div className="flex items-center gap-1.5">
               <span className="flex size-6 items-center justify-center rounded-full bg-casablanca/10">
                 <Coins className="size-3.5 text-casablanca" />
               </span>
             </div>
-            <p className="text-lg text-muted-foreground">Total Earnings</p>
-            <p className="font-medium text-2xl text-foreground">
+            <p className="text-muted-foreground">Total Earnings</p>
+            <p className="mt-auto font-medium text-2xl text-foreground">
+              {mockRewardAccount.totalEarnings} SOL
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 rounded-2xl border bg-foreground/3 p-4">
+            <div className="flex items-center gap-1.5">
+              <span className="flex size-6 items-center justify-center rounded-full bg-casablanca/10">
+                <Coins className="size-3.5 text-casablanca" />
+              </span>
+            </div>
+            <p className="text-muted-foreground">Unclaimed Earnings</p>
+            <p className="mt-auto font-medium text-2xl text-foreground">
               {mockRewardAccount.totalEarnings} SOL
             </p>
           </div>

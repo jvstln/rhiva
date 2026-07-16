@@ -1,9 +1,11 @@
 "use client";
 
+import { mergeProps, useRender } from "@base-ui/react";
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
+import { XIcon } from "lucide-react";
 import type * as React from "react";
-
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
@@ -83,6 +85,39 @@ function PopoverDescription({
   );
 }
 
+function PopoverFooter({
+  className,
+  render,
+  ...props
+}: useRender.ComponentProps<"div">) {
+  return useRender({
+    defaultTagName: "div",
+    props: mergeProps(
+      { className: cn("flex items-center gap-2", className) },
+      props,
+    ),
+    state: { slot: "popover-footer" },
+    render,
+  });
+}
+
+function PopoverClose({
+  className,
+  render,
+  ...props
+}: PopoverPrimitive.Close.Props) {
+  return (
+    <PopoverPrimitive.Close
+      data-slot="popover-close"
+      className={cn("text-muted-foreground", className)}
+      render={render ?? <Button variant={"ghost"} size={"icon-sm"} />}
+      {...props}
+    >
+      <XIcon />
+    </PopoverPrimitive.Close>
+  );
+}
+
 export {
   Popover,
   PopoverContent,
@@ -90,4 +125,6 @@ export {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
+  PopoverFooter,
+  PopoverClose,
 };

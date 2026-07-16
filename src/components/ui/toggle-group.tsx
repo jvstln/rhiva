@@ -75,7 +75,7 @@ function ToggleGroupItem({
       data-spacing={context.spacing}
       className={cn(
         "shrink-0 focus:z-10 focus-visible:z-10 group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:border-s-0 group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:border-t-0 group-data-[spacing=0]/toggle-group:px-2 group-data-[spacing=0]/toggle-group:has-data-[icon=inline-start]:ps-1.5 group-data-[spacing=0]/toggle-group:has-data-[icon=inline-end]:pe-1.5 group-data-horizontal/toggle-group:data-[spacing=0]:last:rounded-e-lg group-data-vertical/toggle-group:data-[spacing=0]:last:rounded-b-lg group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-s group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-t group-data-horizontal/toggle-group:data-[spacing=0]:first:rounded-s-lg group-data-vertical/toggle-group:data-[spacing=0]:first:rounded-t-lg",
-        "group-data-horizontal/toggle-group:rounded-none group-data-horizontal/toggle-group:last:rounded-e-(--rounded) group-data-horizontal/toggle-group:first:rounded-s-(--rounded)",
+        "group-data-horizontal/toggle-group:group-data-[spacing=0]/toggle-group:rounded-none group-data-horizontal/toggle-group:group-data-[spacing=0]/toggle-group:last:rounded-e-(--rounded) group-data-horizontal/toggle-group:group-data-[spacing=0]/toggle-group:first:rounded-s-(--rounded)",
         toggleVariants({
           variant: context.variant || variant,
           size: context.size || size,

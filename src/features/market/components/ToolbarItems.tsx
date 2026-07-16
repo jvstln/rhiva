@@ -86,7 +86,7 @@ export const QuickBuyInput = ({
   return (
     <InputGroup
       size="sm"
-      className={cn(variant === "minimal" ? "w-24" : "w-40", className)}
+      className={cn(variant === "minimal" ? "w-22" : "w-36", className)}
     >
       <InputGroupInput
         type="number"
@@ -122,7 +122,7 @@ export const QuickSellInput = ({
   const [internalValue, setInternalValue] = useState(String(value));
 
   return (
-    <InputGroup size="sm" className={cn("w-40", className)}>
+    <InputGroup size="sm" className={cn("w-36", className)}>
       <InputGroupInput
         type="number"
         value={internalValue}

@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown, Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import { TokenDialog } from "./TokenDialog";
 
 export function PortfolioHero() {
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+  const [balanceHidden, setBalanceHidden] = useState(false);
 
   return (
     <div
@@ -30,13 +31,20 @@ export function PortfolioHero() {
       }}
     >
       <p className="flex items-center gap-1.5 text-b-2 text-gray">
-        Est. total value <Eye className="size-4" />
+        Est. total value{" "}
+        <Button
+          variant={"ghost"}
+          size="icon-sm"
+          onClick={() => setBalanceHidden((bh) => !bh)}
+        >
+          {balanceHidden ? <EyeOff /> : <Eye />}
+        </Button>
       </p>
 
       <div className="mt-2 flex items-center gap-2">
         <span className="font-bold text-h2 text-white">
           {selectedCurrency.symbol.length === 1 ? selectedCurrency.symbol : ""}
-          {PORTFOLIO_SUMMARY.totalValue}
+          {balanceHidden ? "••••" : PORTFOLIO_SUMMARY.totalValue}
           {selectedCurrency.symbol.length > 1
             ? ` ${selectedCurrency.symbol}`
             : ""}

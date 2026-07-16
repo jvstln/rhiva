@@ -1,19 +1,19 @@
 "use client";
 
-import { ArrowUpRight, ChevronLeft, Mail, Waves } from "lucide-react";
-import Image from "next/image";
-import type * as React from "react";
-import { useState } from "react";
-import type { SimpleIcon } from "simple-icons";
 import {
-  siApple,
-  siCoinbase,
-  siEthereum,
-  siGoogle,
-  siOkx,
-  siWalletconnect,
-  siX,
-} from "simple-icons";
+  NetworkEthereum,
+  TokenJUP,
+  WalletBackpack,
+  WalletCoinbase,
+  WalletMetamask,
+  WalletOkx,
+  WalletPhantom,
+  WalletSolflare,
+  WalletWalletConnect,
+} from "@web3icons/react";
+import { ArrowUpRight, ChevronLeft, Mail, Waves } from "lucide-react";
+import { useState } from "react";
+import { siApple, siGoogle, siX } from "simple-icons";
 import {
   createDialogHandle,
   Dialog,
@@ -22,37 +22,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import solflare from "@/public/brands/solflare.png";
-import { Item, ItemFooter, ItemMedia } from "../ui/item";
-
-/* ------------------------------------------------------------------ */
-/* Shared icon helpers                                                  */
-/* ------------------------------------------------------------------ */
-
-function BrandIcon({
-  icon,
-  className,
-  color,
-}: {
-  icon: SimpleIcon;
-  className?: string;
-  color?: string;
-}) {
-  return (
-    <svg
-      role="img"
-      viewBox="0 0 24 24"
-      className={className}
-      fill={color ?? `#${icon.hex}`}
-    >
-      <title>{icon.title}</title>
-      <path d={icon.path} />
-    </svg>
-  );
-}
+import { SimpleIcon } from "../ui/icons";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 /** Placeholder for wallet brands not available in simple-icons. */
-function FallbackGlyph({
+function _FallbackGlyph({
   label,
   className,
 }: {
@@ -69,22 +43,33 @@ function FallbackGlyph({
 interface WalletEntry {
   id: string;
   name?: string;
-  bgClassName: string;
   icon: React.ReactNode;
   onSelect?: () => void;
 }
 
-function WalletTile({ entry }: { entry: WalletEntry }) {
+function WalletTile({
+  entry,
+  size = "default",
+}: {
+  entry: WalletEntry;
+  size?: "default" | "sm";
+}) {
   return (
     <button
       type="button"
       onClick={entry.onSelect}
-      className="flex w-24 flex-col items-center gap-2 text-center"
+      className={cn("flex flex-col items-center gap-2 text-center", {
+        "w-24": size === "default",
+        "w-12": size === "sm",
+      })}
     >
       <span
         className={cn(
-          "flex size-16 items-center justify-center rounded-2xl border border-border [&_svg]:size-8",
-          entry.bgClassName,
+          "flex items-center justify-center rounded-2xl border border-border [&_svg]:not-[[class*=size]]:size-8",
+          {
+            "size-16": size === "default",
+            "size-12": size === "sm",
+          },
         )}
       >
         {entry.icon}
@@ -92,21 +77,6 @@ function WalletTile({ entry }: { entry: WalletEntry }) {
       {entry.name && (
         <span className="text-foreground text-sm">{entry.name}</span>
       )}
-    </button>
-  );
-}
-
-function WalletTileCompact({ entry }: { entry: WalletEntry }) {
-  return (
-    <button
-      type="button"
-      onClick={entry.onSelect}
-      className={cn(
-        "flex size-12 items-center justify-center rounded-xl border border-border [&_svg]:size-6",
-        entry.bgClassName,
-      )}
-    >
-      {entry.icon}
     </button>
   );
 }
@@ -137,8 +107,7 @@ function WalletListStep({ onSelectSocials }: { onSelectSocials: () => void }) {
     {
       id: "jupiter-recommended",
       name: "Jupiter",
-      bgClassName: "bg-[#0B1728]",
-      icon: <FallbackGlyph label="J" className="text-ocean-green" />,
+      icon: <TokenJUP />,
     },
   ];
 
@@ -146,32 +115,27 @@ function WalletListStep({ onSelectSocials }: { onSelectSocials: () => void }) {
     {
       id: "jupiter",
       name: "Jupiter",
-      bgClassName: "bg-[#0B1728]",
-      icon: <FallbackGlyph label="J" className="text-ocean-green" />,
+      icon: <TokenJUP />,
     },
     {
       id: "phantom",
       name: "Phantom",
-      bgClassName: "bg-[#AB9FF2]",
-      icon: <FallbackGlyph label="P" className="text-white" />,
+      icon: <WalletPhantom />,
     },
     {
       id: "backpack",
       name: "Backpack",
-      bgClassName: "bg-black",
-      icon: <FallbackGlyph label="B" className="text-roman" />,
+      icon: <WalletBackpack />,
     },
     {
       id: "coinbase",
       name: "Coinbase",
-      bgClassName: "bg-[#0052FF]",
-      icon: <BrandIcon icon={siCoinbase} color="#ffffff" />,
+      icon: <WalletCoinbase />,
     },
     {
       id: "okx",
       name: "OKX Wallet",
-      bgClassName: "bg-black",
-      icon: <BrandIcon icon={siOkx} color="#ffffff" />,
+      icon: <WalletOkx className="**:fill-white" />,
     },
   ];
 
@@ -179,104 +143,78 @@ function WalletListStep({ onSelectSocials }: { onSelectSocials: () => void }) {
     {
       id: "wallet-connect",
       name: "Wallet Connect",
-      bgClassName: "bg-surface-2",
-      icon: <BrandIcon icon={siWalletconnect} />,
+      icon: <WalletWalletConnect />,
     },
   ];
 
   const moreWallets: WalletEntry[] = [
     {
       id: "metamask-1",
-      bgClassName: "bg-white",
-      icon: <FallbackGlyph label="🦊" />,
+      icon: <WalletMetamask />,
     },
     {
       id: "ethereum-1",
-      bgClassName: "bg-white",
-      icon: <BrandIcon icon={siEthereum} color="#0b0b0b" />,
-    },
-    {
-      id: "arrows-1",
-      bgClassName: "bg-gradient-to-br from-info to-ocean-green",
-      icon: <FallbackGlyph label="⇄" className="text-black" />,
-    },
-    {
-      id: "tiplink",
-      bgClassName: "bg-[#0B1728]",
-      icon: <FallbackGlyph label="TL" className="text-info text-xs" />,
-    },
-    {
-      id: "magic-eden",
-      bgClassName: "bg-gradient-to-br from-casablanca to-roman",
-      icon: <FallbackGlyph label="ME" className="text-black text-xs" />,
-    },
-    {
-      id: "arrows-2",
-      bgClassName: "bg-gradient-to-br from-info to-ocean-green",
-      icon: <FallbackGlyph label="⇄" className="text-black" />,
-    },
-    {
-      id: "metamask-2",
-      bgClassName: "bg-white",
-      icon: <FallbackGlyph label="🦊" />,
-    },
-    {
-      id: "ethereum-2",
-      bgClassName: "bg-white",
-      icon: <BrandIcon icon={siEthereum} color="#0b0b0b" />,
+      icon: <NetworkEthereum />,
     },
   ];
 
   return (
-    <div className="max-h-[70vh] space-y-6 overflow-y-auto pr-1">
-      <WalletSection title="Recently Used">
-        <button type="button" onClick={onSelectSocials}>
-          <Item variant={"outline"}>
-            <ItemMedia variant={"image"}>
-              <Image src={solflare} alt="Solflare icon" />
-            </ItemMedia>
-            <ItemFooter>Solflare</ItemFooter>
-          </Item>
-        </button>
-      </WalletSection>
-
-      <WalletSection title="Recommended">
-        {recommended.map((entry) => (
-          <WalletTile key={entry.id} entry={entry} />
-        ))}
-      </WalletSection>
-
-      <WalletSection title="Top Wallet">
-        {topWallet.map((entry) => (
-          <WalletTile key={entry.id} entry={entry} />
-        ))}
-      </WalletSection>
-
-      <WalletSection title="Reown/Wallet Connect">
-        <button type="button" onClick={onSelectSocials}>
-          <Item variant={"outline"}>
-            <ItemMedia className="">
-              <BrandIcon icon={siGoogle} className="size-4" />
-              <BrandIcon icon={siX} color="#ffffff" className="size-4" />
-              <BrandIcon icon={siApple} color="#ffffff" className="size-4" />
-            </ItemMedia>
-            <ItemFooter>Socials</ItemFooter>
-          </Item>
-        </button>
-        {reownWalletConnect.map((entry) => (
-          <WalletTile key={entry.id} entry={entry} />
-        ))}
-      </WalletSection>
-
-      <div className="space-y-3">
-        <p className="font-medium text-foreground text-sm">More Wallets</p>
-        <div className="flex flex-wrap gap-3">
-          {moreWallets.map((entry) => (
-            <WalletTileCompact key={entry.id} entry={entry} />
+    <ScrollArea className="-mx-(--padding-x) max-h-[70vh] px-(--padding-x)">
+      <div className="space-y-6 pr-1">
+        <WalletSection title="Recently Used">
+          <WalletTile
+            entry={{
+              icon: <WalletSolflare />,
+              id: "solflare",
+              name: "Solflare",
+            }}
+          />
+        </WalletSection>
+        <WalletSection title="Recommended">
+          {recommended.map((entry) => (
+            <WalletTile key={entry.id} entry={entry} />
           ))}
+        </WalletSection>
+        <WalletSection title="Top Wallet">
+          {topWallet.map((entry) => (
+            <WalletTile key={entry.id} entry={entry} />
+          ))}
+        </WalletSection>
+        <WalletSection title="Reown/Wallet Connect">
+          <WalletTile
+            entry={{
+              id: "socials",
+              name: "Socials",
+              icon: (
+                <div className="grid grid-cols-2 gap-1">
+                  <SimpleIcon icon={siGoogle} className="size-4" />
+                  <SimpleIcon icon={siX} fill="#ffffff" className="size-4" />
+                  <SimpleIcon
+                    icon={siApple}
+                    fill="#ffffff"
+                    className="size-4"
+                  />
+                </div>
+              ),
+              onSelect: onSelectSocials,
+            }}
+          />
+          {reownWalletConnect.map((entry) => (
+            <WalletTile key={entry.id} entry={entry} />
+          ))}
+        </WalletSection>
+        <div className="space-y-3">
+          <p className="font-medium text-foreground text-sm">More Wallets</p>
+          <div className="flex flex-wrap gap-3">
+            {moreWallets.map((entry) => (
+              <WalletTile size="sm" key={entry.id} entry={entry} />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+
+      <ScrollBar showScrollBar />
+    </ScrollArea>
   );
 }
 
@@ -290,7 +228,7 @@ function GoogleButton() {
       type="button"
       className="flex w-full items-center gap-3 rounded-xl bg-surface-2 px-5 py-4 font-medium text-foreground transition-colors hover:bg-surface-3"
     >
-      <BrandIcon icon={siGoogle} className="size-5" />
+      <SimpleIcon icon={siGoogle} className="size-5" />
       Continue With Google
     </button>
   );
@@ -304,7 +242,7 @@ function XAndAppleButtons() {
         className="flex items-center justify-center rounded-xl bg-surface-2 py-4 transition-colors hover:bg-surface-3"
       >
         <span className="flex size-8 items-center justify-center rounded-md bg-black">
-          <BrandIcon icon={siX} color="#ffffff" className="size-4" />
+          <SimpleIcon icon={siX} color="#ffffff" className="size-4" />
         </span>
       </button>
       <button
@@ -312,7 +250,7 @@ function XAndAppleButtons() {
         className="flex items-center justify-center rounded-xl bg-surface-2 py-4 transition-colors hover:bg-surface-3"
       >
         <span className="flex size-8 items-center justify-center rounded-md bg-black">
-          <BrandIcon icon={siApple} color="#ffffff" className="size-4" />
+          <SimpleIcon icon={siApple} color="#ffffff" className="size-4" />
         </span>
       </button>
     </div>
@@ -416,9 +354,7 @@ export function ConnectWalletDialog({
       }}
     >
       {children && <DialogTrigger render={children} />}
-      <DialogContent
-        className={cn("gap-0 border-border bg-background sm:max-w-[420px]")}
-      >
+      <DialogContent className={cn("gap-0 border-border bg-background")}>
         <div className="mb-5 grid grid-cols-[24px_1fr_24px] items-center">
           {step === "email" ? (
             <button

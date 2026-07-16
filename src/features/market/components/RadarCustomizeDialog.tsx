@@ -253,7 +253,7 @@ export function RadarCustomizeDialog({
       {children && <DialogTrigger render={children} />}
 
       <Tabs defaultValue="display" className="flex w-full flex-col">
-        <DialogContent className="min-w-sm max-w-fit sm:max-w-fit">
+        <DialogContent className="">
           <DialogHeader className="pb-0">
             <DialogTitle className={"sr-only"}>
               Customize radar view

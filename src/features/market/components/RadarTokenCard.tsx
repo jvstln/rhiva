@@ -18,7 +18,6 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/button/copy-button";
 import { InfoBadge } from "@/components/ui/info-badge";
@@ -29,11 +28,10 @@ import {
   formatAge,
   formatCompactCurrency,
   formatCompactNumber,
-  getInitials,
 } from "@/lib/utils";
 import type { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
-import { TokenHoverTooltip } from "./tooltips/TokenHoverTooltip";
+import { TokenAvatar } from "./tooltips/TokenAvatar";
 
 interface TokenCardProps {
   token: MemeToken;
@@ -46,12 +44,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
       <div className="flex items-center gap-3">
         {/* LEFT COLUMN: Avatar and Address */}
         <div className="flex shrink-0 flex-col items-center gap-2">
-          <TokenHoverTooltip token={token}>
-            <Avatar variant="square" size="lg">
-              <AvatarImage src={token.logo_uri ?? ""} />
-              <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
-            </Avatar>
-          </TokenHoverTooltip>
+          <TokenAvatar token={token} />
           <span className="text-[10px] text-gray">
             {token.address.slice(0, 4)}...{token.address.slice(-4)}
           </span>

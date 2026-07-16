@@ -1,8 +1,17 @@
 "use client";
 
+import {
+  ChevronLeft,
+  CircleDollarSign,
+  Coins,
+  Component,
+  Gift,
+  Repeat,
+  Wallet,
+  XSquare,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { ChevronLeft, Component, Gift, Repeat, XSquare, CircleDollarSign, Wallet, Coins } from "lucide-react";
-import Link from "next/link";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -12,19 +21,21 @@ import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog
 import { cn } from "@/lib/utils";
 
 export const LiquidityDetailPage = () => {
+  const router = useRouter();
   const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
 
   return (
     <DashboardSlot>
       {/* HEADER */}
       <div className="mb-6 space-y-4">
-        <Link
-          href="/liquidity"
+        <Button
+          onClick={() => router.back()}
           className={cn(buttonVariants({ variant: "ghost" }))}
+          variant={"ghost"}
         >
           <ChevronLeft />
           Back
-        </Link>
+        </Button>
 
         <div className="flex items-center gap-4">
           <Avatar>
@@ -137,14 +148,14 @@ export const LiquidityDetailPage = () => {
               meta="WETH/SOL ⇄"
               icon={<CircleDollarSign className="size-4" />}
             />
-            <StatCard 
-              label="Total Liquidity" 
-              value="$211.45" 
+            <StatCard
+              label="Total Liquidity"
+              value="$211.45"
               icon={<Wallet className="size-4" />}
             />
-            <StatCard 
-              label="Fees Earned (Claimed)" 
-              value="$17.02" 
+            <StatCard
+              label="Fees Earned (Claimed)"
+              value="$17.02"
               icon={<Coins className="size-4" />}
             />
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { toPng } from "html-to-image";
+import { toBlob, toPng } from "html-to-image";
 import { Download, PlusCircle, Share } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -20,12 +20,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import type { LpPosition } from "@/data/portfolio-data";
 import { downloadLink, selectFile } from "@/lib/file.util";
-import { cn } from "@/lib/utils";
-import {
-  PNL_LOSS_IMAGES,
-  PNL_PROFIT_IMAGES,
-  PortfolioTab,
-} from "../portfolio.schema";
+import { cn, share } from "@/lib/utils";
+import { PNL_PROFIT_IMAGES, PortfolioTab } from "../portfolio.schema";
 import { LpCard, PnlSummaryCard, TokenCard } from "./PnlCards";
 
 /* ------------------------------------------------------------------ */
@@ -57,6 +53,11 @@ const PnlExportDialog = ({
 
   const [selectedBg, setSelectedBg] = useState(allImages[0]);
   const [customImages, setCustomImages] = useState<string[]>([]);
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const toggles =
     type === "summary"
@@ -83,6 +84,26 @@ const PnlExportDialog = ({
     }
   };
 
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      const blob = await toBlob(cardRef.current);
+      if (!blob) throw new Error("Failed to generate image to share");
+
+      const files = [new File([blob], "pnl-card.png", { type: "image/png" })];
+
+      await share({
+        title: "Share PnL",
+        text: `Check out my PnL on Rhiva! ${origin}`,
+        files,
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to share PNL card");
+    }
+  };
+
   // Cleanup custom images on unmount
   useEffect(
     () => () => {
@@ -97,7 +118,7 @@ const PnlExportDialog = ({
     <Dialog {...props}>
       {children && <DialogTrigger render={children} />}
 
-      <DialogContent className="flex flex-col sm:max-w-xl">
+      <DialogContent className="flex flex-col">
         <DialogHeader>
           <DialogTitle>Share position performance</DialogTitle>
           <DialogDescription>
@@ -212,7 +233,7 @@ const PnlExportDialog = ({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleDownload}>
+          <Button variant="outline" onClick={handleShare}>
             <Share />
             Share
           </Button>

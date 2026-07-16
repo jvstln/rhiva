@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart2, BarChart3, Info, LineChart } from "lucide-react";
+import { Info } from "lucide-react";
 import type * as React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -354,9 +354,9 @@ function ZapInTab() {
         value={curveType}
         onChange={setCurveType}
         options={[
-          { value: "spot", label: "Spot", icon: BarChart3 },
-          { value: "curve", label: "Curve", icon: LineChart },
-          { value: "bid-ask", label: "Bid Ask", icon: BarChart2 },
+          { value: "spot", label: "Spot" },
+          { value: "curve", label: "Curve" },
+          { value: "bid-ask", label: "Bid Ask" },
         ]}
       />
 

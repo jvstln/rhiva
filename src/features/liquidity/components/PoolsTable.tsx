@@ -24,6 +24,7 @@ import { POOLS as POOLS_DATA, type PoolRow } from "@/data/liquidity-data";
 import { gsap } from "@/lib/gsap.util";
 import { cn, getInitials } from "@/lib/utils";
 import { POOLS, type Pool } from "../liquidity.schema";
+import { useLiquidityStore } from "../liquidity.store";
 
 const stats = [
   { label: "Swap", value: "848", change: "+567%", color: "text-emerald-400" },
@@ -89,6 +90,45 @@ function ValueChangeCell({ value, change }: { value: string; change: string }) {
         {change}
       </p>
     </div>
+  );
+}
+
+function ZapInButton() {
+  const zapIn = useLiquidityStore((state) => state.liquidityFilters.zapIn);
+
+  return (
+    <Button
+      aria-label="Zap in"
+      variant={"secondary"}
+      onMouseEnter={(e) => {
+        gsap.context(() => {
+          gsap.to("[data-slot='action-value']", {
+            keyframes: [{ width: "auto" }, { scale: 1 }],
+            duration: 0.3,
+            ease: "none",
+          });
+        }, e.currentTarget);
+      }}
+      onMouseLeave={(e) => {
+        gsap.context(() => {
+          gsap.to("[data-slot='action-value']", {
+            scale: 0,
+            width: 0,
+            duration: 0.3,
+          });
+        }, e.currentTarget);
+      }}
+    >
+      <Rocket className="size-4 text-primary" />
+      {zapIn !== null && (
+        <span
+          data-slot="action-value"
+          className="w-0 scale-0 overflow-hidden transition-[width]"
+        >
+          {zapIn} SOL
+        </span>
+      )}
+    </Button>
   );
 }
 
@@ -173,10 +213,10 @@ export function PoolsTable() {
                   <p className="font-semibold text-b-2 text-white">
                     {poolRow.pair}
                   </p>
-                  <p className="text-b-5 text-gray">
+                  <p className="text-muted-foreground text-xs">
                     Tick Spacing: {poolRow.tickSpacing} Fee: {poolRow.fee}
                   </p>
-                  <p className="text-b-5 text-gray">{poolRow.age}</p>
+                  <p className="text-muted-foreground text-xs">{poolRow.age}</p>
                 </div>
               </LinkWrapper>
             </div>
@@ -271,7 +311,7 @@ export function PoolsTable() {
       },
       {
         accessorKey: "volume",
-        header: "Volume",
+        header: "Vol",
         cell: ({ row }) => (
           <LinkWrapper
             href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
@@ -287,7 +327,7 @@ export function PoolsTable() {
       },
       {
         accessorKey: "volumeRatio",
-        header: "Volume/Active TVL",
+        header: "Vol/Active TVL",
         cell: ({ row }) => (
           <LinkWrapper
             href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
@@ -342,40 +382,11 @@ export function PoolsTable() {
         size: 50,
       }),
       {
-        id: "actions",
-        header: "",
+        id: "action",
+        header: "Zap In",
         cell: () => (
           <div className="flex w-24 items-center justify-center gap-4">
-            <Button
-              aria-label="Zap in"
-              variant={"secondary"}
-              onMouseEnter={(e) => {
-                gsap.context(() => {
-                  gsap.to("[data-slot='action-value']", {
-                    keyframes: [{ width: "auto" }, { scale: 1 }],
-                    duration: 0.3,
-                    ease: "none",
-                  });
-                }, e.currentTarget);
-              }}
-              onMouseLeave={(e) => {
-                gsap.context(() => {
-                  gsap.to("[data-slot='action-value']", {
-                    scale: 0,
-                    width: 0,
-                    duration: 0.3,
-                  });
-                }, e.currentTarget);
-              }}
-            >
-              <Rocket className="size-4 text-primary" />
-              <span
-                data-slot="action-value"
-                className="w-0 scale-0 overflow-hidden transition-[width]"
-              >
-                {0.3} SOL
-              </span>
-            </Button>
+            <ZapInButton />
           </div>
         ),
         enableSorting: false,
@@ -391,13 +402,21 @@ export function PoolsTable() {
     onSortingChange: setSorting,
   });
 
+  const pinnedColumnClassName = cn(
+    "data-[column-id=action]:sticky data-[column-id=action]:right-0 data-[column-id=action]:shadow-[inset_1px_0_var(--color-border)] bg-background",
+    "w-auto!",
+  );
+
   return (
     <DataTable
       table={table}
       classNames={{
-        table: "table-fixed w-max",
-        th: "normal-case",
-        td: "has-data-[slot=value-change-cell]:text-center",
+        table: "w-full",
+        th: cn("normal-case", pinnedColumnClassName),
+        td: cn(
+          "has-data-[slot=value-change-cell]:text-center",
+          pinnedColumnClassName,
+        ),
       }}
     />
   );
