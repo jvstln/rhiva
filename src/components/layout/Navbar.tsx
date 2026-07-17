@@ -72,6 +72,11 @@ export function Navbar({
                     Docs
                   </NavigationMenuLink>
                 </li>
+                <li>
+                  <NavigationMenuLink render={<Link href="#" />}>
+                    Brand kit
+                  </NavigationMenuLink>
+                </li>
                 <li className="flex gap-2">
                   <NavigationMenuLink href="https://t.co" target="_blank">
                     <TelegramIcon />

@@ -68,19 +68,11 @@ export const REWARD_TIERS: RewardTier[] = [
   {
     id: "king",
     name: "KING",
-    multiplier: "5.5X",
+    multiplier: "5X",
     minXp: 250_000,
     image: "/reward-tiers/tier-9.png",
   },
 ];
-
-export interface RewardQuest {
-  id: string;
-  label: string;
-  rewardXp: number;
-  progressPercent: number;
-  icon: "volume" | "transactions";
-}
 
 export const mockRewardAccount = {
   currentXp: 2_625,
@@ -93,20 +85,3 @@ export const mockRewardAccount = {
   totalEarnings: 0.8,
   minClaimAmount: 0.01,
 };
-
-export const mockRewardQuests: RewardQuest[] = [
-  {
-    id: "volume",
-    label: "Trade 5 more SOL in Volume",
-    rewardXp: 1_000,
-    progressPercent: 62,
-    icon: "volume",
-  },
-  {
-    id: "transactions",
-    label: "Make 10 more transactions",
-    rewardXp: 200,
-    progressPercent: 38,
-    icon: "transactions",
-  },
-];

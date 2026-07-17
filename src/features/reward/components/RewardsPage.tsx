@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowRight,
   Coins,
   Globe,
   LineChart,
@@ -37,12 +36,36 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   mockRewardAccount,
-  mockRewardQuests,
   REWARD_TIERS,
   type RewardTier,
 } from "@/data/reward-data";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
+
+export type RewardQuest = {
+  id: string;
+  label: string;
+  rewardXp: number;
+  progressPercent: number;
+  icon: "volume" | "transactions";
+};
+
+export const REWARD_QUESTS: RewardQuest[] = [
+  {
+    id: "volume",
+    label: "5 transactions per day = 150XP bonus",
+    rewardXp: 1_000,
+    progressPercent: 62,
+    icon: "volume",
+  },
+  {
+    id: "transactions",
+    label: "Transaction volume is $500 = 500XP",
+    rewardXp: 200,
+    progressPercent: 38,
+    icon: "transactions",
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /* Tier progress helper                                                 */
@@ -467,28 +490,7 @@ function ReferralCard() {
               {mockRewardAccount.totalEarnings} SOL
             </p>
           </div>
-
-          <div className="flex flex-col gap-2 rounded-2xl border bg-foreground/3 p-4">
-            <div className="flex items-center gap-1.5">
-              <span className="flex size-6 items-center justify-center rounded-full bg-casablanca/10">
-                <Coins className="size-3.5 text-casablanca" />
-              </span>
-            </div>
-            <p className="text-muted-foreground">Unclaimed Earnings</p>
-            <p className="mt-auto font-medium text-2xl text-foreground">
-              {mockRewardAccount.totalEarnings} SOL
-            </p>
-          </div>
         </div>
-
-        <p className="text-center text-muted-foreground text-sm">
-          Minimum claim amount is {mockRewardAccount.minClaimAmount} SOL
-        </p>
-
-        <Button className="w-full" size="lg">
-          Claim Earnings
-          <ArrowRight />
-        </Button>
       </div>
     </div>
   );
@@ -586,10 +588,10 @@ function QuestRing({
 
 function QuestsCard() {
   return (
-    <div className="space-y-8 rounded-lg border border-border p-6">
+    <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">
       <p className="font-medium text-foreground">Quests</p>
-      <div className="flex items-center justify-center gap-16">
-        {mockRewardQuests.map((quest) => (
+      <div className="flex flex-1 items-center justify-center gap-16">
+        {REWARD_QUESTS.map((quest) => (
           <QuestRing
             key={quest.id}
             label={quest.label}
@@ -626,7 +628,7 @@ export function RewardsPage() {
           <TierRoadmapCard onViewAll={() => setTierDialogOpen(true)} />
         </div>
 
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <ReferralCard />
           <QuestsCard />
         </div>

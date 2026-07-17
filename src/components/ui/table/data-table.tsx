@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import React from "react";
-import { QueryState } from "@/components/layout/QueryState";
 import {
   Table,
   TableBody,
@@ -44,8 +43,6 @@ interface DataTableProps<TData> {
   variant?: keyof typeof variants;
   caption?: string;
   colgroup?: React.ReactNode;
-  isLoading?: boolean;
-  error?: string;
 }
 
 const variants = {
@@ -95,8 +92,6 @@ export function DataTable<TData>({
   table,
   classNames: _classNames = {},
   variant = "default",
-  isLoading,
-  error,
   caption,
   colgroup,
 }: DataTableProps<TData>) {
@@ -169,16 +164,6 @@ export function DataTable<TData>({
       [columnId]: finalWidth,
     }));
   };
-
-  if (isLoading || error) {
-    return (
-      <QueryState
-        query={{ data: [] }}
-        getIsLoading={() => isLoading}
-        getIsError={() => error}
-      />
-    );
-  }
 
   // Merge classNames with specified variant
   const classNames = Object.entries(variants[variant]).reduce(

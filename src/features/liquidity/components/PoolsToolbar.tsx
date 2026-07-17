@@ -13,12 +13,20 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { capitalize } from "@/lib/utils";
 import { PoolColumns } from "../liquidity.schema";
 import { useLiquidityStore } from "../liquidity.store";
 import { PoolFiltersDialog } from "./PoolFiltersDialog";
+
+const TIMEFRAMES = ["1m", "5m", "30m", "1h", "2h", "4h", "12h", "24h"];
 
 export function PoolsToolbar() {
   const searchParams = useSearchParams();
@@ -49,18 +57,23 @@ export function PoolsToolbar() {
       <div className="inline-flex items-center gap-2">
         <ZapInInput onSettingsDialogOpen={() => setSettingsDialogOpen(true)} />
 
-        <ToggleGroup
-          value={[timeframe]}
-          onValueChange={([val]) => {
+        <Select
+          value={timeframe}
+          onValueChange={(val) => {
             if (val) setTimeframe(val);
           }}
         >
-          {["1m", "5m", "30m", "1h", "2h", "4h", "12h", "24h"].map((tf) => (
-            <ToggleGroupItem key={tf} value={tf}>
-              {tf}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+          <SelectTrigger className="w-fit">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {TIMEFRAMES.map((tf) => (
+              <SelectItem key={tf} value={tf}>
+                {tf}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <PoolFiltersDialog>
           <Button variant="ghost" size="sm">

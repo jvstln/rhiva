@@ -40,7 +40,7 @@ interface TokenCardProps {
 
 export function RadarTokenCard({ token, column }: TokenCardProps) {
   return (
-    <article className="border-border/70 border-b px-4 py-4 last:border-none">
+    <article className="group/token-display border-border/70 border-b px-4 py-4 last:border-none">
       <div className="flex items-center gap-3">
         {/* LEFT COLUMN: Avatar and Address */}
         <div className="flex shrink-0 flex-col items-center gap-2">

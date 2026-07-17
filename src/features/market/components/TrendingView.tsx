@@ -22,6 +22,7 @@ import Link from "next/link";
 import type * as React from "react";
 import { useMemo, useState } from "react";
 import { siGoogle } from "simple-icons";
+import { QueryState } from "@/components/layout/QueryState";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -474,7 +475,7 @@ const trendingColumns: ColumnDef<TrendingToken>[] = [
     id: "action",
     header: () => <span className="">Action</span>,
     cell: () => <ActionButtons />,
-    size: 300,
+    size: 130,
   },
 ];
 
@@ -497,16 +498,16 @@ export function TrendingTable() {
 
   return (
     <div className="mx-auto w-full min-w-0 2xl:container">
-      <DataTable
-        table={table}
-        classNames={{
-          table: "table-fixed w-max",
-          td: pinnedColumnClassName,
-          th: pinnedColumnClassName,
-        }}
-        isLoading={trendingTokens.isPending}
-        error={trendingTokens.error?.message}
-      />
+      <QueryState query={trendingTokens}>
+        <DataTable
+          table={table}
+          classNames={{
+            table: "table-fixed w-max",
+            td: pinnedColumnClassName,
+            th: pinnedColumnClassName,
+          }}
+        />
+      </QueryState>
     </div>
   );
 }

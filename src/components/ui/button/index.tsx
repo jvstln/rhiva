@@ -1,12 +1,8 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { buttonTooltipHandle } from "@/components/tooltip.provider";
+import { TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -87,12 +83,12 @@ function Button({
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger render={button} />
-        <TooltipContent>{tooltip}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <TooltipTrigger
+      handle={buttonTooltipHandle}
+      render={button}
+      delay={0}
+      payload={{ content: tooltip }}
+    />
   );
 }
 
