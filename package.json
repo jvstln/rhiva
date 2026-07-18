@@ -17,7 +17,7 @@
   },
   "workspaces": [
     "ui/*",
-    "app/*",
+    "apps/*",
     "packages/*"
   ]
 }
