@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -7,22 +7,32 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/.next",
+      "!**/public",
+      "!**/.open-next",
+      "!**/.wrangler",
+      "!bun.lock"
+    ]
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noUnknownAtRules": "off"
+      "complexity": {
+        "noImportantStyles": "off"
       },
-      "nursery": {
-        "useSortedClasses": { "fix": "safe", "level": "warn" }
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noUnknownAtRules": "off",
+        "noAsyncPromiseExecutor": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "useNodejsImportProtocol": "off",
+        "useExponentiationOperator": "off"
       }
     },
     "domains": {
@@ -30,10 +40,33 @@
       "react": "recommended"
     }
   },
+  "formatter": {
+    "enabled": true,
+    "indentWidth": 2,
+    "indentStyle": "space"
+  },
+  "javascript": {
+    "formatter": {
+      "indentStyle": "space",
+      "quoteStyle": "double",
+      "attributePosition": "multiline"
+    }
+  },
+  "html": {
+    "formatter": {
+      "attributePosition": "multiline",
+      "indentStyle": "space"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": "off"
       }
     }
   }
