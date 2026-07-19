@@ -41,24 +41,14 @@ export function Navbar({
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
-      <Link
-        href="/"
-        className="block size-fit shrink-0"
-      >
-        <Image
-          src={logo}
-          alt="Logo"
-          className="h-5 w-fit"
-        />
+      <Link href="/" className="h-full flex items-center shrink-0">
+        <Image src={logo} alt="Logo" className="h-2/3 w-auto" />
       </Link>
 
       <NavigationMenu>
         <NavigationMenuList>
           {NAV_LINKS.map((link) => (
-            <NavigationMenuItem
-              key={link.label}
-              value={link.label}
-            >
+            <NavigationMenuItem key={link.label} value={link.label}>
               <NavigationMenuLink
                 render={<Link href={link.url} />}
                 data-active={pathname.startsWith(link.url) ? true : undefined}
@@ -88,22 +78,13 @@ export function Navbar({
                   </NavigationMenuLink>
                 </li>
                 <li className="flex gap-2">
-                  <NavigationMenuLink
-                    href="https://t.co"
-                    target="_blank"
-                  >
+                  <NavigationMenuLink href="https://t.co" target="_blank">
                     <TelegramIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink
-                    href=""
-                    target="_blank"
-                  >
+                  <NavigationMenuLink href="" target="_blank">
                     <DiscordIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink
-                    href=""
-                    target="_blank"
-                  >
+                  <NavigationMenuLink href="" target="_blank">
                     <XIcon />
                   </NavigationMenuLink>
                 </li>
@@ -117,18 +98,12 @@ export function Navbar({
         <SearchInput />
 
         <NotificationPopover>
-          <Button
-            variant={"ghost"}
-            size="icon"
-          >
+          <Button variant={"ghost"} size="icon">
             <Bell />
           </Button>
         </NotificationPopover>
         <SettingsDialog>
-          <Button
-            variant={"ghost"}
-            size="icon"
-          >
+          <Button variant={"ghost"} size="icon">
             <Settings />
           </Button>
         </SettingsDialog>
@@ -156,10 +131,7 @@ export function Navbar({
           </button>
         ) : (
           <ConnectWalletDialog>
-            <Button
-              variant="outline"
-              data-active
-            >
+            <Button variant="outline" data-active>
               Connect wallet
             </Button>
           </ConnectWalletDialog>
