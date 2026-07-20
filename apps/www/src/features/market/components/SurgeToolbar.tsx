@@ -8,10 +8,14 @@ import {
 } from "@/components/ui/input-group";
 import { useMarketStore } from "../market.store";
 import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
-
-const _PRIORITY_TABS = ["P1", "P2", "P3"] as const;
+import { Select } from "@/components/ui/select";
+import { SurgeFilterDialog } from "./SurgeFilterDialog";
 
 export const SurgeToolbar = () => {
+  const minMcap = useMarketStore((state) => state.surgeFilters.min_mcap);
+  const maxMcap = useMarketStore((state) => state.surgeFilters.max_mcap);
+  const setFilters = useMarketStore((state) => state.setSurgeFilters);
+
   return (
     <div className="flex min-w-max items-center gap-2">
       <span className="font-medium text-muted-foreground text-xs">
@@ -22,9 +26,17 @@ export const SurgeToolbar = () => {
           size="sm"
           className="w-24"
         >
-          <InputGroupInput placeholder="Min" />
+          <InputGroupInput
+            value={minMcap}
+            onDebouncedValueChange={(value) => {
+              setFilters({ min_mcap: value });
+            }}
+          />
           <InputGroupAddon align="inline-end">
             <InputGroupText>K</InputGroupText>
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-start">
+            <InputGroupText>Min</InputGroupText>
           </InputGroupAddon>
         </InputGroup>
         <span className="text-muted-foreground">-</span>
@@ -32,20 +44,32 @@ export const SurgeToolbar = () => {
           size="sm"
           className="w-24"
         >
-          <InputGroupInput placeholder="Max" />
+          <InputGroupInput
+            value={maxMcap}
+            onDebouncedValueChange={(value) => {
+              setFilters({ max_mcap: value });
+            }}
+          />
           <InputGroupAddon align="inline-end">
             <InputGroupText>K</InputGroupText>
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-start">
+            <InputGroupText>Max</InputGroupText>
           </InputGroupAddon>
         </InputGroup>
       </div>
 
-      <Button
-        variant="ghost"
-        size="sm"
-      >
-        <Filter />
-        Filter
-      </Button>
+      <Select></Select>
+
+      <SurgeFilterDialog>
+        <Button
+          variant="ghost"
+          size="sm"
+        >
+          <Filter />
+          Filter
+        </Button>
+      </SurgeFilterDialog>
 
       <SurgeQuickBuyInput />
       <SurgeBondingCurveToggle />

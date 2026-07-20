@@ -10,20 +10,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { LP_POSITIONS } from "@/data/portfolio-data";
 import { POOLS } from "@/features/liquidity/liquidity.schema";
 import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
-import { capitalize, cn } from "@/lib/utils";
+import { capitalize } from "@/lib/utils";
 import { PnlExportDialog } from "./PnlExportDialog";
+import { useRouter } from "next/navigation";
 
 const columnHelper = createColumnHelper<(typeof LP_POSITIONS)[0]>();
-
-const LinkWrapper = ({
-  ...props
-}: Partial<React.ComponentProps<typeof Link>>) => (
-  <Link
-    {...props}
-    href="/liquidity/detail"
-    className={cn("block", props.className)}
-  />
-);
 
 const filters = ["openedPosition", "history"];
 
@@ -78,8 +69,16 @@ const columns = [
   columnHelper.accessor((row) => row, {
     header: "POSITION/POOL",
     cell: ({ row }) => (
-      <div className="group flex items-center gap-3 transition-opacity hover:opacity-80">
-        <Link href="/token">
+      <div
+        className="group flex items-center gap-3 transition-opacity hover:opacity-80"
+        data-pool-id={row.original.pool}
+      >
+        <Link
+          href="/token/123"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
           <Avatar>
             <AvatarImage />
             <AvatarFallback>
@@ -89,7 +88,10 @@ const columns = [
         </Link>
         <div>
           <Link
-            href="/token"
+            href="/token/123"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             className="font-bold text-b-2"
           >
             {row.original.pool}
@@ -108,36 +110,28 @@ const columns = [
   columnHelper.accessor((row) => row, {
     header: "PnL",
     cell: ({ row }) => (
-      <LinkWrapper className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-0.5">
         <p className="font-medium text-up">{row.original.pnlUsd}</p>
         <p className="font-medium text-up">{row.original.pnlPct}</p>
-      </LinkWrapper>
+      </div>
     ),
   }),
   columnHelper.accessor("totalDeposit", {
     header: "Your Liquidity",
     cell: ({ row }) => (
-      <LinkWrapper>
-        <p className="font-medium text-white">{row.original.totalDeposit}</p>
-      </LinkWrapper>
+      <p className="font-medium text-white">{row.original.totalDeposit}</p>
     ),
   }),
   columnHelper.accessor("totalWithdraw", {
     header: "Claimable Fees",
     cell: ({ row }) => (
-      <LinkWrapper>
-        <p className="font-medium text-white">{row.original.totalWithdraw}</p>
-      </LinkWrapper>
+      <p className="font-medium text-white">{row.original.totalWithdraw}</p>
     ),
   }),
   columnHelper.display({
     id: "feeTvl",
     header: "24h Fee / TVL",
-    cell: () => (
-      <LinkWrapper>
-        <p className="font-medium text-white">0.53%</p>
-      </LinkWrapper>
-    ),
+    cell: () => <p className="font-medium text-white">0.53%</p>,
   }),
   columnHelper.display({
     id: "action",
@@ -151,6 +145,7 @@ export const LiquidityPositionsTable = () => {
   const setActiveFilter = usePortfolioStore(
     (state) => state.setLiquidityFilter,
   );
+  const router = useRouter();
 
   const table = useDataTable({
     data: LP_POSITIONS,
@@ -186,7 +181,21 @@ export const LiquidityPositionsTable = () => {
           ))}
         </div>
       </div>
-      <DataTable table={table} />
+      <nav
+        onClick={(e) => {
+          if (!(e.target instanceof HTMLElement)) return;
+
+          const tableRow = e.target.closest("tr");
+          const poolId =
+            tableRow?.querySelector<HTMLElement>("[data-pool-id]")?.dataset
+              .poolId;
+
+          if (poolId) router.push(`/liquidity/detail`);
+        }}
+        onKeyDown={() => null}
+      >
+        <DataTable table={table} />
+      </nav>
     </div>
   );
 };

@@ -13,30 +13,30 @@ import {
   SwissFranc,
 } from "lucide-react";
 
-export function formatCompactCurrency(value: number | null): string {
-  if (value === null) return "N/A";
+export function formatCompactCurrency(value?: number | null): string {
+  if (value === null || value === undefined) return "N/A";
   const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}b`;
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}m`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(1)}k`;
-  return `$${value.toFixed(0)}`;
+  if (abs >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}b`;
+  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}m`;
+  if (abs >= 1_000) return `$${(value / 1_000).toFixed(2)}k`;
+  return `$${value.toFixed(2)}`;
 }
 
 /** "+23.45%", "-4.10%" */
-export function formatSignedPercent(value: number | null, digits = 2): string {
-  if (value === null) return "N/A";
+export function formatSignedPercent(value?: number | null, digits = 2): string {
+  if (value === null || value === undefined) return "N/A";
 
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(digits)}%`;
 }
 
 /** "511", "1.2k" — used for TXNS counts */
-export function formatCompactNumber(value: number | null): string {
-  if (value === null) return "N/A";
+export function formatCompactNumber(value?: number | null): string {
+  if (value === null || value === undefined) return "N/A";
 
   return new Intl.NumberFormat("en-US", { notation: "compact" }).format(value);
 }
-export function formatAge(unixTime: number | null): string {
+export function formatAge(unixTime?: number | null): string {
   if (!unixTime) return "N/A";
   const isSeconds = unixTime < 1e12;
   const timestamp = isSeconds ? unixTime * 1000 : unixTime;

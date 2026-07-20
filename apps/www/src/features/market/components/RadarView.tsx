@@ -1,11 +1,8 @@
+"use client";
 import { QueryState } from "@/components/layout/QueryState";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { capitalize } from "@/lib/utils";
-import {
-  useRadarFreshTokens,
-  useRadarGraduatedTokens,
-  useRadarHeatedUpTokens,
-} from "../market.hook";
+import { useRadarTokens } from "../market.hook";
 import { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
 import { RadarColumnToolbar } from "./RadarColumnToolbar";
@@ -14,9 +11,18 @@ import { RadarTokenCard } from "./RadarTokenCard";
 export const RadarView = () => {
   const radarFilters = useMarketStore((state) => state.radarFilters);
 
-  const freshQuery = useRadarFreshTokens(radarFilters.fresh);
-  const heatingQuery = useRadarHeatedUpTokens(radarFilters.heatingUp);
-  const graduatedQuery = useRadarGraduatedTokens(radarFilters.graduated);
+  const freshQuery = useRadarTokens({
+    ...radarFilters.fresh,
+    type: "fresh",
+  });
+  const heatingQuery = useRadarTokens({
+    ...radarFilters.heatingUp,
+    type: "heatingUp",
+  });
+  const graduatedQuery = useRadarTokens({
+    ...radarFilters.graduated,
+    type: "graduated",
+  });
 
   return (
     <div className="flex h-full min-h-0 flex-1 rounded-xl border">
@@ -41,22 +47,16 @@ export const RadarView = () => {
             </div>
 
             <ScrollArea className="h-full min-h-0 flex-1">
-              <QueryState
-                query={query}
-                getIsLoading={(q) => q.isPending}
-              >
-                {query.data?.items.map((token) => (
+              <QueryState query={query} getIsLoading={(q) => q.isPending}>
+                {query.data?.tokens.map((token) => (
                   <RadarTokenCard
-                    key={token.address}
+                    key={token.mint}
                     token={token}
                     column={column}
                   />
                 ))}
               </QueryState>
-              <ScrollBar
-                showScrollBar
-                showIndicator
-              />
+              <ScrollBar showScrollBar showIndicator />
             </ScrollArea>
           </section>
         );

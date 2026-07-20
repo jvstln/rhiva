@@ -1,10 +1,10 @@
 "use client";
-import { AtSign, ChefHat, EyeOff } from "lucide-react";
+import { AtSign, ChefHat, Copy, EyeOff, User } from "lucide-react";
 import type React from "react";
 import { useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { PumpFunIcon } from "@/components/ui/icons";
+import { PumpFunIcon, SimpleIcon } from "@/components/ui/icons";
 import {
   Tooltip,
   TooltipContent,
@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/tooltip";
 import { gsap, useGSAP } from "@/lib/gsap.util";
 import { cn, getInitials } from "@/lib/utils";
-import type { MemeToken, TrendingToken } from "../../market.token.type";
-
-interface TokenHoverTooltipProps {
-  token: MemeToken | TrendingToken;
-  size?: "default" | "sm";
-}
+import type { Token } from "../../market.token.type";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { siGoogle } from "simple-icons";
 
 const TokenAvatarBorderSvg = ({
   strokeLengthInPercent = 0,
@@ -42,8 +44,8 @@ const TokenAvatarBorderSvg = ({
       {...props}
       className={cn("absolute inset-0 stroke-accent", props?.className)}
     >
-      {/* Border images.. one for the border, one for bonding curve progress */}
       <title>Token bonding curve progress</title>
+      {/* Border images.. one for the border, one for bonding curve progress */}
       <path
         d="M 24,20 A 4,4 0 0,1 20,24   H 4 A 4,4 0 0,1 0,20   V 4 A 4,4 0 0,1 4,0   H 20 A 4,4 0 0,1 24,4   V 20 Z"
         className="opacity-30"
@@ -56,13 +58,15 @@ const TokenAvatarBorderSvg = ({
   );
 };
 
-export function TokenAvatar({
-  token,
-  size = "default",
-}: TokenHoverTooltipProps) {
+interface TokenAvatarProps {
+  token: Token;
+  size?: "default" | "sm";
+}
+
+export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger render={<div />}>
         {/** biome-ignore lint/a11y/noStaticElementInteractions: prevents propagation to the main token navigation */}
         {/** biome-ignore lint/a11y/useKeyWithClickEvents: prevents propagation to the main token navigation */}
         <div
@@ -87,7 +91,9 @@ export function TokenAvatar({
             className={cn("group/image relative size-full shrink-0")}
           >
             <AvatarImage src={token.logo_uri ?? ""} />
-            <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
+            <AvatarFallback>
+              {token.name ? getInitials(token.name) : <User />}
+            </AvatarFallback>
           </Avatar>
 
           <TokenAvatarBorderSvg
@@ -132,9 +138,51 @@ export function TokenAvatar({
           className={"size-[236px]"}
         >
           <AvatarImage src={token.logo_uri ?? ""} />
-          <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
+          <AvatarFallback>
+            {token.name ? getInitials(token.name) : <User />}
+          </AvatarFallback>
         </Avatar>
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+export function TokenNameAndSymbol({ token }: { token: Token }) {
+  return (
+    <DropdownMenu>
+      <div className="flex items-center gap-1 text-base">
+        <span className="truncate font-semibold">{token.name ?? "N/A"}</span>
+        <DropdownMenuTrigger
+          className="flex items-center gap-1 text-muted-foreground"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          openOnHover
+          delay={0}
+        >
+          <span className="truncate">{token.symbol ?? "N/A"}</span>
+          <Copy className="size-3.5" />
+        </DropdownMenuTrigger>
+      </div>
+
+      <DropdownMenuContent
+        align="center"
+        className="w-fit max-w-62.5"
+      >
+        <DropdownMenuItem>
+          <Copy />
+          Copy
+          <span className="truncate">{token.mint}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="truncate">
+          <Copy /> Copy <span className="truncate">{token.name}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="truncate">
+          <SimpleIcon icon={siGoogle} /> Google for{" "}
+          <span className="truncate">{token.name}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

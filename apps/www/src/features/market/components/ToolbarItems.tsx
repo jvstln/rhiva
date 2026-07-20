@@ -16,26 +16,26 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { BondingCurve } from "../market.schema";
+import { Preset } from "../market.schema";
 
 export const BondingCurveToggle = ({
   value,
   onValueChange,
   className,
 }: {
-  onValueChange?: (value: BondingCurve) => void;
-  value?: BondingCurve;
+  onValueChange?: (value: Preset) => void;
+  value?: Preset;
   className?: string;
 }) => {
   return (
     <ToggleGroup
       value={value ? [value] : undefined}
-      onValueChange={([value]) => onValueChange?.(value as BondingCurve)}
+      onValueChange={([value]) => onValueChange?.(value as Preset)}
       size={"sm"}
       spacing={0}
       className={className}
     >
-      {BondingCurve.options.map((p) => (
+      {Preset.options.map((p) => (
         <Tooltip key={p}>
           <TooltipTrigger
             render={

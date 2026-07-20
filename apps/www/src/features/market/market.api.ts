@@ -1,98 +1,92 @@
 import { api } from "@/lib/api";
 import type {
-  MemeTokenResponseData,
   RadarFilters,
   SurgeFilters,
+  Token,
+  TokenCandle,
+  TokenCandleFilters,
   TrendingFilters,
-  TrendingTokenResponseData,
 } from "./market.type";
+import { mapToToken } from "./market.util";
 
-export const getTrendingTokens = async (filters: TrendingFilters) => {
-  const response = await api.get<{ data: TrendingTokenResponseData }>(
-    "/defi/v3/token/list",
-    {
-      params: {
-        sort_by: `volume_${filters.timeframe}_usd`,
-        sort_type: "desc",
-        min_liquidity: "1000", // tunable
-        [`min_volume_${filters.timeframe}_usd`]: "5000",
-        [`min_trade_${filters.timeframe}_count`]: "10",
-        min_holder: "30",
-      },
-    },
-  );
-  return response.data.data;
+export const getToken = async (mint: string) => {
+  const response = await api.get<any>(`/token/${mint}`);
+  return mapToToken(response.data);
 };
 
-export const getRadarFreshTokens = async (_filters: RadarFilters["fresh"]) => {
-  const response = await api.get<{ data: MemeTokenResponseData }>(
-    "/defi/v3/token/meme/list",
-    {
-      url: "/defi/v3/token/list",
-      params: {
-        sort_by: "creation_time",
-        sort_type: "desc",
-        graduated: false,
-        max_progress_percent: 30, // tunable
-      },
-    },
-  );
-  return response.data.data;
+export const getTrendingTokens = async (
+  filters: TrendingFilters,
+): Promise<{ tokens: Token[] }> => {
+  const trendingResponse = await api.get<
+    Array<{ mint: string; score: number }>
+  >("/trending", {
+    params: { window: filters.timeframe },
+  });
+
+  const tokens = (
+    await Promise.allSettled(
+      trendingResponse.data.map(({ mint }) => {
+        return getToken(mint);
+      }),
+    )
+  )
+    .map((p) => {
+      if (p.status === "rejected") return null;
+      return p.value;
+    })
+    .filter((token) => token !== null);
+
+  return { tokens: tokens };
 };
 
-export const getRadarHeatedUpTokens = async (
-  _filters: RadarFilters["heatingUp"],
+export const getRadarTokens = async (
+  filters: RadarFilters[keyof RadarFilters] & { type: keyof RadarFilters },
 ) => {
-  const response = await api.get<{ data: MemeTokenResponseData }>(
-    "/defi/v3/token/meme/list",
-    {
-      url: "/defi/v3/token/list",
-      params: {
-        sort_by: "trade_5m_count", // or volume_5m_usd — pick your momentum metric
-        sort_type: "desc",
-        graduated: false,
-        min_progress_percent: 30, // past "fresh" territory
-        max_progress_percent: 99,
-        min_trade_5m_count: 10,
-      },
+  const stageMap: Record<keyof RadarFilters, string> = {
+    fresh: "new_creation",
+    heatingUp: "near_completion",
+    graduated: "completed",
+  };
+
+  const radarResponse = await api.get<Array<{ mint: string }>>("/trenches", {
+    params: {
+      stage: stageMap[filters.type],
     },
-  );
-  return response.data.data;
+  });
+
+  const tokens = (
+    await Promise.allSettled(
+      radarResponse.data.map(({ mint }) => {
+        return getToken(mint);
+      }),
+    )
+  )
+    .map((p) => {
+      if (p.status === "rejected") return null;
+      return p.value;
+    })
+    .filter((token) => token !== null);
+
+  return { tokens: tokens };
 };
 
-export const getRadarGraduatedTokens = async (
-  _filters: RadarFilters["graduated"],
-) => {
-  const response = await api.get<{ data: MemeTokenResponseData }>(
-    "/defi/v3/token/meme/list",
-    {
-      url: "/defi/v3/token/list",
-      params: {
-        sort_by: "graduated_time",
-        sort_type: "desc",
-        graduated: true,
-      },
-    },
-  );
-  return response.data.data;
+export const getSurgeTokens = async (params: SurgeFilters) => {
+  const response = await api.get<any[]>("/surge", {
+    params,
+  });
+
+  const tokens: Token[] = response.data.map((r) => mapToToken(r));
+
+  return { tokens };
 };
 
-export const getSurgeGraduatedTokens = async (filters: SurgeFilters) => {
-  const response = await api.get<{ data: MemeTokenResponseData }>(
-    "/defi/v3/token/meme/list",
+export const getTokenCandles = async (filters: TokenCandleFilters) => {
+  const response = await api.get<TokenCandle[]>(
+    `/token/${filters.mint}/candles`,
     {
-      url: "/defi/v3/token/list",
-      params: {
-        graduated: true,
-        sort_by: `price_change_${filters.timeframe}_percent`,
-        sort_type: "desc",
-        min_liquidity: "2000",
-        min_holder: "30",
-        [`min_trade_${filters.timeframe}_count`]: "15",
-        min_market_cap: filters.mcMin,
-        max_market_cap: filters.mcMax,
-      },
+      params: { tf: filters.timeframe, limit: filters.limit },
     },
   );
-  return response.data.data;
+
+  return response.data;
 };

@@ -1,4 +1,10 @@
-import type { BondingCurve, RadarColumns, Timeframe } from "./market.schema";
+import type {
+  Preset,
+  RadarColumns,
+  SurgeFilters,
+  SurgeFiltersInput,
+  Timeframe,
+} from "./market.schema";
 
 type Sort = "asc" | "desc" | null;
 
@@ -20,33 +26,37 @@ export type MarketState = {
     ) => void;
   };
 
-  surgeFilters: SurgeFilters;
-  setSurgeFilters: (filters: Partial<SurgeFilters>) => void;
+  surgeFilters: SurgeFiltersInput & {
+    timeframe: Timeframe;
+    quickBuy: number | null;
+    preset: Preset;
+  };
+  setSurgeFilters: (filters: Partial<MarketState["surgeFilters"]>) => void;
+
+  watchlist: {
+    items: Array<string>;
+    add: (mint: string) => void;
+    remove: (mint: string) => void;
+    toggle: (mint: string) => void;
+  };
 };
 
 export type TrendingFilters = {
   timeframe: Timeframe;
   quickSell: number | null;
   quickBuy: number | null;
-  preset: BondingCurve;
+  preset: Preset;
 };
 
 export type RadarFilters = Record<
   RadarColumns,
   {
     search: string;
-    bondingCurve: BondingCurve;
+    bondingCurve: Preset;
     quickBuy: number | null;
     quickSell: number | null;
   }
 >;
 
-export type SurgeFilters = {
-  timeframe: Timeframe;
-  mcMin: number | null;
-  mcMax: number | null;
-  quickBuy: number | null;
-  preset: BondingCurve;
-};
-
-export * from "./market.token.type";
+export type * from "./market.token.type";
+export type * from "./market.schema";

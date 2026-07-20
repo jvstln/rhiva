@@ -8,7 +8,7 @@ export const useMarketStore = create<MarketState>()(
   devtools(
     persist(
       immer(
-        (set): MarketState => ({
+        (set, get): MarketState => ({
           radarFilters: {
             fresh: {
               search: "",
@@ -69,8 +69,6 @@ export const useMarketStore = create<MarketState>()(
           // ------------------------------------------------------------------------
           surgeFilters: {
             timeframe: "1h",
-            mcMin: null,
-            mcMax: null,
             quickBuy: null,
             preset: "p1",
           },
@@ -80,6 +78,29 @@ export const useMarketStore = create<MarketState>()(
             });
           },
           // ------------------------------------------------------------------------
+
+          watchlist: {
+            items: [],
+            add(mint) {
+              if (get().watchlist.items.includes(mint)) return;
+              set((state) => {
+                state.watchlist.items.push(mint);
+              });
+            },
+            remove(mint) {
+              if (!get().watchlist.items.includes(mint)) return;
+              set((state) => {
+                return state.watchlist.items.filter((m) => m !== mint);
+              });
+            },
+            toggle(mint) {
+              if (get().watchlist.items.includes(mint)) {
+                get().watchlist.remove(mint);
+              } else {
+                get().watchlist.add(mint);
+              }
+            },
+          },
         }),
       ),
       {

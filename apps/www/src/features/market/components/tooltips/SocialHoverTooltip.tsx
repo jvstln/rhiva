@@ -1,16 +1,16 @@
-import { BadgeCheck, CalendarDays, ExternalLink } from "lucide-react";
+import { BadgeCheck, CalendarDays, ExternalLink, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { XIcon } from "@/components/ui/icons";
 import { getInitials } from "@/lib/utils";
-import type { MemeToken, TrendingToken } from "../../market.token.type";
+import type { Token } from "../../market.token.type";
 
 interface SocialHoverTooltipProps {
-  token: TrendingToken | MemeToken;
+  token: Token;
 }
 
 export function SocialHoverTooltip({ token }: SocialHoverTooltipProps) {
-  const twitterUrl = token.extensions?.twitter;
+  const twitterUrl = token.live?.twitter_url;
   const handle = twitterUrl ? twitterUrl.split("/").pop() : token.symbol;
 
   // You can derive a join date from `recent_listing_time` if needed,
@@ -37,7 +37,9 @@ export function SocialHoverTooltip({ token }: SocialHoverTooltipProps) {
         <div className="-mt-2/3 relative flex items-start justify-between">
           <Avatar>
             <AvatarImage src={token.logo_uri || ""} />
-            <AvatarFallback>{getInitials(token.name)}</AvatarFallback>
+            <AvatarFallback>
+              {token.name ? getInitials(token.name) : <User />}
+            </AvatarFallback>
           </Avatar>
           <Button
             size="icon-sm"
@@ -61,7 +63,7 @@ export function SocialHoverTooltip({ token }: SocialHoverTooltipProps) {
 
         {/* Bio */}
         <p className="text-muted-foreground text-sm">
-          {token.extensions?.description || "The Prophecy is finally here."}
+          {token.live?.twitter_handle}
         </p>
 
         {/* Joined Date */}

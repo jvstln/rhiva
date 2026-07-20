@@ -1,3 +1,4 @@
+"use client";
 import {
   BadgeCheck,
   BikeIcon,
@@ -29,24 +30,35 @@ import {
 } from "@/components/ui/info-badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import type { MemeToken } from "@/features/market/market.type";
+import type { Token } from "@/features/market/market.type";
 import {
   cn,
   formatAge,
   formatCompactCurrency,
   formatCompactNumber,
 } from "@/lib/utils";
+import { formatSignedPercent } from "@/lib/finance.util";
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import { TokenAvatar } from "./tooltips/TokenAvatar";
 
 interface TokenRowProps {
-  token: MemeToken;
+  token: Token;
 }
 
 function TokenRow({ token }: TokenRowProps) {
-  const priceChange = token.price_change_24h_percent ?? 0;
+  const timeframe = useMarketStore((state) => state.surgeFilters.timeframe);
+  const priceChange = token.price_change_percent ?? 0;
   const priceIsUp = priceChange >= 0;
+
+  const timeframeData = token.timeframes?.[timeframe];
+  const uniqueWallet = timeframeData?.unique_wallet ?? 0;
+  const volumeBuyUsd = timeframeData?.volume_buy_usd ?? 0;
+  const volumeSellUsd = timeframeData?.volume_sell_usd ?? 0;
+  const buyCount = timeframeData?.buy ?? 0;
+  const sellCount = timeframeData?.sell ?? 0;
+  const tradeCount = timeframeData?.trade_count ?? 0;
+  const volumeUsd = timeframeData?.volume_usd ?? 0;
 
   return (
     <div className="flex items-center gap-6 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60">
@@ -80,7 +92,7 @@ function TokenRow({ token }: TokenRowProps) {
               className="h-4/5 self-center"
             />
             <span className="truncate">
-              {token.address.slice(0, 4)}...{token.address.slice(-4)}
+              {token.mint.slice(0, 4)}...{token.mint.slice(-4)}
             </span>
             <CopyButton />
             <InfoBadge>
@@ -96,24 +108,24 @@ function TokenRow({ token }: TokenRowProps) {
                 tooltip={
                   <div>
                     <InfoBadgeTooltipHeader>
-                      New Users (24h)
+                      New Users ({timeframe})
                     </InfoBadgeTooltipHeader>
                     <InfoBadgeTooltipGrid>
                       <InfoBadgeTooltipRow
                         label="Total Unique"
-                        value={formatCompactNumber(token.unique_wallet_24h)}
+                        value={formatCompactNumber(uniqueWallet)}
                       />
                       <InfoBadgeTooltipRow
                         label="New Wallets"
                         value={formatCompactNumber(
-                          Math.floor(token.unique_wallet_24h * 0.2),
+                          Math.floor(uniqueWallet * 0.2),
                         )}
                         valueClassName="text-up"
                       />
                       <InfoBadgeTooltipRow
                         label="Returning"
                         value={formatCompactNumber(
-                          Math.floor(token.unique_wallet_24h * 0.8),
+                          Math.floor(uniqueWallet * 0.8),
                         )}
                       />
                     </InfoBadgeTooltipGrid>
@@ -121,7 +133,7 @@ function TokenRow({ token }: TokenRowProps) {
                 }
               >
                 <UserStar />
-                {formatCompactNumber(Math.floor(token.unique_wallet_24h * 0.2))}
+                {formatCompactNumber(Math.floor(uniqueWallet * 0.2))}
               </InfoBadge>
               <InfoBadge
                 variant="badge"
@@ -136,19 +148,19 @@ function TokenRow({ token }: TokenRowProps) {
                         label="Dev Wallet"
                         value={
                           <span>
-                            {token.address.slice(0, 4)}...
-                            {token.address.slice(-4)}{" "}
+                            {token.mint.slice(0, 4)}...
+                            {token.mint.slice(-4)}{" "}
                           </span>
                         }
                       />
                       <InfoBadgeTooltipRow
                         label="Bought"
-                        value={`${formatCompactCurrency(token.volume_buy_24h_usd * 0.05)} / ${Math.floor(token.buy_24h * 0.1)}TXs`}
+                        value={`${formatCompactCurrency(volumeBuyUsd * 0.05)} / ${Math.floor(buyCount * 0.1)}TXs`}
                         valueClassName="text-up"
                       />
                       <InfoBadgeTooltipRow
                         label="Sold"
-                        value={`${formatCompactCurrency(token.volume_sell_24h_usd * 0.08)} / ${Math.floor(token.sell_24h * 0.1)}TXs`}
+                        value={`${formatCompactCurrency(volumeSellUsd * 0.08)} / ${Math.floor(sellCount * 0.1)}TXs`}
                         valueClassName="text-down"
                       />
                       <InfoBadgeTooltipRow
@@ -159,14 +171,14 @@ function TokenRow({ token }: TokenRowProps) {
                         label="Funding"
                         value={
                           <span>
-                            {token.address.slice(4, 8)}...
-                            {token.address.slice(-8, -4)}{" "}
+                            {token.mint.slice(4, 8)}...
+                            {token.mint.slice(-8, -4)}{" "}
                           </span>
                         }
                       />
                       <InfoBadgeTooltipRow
                         label="Transfer In"
-                        value={`${(token.liquidity % 10).toFixed(2)} SOL`}
+                        value={`${((token.live?.dexscreener_liquidity_usd ?? 0) % 10).toFixed(2)} SOL`}
                       />
                       <InfoBadgeTooltipRow
                         label="Time"
@@ -210,23 +222,27 @@ function TokenRow({ token }: TokenRowProps) {
                     <InfoBadgeTooltipGrid>
                       <InfoBadgeTooltipRow
                         label="Total Supply Held"
-                        value={`${(30 + (token.liquidity % 15)).toFixed(1)}%`}
+                        value={`${(30 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 15)).toFixed(1)}%`}
                         valueClassName="text-warn"
                       />
                       <InfoBadgeTooltipRow
                         label="Creator Balance"
-                        value={`${(token.liquidity % 3).toFixed(1)}%`}
+                        value={`${((token.live?.dexscreener_liquidity_usd ?? 0) % 3).toFixed(1)}%`}
                       />
                       <InfoBadgeTooltipRow
                         label="Largest Wallet"
-                        value={`${(3 + (token.liquidity % 4)).toFixed(1)}%`}
+                        value={`${(3 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 4)).toFixed(1)}%`}
                       />
                     </InfoBadgeTooltipGrid>
                   </div>
                 }
               >
                 <Users />
-                {(30 + (token.liquidity % 15)).toFixed(1)}%
+                {(
+                  30 +
+                  ((token.live?.dexscreener_liquidity_usd ?? 0) % 15)
+                ).toFixed(1)}
+                %
               </InfoBadge>
               <InfoBadge
                 variant="badge"
@@ -239,30 +255,35 @@ function TokenRow({ token }: TokenRowProps) {
                     <InfoBadgeTooltipGrid>
                       <InfoBadgeTooltipRow
                         label="Bundlers hold"
-                        value={`${(20 + (token.liquidity % 3) + 0.55).toFixed(2)}%`}
+                        value={`${(20 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 3) + 0.55).toFixed(2)}%`}
                       />
                       <InfoBadgeTooltipRow
                         label="ATH hold"
-                        value={`${(90 + (token.liquidity % 11)).toFixed(0)}%`}
+                        value={`${(90 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 11)).toFixed(0)}%`}
                       />
                       <InfoBadgeTooltipRow
                         label="Total bundlers"
-                        value={`${Math.floor(250 + (token.liquidity % 95))}`}
+                        value={`${Math.floor(250 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 95))}`}
                       />
                       <InfoBadgeTooltipRow
                         label="Bundled total"
-                        value={`${(1000 + (token.liquidity % 150) + 0.75).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                        value={`${(1000 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 150) + 0.75).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                       />
                       <InfoBadgeTooltipRow
                         label="Bundled token"
-                        value={`${(160 + (token.liquidity % 15) + 0.8).toFixed(1)}%`}
+                        value={`${(160 + ((token.live?.dexscreener_liquidity_usd ?? 0) % 15) + 0.8).toFixed(1)}%`}
                       />
                     </InfoBadgeTooltipGrid>
                   </div>
                 }
               >
                 <Layers />
-                {(20 + (token.liquidity % 3) + 0.55).toFixed(2)}%
+                {(
+                  20 +
+                  ((token.live?.dexscreener_liquidity_usd ?? 0) % 3) +
+                  0.55
+                ).toFixed(2)}
+                %
               </InfoBadge>
               <InfoBadge
                 variant={"badge"}
@@ -311,20 +332,20 @@ function TokenRow({ token }: TokenRowProps) {
                     <InfoBadgeTooltipGrid>
                       <InfoBadgeTooltipRow
                         label="Total Snipers"
-                        value={Math.floor(token.trade_24h_count * 0.02)}
+                        value={Math.floor(tradeCount * 0.02)}
                       />
                       <InfoBadgeTooltipRow
                         label="Snipers Holding"
-                        value={Math.floor(token.trade_24h_count * 0.005)}
+                        value={Math.floor(tradeCount * 0.005)}
                         valueClassName="text-down"
                       />
                       <InfoBadgeTooltipRow
                         label="Snipers Sold"
-                        value={Math.floor(token.trade_24h_count * 0.015)}
+                        value={Math.floor(tradeCount * 0.015)}
                       />
                       <InfoBadgeTooltipRow
                         label="Avg Profit"
-                        value={`+${(token.volume_24h_usd % 5).toFixed(1)} SOL`}
+                        value={`+${(volumeUsd % 5).toFixed(1)} SOL`}
                         valueClassName="text-up"
                       />
                     </InfoBadgeTooltipGrid>
@@ -332,7 +353,7 @@ function TokenRow({ token }: TokenRowProps) {
                 }
               >
                 <Crosshair />
-                {Math.floor(token.trade_24h_count * 0.02)}
+                {Math.floor(tradeCount * 0.02)}
               </InfoBadge>
               <InfoBadge
                 variant={"badge"}
@@ -364,11 +385,15 @@ function TokenRow({ token }: TokenRowProps) {
             <span className="text-gray">
               ATH{" "}
               <span className="font-medium text-white">
-                {formatCompactCurrency(token.market_cap * 1.35)}
+                {formatCompactCurrency(
+                  (token.live?.dexscreener_market_cap_usd ?? 0) * 1.35,
+                )}
               </span>
             </span>
 
-            <span className="text-up">+35.1%</span>
+            <span className="text-up">
+              {formatSignedPercent(token.last_surge_pct ?? token.price_change_percent ?? timeframeData?.price_change_percent ?? 0, 1)}
+            </span>
           </div>
 
           <div className="w-1/2" />
@@ -378,7 +403,7 @@ function TokenRow({ token }: TokenRowProps) {
           <span className="whitespace-nowrap text-muted-foreground text-sm">
             MC{" "}
             <span className="w-16 font-medium text-info text-lg">
-              {formatCompactCurrency(token.market_cap)}
+              {formatCompactCurrency(token.live?.dexscreener_market_cap_usd)}
             </span>
           </span>
 
@@ -389,7 +414,7 @@ function TokenRow({ token }: TokenRowProps) {
             }}
           />
           <span className="text-right font-semibold text-2xl text-white">
-            {formatCompactCurrency(token.liquidity)}
+            {formatCompactCurrency(token.live?.dexscreener_liquidity_usd)}
           </span>
           <span
             className={cn(
@@ -420,7 +445,7 @@ function TokenRow({ token }: TokenRowProps) {
         <div className="flex flex-wrap items-center justify-end gap-x-1 **:data-[slot=info-badge]:text-sm">
           <InfoBadge tooltip="Bonding Curve Progress">
             <Trophy />
-            {token.meme_info.progress_percent.toFixed(0)}
+            {(token.bonding?.completion_pct ?? 0).toFixed(0)}
           </InfoBadge>
           <InfoBadge
             className="[--accent:var(--color-warn)]"
@@ -446,21 +471,21 @@ function TokenRow({ token }: TokenRowProps) {
           </InfoBadge>
           <InfoBadge tooltip="Total Holders">
             <Users />
-            {formatCompactNumber(token.holder)}
+            {formatCompactNumber(token.holders?.holder_count)}
           </InfoBadge>
           <InfoBadge tooltip="85 wallets that used Axiom, Padre, Photon etc., and current holding 0%">
             <Bot />
-            {formatCompactNumber(token.unique_wallet_24h)}
+            {formatCompactNumber(uniqueWallet)}
           </InfoBadge>
           <InfoBadge
             className="[--accent:var(--color-warn)]"
             tooltip="Prio & Tip & Trading Fees 23.10 SOL"
           >
             <HandCoins />
-            {token.global_fees_paid.toFixed(2)}
+            {(token.global_fees_paid ?? 0).toFixed(2)}
           </InfoBadge>
-          <InfoBadge tooltip="Trades (24h)">
-            TX {formatCompactNumber(token.trade_24h_count)}
+          <InfoBadge tooltip={`Trades (${timeframe})`}>
+            TX {formatCompactNumber(tradeCount)}
           </InfoBadge>
         </div>
 
@@ -470,7 +495,7 @@ function TokenRow({ token }: TokenRowProps) {
         />
 
         <div className="w-full text-right text-b-5 text-gray">
-          V {formatCompactCurrency(token.volume_24h_usd)}
+          V {formatCompactCurrency(volumeUsd)}
         </div>
       </div>
     </div>
@@ -487,9 +512,9 @@ export function SurgeTable() {
         query={query}
         getIsLoading={(q) => q.isPending}
       >
-        {query.data?.items.map((token) => (
+        {query.data?.tokens?.map((token) => (
           <TokenRow
-            key={token.address}
+            key={token.mint}
             token={token}
           />
         ))}

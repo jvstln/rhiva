@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -17,12 +18,13 @@ import {
   User,
   UserPlus,
   Users,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/button/copy-button";
 import { InfoBadge } from "@/components/ui/info-badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import type { MemeToken } from "@/features/market/market.type";
+import type { Token } from "@/features/market/market.type";
 import {
   cn,
   formatAge,
@@ -34,9 +36,80 @@ import { useMarketStore } from "../market.store";
 import { TokenAvatar } from "./tooltips/TokenAvatar";
 
 interface TokenCardProps {
-  token: MemeToken;
+  token: Token;
   column: RadarColumns;
 }
+
+interface RadarMetric {
+  id: string;
+  tooltip: string;
+  tone: "up" | "down";
+  icon: LucideIcon;
+  value: (token: Token) => ReactNode;
+}
+
+const RADAR_METRICS: RadarMetric[] = [
+  {
+    id: "totalHolders",
+    tooltip: "Total Holders",
+    tone: "down",
+    icon: UserPlus,
+    value: (token) => formatCompactNumber(token.holders?.holder_count),
+  },
+  {
+    id: "bondingCurve",
+    tooltip: "Bonding Curve Progress",
+    tone: "up",
+    icon: ChefHat,
+    value: (token) => `${(token.bonding?.completion_pct ?? 0).toFixed(1)}%`,
+  },
+  {
+    id: "liquidity",
+    tooltip: "Liquidity",
+    tone: "up",
+    icon: Ghost,
+    value: (token) =>
+      formatCompactCurrency(token.live?.dexscreener_liquidity_usd),
+  },
+  {
+    id: "trades",
+    tooltip: "Trades (24h)",
+    tone: "up",
+    icon: Layers,
+    value: (token) =>
+      formatCompactNumber(token.timeframes?.["24h"]?.trade_count),
+  },
+  {
+    id: "buyVolume",
+    tooltip: "Buy Volume (24h)",
+    tone: "up",
+    icon: Activity,
+    value: (token) =>
+      formatCompactCurrency(token.timeframes?.["24h"]?.volume_buy_usd),
+  },
+  {
+    id: "sellVolume",
+    tooltip: "Sell Volume (24h)",
+    tone: "up",
+    icon: Leaf,
+    value: (token) =>
+      formatCompactCurrency(token.timeframes?.["24h"]?.volume_sell_usd),
+  },
+  {
+    id: "sellCount",
+    tooltip: "Sell Count (24h)",
+    tone: "down",
+    icon: Leaf,
+    value: (token) => `${token.sells ?? 0}`,
+  },
+  {
+    id: "uniqueTraders",
+    tooltip: "Unique Traders (24h)",
+    tone: "down",
+    icon: Crosshair,
+    value: (token) => `${token.timeframes?.["24h"]?.unique_wallet ?? 0}`,
+  },
+];
 
 export function RadarTokenCard({ token, column }: TokenCardProps) {
   return (
@@ -46,7 +119,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
         <div className="flex shrink-0 flex-col items-center gap-2">
           <TokenAvatar token={token} />
           <span className="text-[10px] text-gray">
-            {token.address.slice(0, 4)}...{token.address.slice(-4)}
+            {token.mint.slice(0, 4)}...{token.mint.slice(-4)}
           </span>
         </div>
 
@@ -66,10 +139,11 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
 
             <div className="flex gap-1">
               <InfoBadge>
-                V {formatCompactCurrency(token.volume_24h_usd)}
+                V {formatCompactCurrency(token.timeframes?.["24h"]?.volume_usd)}
               </InfoBadge>
               <InfoBadge className="[--accent:var(--color-warn)]">
-                MC {formatCompactCurrency(token.market_cap)}
+                MC{" "}
+                {formatCompactCurrency(token.live?.dexscreener_market_cap_usd)}
               </InfoBadge>
             </div>
           </div>
@@ -80,9 +154,9 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
             </span>
             <InfoBadge tooltip="Creator">
               <User />
-              {token.meme_info.creator?.slice(0, 4)}
+              {token.creator?.slice(0, 4)}
             </InfoBadge>
-            {token.extensions?.website && (
+            {token.social?.website_url && (
               <InfoBadge
                 className="[--accent:var(--color-warn)]"
                 tooltip="Risky Website"
@@ -90,17 +164,17 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
                 <AlertTriangle />
               </InfoBadge>
             )}
-            {token.extensions?.website && (
+            {token.social?.website_url && (
               <InfoBadge tooltip="Website">
                 <Globe />
               </InfoBadge>
             )}
-            {token.extensions?.telegram && (
+            {token.social?.telegram_url && (
               <InfoBadge tooltip="Telegram">
                 <MessageCircle />
               </InfoBadge>
             )}
-            {token.extensions?.twitter && (
+            {token.social?.twitter_url && (
               <InfoBadge tooltip="Twitter">
                 <Search />
               </InfoBadge>
@@ -120,7 +194,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
 
             <InfoBadge tooltip="Holders">
               <Users />
-              {formatCompactNumber(token.holder)}
+              {formatCompactNumber(token.holders?.holder_count)}
             </InfoBadge>
             <InfoBadge tooltip="Bot Activity">
               <Bot />
@@ -128,16 +202,16 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
             </InfoBadge>
             <InfoBadge tooltip="Unique Wallets (24h)">
               <Eye />
-              {formatCompactNumber(token.unique_wallet_24h)}
+              {formatCompactNumber(token.timeframes?.["24h"]?.unique_wallet)}
             </InfoBadge>
             <InfoBadge className="ml-auto">
               <span>N </span>
               <span className="[--accent:var(--color-up)]">
-                +{formatCompactNumber(token.buy_24h)} B
+                +{formatCompactNumber(token.buys)} B
               </span>{" "}
               TX
               <span className="[--accent:var(--color-down)]">
-                {formatCompactNumber(token.trade_24h_count)} —
+                {formatCompactNumber(token.timeframes?.["24h"]?.trade_count)} —
               </span>
             </InfoBadge>
           </div>
@@ -145,70 +219,20 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
           <div className="flex items-end justify-between gap-1">
             <ScrollArea className="min-w-0 grow">
               <div className="flex gap-x-1">
-                <InfoBadge
-                  variant="badge"
-                  tone="down"
-                  tooltip="Total Holders"
-                >
-                  <UserPlus />
-                  {formatCompactNumber(token.holder)}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tone="up"
-                  tooltip="Bonding Curve Progress"
-                >
-                  <ChefHat />
-                  {`${token.meme_info.progress_percent.toFixed(1)}%`}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tone="up"
-                  tooltip="Liquidity"
-                >
-                  <Ghost />
-                  {formatCompactCurrency(token.liquidity)}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tone="up"
-                  tooltip="Trades (24h)"
-                >
-                  <Layers />
-                  {formatCompactNumber(token.trade_24h_count)}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tone="up"
-                  tooltip="Buy Volume (24h)"
-                >
-                  <Activity />
-                  {formatCompactCurrency(token.volume_buy_24h_usd)}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tone="up"
-                  tooltip="Sell Volume (24h)"
-                >
-                  <Leaf />
-                  {formatCompactCurrency(token.volume_sell_24h_usd)}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tone="down"
-                  tooltip="Sell Count (24h)"
-                >
-                  <Leaf />
-                  {`${token.sell_24h}`}
-                </InfoBadge>
-                <InfoBadge
-                  variant="badge"
-                  tooltip="Unique Traders (24h)"
-                  tone="down"
-                >
-                  <Crosshair />
-                  {`${token.unique_wallet_24h}`}
-                </InfoBadge>
+                {RADAR_METRICS.map((metric) => {
+                  const Icon = metric.icon;
+                  return (
+                    <InfoBadge
+                      key={metric.id}
+                      variant="badge"
+                      tone={metric.tone}
+                      tooltip={metric.tooltip}
+                    >
+                      <Icon />
+                      {metric.value(token)}
+                    </InfoBadge>
+                  );
+                })}
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>

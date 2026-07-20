@@ -1,20 +1,35 @@
 import { CheckCircle2, HelpCircle, Sparkles } from "lucide-react";
-import type { AVATAR_REUSED } from "@/data/token-detail-data";
+import type { Token } from "@/features/market/market.token.type";
 import { TokenThumbnail } from "@/features/market/components/TokenThumbnail";
 
 import { InfoRow, InfoSection } from "./InfoSection";
 
-const AUDIT_ROWS = [
-  { label: "NoMint", ok: true },
-  { label: "No Blacklist", ok: true },
-  { label: "Burnt", ok: true },
-  { label: "Top 10", value: "99%", warn: true },
-];
+type TokenAuditCardProps = { token: Token };
 
-export function TokenAuditCard() {
+type AvatarItem = { name: string; wallet: string; mc: string; age: string };
+
+export function TokenAuditCard({ token }: TokenAuditCardProps) {
+  const auditRows = [
+    { label: "NoMint", ok: true },
+    { label: "No Blacklist", ok: true },
+    {
+      label: "Burnt",
+      ok: true,
+      value: token.bonding?.stage === "completed" ? "100%" : "N/A",
+    },
+    {
+      label: "Top 10",
+      value:
+        token.holders?.top10_holder_pct !== undefined
+          ? `${token.holders.top10_holder_pct.toFixed(0)}%`
+          : "N/A",
+      warn: true,
+    },
+  ];
+
   return (
     <InfoSection title="Token Audit">
-      {AUDIT_ROWS.map((row) => (
+      {auditRows.map((row) => (
         <InfoRow
           key={row.label}
           label={row.label}
@@ -38,16 +53,16 @@ export function TokenAuditCard() {
   );
 }
 
-export function AvatarReusedCard({ items }: { items: typeof AVATAR_REUSED }) {
+export function AvatarReusedCard({ items }: { items: AvatarItem[] }) {
   return (
     <InfoSection
       title="Avatar Reused Tokens"
       aside={<span>MC</span>}
     >
       <div className="space-y-2">
-        {items.map((item, i) => (
+        {items.map((item) => (
           <div
-            key={i}
+            key={item.wallet}
             className="flex items-center gap-2"
           >
             <TokenThumbnail

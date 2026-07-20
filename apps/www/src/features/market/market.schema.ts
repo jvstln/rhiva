@@ -1,3 +1,4 @@
+import { NumberFilter } from "@/schemas";
 import z from "zod";
 
 export const MarketView = z
@@ -7,8 +8,8 @@ export const MarketView = z
 export const RadarColumns = z.enum(["fresh", "heatingUp", "graduated"]);
 export type RadarColumns = z.infer<typeof RadarColumns>;
 
-export const BondingCurve = z.enum(["p1", "p2", "p3"]);
-export type BondingCurve = z.infer<typeof BondingCurve>;
+export const Preset = z.enum(["p1", "p2", "p3"]);
+export type Preset = z.infer<typeof Preset>;
 
 export const Timeframe = z.enum([
   "1m",
@@ -23,3 +24,18 @@ export const Timeframe = z.enum([
   "30d",
 ]);
 export type Timeframe = z.infer<typeof Timeframe>;
+
+export const SurgeFilters = z
+  .object({
+    direction: z.enum(["up", "down"]),
+    sort: z.enum(["surge", "volume", "mcap", "entry_change", "age"]),
+    order: z.enum(["asc", "desc"]),
+    min_surge_pct: NumberFilter,
+    min_mcap: NumberFilter,
+    max_mcap: NumberFilter,
+    min_liquidity: NumberFilter,
+    max_age_sec: NumberFilter,
+  })
+  .partial();
+export type SurgeFiltersInput = z.input<typeof SurgeFilters>;
+export type SurgeFilters = z.infer<typeof SurgeFilters>;

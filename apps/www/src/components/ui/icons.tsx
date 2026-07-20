@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import type * as React from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 
@@ -123,6 +124,8 @@ export const SolanaIcon = (props: IconProps) => (
 
 export const SimpleIcon = ({
   icon,
+  style,
+  className,
   ...props
 }: IconProps & { icon: SimpleIconType }) => {
   return (
@@ -130,7 +133,9 @@ export const SimpleIcon = ({
       viewBox="0 0 24 24"
       width="1em"
       height="1em"
-      fill={`#${icon.hex}`}
+      fill={"currentColor"}
+      style={{ "--accent": `#${icon.hex}`, ...style } as React.CSSProperties}
+      className={cn("text-accent", className)}
       {...props}
     >
       <title>{icon.title}</title>

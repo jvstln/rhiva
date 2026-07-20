@@ -4,6 +4,7 @@ import type * as React from "react";
 import { buttonTooltipHandle } from "@/components/tooltip.provider";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Spinner } from "../spinner";
 
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-full border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -54,6 +55,8 @@ export namespace Button {
   export type Props = ButtonPrimitive.Props &
     VariantProps<typeof buttonVariants> & {
       tooltip?: React.ReactNode;
+      loading?: boolean;
+      loadingText?: React.ReactNode;
     };
 }
 
@@ -63,6 +66,7 @@ function Button({
   size = "default",
   ref,
   tooltip,
+  loading,
   ...props
 }: Button.Props) {
   const button = (
@@ -75,7 +79,9 @@ function Button({
         props["aria-label"] ||
         (typeof tooltip === "string" ? tooltip : undefined)
       }
-    />
+    >
+      {loading ? <Spinner /> : props.children}
+    </ButtonPrimitive>
   );
 
   if (!tooltip) {

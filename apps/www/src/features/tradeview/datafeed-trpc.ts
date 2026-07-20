@@ -11,7 +11,7 @@ import type {
   Network,
   SearchResultItem,
   TradingViewDatafeedConfig,
-} from "./trade-view.type";
+} from "./tradeview.type";
 import { mapResolutionToTimeframe } from "./tradeview.util";
 
 export type CreateDataFeedArgs = {

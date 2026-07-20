@@ -255,4 +255,7 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  .link {
+    @apply text-primary underline-offset-4 transition-colors hover:underline;
+  }
 }

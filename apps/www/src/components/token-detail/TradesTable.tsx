@@ -2,7 +2,9 @@
 
 import { Eye, Filter, Pencil } from "lucide-react";
 import { useState } from "react";
-import { TRADE_TABS, TRADES } from "@/data/token-detail-data";
+import { TRADE_TABS } from "@/data/token-detail-data";
+import type { Token } from "@/features/market/market.token.type";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import { cn } from "@/lib/utils";
 
 const COLUMNS = [
@@ -15,8 +17,34 @@ const COLUMNS = [
   "Trader",
 ] as const;
 
-export function TradesTable() {
+type TradesTableProps = { token: Token };
+
+export function TradesTable({ token }: TradesTableProps) {
   const [tab, setTab] = useState<(typeof TRADE_TABS)[number]>("Trades");
+  const tradeRows = [
+    {
+      age: "Now",
+      type:
+        token.buys && token.sells && token.buys >= token.sells ? "Buy" : "Sell",
+      mc:
+        token.live?.dexscreener_market_cap_usd !== undefined
+          ? formatCompactCurrency(token.live.dexscreener_market_cap_usd)
+          : "N/A",
+      amount:
+        token.timeframes?.["24h"]?.trade_count !== undefined
+          ? formatCompactNumber(token.timeframes?.["24h"]?.trade_count)
+          : "N/A",
+      totalUsd:
+        token.timeframes?.["24h"]?.volume_usd !== undefined
+          ? formatCompactCurrency(token.timeframes?.["24h"]?.volume_usd)
+          : "N/A",
+      gas:
+        token.global_fees_paid !== undefined
+          ? formatCompactCurrency(token.global_fees_paid)
+          : "N/A",
+      trader: token.symbol ?? token.name ?? "Token",
+    },
+  ];
 
   return (
     <section className="border-border/70 border-t">
@@ -37,7 +65,7 @@ export function TradesTable() {
       </div>
 
       <div className="overflow-x-auto px-6 pb-6">
-        <table className="w-full min-w-[900px] border-collapse text-left">
+        <table className="w-full min-w-225 border-collapse text-left">
           <thead>
             <tr className="border-border/70 border-b text-b-4 text-gray">
               {COLUMNS.map((col) => (
@@ -53,9 +81,9 @@ export function TradesTable() {
             </tr>
           </thead>
           <tbody>
-            {TRADES.map((row, i) => (
+            {tradeRows.map((row) => (
               <tr
-                key={i}
+                key={`${row.trader}-${row.type}`}
                 className="border-border/40 border-b text-b-4"
               >
                 <td className="py-2 pr-6 text-gray">{row.age}</td>

@@ -1,7 +1,7 @@
 import { Input as InputPrimitive } from "@base-ui/react/input";
 import { cva, type VariantProps } from "class-variance-authority";
-import type * as React from "react";
 import { cn } from "@/lib/utils";
+import { debounce } from "lodash";
 
 const inputVariants = cva(
   cn(
@@ -23,19 +23,31 @@ const inputVariants = cva(
 
 export type InputVariants = VariantProps<typeof inputVariants>;
 
-export interface InputProps
-  extends Omit<React.ComponentProps<"input">, "size">,
-    Omit<InputVariants, "size"> {
-  "data-size"?: InputVariants["size"];
-}
+export type InputProps = InputPrimitive.Props &
+  Omit<InputVariants, "size"> & {
+    "data-size"?: InputVariants["size"];
+    onDebouncedValueChange?: InputPrimitive.Props["onValueChange"];
+  };
 
-function Input({ className, type, "data-size": size, ...props }: InputProps) {
+function Input({
+  className,
+  onDebouncedValueChange,
+  type,
+  "data-size": size,
+  ...props
+}: InputProps) {
   return (
     <InputPrimitive
       type={type}
       data-slot="input"
       className={cn(inputVariants({ size: size }), className)}
       {...props}
+      onValueChange={(...args) => {
+        props.onValueChange?.(...args);
+        debounce(() => {
+          onDebouncedValueChange?.(...args);
+        }, 800)();
+      }}
     />
   );
 }

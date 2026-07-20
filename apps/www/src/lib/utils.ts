@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { debounce } from "lodash";
 import { extendTailwindMerge } from "tailwind-merge";
 
 const customTwMerge = extendTailwindMerge({
@@ -52,6 +53,8 @@ export function arrayWithId(arrOrNumber: unknown[] | number) {
 }
 
 export const capitalize = (str: string) => {
+  if (!str) return str;
+
   return str.replace(
     /(^\w)|([_-]\w)|([a-z])([A-Z])/g,
     (_, firstLetter, withSeparator, endCamelCase, startCamelCase) => {
@@ -84,6 +87,10 @@ export function getInitials(name: string | null) {
 export async function share(params: Parameters<typeof navigator.share>[0]) {
   await navigator.share(params);
 }
+
+export const debounceInput = (func: () => void) => {
+  debounce(func, 800)();
+};
 
 export * from "./error.util";
 export * from "./finance.util";

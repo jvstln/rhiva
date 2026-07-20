@@ -49,9 +49,9 @@ const inputGroupAddonVariants = cva(
     variants: {
       align: {
         "inline-start":
-          "order-first ps-2 has-[>button]:ms-[-0.3rem] has-[>kbd]:ms-[-0.15rem]",
+          "order-first ps-4 has-[>button]:ms-[-0.3rem] has-[>kbd]:ms-[-0.15rem]",
         "inline-end":
-          "order-last pe-2 has-[>button]:me-[-0.3rem] has-[>kbd]:me-[-0.15rem]",
+          "order-last pe-4 has-[>button]:me-[-0.3rem] has-[>kbd]:me-[-0.15rem]",
         "block-start":
           "order-first w-full justify-start px-2.5 pt-2 group-has-[>input]/input-group:pt-2 [.border-b]:pb-2",
         "block-end":
@@ -142,7 +142,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 function InputGroupInput({
   className,
   ...props
-}: React.ComponentProps<"input">) {
+}: React.ComponentProps<typeof Input>) {
   const { size } = React.useContext(InputGroupContext);
   return (
     <Input

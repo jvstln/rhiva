@@ -3,6 +3,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   AlertCircle,
+  BarChart3,
+  Bot,
   Copy,
   Crown,
   Eye,
@@ -11,16 +13,14 @@ import {
   Globe,
   Layers,
   Leaf,
+  type LucideIcon,
   Microscope,
-  Rat,
   Search,
-  Sprout,
+  Shield,
   Star,
-  UserRoundCheck,
+  Target,
 } from "lucide-react";
-import Link from "next/link";
-import type * as React from "react";
-import { useMemo, useState } from "react";
+import { type MouseEventHandler, useMemo } from "react";
 import { siGoogle } from "simple-icons";
 import { QueryState } from "@/components/layout/QueryState";
 import { Button } from "@/components/ui/button";
@@ -41,34 +41,38 @@ import {
   formatSignedPercent,
 } from "@/lib/utils";
 import { useTrendingTokens } from "../market.hook";
+import type { Timeframe } from "../market.schema";
 import { useMarketStore } from "../market.store";
-import type { TrendingToken } from "../market.type";
+import type { Token } from "../market.type";
 import { SocialHoverTooltip } from "./tooltips/SocialHoverTooltip";
-import { TokenAvatar } from "./tooltips/TokenAvatar";
+import { TokenAvatar, TokenNameAndSymbol } from "./tooltips/TokenAvatar";
+import { useRouter } from "next/navigation";
 
-/* ------------------------------------------------------------------ */
-/* Favorite / watchlist star toggle                                    */
-/* ------------------------------------------------------------------ */
+interface TrendingTableMeta {
+  timeframe: Timeframe;
+}
 
-function StarButton({ pairId: _pairId }: { pairId: string }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+function AddToWatchlistButton({ mint }: { mint: string }) {
+  const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
+  const watchlist = useMarketStore((state) => state.watchlist.items);
+
+  const isInWatchlist = watchlist.includes(mint);
 
   return (
-    <button
-      type="button"
-      onClick={() => setIsFavorite((prev) => !prev)}
-      aria-pressed={isFavorite}
-      aria-label={isFavorite ? "Remove from watchlist" : "Add to watchlist"}
-      className={cn(
-        "flex size-6 shrink-0 items-center justify-center rounded-md outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50",
-        isFavorite ? "text-casablanca" : "text-white/20 hover:text-white/50",
-      )}
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label={isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+      aria-pressed={isInWatchlist}
+      data-pressed={isInWatchlist || undefined}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        toggleWatchlist(mint);
+      }}
     >
-      <Star
-        className="size-4"
-        fill={isFavorite ? "currentColor" : "none"}
-      />
-    </button>
+      <Star className="text-amber-500 data-pressed:fill-current" />
+    </Button>
   );
 }
 
@@ -158,53 +162,21 @@ function Sparkline({
 /* Pair info cell (star, avatar, name, sub-icons, watcher count)       */
 /* ------------------------------------------------------------------ */
 
-// SubIcon logic replaced with InfoBadge variant="icon"
-
-function PairInfoCell({ token }: { token: TrendingToken }) {
+function PairInfoCell({ token }: { token: Token }) {
   return (
-    <div className="flex items-center gap-3">
-      <StarButton pairId={token.address} />
-
+    <div
+      data-token-id={token.mint}
+      className="flex items-center gap-3"
+    >
+      <AddToWatchlistButton mint={token.mint} />
       <TokenAvatar token={token} />
 
       <div className="flex w-[200px] flex-col gap-1">
-        <DropdownMenu>
-          <div className="flex items-center gap-1 text-base">
-            <span className="truncate font-semibold">{token.name}</span>
-            <DropdownMenuTrigger
-              render={
-                <span className="flex items-center gap-1 text-muted-foreground" />
-              }
-              openOnHover
-              delay={0}
-            >
-              <span className="truncate">{token.symbol}</span>
-              <Copy className="size-3.5" />
-            </DropdownMenuTrigger>
-          </div>
-
-          <DropdownMenuContent
-            align="center"
-            className="w-fit max-w-[250px]"
-          >
-            <DropdownMenuItem>
-              <Copy />
-              Copy
-              <span className="truncate">{token.address}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="truncate">
-              <Copy /> Copy <span className="truncate">{token.name}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="truncate">
-              <SimpleIcon icon={siGoogle} /> Google for{" "}
-              <span className="truncate">{token.name}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TokenNameAndSymbol token={token} />
 
         <div className="flex items-center gap-2 *:data-[slot=info-badge]:[&_svg]:size-4">
           <InfoBadge className="text-sm [--accent:var(--color-up)]">
-            {formatAge(token.recent_listing_time)}
+            {token.live?.updated_at ? formatAge(token.live?.updated_at) : "N/A"}
           </InfoBadge>
           <InfoBadge
             aria-label="Dev activity"
@@ -219,7 +191,7 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
             tooltip={
               <InfoBadgeTooltipRow
                 label="X Connection"
-                value={token.extensions?.twitter ?? "N/A"}
+                value={token.social?.twitter_url ?? "N/A"}
               />
             }
           >
@@ -231,13 +203,13 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
               <InfoBadgeTooltipRow
                 label="Website"
                 value={
-                  token.extensions?.website ? (
+                  token.social?.website_url ? (
                     <a
-                      href={token.extensions?.website}
+                      href={token.social?.website_url}
                       target="_blank"
                       rel="noopener"
                     >
-                      {token.extensions?.website}
+                      {token.social?.website_url}
                     </a>
                   ) : (
                     "N/A"
@@ -249,7 +221,7 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
             <Globe />
           </InfoBadge>
           <InfoBadge
-            tooltip={token.extensions?.description}
+            tooltip={token?.description}
             aria-label="Add note"
           >
             <Flag />
@@ -257,16 +229,16 @@ function PairInfoCell({ token }: { token: TrendingToken }) {
           <InfoBadge aria-label="Inspect pair">
             <Search />
           </InfoBadge>
-          <InfoBadge>
+          <InfoBadge aria-label="Holders">
             <Eye className="size-3" />
-            {formatCompactNumber(token.holder)}
+            {formatCompactNumber(token.holders?.holder_count)}
           </InfoBadge>
         </div>
       </div>
 
       <Sparkline
         data={[20, 25, 22, 28, 24, 32, 28, 36, 32, 40]}
-        positive={(token.price_change_24h_percent ?? 0) >= 0}
+        positive={(token.price_change_percent ?? 0) >= 0}
       />
     </div>
   );
@@ -329,44 +301,96 @@ function TxnsCell({ total, buys, sells }: TxnsCellProps) {
 /* Token security badge grid                                           */
 /* ------------------------------------------------------------------ */
 
-const METRIC_ICONS: Record<
-  string,
-  React.ComponentType<{ className?: string }>
-> = {
-  holders: UserRoundCheck,
-  top10: Crown,
-  airdrop: Rat,
-  bundlers: Layers,
-  devSold: Microscope,
-  freshWallets: Fish,
-  lpBurned: Sprout,
-};
-
-export interface TrendingPairMetric {
+export interface TokenMetric {
   id: string;
   label: string;
-  value: number;
+  value: (token: Token) => string | number | undefined;
   tone: "risk" | "safe";
   suffix?: string;
+  icon?: LucideIcon;
 }
 
-// MetricPill replaced with InfoBadge variant="badge"
+const METRICS: TokenMetric[] = [
+  {
+    id: "top10",
+    label: "Top 10 Holders",
+    value: (token) => formatCompactNumber(token.holders?.top10_holder_pct),
+    tone: "risk",
+    icon: Crown,
+  },
+  {
+    id: "dev",
+    label: "Dev Holdings",
+    value: (token) => formatCompactNumber(token.holders?.dev_holder_pct),
+    tone: "safe",
+    icon: Shield,
+  },
+  {
+    id: "audit",
+    label: "Audit Score",
+    value: (token) => formatCompactNumber(token.audit_score),
+    tone: "safe",
+    icon: Microscope,
+  },
+  {
+    id: "bundlers",
+    label: "Bundled Supply",
+    value: (token) => formatCompactNumber(token.bundled_supply),
+    tone: "risk",
+    icon: Layers,
+  },
+  {
+    id: "whales",
+    label: "Whale Holdings",
+    value: (token) => formatCompactNumber(token.whale_holdings),
+    tone: "risk",
+    icon: Fish,
+  },
+  {
+    id: "snipers",
+    label: "Sniper Holdings",
+    value: (token) => formatCompactNumber(token.sniper_holdings),
+    tone: "safe",
+    icon: Target,
+  },
+  {
+    id: "dex",
+    label: "DEX Screener",
+    value: (token) => token.live?.has_paid_order,
+    tone: "safe",
+    icon: BarChart3,
+  },
+  {
+    id: "bot",
+    label: "Bot Activity",
+    value: (token) => token.bot_activity,
+    tone: "safe",
+    icon: Bot,
+  },
+];
 
-function TokenSecurityBadges({ metrics }: { metrics: TrendingPairMetric[] }) {
+function TokenSecurityBadges({ token }: { token: Token }) {
   return (
     <div className="flex flex-wrap gap-1">
-      {metrics.map((metric) => {
-        const Icon = METRIC_ICONS[metric.id] ?? UserRoundCheck;
+      {METRICS.map((metric) => {
+        const Icon = metric.icon;
+        const tone = metric.tone === "risk" ? "down" : "up";
+        const metricValue = metric.value(token) ?? "N/A";
 
         return (
           <InfoBadge
             key={metric.id}
             variant="badge"
-            tone={metric.tone === "risk" ? "down" : "up"}
-            tooltip={metric.label}
+            tone={tone}
+            tooltip={
+              <InfoBadgeTooltipRow
+                label={metric.label}
+                value={metricValue}
+              />
+            }
           >
-            <Icon />
-            {metric.value}%{metric.suffix && <span>{metric.suffix}</span>}
+            {Icon && <Icon />}
+            {metricValue}
           </InfoBadge>
         );
       })}
@@ -419,91 +443,66 @@ function ActionButtons() {
 /* Column definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-const MOCK_SECURITY_METRICS: TrendingPairMetric[] = [
-  { id: "holders", label: "Holders", value: 99, tone: "risk" },
-  { id: "top10", label: "Top 10", value: 99, tone: "risk", suffix: "7d" },
-  { id: "airdrop", label: "Snipers", value: 0, tone: "safe" },
-  { id: "bundlers", label: "Bundlers", value: 0, tone: "safe" },
-  { id: "devSold", label: "Audit", value: 0, tone: "safe" },
-  { id: "freshWallets", label: "Whales", value: 0, tone: "safe" },
-  { id: "lpBurned", label: "LP Burned", value: 98.71, tone: "risk" },
-];
-
-const LinkWrapper = ({
-  ...props
-}: Partial<React.ComponentProps<typeof Link>>) => (
-  <Link
-    {...props}
-    href="/token"
-    className={cn("block", props.className)}
-  />
-);
-
-const trendingColumns: ColumnDef<TrendingToken>[] = [
+const trendingColumns: ColumnDef<Token>[] = [
   {
     id: "pairInfo",
     header: "Pair Info",
-    cell: ({ row }) => (
-      <LinkWrapper>
-        <PairInfoCell token={row.original} />
-      </LinkWrapper>
-    ),
+    cell: ({ row }) => <PairInfoCell token={row.original} />,
     size: 500,
   },
   {
     id: "marketCap",
     header: "Market Cap",
     cell: ({ row }) => (
-      <LinkWrapper>
-        <MetricCell
-          value={formatCompactCurrency(row.original.market_cap)}
-          changePercent={row.original.price_change_24h_percent ?? undefined}
-        />
-      </LinkWrapper>
+      <MetricCell
+        value={formatCompactCurrency(
+          row.original.live?.dexscreener_market_cap_usd,
+        )}
+        changePercent={row.original.price_change_percent}
+      />
     ),
   },
   {
     id: "liquidity",
     header: "Liquidity",
     cell: ({ row }) => (
-      <LinkWrapper>
-        <MetricCell value={formatCompactCurrency(row.original.liquidity)} />
-      </LinkWrapper>
+      <MetricCell
+        value={formatCompactCurrency(
+          row.original.live?.dexscreener_liquidity_usd,
+        )}
+      />
     ),
   },
   {
     id: "volume",
     header: "Volume",
-    cell: ({ row }) => (
-      <LinkWrapper>
-        <MetricCell
-          value={formatCompactCurrency(row.original.volume_24h_usd)}
-        />
-      </LinkWrapper>
-    ),
+    cell: ({ row, table }) => {
+      const { timeframe } = table.options.meta as TrendingTableMeta;
+      const volumeUsd = row.original.timeframes?.[timeframe]?.volume_usd ?? 0;
+      return <MetricCell value={formatCompactCurrency(volumeUsd)} />;
+    },
   },
   {
     id: "txns",
     header: "TXNS",
-    cell: ({ row }) => (
-      <LinkWrapper>
+    cell: ({ row, table }) => {
+      const { timeframe } = table.options.meta as TrendingTableMeta;
+      const trades = row.original.timeframes?.[timeframe]?.trade_count ?? 0;
+      const buys = row.original.timeframes?.[timeframe]?.buy ?? 0;
+      const sells = row.original.timeframes?.[timeframe]?.sell ?? 0;
+      return (
         <TxnsCell
-          total={row.original.trade_24h_count}
-          buys={row.original.buy_24h}
-          sells={row.original.sell_24h}
+          total={trades}
+          buys={buys}
+          sells={sells}
         />
-      </LinkWrapper>
-    ),
+      );
+    },
   },
   {
     id: "tokenInfo",
     header: "Token Info",
-    /* TODO: replace with real backend metrics when available */
-    cell: ({ row }) => (
-      <LinkWrapper>
-        <TokenSecurityBadges metrics={MOCK_SECURITY_METRICS} />
-      </LinkWrapper>
-    ),
+    cell: ({ row }) => <TokenSecurityBadges token={row.original} />,
     size: 300,
   },
   {
@@ -519,12 +518,18 @@ const trendingColumns: ColumnDef<TrendingToken>[] = [
 /* ------------------------------------------------------------------ */
 
 export function TrendingTable() {
+  const router = useRouter();
   const trendingFilters = useMarketStore((state) => state.trendingFilters);
   const trendingTokens = useTrendingTokens(trendingFilters);
 
+  console.log(trendingTokens.data);
+
   const table = useDataTable({
-    data: trendingTokens.data?.items ?? [],
+    data: trendingTokens.data?.tokens ?? [],
     columns: trendingColumns,
+    meta: {
+      timeframe: trendingFilters.timeframe,
+    },
   });
 
   const pinnedColumnClassName = cn(
@@ -532,17 +537,31 @@ export function TrendingTable() {
   );
 
   return (
-    <div className="mx-auto w-full min-w-0 2xl:container">
+    <nav
+      // Check for row clicks and redirect to token page if a row is clicked
+      onClick={(e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+
+        const tokenId = e.target
+          .closest("tr:has([data-token-id])")
+          ?.querySelector<HTMLElement>("[data-token-id]")?.dataset.tokenId;
+
+        if (tokenId) router.push(`/token/${tokenId}`);
+      }}
+      onKeyDown={() => null}
+      className="mx-auto w-full min-w-0 2xl:container"
+    >
       <QueryState query={trendingTokens}>
         <DataTable
           table={table}
           classNames={{
             table: "table-fixed w-max",
+            tr: "cursor-pointer",
             td: pinnedColumnClassName,
             th: pinnedColumnClassName,
           }}
         />
       </QueryState>
-    </div>
+    </nav>
   );
 }
