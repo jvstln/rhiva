@@ -4,7 +4,7 @@ import type {
   IBasicDataFeed,
   LibrarySymbolInfo,
   SearchSymbolResultItem,
-} from "charting_library";
+} from "@/public/tradeview";
 import type {
   Aggregrate,
   ChartTimeframe,

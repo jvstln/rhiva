@@ -10,6 +10,7 @@ import {
 } from "./market.api";
 import type {
   RadarFilters,
+  SurgeFiltersInput,
   TokenCandleFilters,
   TrendingFilters,
 } from "./market.type";
@@ -38,7 +39,7 @@ export function useRadarTokens(
   });
 }
 
-export function useSurgeTokens(filters: SurgeFilters) {
+export function useSurgeTokens(filters: SurgeFiltersInput) {
   const params = SurgeFilters.parse(filters);
 
   return useQuery({

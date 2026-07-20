@@ -2,7 +2,7 @@
 import { TradeViewChart } from "@/features/tradeview/components/TradeViewChart";
 import type { CreateDataFeedArgs } from "@/features/tradeview/datafeed-trpc";
 import type { SearchResultItem } from "@/features/tradeview/tradeview.type";
-import type { Bar, ResolutionString } from "charting_library";
+import type { Bar, ResolutionString } from "@/public/tradeview";
 import { useCallback, useMemo } from "react";
 import { getTokenCandles } from "@/features/market/market.api";
 import type { Token, TokenCandle } from "@/features/market/market.token.type";

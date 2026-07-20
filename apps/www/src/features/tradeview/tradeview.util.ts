@@ -1,4 +1,4 @@
-import type { Bar, ResolutionString } from "charting_library";
+import type { Bar, ResolutionString } from "@/public/tradeview";
 import type { Aggregrate, ChartTimeframe } from "./tradeview.type";
 
 export function mapResolutionToTimeframe(resolution: ResolutionString): {

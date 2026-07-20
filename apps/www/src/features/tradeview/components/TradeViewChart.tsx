@@ -1,5 +1,5 @@
 "use client";
-import { type ResolutionString, widget } from "charting_library";
+import { type ResolutionString, widget } from "@/public/tradeview";
 import { useEffect, useRef } from "react";
 import { type CreateDataFeedArgs, createDatafeed } from "../datafeed-trpc";
 

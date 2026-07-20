@@ -1,4 +1,4 @@
-import type { ResolutionString } from "charting_library";
+import type { ResolutionString } from "@/public/tradeview";
 
 export type Network = "solana";
 export type Aggregrate = "1" | "4" | "12" | "15" | "30";
