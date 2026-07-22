@@ -33,7 +33,7 @@ export function TokenDetailRail({ token }: TokenDetailRailProps) {
     <aside className="w-95 shrink-0 border-border/70 border-l">
       <ScrollArea className="h-[calc(100vh-4rem)]">
         <TimeframeStats token={token} />
-        <TradePanel />
+        <TradePanel token={token} />
         <SecurityStatsGrid token={token} />
         <DynamicPoolInfoCard token={token} />
         <DevInfoCard token={token} />

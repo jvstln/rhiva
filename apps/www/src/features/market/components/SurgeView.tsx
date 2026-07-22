@@ -41,6 +41,7 @@ import { formatSignedPercent } from "@/lib/finance.util";
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import { TokenAvatar } from "./tooltips/TokenAvatar";
+import { useRouter } from "next/navigation";
 
 interface TokenRowProps {
   token: Token;
@@ -48,6 +49,8 @@ interface TokenRowProps {
 
 function TokenRow({ token }: TokenRowProps) {
   const timeframe = useMarketStore((state) => state.surgeFilters.timeframe);
+  const router = useRouter();
+
   const priceChange = token.price_change_percent ?? 0;
   const priceIsUp = priceChange >= 0;
 
@@ -61,7 +64,13 @@ function TokenRow({ token }: TokenRowProps) {
   const volumeUsd = timeframeData?.volume_usd ?? 0;
 
   return (
-    <div className="flex items-center gap-6 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60">
+    <article
+      className="group/token-display flex items-center gap-6 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60"
+      onKeyDown={() => null}
+      onClick={() => {
+        router.push(`/token/${token.mint}`);
+      }}
+    >
       {/* Token identity */}
       <div className="flex min-w-0 max-w-100 flex-1 basis-3/10 gap-3">
         <TokenAvatar token={token} />
@@ -392,7 +401,13 @@ function TokenRow({ token }: TokenRowProps) {
             </span>
 
             <span className="text-up">
-              {formatSignedPercent(token.last_surge_pct ?? token.price_change_percent ?? timeframeData?.price_change_percent ?? 0, 1)}
+              {formatSignedPercent(
+                token.last_surge_pct ??
+                  token.price_change_percent ??
+                  timeframeData?.price_change_percent ??
+                  0,
+                1,
+              )}
             </span>
           </div>
 
@@ -498,7 +513,7 @@ function TokenRow({ token }: TokenRowProps) {
           V {formatCompactCurrency(volumeUsd)}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 

@@ -34,6 +34,7 @@ import {
 import type { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
 import { TokenAvatar } from "./tooltips/TokenAvatar";
+import { useRouter } from "next/navigation";
 
 interface TokenCardProps {
   token: Token;
@@ -112,8 +113,16 @@ const RADAR_METRICS: RadarMetric[] = [
 ];
 
 export function RadarTokenCard({ token, column }: TokenCardProps) {
+  const router = useRouter();
+
   return (
-    <article className="group/token-display border-border/70 border-b px-4 py-4 last:border-none">
+    <article
+      className="group/token-display border-border/70 border-b px-4 py-4 last:border-none"
+      onKeyDown={() => null}
+      onClick={() => {
+        router.push(`/token/${token.mint}`);
+      }}
+    >
       <div className="flex items-center gap-3">
         {/* LEFT COLUMN: Avatar and Address */}
         <div className="flex shrink-0 flex-col items-center gap-2">
