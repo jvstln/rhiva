@@ -152,7 +152,7 @@ export function Navbar() {
               data-active
               tooltip={wallets[0].address}
             >
-              {wallets[0].address.slice(10)}...
+              {wallets[0].address.slice(0, 10)}...
             </Button>
           </DisconnectWalletDialog>
         )}

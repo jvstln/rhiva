@@ -4,7 +4,7 @@ import { LogoIcon } from "@/public/logo-icon";
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (
-    <Loader2Icon
+    <LogoIcon
       data-slot="spinner"
       role="status"
       aria-label="Loading"
