@@ -41,6 +41,7 @@ import {
 } from "@/data/reward-data";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
+import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
 
 export type RewardQuest = {
   id: string;
@@ -648,11 +649,22 @@ export function RewardsPage() {
 
   return (
     <DashboardSlot>
-      <div>
-        <DashboardHeader>Point System</DashboardHeader>
-        <DashboardDescription>
-          Track your XP, level up, and climb the global ranks
-        </DashboardDescription>
+      <div className="flex justify-between">
+        <div>
+          <DashboardHeader>Point System</DashboardHeader>
+          <DashboardDescription>
+            Track your XP, level up, and climb the global ranks
+          </DashboardDescription>
+        </div>
+
+        <ClaimRewardsDialog />
+        {/* <Button
+            tooltip={"Claim your reward for trading upto $2000"}
+            className="not-hover:animate-pulse"
+          >
+            Claim gift
+          </Button>
+        </ClaimRewardsDialog> */}
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
