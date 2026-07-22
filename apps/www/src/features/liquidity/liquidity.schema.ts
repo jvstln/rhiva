@@ -9,9 +9,17 @@ export const PoolColumns = z.enum([
 ]);
 
 export const POOLS = [
-  { id: "meteora", icon: MeteoraIcon },
+  { id: "meteora-dlmm", icon: MeteoraIcon },
   { id: "orca", icon: OrcaIcon },
-  { id: "raydium", icon: RaydiumIcon },
+  { id: "raydium-clmm", icon: RaydiumIcon },
 ] as const;
 
-export type Pool = (typeof POOLS)[number]["id"];
+export type PoolDex = (typeof POOLS)[number]["id"];
+
+export const LiquidityPoolFilters = z
+  .object({
+    dex: z.enum(POOLS.map((p) => p.id)),
+    sort: z.enum(["bin_step"]),
+  })
+  .partial();
+export type LiquidityPoolFilters = z.infer<typeof LiquidityPoolFilters>;

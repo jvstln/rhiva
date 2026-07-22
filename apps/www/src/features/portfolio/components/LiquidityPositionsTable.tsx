@@ -190,7 +190,7 @@ export const LiquidityPositionsTable = () => {
             tableRow?.querySelector<HTMLElement>("[data-pool-id]")?.dataset
               .poolId;
 
-          if (poolId) router.push(`/liquidity/detail`);
+          if (poolId) router.push(`/liquidity/detail/${poolId}`);
         }}
         onKeyDown={() => null}
       >

@@ -3,12 +3,9 @@
 import {
   type ColumnDef,
   createColumnHelper,
-  type Row,
   type SortingState,
 } from "@tanstack/react-table";
 import { Rocket, Star } from "lucide-react";
-import type { Route } from "next";
-import Link from "next/link";
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,65 +17,19 @@ import {
 } from "@/components/ui/popover";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { POOLS as POOLS_DATA, type PoolRow } from "@/data/liquidity-data";
+import { useLiquidityPools } from "../liquidity.hook";
 import { gsap } from "@/lib/gsap.util";
-import { cn, getInitials } from "@/lib/utils";
-import { POOLS, type Pool } from "../liquidity.schema";
+import { cn, getInitials, formatCompactCurrency } from "@/lib/utils";
+import { POOLS, type PoolDex } from "../liquidity.schema";
 import { useLiquidityStore } from "../liquidity.store";
+import type { LiquidityPool } from "../liquidity.type";
+import { useRouter } from "next/navigation";
 
-const stats = [
-  { label: "Swap", value: "848", change: "+567%", color: "text-emerald-400" },
-  {
-    label: "Traders",
-    value: "273",
-    change: "+600%",
-    color: "text-emerald-400",
-  },
-  {
-    label: "Total LPs",
-    value: "16",
-    change: "+128%",
-    color: "text-emerald-400",
-  },
-  { label: "Net deposit", value: "$1.28k", change: null, color: "text-white" },
-  {
-    label: "Holders",
-    value: "999",
-    change: "+29.34%",
-    color: "text-emerald-400",
-  },
-  { label: "Avg Vol/", value: "$104.12", change: null, color: "text-white" },
-  { label: "Min Volatility", value: "6.2%", change: null, color: "text-white" },
-  {
-    label: "Top 10 Holders",
-    value: "22.34%",
-    change: null,
-    color: "text-orange-500",
-  },
-  {
-    label: "Dev Balance",
-    value: "0.25%",
-    change: null,
-    color: "text-cyan-400",
-  },
-];
-
-const parseNumericValue = (val: string): number => {
-  const clean = val.replace(/[$,%]/g, "").trim();
-  if (clean.toLowerCase().endsWith("k")) return parseFloat(clean) * 1000;
-  if (clean.toLowerCase().endsWith("m")) return parseFloat(clean) * 1000000;
-  if (clean.toLowerCase().endsWith("b")) return parseFloat(clean) * 1000000000;
-  return parseFloat(clean) || 0;
-};
-
-const numericSort = (
-  rowA: Row<PoolRow>,
-  rowB: Row<PoolRow>,
-  columnId: string,
-) => {
-  const a = parseNumericValue(rowA.getValue(columnId) as string);
-  const b = parseNumericValue(rowB.getValue(columnId) as string);
-  return a - b;
+const formatPercentString = (value?: string | number | null): string => {
+  if (value === undefined || value === null || value === "") return "N/A";
+  const num = Number(value);
+  if (Number.isNaN(num)) return "N/A";
+  return `${num.toLocaleString("en-US", { maximumFractionDigits: 3 })}%`;
 };
 
 function ValueChangeCell({ value, change }: { value: string; change: string }) {
@@ -132,32 +83,144 @@ function ZapInButton() {
   );
 }
 
-export function LinkWrapper({
-  className,
-  children,
-  href,
-}: {
-  className?: string;
-  children: React.ReactNode;
-  href?: Route;
-}) {
-  return (
-    <Link
-      href={href || "/liquidity/pool"}
-      className={cn("block", className)}
-    >
-      {children}
-    </Link>
-  );
-}
-
-const columnHelper = createColumnHelper<PoolRow>();
+const columnHelper = createColumnHelper<LiquidityPool>();
 
 export function PoolsTable() {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pool, setPool] = React.useState<Pool | "all">("all");
+  const [pool, setPool] = React.useState<PoolDex | "all">("all");
 
-  const columns = React.useMemo<ColumnDef<PoolRow>[]>(
+  const pools = useLiquidityPools();
+
+  const poolStats = React.useMemo(() => {
+    const poolsArr = pools.data?.pools ?? [];
+    const swapVolume = poolsArr.reduce(
+      (sum, pool) => sum + (pool.volume_24h_usd ?? 0),
+      0,
+    );
+    const totalLpCount = poolsArr.reduce(
+      (sum, pool) => sum + (pool.total_lps ?? 0),
+      0,
+    );
+    const tradersCount = poolsArr.reduce(
+      (sum, pool) => sum + (pool.traders_24h ?? 0),
+      0,
+    );
+    const netDeposit = poolsArr.reduce(
+      (sum, pool) => sum + (pool.net_deposit_usd ?? 0),
+      0,
+    );
+    const holdersCount = poolsArr.reduce(
+      (sum, pool) => sum + (pool.holders_count ?? 0),
+      0,
+    );
+    const avgVolume = poolsArr.length > 0 ? swapVolume / poolsArr.length : null;
+    const minVolatility = poolsArr.reduce<number | null>((current, pool) => {
+      const value = pool.min_volatility_pct;
+      if (value === undefined || value === null) return current;
+      if (current === null) return value;
+      return Math.min(current, value);
+    }, null);
+    const top10Holders = poolsArr.reduce<number | null>((current, pool) => {
+      const value = pool.top10_holder_pct;
+      if (value === undefined || value === null) return current;
+      if (current === null) return value;
+      return current + value;
+    }, null);
+    const devBalance = poolsArr.reduce<number | null>((current, pool) => {
+      const value = pool.dev_balance_pct;
+      if (value === undefined || value === null) return current;
+      if (current === null) return value;
+      return current + value;
+    }, null);
+
+    return {
+      swap: swapVolume,
+      traders: tradersCount > 0 ? tradersCount : null,
+      totalLps: totalLpCount > 0 ? totalLpCount : null,
+      netDeposit: netDeposit > 0 ? netDeposit : null,
+      holders: holdersCount > 0 ? holdersCount : null,
+      avgVolume,
+      minVolatility,
+      top10Holders,
+      devBalance,
+    };
+  }, [pools.data]);
+
+  const stats = React.useMemo(
+    () => [
+      {
+        label: "Swap",
+        value: poolStats.swap ? formatCompactCurrency(poolStats.swap) : "N/A",
+        change: null,
+        color: "text-emerald-400",
+      },
+      {
+        label: "Traders",
+        value: poolStats.traders?.toString() ?? "N/A",
+        change: null,
+        color: "text-emerald-400",
+      },
+      {
+        label: "Total LPs",
+        value: poolStats.totalLps?.toString() ?? "N/A",
+        change: null,
+        color: "text-emerald-400",
+      },
+      {
+        label: "Net deposit",
+        value: poolStats.netDeposit
+          ? formatCompactCurrency(poolStats.netDeposit)
+          : "N/A",
+        change: null,
+        color: "text-white",
+      },
+      {
+        label: "Holders",
+        value: poolStats.holders?.toString() ?? "N/A",
+        change: null,
+        color: "text-emerald-400",
+      },
+      {
+        label: "Avg Vol/",
+        value: poolStats.avgVolume
+          ? formatCompactCurrency(poolStats.avgVolume)
+          : "N/A",
+        change: null,
+        color: "text-white",
+      },
+      {
+        label: "Min Volatility",
+        value:
+          poolStats.minVolatility != null
+            ? formatPercentString(poolStats.minVolatility)
+            : "N/A",
+        change: null,
+        color: "text-white",
+      },
+      {
+        label: "Top 10 Holders",
+        value:
+          poolStats.top10Holders != null
+            ? formatPercentString(poolStats.top10Holders)
+            : "N/A",
+        change: null,
+        color: "text-orange-500",
+      },
+      {
+        label: "Dev Balance",
+        value:
+          poolStats.devBalance != null
+            ? formatPercentString(poolStats.devBalance)
+            : "N/A",
+        change: null,
+        color: "text-cyan-400",
+      },
+    ],
+    [poolStats],
+  );
+
+  const columns = React.useMemo<ColumnDef<LiquidityPool>[]>(
     () => [
       {
         id: "pool",
@@ -165,7 +228,7 @@ export function PoolsTable() {
           return (
             <ToggleGroup
               defaultValue={[pool]}
-              onValueChange={([value]) => setPool(value as Pool)}
+              onValueChange={([value]) => setPool(value as PoolDex)}
             >
               <ToggleGroupItem value="all">All pools</ToggleGroupItem>
               {POOLS.map((pool) => (
@@ -193,19 +256,23 @@ export function PoolsTable() {
                 : MeteoraIcon;
 
           return (
-            <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-2"
+              data-pool-id={poolRow.pool_address}
+            >
               <Button
                 size="icon-sm"
                 variant={"ghost"}
                 aria-label="Add to watchlist"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 <Star />
               </Button>
 
-              <LinkWrapper
-                href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-                className="flex items-center gap-3"
-              >
+              <div className="flex items-center gap-3">
                 <Avatar className="size-9 ring-2 ring-background">
                   <AvatarImage
                     src={`https://picsum.photos/seed/${poolRow.pair}/200`}
@@ -224,7 +291,7 @@ export function PoolsTable() {
                   </p>
                   <p className="text-muted-foreground text-xs">{poolRow.age}</p>
                 </div>
-              </LinkWrapper>
+              </div>
             </div>
           );
         },
@@ -235,16 +302,11 @@ export function PoolsTable() {
         accessorKey: "marketCap",
         header: "Market Cap",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.marketCap}
-              change={row.original.marketCapChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.marketCap}
+            change={row.original.marketCapChange}
+          />
         ),
-        sortingFn: numericSort,
         size: 100,
       },
       {
@@ -252,16 +314,11 @@ export function PoolsTable() {
         accessorKey: "tvl",
         header: "TVL",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.tvl}
-              change={row.original.tvlChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.tvl}
+            change={row.original.tvlChange}
+          />
         ),
-        sortingFn: numericSort,
         size: 100,
       },
       {
@@ -269,16 +326,11 @@ export function PoolsTable() {
         accessorKey: "activeTvl",
         header: "Active TVL",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.activeTvl}
-              change={row.original.activeTvlChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.activeTvl}
+            change={row.original.activeTvlChange}
+          />
         ),
-        sortingFn: numericSort,
         size: 100,
       },
       {
@@ -286,16 +338,12 @@ export function PoolsTable() {
         accessorKey: "fees",
         header: "Fees",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.fees}
-              change={row.original.feesChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.fees}
+            change={row.original.feesChange}
+          />
         ),
-        sortingFn: numericSort,
+
         size: 100,
       },
       {
@@ -303,48 +351,36 @@ export function PoolsTable() {
         accessorKey: "feesRatio",
         header: "Fees/Active TVL",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.feesRatio}
-              change={row.original.feesRatioChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.feesRatio}
+            change={row.original.feesRatioChange}
+          />
         ),
-        sortingFn: numericSort,
+
         size: 100,
       },
       {
         accessorKey: "volume",
         header: "Vol",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.volume}
-              change={row.original.volumeChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.volume}
+            change={row.original.volumeChange}
+          />
         ),
-        sortingFn: numericSort,
+
         size: 100,
       },
       {
         accessorKey: "volumeRatio",
         header: "Vol/Active TVL",
         cell: ({ row }) => (
-          <LinkWrapper
-            href={`/liquidity/pool?dex=${pool === "all" ? (["meteora", "orca", "raydium"] as const)[row.index % 3] : pool}`}
-          >
-            <ValueChangeCell
-              value={row.original.volumeRatio}
-              change={row.original.volumeRatioChange}
-            />
-          </LinkWrapper>
+          <ValueChangeCell
+            value={row.original.volumeRatio}
+            change={row.original.volumeRatioChange}
+          />
         ),
-        sortingFn: numericSort,
+
         size: 100,
       },
       columnHelper.display({
@@ -406,11 +442,13 @@ export function PoolsTable() {
         enableSorting: false,
       },
     ],
-    [pool],
+    [pool, stats],
   );
 
+  const poolRows = React.useMemo(() => pools.data?.pools ?? [], [pools.data]);
+
   const table = useDataTable({
-    data: POOLS_DATA,
+    data: poolRows,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -422,16 +460,35 @@ export function PoolsTable() {
   );
 
   return (
-    <DataTable
-      table={table}
-      classNames={{
-        table: "w-full",
-        th: cn("normal-case", pinnedColumnClassName),
-        td: cn(
-          "has-data-[slot=value-change-cell]:text-center",
-          pinnedColumnClassName,
-        ),
+    <nav
+      onClick={(e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+
+        const poolId = e.target
+          .closest("tr:has([data-pool-id])")
+          ?.querySelector<HTMLElement>("[data-pool-id]")?.dataset.poolId;
+
+        if (poolId) {
+          const route = `/liquidity/pool/${poolId}` as Parameters<
+            typeof router.push
+          >[0];
+
+          router.push(route);
+        }
       }}
-    />
+      onKeyDown={() => null}
+    >
+      <DataTable
+        table={table}
+        classNames={{
+          table: "w-full",
+          th: cn("normal-case", pinnedColumnClassName),
+          td: cn(
+            "has-data-[slot=value-change-cell]:text-center",
+            pinnedColumnClassName,
+          ),
+        }}
+      />
+    </nav>
   );
 }
