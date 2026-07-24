@@ -1,3 +1,6 @@
 [submodule "apps/www/public/static/charting_library"]
 	path = apps/www/public/static/charting_library
 	url = git@github.com:rhivadotfun/tradeview.git
+[submodule "modules/server"]
+	path = modules/server
+	url = git@github.com:rhivadotfun/server.git
