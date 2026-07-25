@@ -5,7 +5,7 @@ import DexAPI from "./dex";
 import SwapAPI from "./swap.api";
 import UserAPI from "./user.api";
 
-export default class API {
+export default class {
   readonly dex: DexAPI;
   readonly swap: SwapAPI;
   readonly user: UserAPI;

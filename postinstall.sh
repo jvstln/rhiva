@@ -19,8 +19,13 @@ git update-index --skip-worktree biome.json
 if [ -f "biome.json" ]; then
   rm biome.json
 fi 
+cd ../../..
 
-cd -
+cd terminal-trading-backend
+git update-index --skip-worktree biome.json
+if [ -f "biome.json" ]; then
+  rm biome.json
+fi 
+cd ../..
 
-cd -
 bun run build

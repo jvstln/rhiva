@@ -16,5 +16,8 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --minify --treeshake"
+  },
+  "dependencies": {
+    "@rhivadotfun/dataapi-types": "*"
   }
 }
