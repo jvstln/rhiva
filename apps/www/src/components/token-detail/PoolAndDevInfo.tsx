@@ -18,7 +18,7 @@ function shortenAddress(value?: string | null) {
 }
 
 export function DynamicPoolInfoCard({ token }: TokenDetailCardProps) {
-  const liquidity = token.live?.dexscreener_liquidity_usd;
+  const liquidity = token.liquidityUsd;
 
   return (
     <InfoSection title="Dynamic BC Pool Info">
@@ -41,7 +41,7 @@ export function DynamicPoolInfoCard({ token }: TokenDetailCardProps) {
           {token.symbol ?? token.name ?? "Token"}
         </span>
         <span className="text-white">
-          {token.live?.dexscreener_liquidity_usd ? "Live" : "N/A"}
+          {token.liquidityUsd ? "Live" : "N/A"}
         </span>
         <span className="text-right text-white">
           {liquidity !== undefined ? formatCompactCurrency(liquidity) : "N/A"}
@@ -49,14 +49,10 @@ export function DynamicPoolInfoCard({ token }: TokenDetailCardProps) {
       </div>
       <div className="grid grid-cols-3 gap-2 py-0.5 text-b-4">
         <span className="text-white">SOL</span>
-        <span className="text-up">
-          {token.bonding?.completion_pct !== undefined
-            ? `${token.bonding.completion_pct.toFixed(1)}%`
-            : "N/A"}
-        </span>
+        <span className="text-up">N/A</span>
         <span className="text-right text-white">
-          {token.live?.dexscreener_liquidity_usd !== undefined
-            ? formatCompactCurrency(token.live.dexscreener_liquidity_usd)
+          {token.liquidityUsd !== undefined
+            ? formatCompactCurrency(token.liquidityUsd)
             : "N/A"}
         </span>
       </div>
@@ -71,7 +67,7 @@ export function DevInfoCard({ token }: TokenDetailCardProps) {
         label="DEV"
         value={
           <span className="flex items-center gap-1 font-medium">
-            {shortenAddress(token.creator ?? token.mint)}
+            {shortenAddress(token.dev.address ?? token.mint)}
             <Copy className="size-3 text-gray" />
             <Search className="size-3 text-gray" />
           </span>
@@ -82,7 +78,7 @@ export function DevInfoCard({ token }: TokenDetailCardProps) {
         value={
           <span className="flex items-center gap-1 font-medium">
             <ExternalLink className="size-3 text-gray" />{" "}
-            {formatCompactNumber(token.holders?.dev_balance)} SOL
+            {formatCompactNumber(token.dev.tokenBalance)} SOL
           </span>
         }
       />
@@ -96,24 +92,24 @@ export function BasicDataCard({ token }: TokenDetailCardProps) {
       <InfoRow
         label="Market cap"
         value={
-          token.live?.dexscreener_market_cap_usd !== undefined
-            ? formatCompactCurrency(token.live.dexscreener_market_cap_usd)
+          token.marketCapUsd !== undefined
+            ? formatCompactCurrency(token.marketCapUsd)
             : "N/A"
         }
       />
       <InfoRow
         label="Holders"
         value={
-          token.holders?.holder_count !== undefined
-            ? formatCompactNumber(token.holders.holder_count)
+          token.holders.total !== undefined
+            ? formatCompactNumber(token.holders.total)
             : "N/A"
         }
       />
       <InfoRow
         label="Total supply"
         value={
-          token.total_supply !== undefined
-            ? formatCompactNumber(token.total_supply)
+          token.totalSupply !== undefined
+            ? formatCompactNumber(token.totalSupply)
             : "N/A"
         }
       />
@@ -121,18 +117,17 @@ export function BasicDataCard({ token }: TokenDetailCardProps) {
         label="Pair"
         value={
           <span className="flex items-center gap-1">
-            {shortenAddress(token.pair_address)}{" "}
-            <Copy className="size-3 text-gray" />
+            {shortenAddress(token.mint)} <Copy className="size-3 text-gray" />
           </span>
         }
       />
       <InfoRow
         label="Token created"
-        value={formatDate(token.created_at ?? token.live?.updated_at)}
+        value={formatDate(Number(token.updatedAt))}
       />
       <InfoRow
         label="Pool created"
-        value={formatDate(token.pool_created_at ?? token.created_at)}
+        value={formatDate(Number(token.updatedAt))}
       />
     </InfoSection>
   );

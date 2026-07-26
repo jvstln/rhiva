@@ -96,10 +96,7 @@ function TokenRow({ token }: TokenRowProps) {
             <span className="shrink-0 text-up">
               {formatAge(token.recent_listing_time)}
             </span>
-            <Separator
-              orientation="vertical"
-              className="h-4/5 self-center"
-            />
+            <Separator orientation="vertical" className="h-4/5 self-center" />
             <span className="truncate">
               {token.mint.slice(0, 4)}...{token.mint.slice(-4)}
             </span>
@@ -172,10 +169,7 @@ function TokenRow({ token }: TokenRowProps) {
                         value={`${formatCompactCurrency(volumeSellUsd * 0.08)} / ${Math.floor(sellCount * 0.1)}TXs`}
                         valueClassName="text-down"
                       />
-                      <InfoBadgeTooltipRow
-                        label="Balance"
-                        value="$0"
-                      />
+                      <InfoBadgeTooltipRow label="Balance" value="$0" />
                       <InfoBadgeTooltipRow
                         label="Funding"
                         value={
@@ -211,10 +205,7 @@ function TokenRow({ token }: TokenRowProps) {
                 variant="badge"
                 className="[--accent:var(--color-warn)]"
                 tooltip={
-                  <InfoBadgeTooltipRow
-                    label="Insiders hold"
-                    value="8.04%"
-                  />
+                  <InfoBadgeTooltipRow label="Insiders hold" value="8.04%" />
                 }
               >
                 <RabbitIcon /> 8.04%
@@ -297,10 +288,7 @@ function TokenRow({ token }: TokenRowProps) {
               <InfoBadge
                 variant={"badge"}
                 tooltip={
-                  <InfoBadgeTooltipRow
-                    label="Phishing hold"
-                    value="5%"
-                  />
+                  <InfoBadgeTooltipRow label="Phishing hold" value="5%" />
                 }
                 className="[--accent:var(--color-down)]"
               >
@@ -308,24 +296,14 @@ function TokenRow({ token }: TokenRowProps) {
               </InfoBadge>
               <InfoBadge
                 variant={"badge"}
-                tooltip={
-                  <InfoBadgeTooltipRow
-                    label="Vanish hold"
-                    value="5%"
-                  />
-                }
+                tooltip={<InfoBadgeTooltipRow label="Vanish hold" value="5%" />}
                 className="[--accent:var(--color-up)]"
               >
                 <WormIcon /> 5%
               </InfoBadge>
               <InfoBadge
                 variant={"badge"}
-                tooltip={
-                  <InfoBadgeTooltipRow
-                    label="Fresh hold"
-                    value="5%"
-                  />
-                }
+                tooltip={<InfoBadgeTooltipRow label="Fresh hold" value="5%" />}
                 className="[--accent:var(--color-up)]"
               >
                 <PalmtreeIcon /> 5%
@@ -366,12 +344,7 @@ function TokenRow({ token }: TokenRowProps) {
               </InfoBadge>
               <InfoBadge
                 variant={"badge"}
-                tooltip={
-                  <InfoBadgeTooltipRow
-                    label="Rugged hold"
-                    value="5%"
-                  />
-                }
+                tooltip={<InfoBadgeTooltipRow label="Rugged hold" value="5%" />}
                 className="[--accent:var(--color-down)]"
               >
                 <BikeIcon /> 5%
@@ -382,10 +355,7 @@ function TokenRow({ token }: TokenRowProps) {
         </div>
       </div>
 
-      <Separator
-        orientation="vertical"
-        className=""
-      />
+      <Separator orientation="vertical" className="" />
 
       {/* Market data */}
       <div className="flex min-w-0 flex-1 basis-2/4 flex-col justify-center gap-1.5 text-b-4">
@@ -443,10 +413,7 @@ function TokenRow({ token }: TokenRowProps) {
         </div>
       </div>
 
-      <Separator
-        orientation="vertical"
-        className=""
-      />
+      <Separator orientation="vertical" className="" />
 
       {/* Activity + buy */}
       <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
@@ -466,18 +433,9 @@ function TokenRow({ token }: TokenRowProps) {
             className="[--accent:var(--color-warn)]"
             tooltip={
               <div>
-                <InfoBadgeTooltipRow
-                  label="Dev Migrated"
-                  value="1"
-                />
-                <InfoBadgeTooltipRow
-                  label="Dev Launched"
-                  value="1"
-                />
-                <InfoBadgeTooltipRow
-                  label="Migrated"
-                  value="100%"
-                />
+                <InfoBadgeTooltipRow label="Dev Migrated" value="1" />
+                <InfoBadgeTooltipRow label="Dev Launched" value="1" />
+                <InfoBadgeTooltipRow label="Migrated" value="100%" />
               </div>
             }
           >
@@ -504,10 +462,7 @@ function TokenRow({ token }: TokenRowProps) {
           </InfoBadge>
         </div>
 
-        <Separator
-          className="w-1/4! grow-0"
-          orientation="horizontal"
-        />
+        <Separator className="w-1/4! grow-0" orientation="horizontal" />
 
         <div className="w-full text-right text-b-5 text-gray">
           V {formatCompactCurrency(volumeUsd)}
@@ -523,15 +478,9 @@ export function SurgeTable() {
 
   return (
     <div className="w-full">
-      <QueryState
-        query={query}
-        getIsLoading={(q) => q.isPending}
-      >
+      <QueryState query={query} getIsLoading={(q) => q.isPending}>
         {query.data?.tokens?.map((token) => (
-          <TokenRow
-            key={token.mint}
-            token={token}
-          />
+          <TokenRow key={token.mint} token={token} />
         ))}
       </QueryState>
     </div>
@@ -543,14 +492,8 @@ const SurgeBuyButton = () => {
 
   return (
     quickBuy !== null && (
-      <Button
-        size="sm"
-        variant={"soft"}
-      >
-        <Zap
-          className="size-3"
-          fill="currentColor"
-        />
+      <Button size="sm" variant={"soft"}>
+        <Zap className="size-3" fill="currentColor" />
 
         <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
           Buy

@@ -1,4 +1,7 @@
 import type { Timeframe } from "./market.schema";
+import type { mapToken } from "./market.util";
+
+export type Token = ReturnType<typeof mapToken>;
 
 export type TimeframeMetrics = {
   volume_usd: number | null;
@@ -11,9 +14,111 @@ export type TimeframeMetrics = {
   price_change_percent: number | null;
 };
 
-export type Token = {
+export type TimeframeWindowMetrics = {
+  swaps?: number;
+  buys?: number;
+  sells?: number;
+  traders?: number;
+  volume_usd?: number | null;
+  volume_sol?: number | null;
+  price_change_pct?: number | null;
+  avg_vol_per_min_usd?: number;
+  open?: number;
+  high?: number;
+  low?: number;
+  close?: number;
+  // Legacy aliases
+  trade_count?: number;
+  buy?: number;
+  sell?: number;
+  volume_buy_usd?: number | null;
+  volume_sell_usd?: number | null;
+  unique_wallet?: number;
+  price_change_percent?: number | null;
+};
+
+export type RawTokenTimeframes = {
+  created_at_ms?: number;
+  age_seconds?: number;
+  last_price_usd?: number;
+  windows?: Record<string, TimeframeWindowMetrics>;
+  fees?: {
+    total_fee_sol?: number;
+    avg_fee_bps?: number | null;
+    total_creator_fee_sol?: number;
+    avg_creator_fee_bps?: number | null;
+    total_cashback_sol?: number;
+    trades_with_fee?: number;
+  };
+};
+
+export type RawSniperItem = {
+  wallet: string;
+  first_buy_slot_delta: number;
+  buys_in_window: number;
+  tokens_bought: number;
+  sol_spent: number;
+};
+
+export type RawSnipers = {
+  creation_slot: number;
+  window_slots: number;
+  sniper_count: number;
+  snipers: RawSniperItem[];
+};
+
+export type RawBundleCluster = {
+  cluster_key: string;
+  kind: string;
+  wallets: string[];
+  combined_sol: number;
+  combined_tokens: number;
+  pct_of_early_sol: number;
+};
+
+export type RawBundlers = {
+  creation_slot: number;
+  window_slots: number;
+  early_buyer_count: number;
+  total_early_sol: number;
+  bundle_cluster_count: number;
+  bundled_wallet_count: number;
+  bundled_pct_of_early_sol: number;
+  clusters: RawBundleCluster[];
+};
+
+export type RawInsiders = {
+  creator_wallet: string;
+  creator_funder: string;
+  insider_count: number;
+  insiders: any[];
+};
+
+export type RawToken = {
   mint: string;
-  live: Partial<{
+  name?: string;
+  symbol?: string;
+  logo_uri?: string;
+  description?: string | null;
+  creator?: string;
+  stage?: string | null;
+  recent_listing_time?: number;
+  price_change_percent?: number;
+  buys?: number;
+  sells?: number;
+  bundled_supply?: number;
+  sniper_holdings?: number;
+  whale_holdings?: number;
+  bot_activity?: number;
+  audit_score?: number | null;
+  global_fees_paid?: number | null;
+  market_cap_usd?: number;
+  market_cap_sol?: number;
+  fdv_usd?: number;
+  liquidity_usd?: number;
+  price_usd?: number;
+
+  live?: Partial<{
     txns_1m: number;
     updated_at: number;
     dexscreener_market_cap_usd: number;
@@ -30,14 +135,16 @@ export type Token = {
     social_updated_at: number;
     has_paid_order: number;
   }> | null;
-  holders: Partial<{
+
+  holders?: Partial<{
     holder_count: number;
     top10_holder_pct: number;
     dev_balance: number;
     dev_holder_pct: number;
     last_update_ms: number;
   }> | null;
-  social: Partial<{
+
+  social?: Partial<{
     website_url: string;
     twitter_handle: string;
     twitter_url: string;
@@ -50,40 +157,29 @@ export type Token = {
     dexscreener_market_cap_usd: number;
     last_update_ms: number;
   }> | null;
-  bonding: Partial<{
-    completion_pct: number;
-    stage: "new_creation" | "near_completion" | "completed";
+
+  bonding?: Partial<{
+    completion_pct: number | null;
+    stage: string | null;
+    virtual_sol_reserves?: number | null;
   }> | null;
 
-  logo_uri?: string;
-  name?: string;
-  symbol?: string;
-  buys?: number;
-  sells?: number;
-  price_change_percent?: number;
-  creator?: string;
-  global_fees_paid?: number;
-  audit_score?: number;
-  bundled_supply?: number;
-  whale_holdings?: number;
-  sniper_holdings?: number;
-  bot_activity?: number;
-  recent_listing_time?: number;
-  description?: string;
+  timeframes?:
+    | RawTokenTimeframes
+    | Partial<Record<Timeframe, TimeframeMetrics>>
+    | null;
+  snipers?: RawSnipers | null;
+  bundlers?: RawBundlers | null;
+  insiders?: RawInsiders | null;
+  safety?: any | null;
 
-  // Not Available
   total_supply?: number;
   pair_address?: string;
   created_at?: number | null;
   pool_created_at?: number | null;
-  /** defaulted to 9 (SOL standard) */
   decimals?: number;
-  timeframes?: Partial<Record<Timeframe, TimeframeMetrics>>;
-  /** All-time-high market cap in USD (when available from surge API) */
   ath_mcap_usd?: number;
-  /** Last surge percent (surge-specific payload) — mapped from surge API */
   last_surge_pct?: number;
-  /** Optional rank or position string from surge/radar endpoints (e.g. "8/297") */
   rank?: string;
 };
 

@@ -1,5 +1,12 @@
 "use client";
-import { AtSign, ChefHat, Copy, EyeOff, User } from "lucide-react";
+import {
+  AtSign,
+  ChefHat,
+  Copy,
+  EyeOff,
+  MessageSquareText,
+  User,
+} from "lucide-react";
 import type React from "react";
 import { useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,9 +24,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLinkItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { siGoogle } from "simple-icons";
+import { siGoogle, siX } from "simple-icons";
+import { useCopyToClipboard } from "@/hooks/use-clipboard";
+import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
 
 const TokenAvatarBorderSvg = ({
   strokeLengthInPercent = 0,
@@ -90,7 +100,7 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
             variant="square"
             className={cn("group/image relative size-full shrink-0")}
           >
-            <AvatarImage src={token.logo_uri ?? ""} />
+            <AvatarImage src={token.image ?? ""} />
             <AvatarFallback>
               {token.name ? getInitials(token.name) : <User />}
             </AvatarFallback>
@@ -98,12 +108,12 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
 
           <TokenAvatarBorderSvg
             className="stroke-accent"
-            strokeLengthInPercent={40}
+            strokeLengthInPercent={token.bondingPercent}
           />
           <PumpFunIcon className="translate-1/2 absolute right-0 bottom-0 z-10 size-2 rounded-full border border-current bg-background p-px text-accent sm:size-3" />
 
           {/* Actions */}
-          <div className="-translate-x-1/2 -top-3 pointer-events-none absolute left-0 flex flex-col opacity-0 transition-all *:bg-background group-hover/token-avatar:pointer-events-auto group-hover/token-avatar:opacity-100">
+          <div className="pointer-events-none absolute -top-3 left-0 flex -translate-x-1/2 flex-col opacity-0 transition-all *:bg-background group-hover/token-avatar:pointer-events-auto group-hover/token-avatar:opacity-100">
             <Button
               size="icon-xs"
               variant="outline"
@@ -137,7 +147,7 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
           variant="square"
           className={"size-[236px]"}
         >
-          <AvatarImage src={token.logo_uri ?? ""} />
+          <AvatarImage src={token.image ?? ""} />
           <AvatarFallback>
             {token.name ? getInitials(token.name) : <User />}
           </AvatarFallback>
@@ -148,10 +158,12 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
 }
 
 export function TokenNameAndSymbol({ token }: { token: Token }) {
+  const { copy } = useCopyToClipboard();
+
   return (
     <DropdownMenu>
-      <div className="flex items-center gap-1 text-base">
-        <span className="truncate font-semibold">{token.name ?? "N/A"}</span>
+      <div className="flex items-center gap-1 text-sm">
+        <span className="truncate font-semibold">{token.name}</span>
         <DropdownMenuTrigger
           className="flex items-center gap-1 text-muted-foreground"
           onClick={(e) => {
@@ -161,8 +173,8 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
           openOnHover
           delay={0}
         >
-          <span className="truncate">{token.symbol ?? "N/A"}</span>
-          <Copy className="size-3.5" />
+          <span className="truncate">{token.symbol}</span>
+          <Copy className="size-3" />
         </DropdownMenuTrigger>
       </div>
 
@@ -170,19 +182,47 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
         align="center"
         className="w-fit max-w-62.5"
       >
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => copy(token.mint)}>
           <Copy />
           Copy
           <span className="truncate">{token.mint}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="truncate">
-          <Copy /> Copy <span className="truncate">{token.name}</span>
+        <DropdownMenuItem
+          className="truncate"
+          onClick={() => copy(token.symbol)}
+        >
+          <Copy /> Copy <span className="truncate">{token.symbol}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="truncate">
+        <DropdownMenuLinkItem
+          target="_blank"
+          href={`https://google.com/search?q=${token.symbol}+token`}
+          className="truncate"
+        >
           <SimpleIcon icon={siGoogle} /> Google for{" "}
-          <span className="truncate">{token.name}</span>
-        </DropdownMenuItem>
+          <span className="truncate">{token.symbol}</span>
+        </DropdownMenuLinkItem>
+        <DropdownMenuLinkItem
+          target="_blank"
+          href={`https://x.com/search?q=${token.symbol}+token&src=typed_query`}
+          className="truncate"
+        >
+          <SimpleIcon
+            icon={siX}
+            className="text-foreground"
+          />
+          X search for <span className="truncate">{token.symbol}</span>
+        </DropdownMenuLinkItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function TokenDescription({ token }: { token: Token }) {
+  if (!token.description) return null;
+
+  return (
+    <InfoBadge tooltip={<InfoBadgeTooltipRow label={token.description} />}>
+      <MessageSquareText />
+    </InfoBadge>
   );
 }

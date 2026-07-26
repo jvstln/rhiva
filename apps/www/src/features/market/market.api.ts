@@ -7,11 +7,11 @@ import type {
   TokenCandleFilters,
   TrendingFilters,
 } from "./market.type";
-import { mapToToken } from "./market.util";
+import { mapToken } from "./market.util";
 
 export const getToken = async (mint: string) => {
-  const response = await api.get<any>(`/token/${mint}`);
-  return mapToToken(response.data);
+  const response = await api.get(`/token/${mint}`);
+  return mapToken(response.data);
 };
 
 export const getTrendingTokens = async (
@@ -75,7 +75,7 @@ export const getSurgeTokens = async (params: SurgeFilters) => {
     params,
   });
 
-  const tokens: Token[] = response.data.map((r) => mapToToken(r));
+  const tokens: Token[] = response.data.map((r) => mapToken(r));
 
   return { tokens };
 };

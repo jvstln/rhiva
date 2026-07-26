@@ -47,14 +47,14 @@ export const TokenChart = ({ token }: TokenChartProps) => {
           address: token.mint,
           name: token.name ?? token.mint,
           symbol: token.symbol ?? "???",
-          image_url: token.logo_uri ?? "",
+          image_url: token.image ?? "",
           // decimals is currently not available from the token API — defaulted to 9 (SOL standard)
           decimals: token.decimals ?? 9,
         },
         // No dex/pool context at the token level; treated as a bare token (no quote_token)
       },
     }),
-    [token.mint, token.name, token.symbol, token.logo_uri, token.decimals],
+    [token.mint, token.name, token.symbol, token.image, token.decimals],
   );
 
   // getBars fetches candles directly (not via hook) because it's called inside

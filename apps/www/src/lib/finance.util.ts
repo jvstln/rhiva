@@ -13,13 +13,14 @@ import {
   SwissFranc,
 } from "lucide-react";
 
-export function formatCompactCurrency(value?: number | null): string {
+export function formatCompactCurrency(value?: number | string | null): string {
   if (value === null || value === undefined) return "N/A";
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}b`;
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}m`;
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(2)}k`;
-  return `$${value.toFixed(2)}`;
+  const abs = Math.abs(Number(value));
+  if (abs >= 1_000_000_000)
+    return `$${(Number(value) / 1_000_000_000).toFixed(2)}b`;
+  if (abs >= 1_000_000) return `$${(Number(value) / 1_000_000).toFixed(2)}m`;
+  if (abs >= 1_000) return `$${(Number(value) / 1_000).toFixed(2)}k`;
+  return `$${Number(value).toFixed(2)}`;
 }
 
 /** "+23.45%", "-4.10%" */

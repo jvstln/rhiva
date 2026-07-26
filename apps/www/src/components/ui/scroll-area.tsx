@@ -69,20 +69,20 @@ function ScrollBar({
       </ScrollAreaPrimitive.Scrollbar>
       {showIndicator && orientation === "horizontal" && (
         <>
-          <div className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-0 hidden h-full w-8 items-center justify-end bg-linear-to-l from-background to-transparent pr-1 group-data-overflow-x-end:flex">
+          <div className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-0 hidden h-full w-8 items-center justify-end bg-linear-to-l from-background/20 to-transparent pr-1 group-data-overflow-x-end:flex">
             <ChevronRight className="size-4 text-muted-foreground" />
           </div>
-          <div className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-0 hidden h-full w-8 items-center justify-start bg-linear-to-r from-background to-transparent pl-1 group-data-overflow-x-start:flex">
+          <div className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-0 hidden h-full w-8 items-center justify-start bg-linear-to-r from-background/20 to-transparent pl-1 group-data-overflow-x-start:flex">
             <ChevronLeft className="size-4 text-muted-foreground" />
           </div>
         </>
       )}
       {showIndicator && orientation === "vertical" && (
         <>
-          <div className="-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 hidden h-8 w-full items-end justify-center bg-linear-to-t from-background to-transparent pb-1 group-data-overflow-y-end:flex">
+          <div className="-translate-x-1/2 pointer-events-none absolute bottom-0 left-1/2 hidden h-8 w-full items-end justify-center bg-linear-to-t from-background/20 to-transparent pb-1 group-data-overflow-y-end:flex">
             <ChevronDown className="size-4 text-muted-foreground" />
           </div>
-          <div className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2 hidden h-8 w-full items-start justify-center bg-linear-to-b from-background to-transparent pt-1 group-data-overflow-y-start:flex">
+          <div className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2 hidden h-8 w-full items-start justify-center bg-linear-to-b from-background/20 to-transparent pt-1 group-data-overflow-y-start:flex">
             <ChevronUp className="size-4 text-muted-foreground" />
           </div>
         </>

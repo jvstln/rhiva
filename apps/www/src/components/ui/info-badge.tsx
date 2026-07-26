@@ -42,6 +42,8 @@ export const InfoBadge = ({
   tooltip,
   ...props
 }: InfoBadgeProps) => {
+  const variableClassName = className?.split(/\s+/).filter((c) => /--/.test(c));
+
   const content = (
     <span
       data-slot="info-badge"
@@ -58,26 +60,13 @@ export const InfoBadge = ({
 
   if (!tooltip) return content;
 
-  // return (
-  //   <HoverCard>
-  //     <HoverCardTrigger delay={300}>{content}</HoverCardTrigger>
-  //     <HoverCardContent
-  //       side="bottom"
-  //       align="center"
-  //       className={"w-fit max-w-[280px]"}
-  //     >
-  //       {tooltip}
-  //     </HoverCardContent>
-  //   </HoverCard>
-  // );
-
   return (
     <Tooltip>
       <TooltipTrigger>{content}</TooltipTrigger>
       <TooltipContent
         side="bottom"
         align="center"
-        className="max-w-[280px] font-geist"
+        className={cn("max-w-[280px] font-geist", variableClassName)}
       >
         {tooltip}
       </TooltipContent>

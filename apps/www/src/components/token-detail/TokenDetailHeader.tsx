@@ -48,8 +48,8 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
     {
       label: "Total supply",
       value:
-        token.total_supply !== undefined
-          ? formatCompactNumber(token.total_supply)
+        token.totalSupply !== undefined
+          ? formatCompactNumber(token.totalSupply)
           : "N/A",
     },
     {

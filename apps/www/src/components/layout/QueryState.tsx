@@ -114,7 +114,7 @@ const LoadingState = ({ classNames, loadingText }: LoadingStateProps) => {
         classNames?.loadingRoot,
       )}
     >
-      <Spinner className="size-20" />
+      <Spinner className="size-12" />
       {loadingText && <p className="animate-pulse text-sm">{loadingText}</p>}
     </div>
   );
