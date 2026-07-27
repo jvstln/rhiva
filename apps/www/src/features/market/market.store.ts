@@ -1,6 +1,6 @@
 import { merge } from "lodash";
 import { create } from "zustand";
-import { createJSONStorage, devtools, persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import type { MarketState } from "./market.type";
 
@@ -89,8 +89,11 @@ export const useMarketStore = create<MarketState>()(
             },
             remove(mint) {
               if (!get().watchlist.items.includes(mint)) return;
+
               set((state) => {
-                return state.watchlist.items.filter((m) => m !== mint);
+                state.watchlist.items = state.watchlist.items.filter(
+                  (m) => m !== mint,
+                );
               });
             },
             toggle(mint) {
@@ -105,7 +108,8 @@ export const useMarketStore = create<MarketState>()(
       ),
       {
         name: "rhiva.market",
-        storage: createJSONStorage(() => localStorage),
+        merge: (persistedState, currentState) =>
+          merge(currentState, persistedState),
       },
     ),
     { name: "rhiva-market" },

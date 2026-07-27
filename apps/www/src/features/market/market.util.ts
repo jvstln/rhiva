@@ -52,8 +52,7 @@ export function mapToken(raw: RawToken) {
     safeRaw.liquidity_usd ?? live?.dexscreener_liquidity_usd ?? 0;
 
   const bondingPct =
-    bonding?.completion_pct ??
-    (safeRaw.stage === "completed" ? 100 : 0);
+    bonding?.completion_pct ?? (safeRaw.stage === "completed" ? 100 : 0);
 
   return {
     ...safeRaw,
@@ -63,9 +62,6 @@ export function mapToken(raw: RawToken) {
     image: safeRaw.logo_uri ?? (safeRaw as any).image_url ?? "",
     logo_uri: safeRaw.logo_uri ?? (safeRaw as any).image_url ?? "",
     description: safeRaw.description,
-    market_cap_usd: marketCapUsd,
-    price_usd: priceUsd,
-    liquidity_usd: liquidityUsd,
 
     dev: {
       address: safeRaw.creator,
@@ -87,28 +83,36 @@ export function mapToken(raw: RawToken) {
       phishings: Number(0),
       bundlers: safeRaw.bundlers?.bundled_wallet_count ?? 0,
       snipers: safeRaw.snipers?.sniper_count ?? safeRaw.sniper_holdings ?? 0,
+      fresh: safeRaw.fresh_holdings ?? 0,
       ath: Number(0),
       totalBundlers: safeRaw.bundlers?.bundled_wallet_count ?? 0,
       bundledTotal: safeRaw.bundlers?.bundled_pct_of_early_sol ?? 0,
       bundledToken: Number(0),
       total: Number(rawHolders?.holder_count) || 0,
-      holder_count: rawHolders?.holder_count,
-      top10_holder_pct: rawHolders?.top10_holder_pct ?? safeRaw.whale_holdings,
+
       dev_holder_pct: rawHolders?.dev_holder_pct,
       dev_balance: rawHolders?.dev_balance,
       last_update_ms: rawHolders?.last_update_ms,
     },
 
     socials: {
-      twitterUrl: String(social?.twitter_url ?? (safeRaw as any).twitter_url ?? ""),
+      twitterUrl: String(
+        social?.twitter_url ?? (safeRaw as any).twitter_url ?? "",
+      ),
       twitterHandle: String(
         social?.twitter_handle ?? (safeRaw as any).twitter_handle ?? "",
       ),
-      telegramUrl: String(social?.telegram_url ?? (safeRaw as any).telegram_url ?? ""),
-      telegramHandle: String(
-        (social as any)?.telegram_handle ?? (safeRaw as any).telegram_handle ?? "",
+      telegramUrl: String(
+        social?.telegram_url ?? (safeRaw as any).telegram_url ?? "",
       ),
-      websiteUrl: String(social?.website_url ?? (safeRaw as any).website_url ?? ""),
+      telegramHandle: String(
+        (social as any)?.telegram_handle ??
+          (safeRaw as any).telegram_handle ??
+          "",
+      ),
+      websiteUrl: String(
+        social?.website_url ?? (safeRaw as any).website_url ?? "",
+      ),
     },
 
     bonding: {
@@ -130,6 +134,7 @@ export function mapToken(raw: RawToken) {
     volumeUsd: Number(
       timeframesMap["24h"]?.volume_usd ?? timeframesMap["1h"]?.volume_usd ?? 0,
     ),
+    athUsd: Number(safeRaw.ath_mcap_usd),
     priceChangePercent: Number(
       safeRaw.price_change_percent ??
         timeframesMap["24h"]?.price_change_percent ??
@@ -139,7 +144,7 @@ export function mapToken(raw: RawToken) {
     updatedAt: new Date(safeRaw.live?.updated_at ?? Date.now()),
 
     buys: safeRaw.buys ?? (safeRaw as any).buy_24h ?? (safeRaw as any).buy ?? 0,
-    sells: safeRaw.sells ?? (safeRaw as any).sell_24h ?? (safeRaw as any).sell ?? 0,
+    sells:
+      safeRaw.sells ?? (safeRaw as any).sell_24h ?? (safeRaw as any).sell ?? 0,
   };
 }
-

@@ -3,7 +3,6 @@
 import { Info } from "lucide-react";
 import type * as React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -14,8 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import { ScrollArea, ScrollBar } from "../../../components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { useSettingsStore } from "../settings.store";
+import type { SlippagePreset } from "../settings.type";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 /* ------------------------------------------------------------------ */
 /* Shared types                                                         */
@@ -100,6 +102,8 @@ interface ValueInputRowProps {
   label?: string;
   placeholder: string;
   defaultValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
   suffix?: React.ReactNode;
   className?: string;
 }
@@ -108,10 +112,20 @@ function ValueInputRow({
   label,
   placeholder,
   defaultValue,
+  value: controlledValue,
+  onChange,
   suffix,
   className,
 }: ValueInputRowProps) {
-  const [value, setValue] = useState(defaultValue ?? "");
+  const [localValue, setLocalValue] = useState(defaultValue ?? "");
+  const isControlled = controlledValue !== undefined;
+  const value = isControlled ? controlledValue : localValue;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (!isControlled) setLocalValue(val);
+    onChange?.(val);
+  };
 
   return (
     <div className={className}>
@@ -122,7 +136,7 @@ function ValueInputRow({
         <span className="shrink-0 text-muted-foreground">{placeholder}</span>
         <input
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={handleChange}
           className="w-full bg-transparent text-right font-medium text-foreground outline-none"
         />
         {suffix}
@@ -133,17 +147,29 @@ function ValueInputRow({
 
 function TextInputRow({
   defaultValue,
+  value: controlledValue,
+  onChange,
   className,
 }: {
-  defaultValue: string;
+  defaultValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
   className?: string;
 }) {
-  const [value, setValue] = useState(defaultValue);
+  const [localValue, setLocalValue] = useState(defaultValue ?? "");
+  const isControlled = controlledValue !== undefined;
+  const value = isControlled ? controlledValue : localValue;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (!isControlled) setLocalValue(val);
+    onChange?.(val);
+  };
 
   return (
     <input
       value={value}
-      onChange={(event) => setValue(event.target.value)}
+      onChange={handleChange}
       className={cn(
         "w-full rounded-lg border border-border bg-transparent px-4 py-3 text-muted-foreground outline-none focus:text-foreground",
         className,
@@ -171,16 +197,13 @@ function TokenGlyph({ className }: { className?: string }) {
 /* Tab: Transaction                                                      */
 /* ------------------------------------------------------------------ */
 
-type BroadcastMode = "priority-fee" | "jito-only" | "mixed";
-type PriorityLevel = "fast" | "turbo" | "ultra";
-type RebalancingType = "swap" | "swapless";
-
 function TransactionTab() {
-  const [broadcastMode, setBroadcastMode] =
-    useState<BroadcastMode>("jito-only");
-  const [priorityLevel, setPriorityLevel] = useState<PriorityLevel>("ultra");
-  const [rebalancingType, setRebalancingType] =
-    useState<RebalancingType>("swap");
+  const { broadcastMode, priorityLevel, rebalancingType } = useSettingsStore(
+    (state) => state.transaction,
+  );
+  const setTransactionSettings = useSettingsStore(
+    (state) => state.setTransactionSettings,
+  );
 
   return (
     <div className="space-y-6">
@@ -190,7 +213,7 @@ function TransactionTab() {
         </p>
         <SegmentedControl
           value={broadcastMode}
-          onChange={setBroadcastMode}
+          onChange={(val) => setTransactionSettings({ broadcastMode: val })}
           options={[
             { value: "priority-fee", label: "Priority Fee" },
             { value: "jito-only", label: "Jito Only" },
@@ -208,7 +231,7 @@ function TransactionTab() {
         <p className="mb-3 text-muted-foreground text-sm">Priority Level</p>
         <SegmentedControl
           value={priorityLevel}
-          onChange={setPriorityLevel}
+          onChange={(val) => setTransactionSettings({ priorityLevel: val })}
           options={[
             { value: "fast", label: "Fast" },
             { value: "turbo", label: "Turbo" },
@@ -231,7 +254,9 @@ function TransactionTab() {
             <button
               key={option.value}
               type="button"
-              onClick={() => setRebalancingType(option.value)}
+              onClick={() =>
+                setTransactionSettings({ rebalancingType: option.value })
+              }
               className="flex items-center gap-2 text-sm"
             >
               <span
@@ -267,24 +292,26 @@ function TransactionTab() {
 /* Tab: DLMM                                                            */
 /* ------------------------------------------------------------------ */
 
-type SlippagePreset = "0.1" | "0.5" | "1" | "custom";
-
 function SlippagePresetField({
   label,
-  defaultValue,
+  preset,
+  onPresetChange,
+  customValue,
+  onCustomValueChange,
 }: {
   label: string;
-  defaultValue: SlippagePreset;
+  preset: SlippagePreset;
+  onPresetChange: (preset: SlippagePreset) => void;
+  customValue: string;
+  onCustomValueChange: (val: string) => void;
 }) {
-  const [preset, setPreset] = useState<SlippagePreset>(defaultValue);
-
   return (
     <div>
       <p className="mb-3 font-semibold text-foreground text-sm">{label}</p>
       <SegmentedControl
         tone="neutral"
         value={preset}
-        onChange={setPreset}
+        onChange={onPresetChange}
         options={[
           { value: "0.1", label: "0.1%" },
           { value: "0.5", label: "0.5%" },
@@ -295,22 +322,38 @@ function SlippagePresetField({
       <ValueInputRow
         className="mt-3"
         placeholder="Value"
-        defaultValue="3%"
+        value={customValue}
+        onChange={onCustomValueChange}
       />
     </div>
   );
 }
 
 function DlmmTab() {
+  const dlmm = useSettingsStore((state) => state.dlmm);
+  const setDlmmSettings = useSettingsStore((state) => state.setDlmmSettings);
+
   return (
     <div className="space-y-6">
       <SlippagePresetField
         label="Liquidity Spillage"
-        defaultValue="custom"
+        preset={dlmm.liquiditySlippagePreset}
+        onPresetChange={(val) =>
+          setDlmmSettings({ liquiditySlippagePreset: val })
+        }
+        customValue={dlmm.liquiditySlippageCustom}
+        onCustomValueChange={(val) =>
+          setDlmmSettings({ liquiditySlippageCustom: val })
+        }
       />
       <SlippagePresetField
         label="Swap Slippage"
-        defaultValue="custom"
+        preset={dlmm.swapSlippagePreset}
+        onPresetChange={(val) => setDlmmSettings({ swapSlippagePreset: val })}
+        customValue={dlmm.swapSlippageCustom}
+        onCustomValueChange={(val) =>
+          setDlmmSettings({ swapSlippageCustom: val })
+        }
       />
     </div>
   );
@@ -320,10 +363,9 @@ function DlmmTab() {
 /* Tab: Zap In                                                          */
 /* ------------------------------------------------------------------ */
 
-type ZapCurveType = "spot" | "curve" | "bid-ask";
-
 function ZapInTab() {
-  const [curveType, setCurveType] = useState<ZapCurveType>("spot");
+  const zapIn = useSettingsStore((state) => state.zapIn);
+  const setZapInSettings = useSettingsStore((state) => state.setZapInSettings);
 
   return (
     <div className="space-y-6">
@@ -341,7 +383,8 @@ function ZapInTab() {
       <ValueInputRow
         label="Amount"
         placeholder="Zap in amount"
-        defaultValue="0.1"
+        value={zapIn.amount}
+        onChange={(val) => setZapInSettings({ amount: val })}
         suffix={<TokenGlyph />}
       />
 
@@ -350,11 +393,13 @@ function ZapInTab() {
         <div className="space-y-3">
           <ValueInputRow
             placeholder="Liquidity Slippage"
-            defaultValue="3 %"
+            value={zapIn.liquiditySlippage}
+            onChange={(val) => setZapInSettings({ liquiditySlippage: val })}
           />
           <ValueInputRow
             placeholder="Swap Slippage"
-            defaultValue="3 %"
+            value={zapIn.swapSlippage}
+            onChange={(val) => setZapInSettings({ swapSlippage: val })}
           />
         </div>
       </div>
@@ -362,13 +407,14 @@ function ZapInTab() {
       <ValueInputRow
         label="Swap Price Impact"
         placeholder="Max Price Impact"
-        defaultValue="2 %"
+        value={zapIn.swapPriceImpact}
+        onChange={(val) => setZapInSettings({ swapPriceImpact: val })}
       />
 
       <SegmentedControl
         tone="soft"
-        value={curveType}
-        onChange={setCurveType}
+        value={zapIn.curveType}
+        onChange={(val) => setZapInSettings({ curveType: val })}
         options={[
           { value: "spot", label: "Spot" },
           { value: "curve", label: "Curve" },
@@ -378,17 +424,7 @@ function ZapInTab() {
 
       <div className="flex items-center justify-end gap-2 rounded-lg border border-border px-4 py-3">
         <span className="size-3 rounded-sm bg-primary" />
-        <span className="text-foreground text-sm">quote token</span>
-      </div>
-
-      <div className="flex gap-3">
-        <Button
-          variant="outline"
-          className="text-primary"
-        >
-          Reset
-        </Button>
-        <Button className="flex-1">Save</Button>
+        <span className="text-foreground text-sm">{zapIn.quoteToken}</span>
       </div>
     </div>
   );
@@ -398,20 +434,32 @@ function ZapInTab() {
 /* Tab: Trading Settings                                                */
 /* ------------------------------------------------------------------ */
 
-type PresetId = "preset-1" | "preset-2" | "preset-3";
-type BuySellMode = "buy" | "sell";
-
 function TradingSettingsTab() {
-  const [preset, setPreset] = useState<PresetId>("preset-1");
-  const [buySellMode, setBuySellMode] = useState<BuySellMode>("buy");
-  const [autoFee, setAutoFee] = useState(false);
+  const trading = useSettingsStore((state) => state.trading);
+  const setTradingSettings = useSettingsStore(
+    (state) => state.setTradingSettings,
+  );
+  const updateTradingConfig = useSettingsStore(
+    (state) => state.updateTradingConfig,
+  );
+
+  const activeConfig = trading.presets[trading.activePreset]?.[
+    trading.activeBuySellMode
+  ] ?? {
+    slippage: "20%",
+    priority: "0.001",
+    bribe: "0.01",
+    autoFee: false,
+    maxFee: "0.01",
+    rpc: "RPC https://a...e.com",
+  };
 
   return (
     <div className="space-y-6">
       <SegmentedControl
         tone="soft"
-        value={preset}
-        onChange={setPreset}
+        value={trading.activePreset}
+        onChange={(preset) => setTradingSettings({ activePreset: preset })}
         options={[
           { value: "preset-1", label: "Preset 1" },
           { value: "preset-2", label: "Preset 2" },
@@ -421,8 +469,8 @@ function TradingSettingsTab() {
 
       <SegmentedControl
         tone="soft"
-        value={buySellMode}
-        onChange={setBuySellMode}
+        value={trading.activeBuySellMode}
+        onChange={(mode) => setTradingSettings({ activeBuySellMode: mode })}
         options={[
           { value: "buy", label: "Buy Settings" },
           { value: "sell", label: "Sell Settings" },
@@ -432,36 +480,70 @@ function TradingSettingsTab() {
       <ValueInputRow
         label="Slippage"
         placeholder="value"
-        defaultValue="20%"
+        value={activeConfig.slippage}
+        onChange={(val) =>
+          updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
+            slippage: val,
+          })
+        }
       />
       <ValueInputRow
         label="Priority"
         placeholder="value"
-        defaultValue="0.001"
+        value={activeConfig.priority}
+        onChange={(val) =>
+          updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
+            priority: val,
+          })
+        }
       />
       <ValueInputRow
         label="Bribe"
         placeholder="value"
-        defaultValue="0.01"
+        value={activeConfig.bribe}
+        onChange={(val) =>
+          updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
+            bribe: val,
+          })
+        }
       />
 
       <div className="flex items-center gap-3">
-        {/** biome-ignore lint/a11y/noLabelWithoutControl: label already wraps an input */}
-        <label className="flex shrink-0 items-center gap-2 text-foreground">
+        <Field orientation="horizontal" className="w-fit">
           <Checkbox
-            checked={autoFee}
-            onCheckedChange={(checked) => setAutoFee(checked === true)}
+            checked={activeConfig.autoFee}
+            onCheckedChange={(checked) =>
+              updateTradingConfig(
+                trading.activePreset,
+                trading.activeBuySellMode,
+                { autoFee: checked === true },
+              )
+            }
           />
-          Auto Fee
-        </label>
+          <FieldLabel>Auto Fee</FieldLabel>
+        </Field>
         <ValueInputRow
           className="flex-1"
           placeholder="Max Fee"
-          defaultValue="0.01"
+          value={activeConfig.maxFee}
+          onChange={(val) =>
+            updateTradingConfig(
+              trading.activePreset,
+              trading.activeBuySellMode,
+              { maxFee: val },
+            )
+          }
         />
       </div>
 
-      <TextInputRow defaultValue="RPC https://a...e.com" />
+      <TextInputRow
+        value={activeConfig.rpc}
+        onChange={(val) =>
+          updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
+            rpc: val,
+          })
+        }
+      />
     </div>
   );
 }
@@ -470,42 +552,22 @@ function TradingSettingsTab() {
 /* Tab: Others                                                          */
 /* ------------------------------------------------------------------ */
 
-interface NotificationSetting {
-  id: string;
-  label: string;
-  enabled: boolean;
-}
-
-const initialNotificationSettings: NotificationSetting[] = [
-  { id: "marketing", label: "Marketing & Activities", enabled: true },
-  { id: "transactions", label: "Transactions", enabled: true },
-  { id: "events", label: "Events Alert", enabled: true },
-];
-
 function OthersTab() {
-  const [settings, setSettings] = useState(initialNotificationSettings);
-
-  const toggleSetting = (id: string) => {
-    setSettings((prev) =>
-      prev.map((setting) =>
-        setting.id === id ? { ...setting, enabled: !setting.enabled } : setting,
-      ),
-    );
-  };
+  const notifications = useSettingsStore((state) => state.notifications);
+  const toggleNotification = useSettingsStore(
+    (state) => state.toggleNotification,
+  );
 
   return (
     <div className="space-y-6">
       <p className="text-muted-foreground text-sm">Message Notifications</p>
       <div className="space-y-5">
-        {settings.map((setting) => (
-          <div
-            key={setting.id}
-            className="flex items-center justify-between"
-          >
+        {notifications.map((setting) => (
+          <div key={setting.id} className="flex items-center justify-between">
             <span className="text-foreground">{setting.label}</span>
             <Switch
               checked={setting.enabled}
-              onCheckedChange={() => toggleSetting(setting.id)}
+              onCheckedChange={() => toggleNotification(setting.id)}
             />
           </div>
         ))}
@@ -532,10 +594,7 @@ export function SettingsDialog({
   const [activeTab, setActiveTab] = useState<SettingsTabId>(defaultTab);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger render={children} />}
       <DialogContent className="flex h-[85vh] w-full flex-col sm:max-w-xl">
         <Tabs className={"h-full min-h-0"}>

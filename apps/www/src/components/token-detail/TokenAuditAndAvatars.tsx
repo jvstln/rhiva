@@ -20,8 +20,8 @@ export function TokenAuditCard({ token }: TokenAuditCardProps) {
     {
       label: "Top 10",
       value:
-        token.holders?.top10_holder_pct !== undefined
-          ? `${token.holders.top10_holder_pct.toFixed(0)}%`
+        token.holders?.top10 !== undefined
+          ? `${token.holders.top10.toFixed(0)}%`
           : "N/A",
       warn: true,
     },
@@ -55,20 +55,11 @@ export function TokenAuditCard({ token }: TokenAuditCardProps) {
 
 export function AvatarReusedCard({ items }: { items: AvatarItem[] }) {
   return (
-    <InfoSection
-      title="Avatar Reused Tokens"
-      aside={<span>MC</span>}
-    >
+    <InfoSection title="Avatar Reused Tokens" aside={<span>MC</span>}>
       <div className="space-y-2">
         {items.map((item) => (
-          <div
-            key={item.wallet}
-            className="flex items-center gap-2"
-          >
-            <TokenThumbnail
-              badge={undefined}
-              className="size-8"
-            />
+          <div key={item.wallet} className="flex items-center gap-2">
+            <TokenThumbnail badge={undefined} className="size-8" />
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-b-4 text-white">
                 {item.name}

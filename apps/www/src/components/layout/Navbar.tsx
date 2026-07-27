@@ -19,9 +19,8 @@ import {
 import { SearchInput } from "../ui/search-input";
 import { ConnectWalletDialog } from "../../features/auth/components/ConnectWalletDialog";
 import { NotificationPopover } from "./NotificationPopover";
-import { SettingsDialog } from "./SettingsDialog";
+import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
 import { useAuth } from "@/features/auth/auth.hook";
-import { truncate } from "lodash";
 import { DisconnectWalletDialog } from "@/features/auth/components/DisconnectWalletDialog";
 
 const NAV_LINKS = [
@@ -37,24 +36,14 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
-      <Link
-        href="/"
-        className="h-full flex items-center shrink-0"
-      >
-        <Image
-          src={logo}
-          alt="Logo"
-          className="h-2/3 w-auto"
-        />
+      <Link href="/" className="flex h-full shrink-0 items-center">
+        <Image src={logo} alt="Logo" className="h-2/3 w-auto" />
       </Link>
 
       <NavigationMenu>
         <NavigationMenuList>
           {NAV_LINKS.map((link) => (
-            <NavigationMenuItem
-              key={link.label}
-              value={link.label}
-            >
+            <NavigationMenuItem key={link.label} value={link.label}>
               <NavigationMenuLink
                 render={<Link href={link.url} />}
                 data-active={pathname.startsWith(link.url) ? true : undefined}
@@ -84,22 +73,13 @@ export function Navbar() {
                   </NavigationMenuLink>
                 </li>
                 <li className="flex gap-2">
-                  <NavigationMenuLink
-                    href="https://t.co"
-                    target="_blank"
-                  >
+                  <NavigationMenuLink href="https://t.co" target="_blank">
                     <TelegramIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink
-                    href=""
-                    target="_blank"
-                  >
+                  <NavigationMenuLink href="" target="_blank">
                     <DiscordIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink
-                    href=""
-                    target="_blank"
-                  >
+                  <NavigationMenuLink href="" target="_blank">
                     <XIcon />
                   </NavigationMenuLink>
                 </li>
@@ -112,18 +92,12 @@ export function Navbar() {
       <div className="ml-auto flex items-center gap-3">
         <SearchInput />
         <NotificationPopover>
-          <Button
-            variant={"ghost"}
-            size="icon"
-          >
+          <Button variant={"ghost"} size="icon">
             <Bell />
           </Button>
         </NotificationPopover>
         <SettingsDialog>
-          <Button
-            variant={"ghost"}
-            size="icon"
-          >
+          <Button variant={"ghost"} size="icon">
             <Settings />
           </Button>
         </SettingsDialog>
@@ -136,26 +110,19 @@ export function Navbar() {
         >
           10K XP
         </Link>
-        {wallets.length === 0 ? (
-          <ConnectWalletDialog>
-            <Button
-              variant="outline"
-              data-active
-            >
+        <ConnectWalletDialog>
+          {wallets.length === 0 ? (
+            <Button variant="outline" data-active>
               Connect wallet
             </Button>
-          </ConnectWalletDialog>
-        ) : (
-          <DisconnectWalletDialog>
-            <Button
-              variant="outline"
-              data-active
-              tooltip={wallets[0].address}
-            >
+          ) : (
+            // <DisconnectWalletDialog>
+            <Button variant="outline" data-active tooltip={wallets[0].address}>
               {wallets[0].address.slice(0, 10)}...
             </Button>
-          </DisconnectWalletDialog>
-        )}
+            // </DisconnectWalletDialog>
+          )}
+        </ConnectWalletDialog>
       </div>
     </header>
   );

@@ -22,7 +22,14 @@
     "rules": {
       "recommended": true,
       "nursery": {
-        "useSortedClasses": "warn"
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe",
+          "options": {
+            "functions": ["clsx", "cva", "cn"],
+            "attributes": ["classNames", "className"]
+          }
+        }
       },
       "complexity": {
         "noImportantStyles": "off"

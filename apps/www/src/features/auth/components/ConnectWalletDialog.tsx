@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  NetworkEthereum,
   TokenJUP,
   WalletBackpack,
   WalletCoinbase,
@@ -44,14 +43,8 @@ function WalletButton({
   size?: "default" | "sm";
 }) {
   return (
-    <button
-      type="button"
-      {...props}
-    >
-      <Item
-        variant={"outline"}
-        size={size}
-      >
+    <button type="button" {...props}>
+      <Item variant={"outline"} size={size}>
         <ItemHeader className="justify-center">
           <ItemMedia variant={"image"}>{entry.icon}</ItemMedia>
         </ItemHeader>
@@ -105,20 +98,9 @@ const recommended: WalletEntry[] = [
     name: "Socials",
     icon: (
       <div className="grid grid-cols-2 gap-1">
-        <SimpleIcon
-          icon={siGoogle}
-          className="size-3.25"
-        />
-        <SimpleIcon
-          icon={siX}
-          fill="#ffffff"
-          className="size-3.25"
-        />
-        <SimpleIcon
-          icon={siApple}
-          fill="#ffffff"
-          className="size-3.25"
-        />
+        <SimpleIcon icon={siGoogle} className="size-3.25" />
+        <SimpleIcon icon={siX} fill="#ffffff" className="size-3.25" />
+        <SimpleIcon icon={siApple} fill="#ffffff" className="size-3.25" />
       </div>
     ),
   },
@@ -165,10 +147,6 @@ const moreWallets: WalletEntry[] = [
     id: "metamask",
     icon: <WalletMetamask />,
   },
-  {
-    id: "detected_ethereum_wallets",
-    icon: <NetworkEthereum />,
-  },
 ];
 
 const walletSections: Array<{ title: string; entries: WalletEntry[] }> = [
@@ -210,10 +188,7 @@ export function ConnectWalletDialog({
   };
 
   return (
-    <Dialog
-      handle={dialogHandle}
-      {...props}
-    >
+    <Dialog handle={dialogHandle} {...props}>
       {children && <DialogTrigger render={children} />}
 
       <DialogContent>
@@ -224,10 +199,7 @@ export function ConnectWalletDialog({
         <p className="mb-5 text-muted-foreground text-sm">
           By connecting your wallet, you are confirming that you understand and
           accept the{" "}
-          <Button
-            variant="link"
-            className="p-0 h-auto"
-          >
+          <Button variant="link" className="p-0 h-auto">
             terms of service
           </Button>
         </p>
@@ -235,10 +207,7 @@ export function ConnectWalletDialog({
         <ScrollArea className="-mx-(--padding-x) max-h-105 px-(--padding-x)">
           <div className="space-y-6 pr-1">
             {walletSections.map((section) => (
-              <WalletSection
-                key={section.title}
-                title={section.title}
-              >
+              <WalletSection key={section.title} title={section.title}>
                 {section.entries.map((entry) => {
                   if (entry.id === "socials") {
                     return (

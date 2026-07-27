@@ -118,7 +118,7 @@ export const DevMigratedAndLaunch = ({ token }: { token: Token }) => {
           />
           <InfoBadgeTooltipRow
             label="Migrated"
-            value={`${formatCompactNumber(token.dev.migrated / token.dev.launched)}%`}
+            value={`${formatCompactNumber(token.dev.migrated / token.dev.launched || 0)}%`}
           />
         </InfoBadgeTooltipGrid>
       }

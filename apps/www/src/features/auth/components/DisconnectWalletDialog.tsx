@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useWallets } from "@privy-io/react-auth";
 import { truncate } from "lodash";
 import CopyButton from "@/components/ui/button/copy-button";
 import { ConnectWalletDialog } from "./ConnectWalletDialog";
+import { useAuth } from "../auth.hook";
 
 type DisconnectWalletDialogProps = Dialog.Props & {
   children?: React.ReactElement;
@@ -26,14 +26,13 @@ export function DisconnectWalletDialog({
   children,
   ...props
 }: DisconnectWalletDialogProps) {
-  const { wallets } = useWallets();
+  const { wallets } = useAuth();
   const currentWallet = wallets[0];
 
+  console.log(wallets);
+
   return (
-    <Dialog
-      handle={dialogHandle}
-      {...props}
-    >
+    <Dialog handle={dialogHandle} {...props}>
       {children && <DialogTrigger render={children} />}
 
       <DialogContent>
@@ -51,19 +50,19 @@ export function DisconnectWalletDialog({
             <CopyButton copy={currentWallet?.address} />
           </div>
           <div className="flex gap-2">
-            <ConnectWalletDialog>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  currentWallet.disconnect();
-                  dialogHandle.close();
-                  toast.success("Wallet disconnected successfully");
-                }}
-              >
-                Disconnect
-              </Button>
-            </ConnectWalletDialog>
+            {/* <ConnectWalletDialog> */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                currentWallet.disconnect();
+                // dialogHandle.close();
+                toast.success("Wallet disconnected successfully");
+              }}
+            >
+              Disconnect
+            </Button>
+            {/* </ConnectWalletDialog> */}
           </div>
         </div>
       </DialogContent>

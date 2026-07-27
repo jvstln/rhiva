@@ -5,7 +5,14 @@ import {
 } from "@/components/ui/info-badge";
 import type { Token } from "../../market.token.type";
 import { cn, formatCompactNumber } from "@/lib/utils";
-import { Layers, LocateFixed, Users, UserStar } from "lucide-react";
+import {
+  Layers,
+  LocateFixed,
+  Sprout,
+  Trophy,
+  Users,
+  UserStar,
+} from "lucide-react";
 import { FishIcon, MouseLabIcon } from "@/components/ui/icons";
 
 type HoldersProps = { token: Token };
@@ -70,6 +77,34 @@ export const InsidersHold = ({ token }: HoldersProps) => {
       }
     >
       <MouseLabIcon />
+      {`${formatCompactNumber(holdersPercent)}%`}
+    </InfoBadge>
+  );
+};
+
+export const FreshHold = ({ token }: HoldersProps) => {
+  const holdersPercent = token.holders.fresh;
+
+  return (
+    <InfoBadge
+      variant={"badge"}
+      className={cn(
+        holdersPercent > 5
+          ? "[--accent:var(--color-down)]"
+          : "[--accent:var(--color-up)]",
+      )}
+      tooltip={
+        <InfoBadgeTooltipRow
+          label="Fresh Hold"
+          value={
+            <span className="text-accent">
+              {`${formatCompactNumber(holdersPercent)}%`}
+            </span>
+          }
+        />
+      }
+    >
+      <Sprout />
       {`${formatCompactNumber(holdersPercent)}%`}
     </InfoBadge>
   );
@@ -176,6 +211,15 @@ export const BundlersHold = ({ token }: HoldersProps) => {
     >
       <Layers />
       {`${formatCompactNumber(token.holders.totalBundlers)}%`}
+    </InfoBadge>
+  );
+};
+
+export const KolHold = ({ token }: { token: Token }) => {
+  return (
+    <InfoBadge tooltip="KOL Hold">
+      <Trophy />
+      {(token.bonding?.completion_pct ?? 0).toFixed(0)}
     </InfoBadge>
   );
 };

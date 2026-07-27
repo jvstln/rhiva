@@ -108,6 +108,7 @@ export type RawToken = {
   sells?: number;
   bundled_supply?: number;
   sniper_holdings?: number;
+  fresh_holdings?: number;
   whale_holdings?: number;
   bot_activity?: number;
   audit_score?: number | null;

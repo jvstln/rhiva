@@ -37,9 +37,8 @@ export function SecurityStatsGrid({ token }: SecurityStatsGridProps) {
   const primaryItems = [
     {
       label: "Top 10",
-      value: formatPercent(token.holders?.top10_holder_pct),
-      tone:
-        token.holders?.top10_holder_pct !== undefined ? undefined : "warning",
+      value: formatPercent(token.holders?.top10),
+      tone: token.holders?.top10 !== undefined ? undefined : "warning",
     },
     {
       label: "DEV",
@@ -49,9 +48,7 @@ export function SecurityStatsGrid({ token }: SecurityStatsGridProps) {
     {
       label: "Holders",
       value:
-        token.holders?.holder_count !== undefined
-          ? `${token.holders.holder_count}`
-          : "N/A",
+        token.holders?.total !== undefined ? `${token.holders.total}` : "N/A",
     },
     {
       label: "Snipers",

@@ -6,7 +6,7 @@ import { MarketToolbar } from "./MarketToolbar";
 import { PumpLiveGrid } from "./PumpLiveView";
 import { RadarView } from "./RadarView";
 import { SurgeTable } from "./SurgeView";
-import { TrendingTable } from "./TrendingView";
+import { TrendingView, WatchlistView } from "./TrendingView";
 
 type MarketPageProps = { searchParams: SearchParams };
 
@@ -18,8 +18,8 @@ export async function MarketPage({ searchParams }: MarketPageProps) {
       <MarketStatusBar />
       <MarketToolbar />
 
-      {view === "watchlist" && <TrendingTable />}
-      {view === "trending" && <TrendingTable />}
+      {view === "watchlist" && <WatchlistView />}
+      {view === "trending" && <TrendingView />}
       {view === "surge" && <SurgeTable />}
       {view === "pumpLive" && <PumpLiveGrid />}
       {view === "radar" && <RadarView />}

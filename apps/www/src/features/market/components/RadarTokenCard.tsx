@@ -15,7 +15,7 @@ import {
   CashbackNotice,
   DevHoldOrDevSell,
   DevMigratedAndLaunch,
-} from "./tooltips/DevHoldOrDevSell";
+} from "./tooltips/DevInfo";
 import { DexPaid } from "./tooltips/DexInfo";
 import {
   TopHolders,
@@ -24,6 +24,7 @@ import {
   PhishingsHold,
   SnipersHold,
   TotalHolders,
+  FreshHold,
 } from "./tooltips/Holders";
 import { formatDistanceToNowStrict } from "date-fns";
 import {
@@ -45,6 +46,7 @@ const RADAR_METRICS: Array<(props: { token: Token }) => React.JSX.Element> = [
   InsidersHold,
   BundlersHold,
   PhishingsHold,
+  FreshHold,
   SnipersHold,
   DexPaid,
 ];
@@ -162,10 +164,7 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
   return (
     <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
-        <Button
-          variant="sell"
-          size="sm"
-        >
+        <Button variant="sell" size="sm">
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
           </span>

@@ -5,7 +5,7 @@ import { Filter, Rocket } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React, { useState } from "react";
-import { SettingsDialog } from "@/components/layout/SettingsDialog";
+import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SolanaIcon } from "@/components/ui/icons";
 import {
@@ -68,10 +68,7 @@ export function PoolsToolbar() {
           </SelectTrigger>
           <SelectContent>
             {TIMEFRAMES.map((tf) => (
-              <SelectItem
-                key={tf}
-                value={tf}
-              >
+              <SelectItem key={tf} value={tf}>
                 {tf}
               </SelectItem>
             ))}
@@ -79,10 +76,7 @@ export function PoolsToolbar() {
         </Select>
 
         <PoolFiltersDialog>
-          <Button
-            variant="ghost"
-            size="sm"
-          >
+          <Button variant="ghost" size="sm">
             <Filter className="text-muted-foreground" />
             Filter
           </Button>
@@ -128,11 +122,7 @@ const ZapInInput = ({
       </InputGroupAddon>
 
       <InputGroupAddon className="h-full">
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={onSettingsDialogOpen}
-        >
+        <Button size="sm" variant="secondary" onClick={onSettingsDialogOpen}>
           <Rocket className="text-emerald-400" />
           Zap in
         </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Copy, CopyCheck, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { useMemo } from "react";
 import { QueryState } from "@/components/layout/QueryState";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   formatCompactNumber,
   formatSignedPercent,
 } from "@/lib/utils";
-import { useTrendingTokens } from "../market.hook";
+import { useTrendingTokens, useWatchlistTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import type { Token } from "../market.type";
 import {
@@ -27,9 +27,10 @@ import {
   TokenAvatar,
   TokenDescription,
   TokenNameAndSymbol,
+  TokenSymbolCopy,
 } from "./tooltips/TokenAvatar";
 import { useRouter } from "next/navigation";
-import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevHoldOrDevSell";
+import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevInfo";
 import {
   BundlersHold,
   InsidersHold,
@@ -39,12 +40,7 @@ import {
 } from "./tooltips/Holders";
 import { DexPaid } from "./tooltips/DexInfo";
 import { formatDistanceToNowStrict } from "date-fns";
-import { useCopyToClipboard } from "@/hooks/use-clipboard";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { Area, AreaChart } from "recharts";
 
 function AddToWatchlistButton({ mint }: { mint: string }) {
@@ -66,7 +62,7 @@ function AddToWatchlistButton({ mint }: { mint: string }) {
         toggleWatchlist(mint);
       }}
     >
-      <Star className="text-amber-500 data-pressed:fill-current" />
+      <Star className="text-amber-500 group-data-pressed/button:fill-current" />
     </Button>
   );
 }
@@ -94,10 +90,6 @@ function TokenMiniChart({ data }: SparklineProps) {
     <div className="h-20 w-24">
       <ChartContainer config={{}}>
         <AreaChart accessibilityLayer data={chartData}>
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent indicator="line" />}
-          />
           <Area
             dataKey="y"
             type="natural"
@@ -116,7 +108,6 @@ function TokenMiniChart({ data }: SparklineProps) {
 /* ------------------------------------------------------------------ */
 
 function PairInfoCell({ token }: { token: Token }) {
-  const { copy, copyState } = useCopyToClipboard();
   return (
     <div data-token-id={token.mint} className="flex items-center gap-3">
       <AddToWatchlistButton mint={token.mint} />
@@ -137,17 +128,7 @@ function PairInfoCell({ token }: { token: Token }) {
               "$1$2",
             )}
           </InfoBadge>
-          <InfoBadge
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              copy(token.mint);
-            }}
-            className="text-sm"
-          >
-            {token.mint.slice(0, 4)}...{token.mint.slice(-4)}{" "}
-            {copyState === "copied" ? <CopyCheck /> : <Copy />}
-          </InfoBadge>
+          <TokenSymbolCopy token={token} />
           <TokenLatestPost token={token} />
           <TokenConnection token={token} />
           <TokenWebsite token={token} />
@@ -348,17 +329,12 @@ const trendingColumns: ColumnDef<Token>[] = [
 /* Table shell                                                          */
 /* ------------------------------------------------------------------ */
 
-export function TrendingTable() {
+export function TrendingTable({ tokens }: { tokens: Token[] }) {
   const router = useRouter();
-  const trendingFilters = useMarketStore((state) => state.trendingFilters);
-  const trendingTokens = useTrendingTokens(trendingFilters);
 
   const table = useDataTable({
-    data: trendingTokens.data?.tokens ?? [],
+    data: tokens,
     columns: trendingColumns,
-    meta: {
-      timeframe: trendingFilters.timeframe,
-    },
   });
 
   const pinnedColumnClassName = cn(
@@ -380,17 +356,41 @@ export function TrendingTable() {
       onKeyDown={() => null}
       className="mx-auto w-full min-w-0 2xl:container"
     >
-      <QueryState query={trendingTokens}>
-        <DataTable
-          table={table}
-          classNames={{
-            table: "table-fixed w-max",
-            tr: "cursor-pointer",
-            td: pinnedColumnClassName,
-            th: pinnedColumnClassName,
-          }}
-        />
-      </QueryState>
+      <DataTable
+        table={table}
+        classNames={{
+          table: "table-fixed w-max",
+          tr: "cursor-pointer",
+          td: pinnedColumnClassName,
+          th: pinnedColumnClassName,
+        }}
+      />
     </nav>
+  );
+}
+
+export function TrendingView() {
+  const trendingFilters = useMarketStore((state) => state.trendingFilters);
+  const trendingTokens = useTrendingTokens(trendingFilters);
+
+  return (
+    <QueryState query={trendingTokens}>
+      <TrendingTable tokens={trendingTokens.data?.tokens ?? []} />
+    </QueryState>
+  );
+}
+
+export function WatchlistView() {
+  const watchlistTokens = useWatchlistTokens();
+
+  const isPending = watchlistTokens.some((q) => q.isPending);
+  const tokens = watchlistTokens
+    .map((q) => q.data)
+    .filter((t): t is Token => !!t);
+
+  return (
+    <QueryState query={{ data: tokens }} getIsLoading={() => isPending}>
+      <TrendingTable tokens={tokens} />
+    </QueryState>
   );
 }

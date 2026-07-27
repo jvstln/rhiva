@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   getRadarTokens,
   getSurgeTokens,
@@ -15,6 +15,7 @@ import type {
   TrendingFilters,
 } from "./market.type";
 import { SurgeFilters } from "./market.schema";
+import { useMarketStore } from "./market.store";
 
 export function useToken(mint: string) {
   return useQuery({
@@ -27,6 +28,17 @@ export function useTrendingTokens(filters: TrendingFilters) {
   return useQuery({
     queryKey: ["market", "trending", filters.timeframe, filters.preset],
     queryFn: () => getTrendingTokens(filters),
+  });
+}
+
+export function useWatchlistTokens() {
+  const watchlist = useMarketStore((state) => state.watchlist.items);
+
+  return useQueries({
+    queries: watchlist.map((mint) => ({
+      queryKey: ["token", mint],
+      queryFn: () => getToken(mint),
+    })),
   });
 }
 

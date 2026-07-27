@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, Settings } from "lucide-react";
-import { SettingsDialog } from "@/components/layout/SettingsDialog";
+import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { Button } from "@/components/ui/button";
 import { useMarketStore } from "../market.store";
 import { BondingCurveToggle } from "./ToolbarItems";
@@ -54,10 +54,7 @@ export const PumpLiveToolbar = () => {
       </div>
 
       <SettingsDialog defaultTab="trading-settings">
-        <Button
-          variant="ghost"
-          size="sm"
-        >
+        <Button variant="ghost" size="sm">
           <Settings className="text-purple-500" />
           Settings
         </Button>
