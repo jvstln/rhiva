@@ -2,6 +2,8 @@
 import { env } from "@/lib/env";
 import { PrivyProvider as PrivyProviderPrimitive } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
+import { ConnectWalletDialog } from "./ConnectWalletDialog";
+import { DisconnectWalletDialog } from "./DisconnectWalletDialog";
 
 type PrivyProviderProps = Partial<
   React.ComponentProps<typeof PrivyProviderPrimitive>
@@ -16,7 +18,7 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
       config={{
         loginMethods: ["email", "google", "twitter", "apple", "wallet"],
         appearance: {
-          walletChainType: "ethereum-and-solana",
+          walletChainType: "solana-only",
           walletList: [
             "phantom",
             "solflare",
@@ -24,7 +26,6 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
             "jupiter",
             "coinbase_wallet",
             "okx_wallet",
-            "detected_ethereum_wallets",
             "wallet_connect",
           ],
         },
@@ -36,6 +37,8 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
       {...props}
     >
       {children}
+      <ConnectWalletDialog />
+      <DisconnectWalletDialog />
     </PrivyProviderPrimitive>
   );
 }

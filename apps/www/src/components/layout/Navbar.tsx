@@ -17,11 +17,11 @@ import {
   NavigationMenuTrigger,
 } from "../ui/navigation-menu";
 import { SearchInput } from "../ui/search-input";
-import { ConnectWalletDialog } from "../../features/auth/components/ConnectWalletDialog";
+import { connectWalletDialogHandle } from "../../features/auth/components/ConnectWalletDialog";
 import { NotificationPopover } from "./NotificationPopover";
 import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
 import { useAuth } from "@/features/auth/auth.hook";
-import { DisconnectWalletDialog } from "@/features/auth/components/DisconnectWalletDialog";
+import { Skeleton } from "../ui/skeleton";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
@@ -32,7 +32,7 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { wallets } = useAuth();
+  const { wallets, isPending } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
@@ -110,19 +110,32 @@ export function Navbar() {
         >
           10K XP
         </Link>
-        <ConnectWalletDialog>
-          {wallets.length === 0 ? (
-            <Button variant="outline" data-active>
-              Connect wallet
-            </Button>
-          ) : (
-            // <DisconnectWalletDialog>
-            <Button variant="outline" data-active tooltip={wallets[0].address}>
-              {wallets[0].address.slice(0, 10)}...
-            </Button>
-            // </DisconnectWalletDialog>
-          )}
-        </ConnectWalletDialog>
+        {isPending ? (
+          <Skeleton
+            className={buttonVariants({
+              variant: "outline",
+              className: "min-w-26",
+            })}
+            data-active
+          />
+        ) : wallets.length === 0 ? (
+          <Button
+            variant="outline"
+            onClick={() => connectWalletDialogHandle.open(null)}
+            data-active
+          >
+            Connect wallet
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            onClick={() => connectWalletDialogHandle.open(null)}
+            data-active
+            tooltip={wallets[0].address}
+          >
+            {wallets[0].address.slice(0, 10)}...
+          </Button>
+        )}
       </div>
     </header>
   );

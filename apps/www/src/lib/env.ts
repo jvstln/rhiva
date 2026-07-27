@@ -6,6 +6,7 @@ const EnvSchema = z
     APP_ORIGIN: z.url().default("https://rhiva.fun"),
     PRIVY_APP_ID: z.string(),
     ENV: z.string().default("development"),
+    PRIVY_SIGNER_ID: z.string().default("s5jb1ugvqttj0k12jnyrz2gx"),
   })
   .catch((error) => {
     throw new Error(
@@ -13,10 +14,10 @@ const EnvSchema = z
     );
   });
 
-
 export const env = EnvSchema.parse({
-  APP_NAME: process.env.APP_NAME,
-  APP_ORIGIN: process.env.APP_ORIGIN,
+  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+  APP_ORIGIN: process.env.NEXT_PUBLIC_APP_ORIGIN,
   PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+  PRIVY_SIGNER_ID: process.env.NEXT_PUBLIC_PRIVY_SIGNER_IDNEXT_PUBLIC_,
   ENV: process.env.NEXT_PUBLIC_ENV,
 });

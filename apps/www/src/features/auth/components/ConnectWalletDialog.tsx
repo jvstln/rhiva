@@ -23,10 +23,9 @@ import { SimpleIcon } from "@/components/ui/icons";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Item, ItemFooter, ItemHeader, ItemMedia } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
-import { useConnectWallet, type WalletListEntry } from "@privy-io/react-auth";
+import type { WalletListEntry } from "@privy-io/react-auth";
 import { SocialAuthDialog } from "./SocialAuthDialog";
-import { toast } from "sonner";
-import { truncate } from "lodash";
+import { useAuth } from "../auth.hook";
 
 interface WalletEntry {
   id: WalletListEntry | "socials";
@@ -165,21 +164,15 @@ type ConnectWalletDialogProps = Dialog.Props & {
   children?: React.ReactElement;
 };
 
-const dialogHandle = createDialogHandle();
+export const connectWalletDialogHandle = createDialogHandle();
 
 export function ConnectWalletDialog({
   children,
   ...props
 }: ConnectWalletDialogProps) {
-  const { connectWallet } = useConnectWallet({
-    onSuccess: ({ wallet }) => {
-      toast.success(
-        `Wallet ${truncate(wallet.address)} connected successfully`,
-      );
-      dialogHandle.close();
-    },
-    onError: () => {
-      toast.error("Failed to connect wallet");
+  const { connectWallet } = useAuth({
+    onConnectWalletSuccess: () => {
+      connectWalletDialogHandle.close();
     },
   });
 
@@ -188,7 +181,7 @@ export function ConnectWalletDialog({
   };
 
   return (
-    <Dialog handle={dialogHandle} {...props}>
+    <Dialog handle={connectWalletDialogHandle} {...props}>
       {children && <DialogTrigger render={children} />}
 
       <DialogContent>
@@ -199,7 +192,7 @@ export function ConnectWalletDialog({
         <p className="mb-5 text-muted-foreground text-sm">
           By connecting your wallet, you are confirming that you understand and
           accept the{" "}
-          <Button variant="link" className="p-0 h-auto">
+          <Button variant="link" className="h-auto p-0">
             terms of service
           </Button>
         </p>

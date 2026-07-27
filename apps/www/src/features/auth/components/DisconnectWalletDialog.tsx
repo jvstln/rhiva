@@ -11,16 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { truncate } from "lodash";
 import CopyButton from "@/components/ui/button/copy-button";
-import { ConnectWalletDialog } from "./ConnectWalletDialog";
 import { useAuth } from "../auth.hook";
 
 type DisconnectWalletDialogProps = Dialog.Props & {
   children?: React.ReactElement;
 };
 
-const dialogHandle = createDialogHandle();
+export const disconnectWalletDialogHandle = createDialogHandle();
 
 export function DisconnectWalletDialog({
   children,
@@ -29,10 +27,8 @@ export function DisconnectWalletDialog({
   const { wallets } = useAuth();
   const currentWallet = wallets[0];
 
-  console.log(wallets);
-
   return (
-    <Dialog handle={dialogHandle} {...props}>
+    <Dialog handle={disconnectWalletDialogHandle} {...props}>
       {children && <DialogTrigger render={children} />}
 
       <DialogContent>
@@ -45,24 +41,21 @@ export function DisconnectWalletDialog({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             {currentWallet?.address
-              ? truncate(currentWallet.address, { length: 24 })
+              ? `${currentWallet.address.slice(0, 24)}...`
               : "N/A"}
             <CopyButton copy={currentWallet?.address} />
           </div>
           <div className="flex gap-2">
-            {/* <ConnectWalletDialog> */}
             <Button
               variant="destructive"
               size="sm"
               onClick={() => {
-                currentWallet.disconnect();
-                // dialogHandle.close();
+                currentWallet?.disconnect();
                 toast.success("Wallet disconnected successfully");
               }}
             >
               Disconnect
             </Button>
-            {/* </ConnectWalletDialog> */}
           </div>
         </div>
       </DialogContent>
