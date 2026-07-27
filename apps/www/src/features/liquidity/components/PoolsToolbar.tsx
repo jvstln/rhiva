@@ -105,28 +105,27 @@ const ZapInInput = ({
   const [internalValue, setInternalValue] = useState(zapIn?.toString() || "");
 
   return (
-    <InputGroup className="w-36">
-      <InputGroupInput
-        value={internalValue}
-        onChange={(e) => {
-          setInternalValue(e.target.value);
-          debounce(() => {
-            setFilters({
-              zapIn: e.target.value ? Number(e.target.value) : null,
-            });
-          }, 800)();
-        }}
-      />
-      <InputGroupAddon align={"inline-end"}>
-        <SolanaIcon />
-      </InputGroupAddon>
-
-      <InputGroupAddon className="h-full">
-        <Button size="sm" variant="secondary" onClick={onSettingsDialogOpen}>
-          <Rocket className="text-emerald-400" />
-          Zap in
-        </Button>
-      </InputGroupAddon>
-    </InputGroup>
+    <div className="flex w-36 rounded-full border *:rounded-none *:border-0 *:first:rounded-s-full *:last:rounded-e-full *:[button]:h-auto">
+      <Button size="sm" variant="soft" onClick={onSettingsDialogOpen}>
+        <Rocket />
+        Zap in
+      </Button>
+      <InputGroup data-size={"sm"}>
+        <InputGroupInput
+          value={internalValue}
+          onChange={(e) => {
+            setInternalValue(e.target.value);
+            debounce(() => {
+              setFilters({
+                zapIn: e.target.value ? Number(e.target.value) : null,
+              });
+            }, 800)();
+          }}
+        />
+        <InputGroupAddon align={"inline-end"}>
+          <SolanaIcon />
+        </InputGroupAddon>
+      </InputGroup>
+    </div>
   );
 };
