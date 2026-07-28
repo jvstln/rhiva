@@ -1,0 +1,3 @@
+[submodule "modules/server"]
+	path = modules/server
+	url = git@github.com:rhivadotfun/server.git

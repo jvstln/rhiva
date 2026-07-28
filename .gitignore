@@ -16,3 +16,4 @@ target
 .cmd
 .idea
 generated
+.DS_Store
