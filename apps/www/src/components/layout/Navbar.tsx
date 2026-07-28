@@ -22,6 +22,7 @@ import { NotificationPopover } from "./NotificationPopover";
 import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
 import { useAuth } from "@/features/auth/auth.hook";
 import { Skeleton } from "../ui/skeleton";
+import { UserPopover } from "@/features/auth/components/UserPopover";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
@@ -127,14 +128,11 @@ export function Navbar() {
             Connect wallet
           </Button>
         ) : (
-          <Button
-            variant="outline"
-            onClick={() => connectWalletDialogHandle.open(null)}
-            data-active
-            tooltip={wallets[0].address}
-          >
-            {wallets[0].address.slice(0, 10)}...
-          </Button>
+          <UserPopover>
+            <Button variant="outline" data-active tooltip={wallets[0].address}>
+              {wallets[0].address.slice(0, 10)}...
+            </Button>
+          </UserPopover>
         )}
       </div>
     </header>

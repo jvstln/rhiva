@@ -7,22 +7,16 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
+namespace Popover {
+  export type Props = PopoverPrimitive.Root.Props;
+}
+
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
-  return (
-    <PopoverPrimitive.Root
-      data-slot="popover"
-      {...props}
-    />
-  );
+  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
 }
 
 function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {
-  return (
-    <PopoverPrimitive.Trigger
-      data-slot="popover-trigger"
-      {...props}
-    />
-  );
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 
 function PopoverContent({
@@ -64,7 +58,7 @@ function PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="popover-header"
       className={cn(
-        "-mt-(--padding) -mx-(--padding) flex flex-col gap-0.5 border-b p-(--padding) text-sm",
+        "-mx-(--padding) -mt-(--padding) flex flex-col gap-0.5 border-b p-(--padding) text-sm",
         className,
       )}
       {...props}
@@ -120,14 +114,7 @@ function PopoverClose({
     <PopoverPrimitive.Close
       data-slot="popover-close"
       className={cn("text-muted-foreground", className)}
-      render={
-        render ?? (
-          <Button
-            variant={"ghost"}
-            size={"icon-sm"}
-          />
-        )
-      }
+      render={render ?? <Button variant={"ghost"} size={"icon-sm"} />}
       {...props}
     >
       <XIcon />

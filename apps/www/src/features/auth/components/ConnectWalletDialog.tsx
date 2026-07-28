@@ -4,7 +4,6 @@ import {
   TokenJUP,
   WalletBackpack,
   WalletCoinbase,
-  WalletMetamask,
   WalletOkx,
   WalletPhantom,
   WalletSolflare,
@@ -43,7 +42,7 @@ function WalletButton({
 }) {
   return (
     <button type="button" {...props}>
-      <Item variant={"outline"} size={size}>
+      <Item variant={"outline"} size={size} className="h-full">
         <ItemHeader className="justify-center">
           <ItemMedia variant={"image"}>{entry.icon}</ItemMedia>
         </ItemHeader>
@@ -67,7 +66,7 @@ function WalletSection({
   return (
     <div className="space-y-3">
       <p className="font-medium text-foreground text-sm">{title}</p>
-      <div className="flex flex-wrap gap-4 *:w-fit *:max-w-23 *:grow-0 *:items-center">
+      <div className="flex flex-wrap gap-4 *:w-fit *:max-w-23 *:grow-0">
         {children}
       </div>
     </div>
@@ -141,12 +140,7 @@ const reownWalletConnect: WalletEntry[] = [
   },
 ];
 
-const moreWallets: WalletEntry[] = [
-  {
-    id: "metamask",
-    icon: <WalletMetamask />,
-  },
-];
+const moreWallets: WalletEntry[] = [];
 
 const walletSections: Array<{ title: string; entries: WalletEntry[] }> = [
   { title: "Recently Used", entries: recentlyUsed },
@@ -170,14 +164,15 @@ export function ConnectWalletDialog({
   children,
   ...props
 }: ConnectWalletDialogProps) {
-  const { connectWallet } = useAuth({
+  const { login } = useAuth({
     onConnectWalletSuccess: () => {
       connectWalletDialogHandle.close();
     },
   });
 
-  const handleConnectWallet = (wallet: WalletListEntry) => {
-    connectWallet({ walletList: [wallet] });
+  const handleConnectWallet = (walletEntry: WalletListEntry) => {
+    // connectWallet({ walletList: [wallet] });
+    login({ walletEntry });
   };
 
   return (
@@ -199,39 +194,47 @@ export function ConnectWalletDialog({
 
         <ScrollArea className="-mx-(--padding-x) max-h-105 px-(--padding-x)">
           <div className="space-y-6 pr-1">
-            {walletSections.map((section) => (
-              <WalletSection key={section.title} title={section.title}>
-                {section.entries.map((entry) => {
-                  if (entry.id === "socials") {
-                    return (
-                      <SocialAuthDialog>
-                        <WalletButton
-                          key={entry.id}
-                          entry={entry}
-                          size={
-                            section.title === "More Wallets" ? "sm" : "default"
-                          }
-                        />
-                      </SocialAuthDialog>
-                    );
-                  }
+            {walletSections.map((section) => {
+              if (section.entries.length === 0) return null;
 
-                  return (
-                    <WalletButton
-                      key={entry.id}
-                      entry={entry}
-                      size={section.title === "More Wallets" ? "sm" : "default"}
-                      onClick={() => {
-                        return (
-                          entry.id !== "socials" &&
-                          handleConnectWallet(entry.id)
-                        );
-                      }}
-                    />
-                  );
-                })}
-              </WalletSection>
-            ))}
+              return (
+                <WalletSection key={section.title} title={section.title}>
+                  {section.entries.map((entry) => {
+                    if (entry.id === "socials") {
+                      return (
+                        <SocialAuthDialog>
+                          <WalletButton
+                            key={entry.id}
+                            entry={entry}
+                            size={
+                              section.title === "More Wallets"
+                                ? "sm"
+                                : "default"
+                            }
+                          />
+                        </SocialAuthDialog>
+                      );
+                    }
+
+                    return (
+                      <WalletButton
+                        key={entry.id}
+                        entry={entry}
+                        size={
+                          section.title === "More Wallets" ? "sm" : "default"
+                        }
+                        onClick={() => {
+                          return (
+                            entry.id !== "socials" &&
+                            handleConnectWallet(entry.id)
+                          );
+                        }}
+                      />
+                    );
+                  })}
+                </WalletSection>
+              );
+            })}
           </div>
 
           <ScrollBar showScrollBar />
