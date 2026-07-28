@@ -46,8 +46,6 @@ export function useAuth(props?: { onConnectWalletSuccess?: () => void }) {
     return user;
   }
 
-  console.log("wallets", wallets, user);
-
   async function login({ walletEntry }: { walletEntry: WalletListEntry }) {
     connectWallet({
       walletList: [walletEntry],
