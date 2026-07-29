@@ -20,7 +20,7 @@ export const getTrendingTokens = async (
   const trendingResponse = await api.get<
     Array<{ mint: string; score: number }>
   >("/trending", {
-    params: { window: filters.timeframe },
+    params: { window: filters.timeframe, limit: 3 },
   });
 
   const tokens = (
@@ -51,6 +51,7 @@ export const getRadarTokens = async (
   const radarResponse = await api.get<Array<{ mint: string }>>("/trenches", {
     params: {
       stage: stageMap[filters.type],
+      limit: 3,
     },
   });
 

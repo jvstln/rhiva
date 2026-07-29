@@ -53,7 +53,7 @@ const variants = {
       "border-border/40 border-b bg-transparent px-4 text-left",
     ),
     tr: cn(
-      "h-14 border-border/20 border-b transition-colors last:border-0 hover:bg-muted/10",
+      "h-14 border-border/20 border-b transition-colors last:border-0 hover:bg-muted",
     ),
     td: cn("px-4 py-3 align-middle text-sm text-white"),
   },

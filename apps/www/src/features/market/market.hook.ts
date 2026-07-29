@@ -16,6 +16,7 @@ import type {
 } from "./market.type";
 import { SurgeFilters } from "./market.schema";
 import { useMarketStore } from "./market.store";
+import { mapToken } from "./market.util";
 
 export function useToken(mint: string) {
   return useQuery({
@@ -26,8 +27,14 @@ export function useToken(mint: string) {
 
 export function useTrendingTokens(filters: TrendingFilters) {
   return useQuery({
-    queryKey: ["market", "trending", filters.timeframe, filters.preset],
+    queryKey: ["market", "trending"],
     queryFn: () => getTrendingTokens(filters),
+    select: (currentData) => ({
+      ...currentData,
+      tokens: currentData.tokens.map((token) =>
+        mapToken(token.original, filters),
+      ),
+    }),
   });
 }
 

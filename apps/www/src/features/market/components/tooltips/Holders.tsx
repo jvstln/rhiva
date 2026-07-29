@@ -219,7 +219,7 @@ export const KolHold = ({ token }: { token: Token }) => {
   return (
     <InfoBadge tooltip="KOL Hold">
       <Trophy />
-      {(token.bonding?.completion_pct ?? 0).toFixed(0)}
+      {(token.bonding?.bondingPct ?? 0).toFixed(0)}
     </InfoBadge>
   );
 };

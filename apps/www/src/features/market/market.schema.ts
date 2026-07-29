@@ -23,7 +23,7 @@ export const Timeframe = z.enum([
   "7d",
   "30d",
 ]);
-export type Timeframe = z.infer<typeof Timeframe>;
+export type Timeframe = `${number}${"m" | "h" | "d"}`;
 
 export const SurgeFilters = z
   .object({

@@ -130,6 +130,8 @@ export const DevMigratedAndLaunch = ({ token }: { token: Token }) => {
 };
 
 export const CashbackNotice = ({ token }: { token: Token }) => {
+  if (token.fees.totalCashbackSol <= 0) return null;
+
   return (
     <InfoBadge
       className="[--accent:var(--color-warn)]"

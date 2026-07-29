@@ -38,12 +38,12 @@ import {
   SnipersHold,
   TopHolders,
 } from "./tooltips/Holders";
-import { DexPaid } from "./tooltips/DexInfo";
+import { DexPaid, TotalFees } from "./tooltips/DexInfo";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ChartContainer } from "@/components/ui/chart";
 import { Area, AreaChart } from "recharts";
 
-function AddToWatchlistButton({ mint }: { mint: string }) {
+export function AddToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
   const watchlist = useMarketStore((state) => state.watchlist.items);
 
@@ -53,7 +53,7 @@ function AddToWatchlistButton({ mint }: { mint: string }) {
     <Button
       variant="ghost"
       size="icon"
-      aria-label={isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+      tooltip={isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
       aria-pressed={isInWatchlist}
       data-pressed={isInWatchlist || undefined}
       onClick={(e) => {
@@ -68,17 +68,10 @@ function AddToWatchlistButton({ mint }: { mint: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Sparkline chart (dependency-free SVG)                                */
+/* Mini chart                                                         */
 /* ------------------------------------------------------------------ */
 
-interface SparklineProps {
-  data: number[];
-  positive?: boolean;
-  width?: number;
-  height?: number;
-}
-
-function TokenMiniChart({ data }: SparklineProps) {
+function _TokenMiniChart({ data }: { data: number[] }) {
   const chartData = useMemo(() => {
     return data.map((value, i) => ({
       x: String(i),
@@ -89,7 +82,10 @@ function TokenMiniChart({ data }: SparklineProps) {
   return (
     <div className="h-20 w-24">
       <ChartContainer config={{}}>
-        <AreaChart accessibilityLayer data={chartData}>
+        <AreaChart
+          accessibilityLayer
+          data={chartData}
+        >
           <Area
             dataKey="y"
             type="natural"
@@ -109,7 +105,10 @@ function TokenMiniChart({ data }: SparklineProps) {
 
 function PairInfoCell({ token }: { token: Token }) {
   return (
-    <div data-token-id={token.mint} className="flex items-center gap-3">
+    <div
+      data-token-id={token.mint}
+      className="flex items-center gap-3"
+    >
       <AddToWatchlistButton mint={token.mint} />
       <TokenAvatar token={token} />
 
@@ -132,11 +131,12 @@ function PairInfoCell({ token }: { token: Token }) {
           <TokenLatestPost token={token} />
           <TokenConnection token={token} />
           <TokenWebsite token={token} />
+          <TotalFees token={token} />
           <TokenViewCount token={token} />
         </div>
       </div>
 
-      <TokenMiniChart data={[20, 25, 22, 28, 24, 32, 28, 36, 32, 40]} />
+      {/* <TokenMiniChart data={[20, 25, 22, 28, 24, 32, 28, 36, 32, 40]} /> */}
     </div>
   );
 }
@@ -170,31 +170,6 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
 }
 
 /* ------------------------------------------------------------------ */
-/* TXNS cell                                                            */
-/* ------------------------------------------------------------------ */
-
-interface TxnsCellProps {
-  total: number;
-  buys: number;
-  sells: number;
-}
-
-function TxnsCell({ total, buys, sells }: TxnsCellProps) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="font-medium text-sm text-white">
-        {formatCompactNumber(total)}
-      </span>
-      <span className="font-medium text-xs">
-        <span className="text-ocean-green">{formatCompactNumber(buys)}</span>
-        <span className="text-white/30"> / </span>
-        <span className="text-roman">{formatCompactNumber(sells)}</span>
-      </span>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /* Token security badge grid                                           */
 /* ------------------------------------------------------------------ */
 
@@ -220,7 +195,10 @@ function ActionButtons() {
   return (
     <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
-        <Button variant="sell" size="sm">
+        <Button
+          variant="sell"
+          size="sm"
+        >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
           </span>
@@ -264,7 +242,7 @@ const trendingColumns: ColumnDef<Token>[] = [
     cell: ({ row }) => (
       <MetricCell
         value={formatCompactCurrency(row.original.marketCapUsd)}
-        changePercent={row.original.priceChangePercent}
+        changePercent={row.original.priceChangePct}
       />
     ),
   },
@@ -288,12 +266,23 @@ const trendingColumns: ColumnDef<Token>[] = [
     id: "txns",
     header: "TXNS",
     cell: ({ row }) => {
+      console.log("tt", row.original.buys, row.original.sells);
+
       return (
-        <TxnsCell
-          total={row.original.totalTransaction}
-          buys={row.original.buys}
-          sells={row.original.sells}
-        />
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-foreground text-sm">
+            {formatCompactNumber(row.original.totalTransaction)}
+          </span>
+          <span className="font-medium text-xs">
+            <span className="text-ocean-green">
+              {formatCompactNumber(row.original.buys)}
+            </span>
+            <span className="text-white/30"> / </span>
+            <span className="text-roman">
+              {formatCompactNumber(row.original.sells)}
+            </span>
+          </span>
+        </div>
       );
     },
   },
@@ -338,7 +327,7 @@ export function TrendingTable({ tokens }: { tokens: Token[] }) {
   });
 
   const pinnedColumnClassName = cn(
-    "data-[column-id=action]:sticky data-[column-id=action]:right-0  bg-background",
+    "data-[column-id=action]:sticky data-[column-id=action]:right-0 data-[column-id=action]:bg-background",
   );
 
   return (
@@ -357,9 +346,10 @@ export function TrendingTable({ tokens }: { tokens: Token[] }) {
       className="mx-auto w-full min-w-0 2xl:container"
     >
       <DataTable
+        key={tokens[0]?.timeframe}
         table={table}
         classNames={{
-          table: "table-fixed w-max",
+          table: "w-max table-fixed",
           tr: "cursor-pointer",
           td: pinnedColumnClassName,
           th: pinnedColumnClassName,
@@ -389,7 +379,10 @@ export function WatchlistView() {
     .filter((t): t is Token => !!t);
 
   return (
-    <QueryState query={{ data: tokens }} getIsLoading={() => isPending}>
+    <QueryState
+      query={{ data: tokens }}
+      getIsLoading={() => isPending}
+    >
       <TrendingTable tokens={tokens} />
     </QueryState>
   );

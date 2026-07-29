@@ -13,7 +13,8 @@ export const BackButton = ({ className, ...props }: BackButtonProps) => {
     <Button
       onClick={() => router.back()}
       variant={"ghost"}
-      className={cn("ml-2 self-start", className)}
+      size="sm"
+      className={cn("mt-2 ml-2 self-start", className)}
       {...props}
     >
       <ChevronLeft /> Back
