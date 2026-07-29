@@ -60,7 +60,12 @@ export function SolflareIcon({ ...props }: IconProps) {
       {...props}
     >
       <title>Solflare icon</title>
-      <rect width={58} height={58} fill="url(#a)" rx={10} />
+      <rect
+        width={58}
+        height={58}
+        fill="url(#a)"
+        rx={10}
+      />
       <defs>
         <pattern
           id="a"
@@ -68,7 +73,10 @@ export function SolflareIcon({ ...props }: IconProps) {
           height={1}
           patternContentUnits="objectBoundingBox"
         >
-          <use xlinkHref="#b" transform="translate(-.393) scale(.00595)" />
+          <use
+            xlinkHref="#b"
+            transform="translate(-.393) scale(.00595)"
+          />
         </pattern>
         <image
           xlinkHref="data:image/png;base64,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"
@@ -101,7 +109,10 @@ export const SolanaIcon = (props: IconProps) => (
         gradientUnits="userSpaceOnUse"
       >
         <stop stopColor="#00FFA3" />
-        <stop offset={1} stopColor="#DC1FFF" />
+        <stop
+          offset={1}
+          stopColor="#DC1FFF"
+        />
       </linearGradient>
     </defs>
     <path
@@ -157,8 +168,14 @@ export const MeteoraIcon = (props: IconProps) => (
         gradientUnits="userSpaceOnUse"
       >
         <stop stopColor="#F5BD00" />
-        <stop offset="0.364891" stopColor="#F54B00" />
-        <stop offset="1" stopColor="#6E45FF" />
+        <stop
+          offset="0.364891"
+          stopColor="#F54B00"
+        />
+        <stop
+          offset="1"
+          stopColor="#6E45FF"
+        />
       </linearGradient>
     </defs>
   </svg>
@@ -175,7 +192,12 @@ export const OrcaIcon = (props: IconProps) => (
     {...props}
   >
     <title>Orca icon</title>
-    <rect width="16" height="16" rx="8" fill="url(#pattern0_8107_50209)" />
+    <rect
+      width="16"
+      height="16"
+      rx="8"
+      fill="url(#pattern0_8107_50209)"
+    />
     <defs>
       <pattern
         id="pattern0_8107_50209"
@@ -183,7 +205,10 @@ export const OrcaIcon = (props: IconProps) => (
         width="1"
         height="1"
       >
-        <use xlinkHref="#image0_8107_50209" transform="scale(0.0078125)" />
+        <use
+          xlinkHref="#image0_8107_50209"
+          transform="scale(0.0078125)"
+        />
       </pattern>
       <image
         id="image0_8107_50209"
@@ -207,7 +232,11 @@ export const RaydiumIcon = (props: IconProps) => (
     {...props}
   >
     <title>Raydium icon</title>
-    <rect width="19" height="19" fill="url(#pattern0_8107_50212)" />
+    <rect
+      width="19"
+      height="19"
+      fill="url(#pattern0_8107_50212)"
+    />
     <defs>
       <pattern
         id="pattern0_8107_50212"
@@ -215,7 +244,10 @@ export const RaydiumIcon = (props: IconProps) => (
         width="1"
         height="1"
       >
-        <use xlinkHref="#image0_8107_50212" transform="scale(0.00125)" />
+        <use
+          xlinkHref="#image0_8107_50212"
+          transform="scale(0.00125)"
+        />
       </pattern>
       <image
         id="image0_8107_50212"
@@ -240,7 +272,12 @@ export const CoinIcon = (props: IconProps) => (
   >
     <title>Coin icon</title>
 
-    <circle cx="14" cy="14" r="14" fill="url(#pattern0_5982_56115)" />
+    <circle
+      cx="14"
+      cy="14"
+      r="14"
+      fill="url(#pattern0_5982_56115)"
+    />
     <defs>
       <pattern
         id="pattern0_5982_56115"
@@ -248,7 +285,10 @@ export const CoinIcon = (props: IconProps) => (
         width="1"
         height="1"
       >
-        <use xlinkHref="#image0_5982_56115" transform="scale(0.00195312)" />
+        <use
+          xlinkHref="#image0_5982_56115"
+          transform="scale(0.00195312)"
+        />
       </pattern>
       <image
         id="image0_5982_56115"

@@ -115,20 +115,39 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
 
           {/* Actions */}
           <div className="pointer-events-none absolute -top-3 left-0 flex -translate-x-1/2 flex-col opacity-0 transition-all *:bg-background group-hover/token-avatar:pointer-events-auto group-hover/token-avatar:opacity-100">
-            <Button size="icon-xs" variant="outline" tooltip="Hide token">
+            <Button
+              size="icon-xs"
+              variant="outline"
+              tooltip="Hide token"
+            >
               <EyeOff />
             </Button>
-            <Button size="icon-xs" variant="outline" tooltip="Blacklist dev">
+            <Button
+              size="icon-xs"
+              variant="outline"
+              tooltip="Blacklist dev"
+            >
               <ChefHat />
             </Button>
-            <Button size="icon-xs" variant="outline" tooltip="Blacklist handle">
+            <Button
+              size="icon-xs"
+              variant="outline"
+              tooltip="Blacklist handle"
+            >
               <AtSign />
             </Button>
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent side="right" align="start" className="px-2 py-2">
-        <Avatar variant="square" className={"size-[236px]"}>
+      <TooltipContent
+        side="right"
+        align="start"
+        className="px-2 py-2"
+      >
+        <Avatar
+          variant="square"
+          className={"size-[236px]"}
+        >
           <AvatarImage src={token.image ?? ""} />
           <AvatarFallback>
             {token.name ? getInitials(token.name) : <User />}
@@ -160,7 +179,10 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
         </DropdownMenuTrigger>
       </div>
 
-      <DropdownMenuContent align="center" className="w-fit max-w-62.5">
+      <DropdownMenuContent
+        align="center"
+        className="w-fit max-w-62.5"
+      >
         <DropdownMenuItem onClick={() => copy(token.mint)}>
           <Copy />
           Copy
@@ -185,8 +207,11 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
           href={`https://x.com/search?q=${token.symbol}+token&src=typed_query`}
           className="truncate"
         >
-          <SimpleIcon icon={siX} className="text-foreground" />X search for{" "}
-          <span className="truncate">{token.symbol}</span>
+          <SimpleIcon
+            icon={siX}
+            className="text-foreground"
+          />
+          X search for <span className="truncate">{token.symbol}</span>
         </DropdownMenuLinkItem>
       </DropdownMenuContent>
     </DropdownMenu>

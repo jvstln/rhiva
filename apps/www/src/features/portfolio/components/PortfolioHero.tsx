@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PORTFOLIO_SUMMARY } from "@/data/portfolio-data";
+import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
 import { cn, currencies } from "@/lib/utils";
 import { SwapDialog } from "./SwapDialog";
 import { TokenDialog } from "./TokenDialog";

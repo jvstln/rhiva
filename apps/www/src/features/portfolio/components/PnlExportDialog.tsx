@@ -18,7 +18,7 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import type { LpPosition } from "@/data/portfolio-data";
+import type { LpPosition } from "@/components/ui/data/portfolio-data";
 import { downloadLink, selectFile } from "@/lib/file.util";
 import { cn, share } from "@/lib/utils";
 import { PNL_PROFIT_IMAGES, PortfolioTab } from "../portfolio.schema";

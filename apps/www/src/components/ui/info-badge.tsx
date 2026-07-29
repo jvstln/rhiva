@@ -4,13 +4,13 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const infoBadgeVariants = cva(
-  "inline-flex group/info-badge items-center shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 text-[10px] leading-4 font-medium [&_svg]:not-[class*=size-]:size-3 [&_svg]:not-[class*=shrink-]:shrink-0 gap-1 text-accent **:[[class*=--accent]]:text-accent tabular-nums font-geist",
+  "group/info-badge inline-flex shrink-0 items-center gap-1 font-geist font-medium text-[10px] text-accent tabular-nums leading-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 [&_svg]:not-[class*=size-]:size-3 [&_svg]:not-[class*=shrink-]:shrink-0 **:[[class*=--accent]]:text-accent",
   {
     variants: {
       variant: {
         inline: "",
         badge:
-          "rounded-md px-1 py-0.25 text-[11px] font-medium border border-border/30 bg-accent/5",
+          "rounded-md border border-border/30 bg-accent/5 px-1 py-0.25 font-medium text-[11px]",
       },
       tone: {
         default: "[--accent:var(--color-gray)]",

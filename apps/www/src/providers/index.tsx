@@ -1,16 +1,18 @@
 "use client";
 import { QueryClientProvider } from "@tanstack/react-query";
+
+import { PrivyProvider } from "./PrivyProvider";
+import { Toaster } from "@/components/ui/sonner";
+import UserApiProvider from "./UserApiProvider";
 import { queryClient } from "@/lib/query-client";
-import { TooltipProvider } from "./tooltip.provider";
-import { Toaster } from "./ui/sonner";
-import { PrivyProvider } from "../features/auth/components/PrivyProvider";
+import { TooltipProvider } from "./ToolTipProvider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <PrivyProvider>
-          {children}
+          <UserApiProvider>{children}</UserApiProvider>
           <Toaster
             position="top-center"
             richColors

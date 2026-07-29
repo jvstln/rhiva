@@ -509,7 +509,10 @@ function TradingSettingsTab() {
       />
 
       <div className="flex items-center gap-3">
-        <Field orientation="horizontal" className="w-fit">
+        <Field
+          orientation="horizontal"
+          className="w-fit"
+        >
           <Checkbox
             checked={activeConfig.autoFee}
             onCheckedChange={(checked) =>
@@ -563,7 +566,10 @@ function OthersTab() {
       <p className="text-muted-foreground text-sm">Message Notifications</p>
       <div className="space-y-5">
         {notifications.map((setting) => (
-          <div key={setting.id} className="flex items-center justify-between">
+          <div
+            key={setting.id}
+            className="flex items-center justify-between"
+          >
             <span className="text-foreground">{setting.label}</span>
             <Switch
               checked={setting.enabled}
@@ -594,7 +600,10 @@ export function SettingsDialog({
   const [activeTab, setActiveTab] = useState<SettingsTabId>(defaultTab);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       {children && <DialogTrigger render={children} />}
       <DialogContent className="flex h-[85vh] w-full flex-col sm:max-w-xl">
         <Tabs className={"h-full min-h-0"}>

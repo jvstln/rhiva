@@ -38,7 +38,7 @@ import {
   mockRewardAccount,
   REWARD_TIERS,
   type RewardTier,
-} from "@/data/reward-data";
+} from "@/components/ui/data/reward-data";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
 import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
@@ -143,7 +143,7 @@ function CurrentTierCard() {
         boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
       }}
     >
-      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-32 rounded-full bg-foreground/30 blur-[100px]" />
+      <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
 
       <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
         <div className="flex shrink-0 flex-col items-center gap-1">
@@ -362,7 +362,7 @@ function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
             );
           })}
           {/* connecting line, sits behind the badges */}
-          <div className="-z-10 absolute top-[50px] right-[10%] left-[10%] h-px bg-white/10" />
+          <div className="absolute top-[50px] right-[10%] left-[10%] -z-10 h-px bg-white/10" />
         </div>
         <ScrollBar
           orientation="horizontal"
@@ -470,7 +470,7 @@ function ReferralCard() {
         boxShadow: `0 4px 32px rgba(255, 255, 255, 0.08), inset -1px -1px 0 rgba(255, 255, 255, 0.6)`,
       }}
     >
-      <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-56 rounded-full bg-foreground/20 blur-[120px]" />
+      <div className="pointer-events-none absolute top-0 left-1/2 size-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/20 blur-[120px]" />
 
       <div className="relative space-y-6">
         <div>

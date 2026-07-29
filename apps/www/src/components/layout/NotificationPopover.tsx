@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import type React from "react";
-import { MOCK_NOTIFICATIONS } from "@/data/notification-data";
+import { MOCK_NOTIFICATIONS } from "@/components/ui/data/notification-data";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {

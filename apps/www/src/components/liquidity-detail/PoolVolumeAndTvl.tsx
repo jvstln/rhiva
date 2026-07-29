@@ -6,7 +6,7 @@ import {
   POOL_DETAIL,
   TOKEN_INFO_COLUMNS,
   VOLUME_SERIES,
-} from "@/data/liquidity-detail-data";
+} from "@/components/ui/data/liquidity-detail-data";
 import { cn } from "@/lib/utils";
 
 export function PoolVolumeAndTvl() {

@@ -215,10 +215,10 @@ const Card = function Card({
     state: { index },
     props: mergeProps(
       {
-        className: cn("scale-60 w-40.5 h-57", className),
+        className: cn("h-57 w-40.5 scale-60", className),
         children: (
           <div
-            className="card-flip-inner size-full relative perspective-midrange"
+            className="card-flip-inner perspective-midrange relative size-full"
             style={{
               transformStyle: "preserve-3d",
               transition: "transform 0.7s cubic-bezier(.2,.8,.2,1)",
@@ -230,7 +230,7 @@ const Card = function Card({
               src={"/reward-tiers/reward-card-back.svg"}
               alt="Back of reward card"
               fill
-              className="flex flex-col items-center justify-center rounded-xl object-cover border backface-hidden inset-shadow-md"
+              className="backface-hidden inset-shadow-md flex flex-col items-center justify-center rounded-xl border object-cover"
               style={{
                 background:
                   "repeating-linear-gradient(135deg, #171320 0px, #171320 8px, #1c1826 8px, #1c1826 16px)",
@@ -242,7 +242,7 @@ const Card = function Card({
               src={reward.image}
               alt="Back of reward card"
               fill
-              className="flex flex-col items-center justify-center rounded-xl object-cover border backface-hidden inset-shadow-md"
+              className="backface-hidden inset-shadow-md flex flex-col items-center justify-center rounded-xl border object-cover"
               style={{
                 background:
                   "repeating-linear-gradient(135deg, #171320 0px, #171320 8px, #1c1826 8px, #1c1826 16px)",
@@ -377,7 +377,7 @@ export const ClaimRewardsDialog = ({
     >
       {children && <DialogTrigger render={children} />}
       <DialogContent
-        className="sm:max-w-3xl min-h-[80vh]  flex flex-col"
+        className="flex min-h-[80vh] flex-col sm:max-w-3xl"
         style={{
           backgroundImage:
             "radial-gradient(circle at 80% 0, rgb(255 255 255 / 0.1), transparent 60%)",
@@ -392,7 +392,7 @@ export const ClaimRewardsDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="relative h-60 grow flex items-center justify-center">
+        <div className="relative flex h-60 grow items-center justify-center">
           {REWARDS.map((reward, index, arr) => (
             <Card
               key={reward.name}
@@ -410,7 +410,7 @@ export const ClaimRewardsDialog = ({
         </div>
         <p
           className={cn(
-            "text-amber-100 transition text-center invisible",
+            "invisible text-center text-amber-100 transition",
             claimedItem && "visible",
           )}
         >
@@ -419,7 +419,7 @@ export const ClaimRewardsDialog = ({
         <Button
           size="lg"
           className={cn(
-            "rounded-full mx-auto invisible w-32 transition-none shadow-2xl",
+            "invisible mx-auto w-32 rounded-full shadow-2xl transition-none",
             claimedItem && "visible",
           )}
           style={{ background: "linear-gradient(160deg, #E3B872, #B47B2E)" }}
@@ -437,7 +437,7 @@ export const ClaimRewardsDialog = ({
           <DraggableLever
             onTrigger={triggerPickAnimation}
             disabled={isShuffling || !!claimedItem}
-            className="w-4/5 mx-auto"
+            className="mx-auto w-4/5"
           />
         )}
       </DialogContent>
@@ -505,13 +505,13 @@ export const DraggableLever = ({
     <div
       ref={containerRef}
       className={cn(
-        "relative grow-0 flex items-center rounded-full border p-1 overflow-hidden",
-        disabled && "pointer-events-none transition opacity-45",
+        "relative flex grow-0 items-center overflow-hidden rounded-full border p-1",
+        disabled && "pointer-events-none opacity-45 transition",
         className,
       )}
     >
       <span
-        className="pointer-events-none select-none absolute flex justify-center items-center inset-0 left-4 text-center font-mono text-xs tracking-widest uppercase text-[#9C96A8]"
+        className="pointer-events-none absolute inset-0 left-4 flex select-none items-center justify-center text-center font-mono text-[#9C96A8] text-xs uppercase tracking-widest"
         data-draggable-text
       >
         Drag or tap to pull
@@ -521,13 +521,13 @@ export const DraggableLever = ({
         ref={boundsRef}
         className={cn(
           "size-full",
-          "before:h-full before:w-(--drag-progress-width) before:absolute before:top-0 before:left-0 min-w-4 before:bg-background",
+          "min-w-4 before:absolute before:top-0 before:left-0 before:h-full before:w-(--drag-progress-width) before:bg-background",
         )}
         data-draggable-bounds
       >
         <Button
           size="icon-lg"
-          className="rounded-full transition-none shadow-lg"
+          className="rounded-full shadow-lg transition-none"
           style={{ background: "linear-gradient(160deg, #E3B872, #B47B2E)" }}
           data-draggable-trigger
         >

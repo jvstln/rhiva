@@ -55,7 +55,7 @@ export function PoolTradeForm() {
             defaultValue="0.0"
             className="h-12 border-border/70 pr-16 text-b-1"
           />
-          <span className="-translate-y-1/2 absolute top-1/2 right-3 font-medium text-b-3 text-gray">
+          <span className="absolute top-1/2 right-3 -translate-y-1/2 font-medium text-b-3 text-gray">
             SOL
           </span>
         </div>
@@ -151,7 +151,7 @@ export function PoolTradeForm() {
             ))}
           </div>
           {/* Center line */}
-          <div className="-translate-x-1/2 absolute top-[-10px] bottom-0 left-1/2 w-0.5 bg-white" />
+          <div className="absolute top-[-10px] bottom-0 left-1/2 w-0.5 -translate-x-1/2 bg-white" />
 
           {/* Bottom solid bar */}
           <div className="h-1 w-full bg-primary" />

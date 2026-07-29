@@ -2,7 +2,7 @@
 
 import { Flame, Globe, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { mockPumpLiveStreams } from "@/data/pump-live-data";
+import { mockPumpLiveStreams } from "@/components/ui/data/pump-live-data";
 import { arrayWithId, cn, formatCompactCurrency } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */

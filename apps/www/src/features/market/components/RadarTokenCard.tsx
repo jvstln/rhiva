@@ -164,7 +164,10 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
   return (
     <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
-        <Button variant="sell" size="sm">
+        <Button
+          variant="sell"
+          size="sm"
+        >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
           </span>

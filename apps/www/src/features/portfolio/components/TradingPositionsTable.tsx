@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/button/copy-button";
 import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
-import { POSITIONS } from "@/data/portfolio-data";
+import { POSITIONS } from "@/components/ui/data/portfolio-data";
 import { capitalize } from "@/lib/utils";
 import { PnlExportDialog } from "./PnlExportDialog";
 import { useRouter } from "next/navigation";

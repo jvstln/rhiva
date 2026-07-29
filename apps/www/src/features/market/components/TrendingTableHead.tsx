@@ -1,4 +1,4 @@
-import { TABLE_COLUMNS } from "@/data/market-trending-data";
+import { TABLE_COLUMNS } from "@/components/ui/data/market-trending-data";
 
 export function TrendingTableHead() {
   return (

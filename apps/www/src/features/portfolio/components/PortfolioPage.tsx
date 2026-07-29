@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { PORTFOLIO_SUMMARY } from "@/data/portfolio-data";
+import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
 import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";

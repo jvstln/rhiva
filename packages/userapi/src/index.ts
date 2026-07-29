@@ -1,26 +1,44 @@
-import { Xior } from "xior";
+import { Xior, type XiorInstance } from "xior";
 import { format } from "util";
 
-import DexAPI from "./dex";
-import SwapAPI from "./swap.api";
 import UserAPI from "./user.api";
+import TransactionApi from "./transactions";
+import NotificationAPI from "./notification.api";
 
 export default class {
-  readonly dex: DexAPI;
-  readonly swap: SwapAPI;
+  private xior!: XiorInstance;
   readonly user: UserAPI;
+  readonly transaction: TransactionApi;
+  readonly notification: NotificationAPI;
 
-  constructor(baseURL: string, accessToken: string, wallet: string) {
-    const xior = Xior.create({
-      baseURL,
+  constructor(
+    private readonly _baseURL: string,
+    private _accessToken: string,
+    private _wallet: string,
+  ) {
+    this.initXior();
+    this.user = new UserAPI(this.xior);
+    this.transaction = new TransactionApi(this.xior);
+    this.notification = new NotificationAPI(this.xior);
+  }
+
+  initXior() {
+    this.xior = Xior.create({
+      baseURL: this._baseURL,
       headers: {
-        authorization: format("Bearer %s", accessToken),
-        "x-wallet-address": wallet,
+        authorization: format("Bearer %s", this._accessToken),
+        "x-wallet-address": this._wallet,
       },
     });
+  }
 
-    this.dex = new DexAPI(xior);
-    this.swap = new SwapAPI(xior);
-    this.user = new UserAPI(xior);
+  set accessToken(value: string) {
+    this._accessToken = value;
+    this.initXior();
+  }
+
+  set wallet(value: string) {
+    this._wallet = value;
+    this.initXior();
   }
 }

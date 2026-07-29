@@ -1,0 +1,76 @@
+name: "Deploy Cloudflare"
+description: "Deploy opennext project to cloudflare"
+inputs:
+  watchPaths:
+    required: false
+    description: "Folder to watch before building"
+  path:
+    required: false
+    default: "."
+    description: "Folder to build & deploy"
+  githubToken:
+    required: true
+    description: "Cloudflare apiToken"
+  apiToken:
+    required: true
+    description: "Cloudflare apiToken"
+  accountId:
+    required: true
+    description: "Cloudflare accountId"
+  envVars:
+    required: false
+    description: "Environment variables for build (JSON object string)"
+runs:
+  using: "composite"
+  steps:
+    - name: Check file changes
+      shell: bash
+      id: changes
+      run: |
+        changed="false"
+        if [ -z "${{ inputs.watchPaths }}" ]; then
+          changed="true"
+        else
+          paths="$(printf '%s\n%s' "${{ inputs.watchPaths }}" "${{ inputs.path }}")"
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            if ! git diff --quiet "${{ github.event.before }}" "${{ github.sha }}" -- "$path"; then
+              changed="true"
+              break
+            fi
+          done <<< "$paths"
+        fi
+        echo "This changed? $changed"
+        echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+    - name: Set env vars
+      if: steps.changes.outputs.changed == 'true' && inputs.envVars != ''
+      shell: bash
+      run: |
+        echo '${{ inputs.envVars }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ input.githubToken }}
+
+    - uses: oven-sh/setup-bun@v1
+      if: steps.changes.outputs.changed == 'true'
+
+    - name: Build
+      shell: bash
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        cd ${{ inputs.path }} && bun install --frozen-lockfile
+        bun x opennextjs-cloudflare build
+
+    - name: Deploy
+      if: steps.changes.outputs.changed == 'true'
+      uses: cloudflare/wrangler-action@v3
+      with:
+        packageManager: bun
+        wranglerVersion: "4.45.3"
+        apiToken: ${{ inputs.apiToken }}
+        accountId: ${{ inputs.accountId }}
+        workingDirectory: ${{ inputs.path }}

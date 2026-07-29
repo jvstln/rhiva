@@ -10,7 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
-import type { Candle } from "@/data/token-detail-data";
+import type { Candle } from "@/components/ui/data/token-detail-data";
 
 interface CandleShapeProps {
   x?: number;

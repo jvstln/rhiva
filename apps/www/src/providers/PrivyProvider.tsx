@@ -1,15 +1,15 @@
 "use client";
 import { env } from "@/lib/env";
-import { PrivyProvider as PrivyProviderPrimitive } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
-import { ConnectWalletDialog } from "./ConnectWalletDialog";
-import { DisconnectWalletDialog } from "./DisconnectWalletDialog";
+import { PrivyProvider as PrivyProviderPrimitive } from "@privy-io/react-auth";
+
+import { DisconnectWalletDialog } from "../features/auth/components/DisconnectWalletDialog";
 
 type PrivyProviderProps = Partial<
   React.ComponentProps<typeof PrivyProviderPrimitive>
 >;
 
-const solanaConnectors = toSolanaWalletConnectors({ shouldAutoConnect: false });
+const solanaConnectors = toSolanaWalletConnectors({ shouldAutoConnect: true });
 
 export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
   return (
@@ -31,13 +31,12 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
         },
         externalWallets: { solana: { connectors: solanaConnectors } },
         embeddedWallets: {
-          solana: { createOnLogin: "users-without-wallets" },
+          solana: { createOnLogin: "all-users" },
         },
       }}
       {...props}
     >
       {children}
-      <ConnectWalletDialog />
       <DisconnectWalletDialog />
     </PrivyProviderPrimitive>
   );

@@ -17,7 +17,7 @@ import {
   NavigationMenuTrigger,
 } from "../ui/navigation-menu";
 import { SearchInput } from "../ui/search-input";
-import { connectWalletDialogHandle } from "../../features/auth/components/ConnectWalletDialog";
+import { disconnectWalletDialogHandle } from "../../features/auth/components/DisconnectWalletDialog";
 import { NotificationPopover } from "./NotificationPopover";
 import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
 import { useAuth } from "@/features/auth/auth.hook";
@@ -32,18 +32,28 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { wallets, isPending } = useAuth();
+  const { wallets, isPending, connectWallet } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
-      <Link href="/" className="flex h-full shrink-0 items-center">
-        <Image src={logo} alt="Logo" className="h-2/3 w-auto" />
+      <Link
+        href="/"
+        className="flex h-full shrink-0 items-center"
+      >
+        <Image
+          src={logo}
+          alt="Logo"
+          className="h-2/3 w-auto"
+        />
       </Link>
 
       <NavigationMenu>
         <NavigationMenuList>
           {NAV_LINKS.map((link) => (
-            <NavigationMenuItem key={link.label} value={link.label}>
+            <NavigationMenuItem
+              key={link.label}
+              value={link.label}
+            >
               <NavigationMenuLink
                 render={<Link href={link.url} />}
                 data-active={pathname.startsWith(link.url) ? true : undefined}
@@ -73,13 +83,22 @@ export function Navbar() {
                   </NavigationMenuLink>
                 </li>
                 <li className="flex gap-2">
-                  <NavigationMenuLink href="https://t.co" target="_blank">
+                  <NavigationMenuLink
+                    href="https://t.co"
+                    target="_blank"
+                  >
                     <TelegramIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink href="" target="_blank">
+                  <NavigationMenuLink
+                    href=""
+                    target="_blank"
+                  >
                     <DiscordIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink href="" target="_blank">
+                  <NavigationMenuLink
+                    href=""
+                    target="_blank"
+                  >
                     <XIcon />
                   </NavigationMenuLink>
                 </li>
@@ -92,12 +111,18 @@ export function Navbar() {
       <div className="ml-auto flex items-center gap-3">
         <SearchInput />
         <NotificationPopover>
-          <Button variant={"ghost"} size="icon">
+          <Button
+            variant={"ghost"}
+            size="icon"
+          >
             <Bell />
           </Button>
         </NotificationPopover>
         <SettingsDialog>
-          <Button variant={"ghost"} size="icon">
+          <Button
+            variant={"ghost"}
+            size="icon"
+          >
             <Settings />
           </Button>
         </SettingsDialog>
@@ -121,7 +146,7 @@ export function Navbar() {
         ) : wallets.length === 0 ? (
           <Button
             variant="outline"
-            onClick={() => connectWalletDialogHandle.open(null)}
+            onClick={() => connectWallet()}
             data-active
           >
             Connect wallet
@@ -129,7 +154,7 @@ export function Navbar() {
         ) : (
           <Button
             variant="outline"
-            onClick={() => connectWalletDialogHandle.open(null)}
+            onClick={() => disconnectWalletDialogHandle.open(null)}
             data-active
             tooltip={wallets[0].address}
           >

@@ -1,17 +1,17 @@
 import type {
-  raydium,
+  meteora,
   buildTransactionResponseSchema,
   estimateOpenPositionFeeResponseSchema,
   buildOpenPositionTransactionResponseSchema,
 } from "@rhivadotfun/api";
 
-import { ApiImpl } from "../../api-impl";
+import { ApiImpl } from "../../../api-impl";
 
-export class CLMMAPI extends ApiImpl {
-  protected path?: string = "/transactions/lp/raydium/clmm";
+export class DLMMAPI extends ApiImpl {
+  protected path?: string = "/transactions/lp/meteora/dlmm";
 
   estimateOpenPositionFee(
-    params: ReturnType<typeof raydium.estimateOpenPositionFeeSchema.encode>,
+    params: ReturnType<typeof meteora.estimateOpenPositionFeeSchema.encode>,
   ) {
     return ApiImpl.getData(
       this.xior.post<
@@ -21,7 +21,7 @@ export class CLMMAPI extends ApiImpl {
   }
 
   async buildTransaction(
-    params: ReturnType<typeof raydium.buildTransactionSchema.encode>,
+    params: ReturnType<typeof meteora.buildTransactionSchema.encode>,
   ) {
     const data = await ApiImpl.getData(
       this.xior.post(this.buildPath("/build-transaction"), params),

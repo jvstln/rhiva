@@ -1,4 +1,4 @@
-import type { PoolRow } from "@/data/liquidity-data";
+import type { PoolRow } from "@/components/ui/data/liquidity-data";
 
 export type LiquidityState = {
   liquidityFilters: {

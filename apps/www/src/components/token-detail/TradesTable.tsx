@@ -2,7 +2,7 @@
 
 import { Eye, Filter, Pencil } from "lucide-react";
 import { useState } from "react";
-import { TRADE_TABS } from "@/data/token-detail-data";
+import { TRADE_TABS } from "@/components/ui/data/token-detail-data";
 import type { Token } from "@/features/market/market.token.type";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import { cn } from "@/lib/utils";

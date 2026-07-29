@@ -1,4 +1,4 @@
-import { CANDLES } from "@/data/token-detail-data";
+import { CANDLES } from "@/components/ui/data/token-detail-data";
 
 import { CandlestickChart } from "./CandlestickChart";
 import { ChartToolbar } from "./ChartToolbar";

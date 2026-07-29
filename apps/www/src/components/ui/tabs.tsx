@@ -27,14 +27,14 @@ function Tabs({
 }
 
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex relative w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none gap-1.5",
+  "group/tabs-list relative inline-flex w-fit items-center justify-center gap-1.5 rounded-lg p-[3px] text-muted-foreground data-[variant=line]:rounded-none group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col",
   {
     variants: {
       variant: {
         default: "",
         line: "p-0",
         ghost: "",
-        soft: "bg-primary/5 p-0 gap-0",
+        soft: "gap-0 bg-primary/5 p-0",
       },
     },
     defaultVariants: {
