@@ -13,6 +13,7 @@ jobs:
         with:
           fetch-depth: 1
           submodules: recursive
+          token: ${{ secrets.SUBMODULE_GITHUB_TOKEN }}
       - uses: ./.github/actions/cloudflare
         with:
           path: "apps/www"
@@ -26,9 +27,6 @@ jobs:
 
               "NEXT_PUBLIC_API_URL": "${{ secrets.NEXT_PUBLIC_API_URL }}",
               "NEXT_PUBLIC_BASE_URL": "${{ secrets.NEXT_PUBLIC_BASE_URL }}",
-              "NEXT_PUBLIC_VAPID_KEY": "${{ secrets.NEXT_PUBLIC_VAPID_KEY }}",
-
-
               "NEXT_PUBLIC_HELIUS_API_URL": "${{ secrets.NEXT_PUBLIC_HELIUS_API_URL }}",
               "NEXT_PUBLIC_HELIUS_API_KEY": "${{ secrets.NEXT_PUBLIC_HELIUS_API_KEY }}",
               "NEXT_PUBLIC_SOLANA_RPC_URL": "${{ secrets.NEXT_PUBLIC_SOLANA_RPC_URL }}",
