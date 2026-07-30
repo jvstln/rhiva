@@ -29,21 +29,34 @@ import { useMarketStore } from "../market.store";
 import { BlacklistDialog } from "./BlacklistDialog";
 import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
 import { TrendingFilterDialog } from "./TrendingFilterDialog";
+import type { Timeframe } from "../market.schema";
 
-const TIMEFRAMES = ["1m", "5m", "1h", "6h", "24h"] as const;
+const TIMEFRAMES: Timeframe[] = [
+  "1m",
+  "5m",
+  "15m",
+  "30m",
+  "1h",
+  "6h",
+  "12h",
+  "24h",
+];
 
 export const TrendingToolbar = () => {
+  const filters = useMarketStore((s) => s.trendingFilters);
+  const setFilters = useMarketStore((s) => s.setTrendingFilters);
+
   return (
     <div className="flex items-center gap-2">
       <ToggleGroup
-        defaultValue={["1h"]}
+        value={[filters.timeframe]}
+        onValueChange={([timeframe]) => {
+          setFilters({ timeframe: timeframe as Timeframe });
+        }}
         size={"sm"}
       >
         {TIMEFRAMES.map((tf) => (
-          <ToggleGroupItem
-            key={tf}
-            value={tf}
-          >
+          <ToggleGroupItem key={tf} value={tf}>
             {tf}
           </ToggleGroupItem>
         ))}
@@ -51,29 +64,20 @@ export const TrendingToolbar = () => {
 
       <div className="flex items-center gap-2">
         <BlacklistDialog>
-          <Button
-            variant="ghost"
-            size="sm"
-          >
+          <Button variant="ghost" size="sm">
             <Ban className="text-orange-500" />
             Blacklist
           </Button>
         </BlacklistDialog>
         <TrendingFilterDialog>
-          <Button
-            variant="ghost"
-            size="sm"
-          >
+          <Button variant="ghost" size="sm">
             <Filter className="text-muted-foreground" />
             Filter
           </Button>
         </TrendingFilterDialog>
 
         <SettingsDialog defaultTab="trading-settings">
-          <Button
-            variant="ghost"
-            size="sm"
-          >
+          <Button variant="ghost" size="sm">
             <Settings className="text-purple-500" />
             Settings
           </Button>
@@ -110,14 +114,7 @@ export const TrendingQuickSellInput = () => {
 
   return (
     <Dialog>
-      <DialogTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="sm"
-          />
-        }
-      >
+      <DialogTrigger render={<Button variant="ghost" size="sm" />}>
         <ArrowDownUp className="text-blue-500" />
         Quick sell
       </DialogTrigger>
@@ -137,10 +134,7 @@ export const TrendingQuickSellInput = () => {
               <XIcon />
               Off
             </ToggleGroupItem>
-            <ToggleGroupItem
-              variant={"sell"}
-              value="on"
-            >
+            <ToggleGroupItem variant={"sell"} value="on">
               <ArrowDownUp />
               Sell
             </ToggleGroupItem>

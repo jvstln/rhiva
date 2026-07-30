@@ -28,7 +28,7 @@ import {
   TokenSocialSearch,
 } from "./tooltips/Socials";
 import { DevHoldOrDevSell, DevMigratedAndLaunch } from "./tooltips/DevInfo";
-import { BotSummary, DexPaid, GlobalFees } from "./tooltips/DexInfo";
+import { BotActivity, DexPaid, TotalFees } from "./tooltips/DexInfo";
 import {
   TopHolders,
   InsidersHold,
@@ -80,15 +80,9 @@ function TokenRow({ token }: TokenRowProps) {
                 "$1$2",
               )}
             </InfoBadge>
-            <Separator
-              orientation="vertical"
-              className="h-4/5 self-center"
-            />
+            <Separator orientation="vertical" className="h-4/5 self-center" />
             <TokenSymbolCopy token={token} />
-            <Separator
-              orientation="vertical"
-              className="h-4/5 self-center"
-            />
+            <Separator orientation="vertical" className="h-4/5 self-center" />
             <TokenLatestPost token={token} />
             <TokenConnection token={token} />
             <TokenDescription token={token} />
@@ -110,10 +104,7 @@ function TokenRow({ token }: TokenRowProps) {
         </div>
       </div>
 
-      <Separator
-        orientation="vertical"
-        className=""
-      />
+      <Separator orientation="vertical" className="" />
 
       {/* Market data */}
       <div className="flex min-w-0 flex-1 basis-2/4 flex-col justify-center gap-1.5 text-b-4">
@@ -127,7 +118,7 @@ function TokenRow({ token }: TokenRowProps) {
             </span>
 
             <span className="text-up">
-              {formatSignedPercent(token.priceChangePercent, 1)}
+              {formatSignedPercent(token.priceChangePct, 1)}
             </span>
           </div>
 
@@ -154,19 +145,16 @@ function TokenRow({ token }: TokenRowProps) {
           <span
             className={cn(
               "ml-auto text-right text-base",
-              token.priceChangePercent > 0 ? "text-up" : "text-down",
+              token.priceChangePct > 0 ? "text-up" : "text-down",
             )}
           >
-            {token.priceChangePercent > 0 ? "+" : ""}
-            {token.priceChangePercent.toFixed(2)}%
+            {token.priceChangePct > 0 ? "+" : ""}
+            {token.priceChangePct.toFixed(2)}%
           </span>
         </div>
       </div>
 
-      <Separator
-        orientation="vertical"
-        className=""
-      />
+      <Separator orientation="vertical" className="" />
 
       {/* Activity + buy */}
       <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
@@ -184,8 +172,8 @@ function TokenRow({ token }: TokenRowProps) {
           <KolHold token={token} />
           <DevMigratedAndLaunch token={token} />
           <TotalHolders token={token} />
-          <BotSummary token={token} />
-          <GlobalFees token={token} />
+          <BotActivity token={token} />
+          <TotalFees token={token} />
 
           <InfoBadge
             tooltip={
@@ -218,8 +206,13 @@ function TokenRow({ token }: TokenRowProps) {
         </div>
 
         <Separator
-          className="w-1/4! grow-0"
+          className="relative w-1/4! grow-0 bg-down before:absolute before:inset-y-0 before:left-0 before:w-(--) before:bg-up"
           orientation="horizontal"
+          style={
+            {
+              "--buy-percent": `${(token.buys / token.totalTransaction) * 100}%`,
+            } as React.CSSProperties
+          }
         />
 
         <div className="w-full text-right text-b-5 text-gray">
@@ -236,15 +229,9 @@ export function SurgeTable() {
 
   return (
     <div className="w-full">
-      <QueryState
-        query={query}
-        getIsLoading={(q) => q.isPending}
-      >
+      <QueryState query={query} getIsLoading={(q) => q.isPending}>
         {query.data?.tokens?.map((token) => (
-          <TokenRow
-            key={token.mint}
-            token={token}
-          />
+          <TokenRow key={token.mint} token={token} />
         ))}
       </QueryState>
     </div>
@@ -256,14 +243,8 @@ const SurgeBuyButton = () => {
 
   return (
     quickBuy !== null && (
-      <Button
-        size="sm"
-        variant={"soft"}
-      >
-        <Zap
-          className="size-3"
-          fill="currentColor"
-        />
+      <Button size="sm" variant={"soft"}>
+        <Zap className="size-3" fill="currentColor" />
 
         <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
           Buy

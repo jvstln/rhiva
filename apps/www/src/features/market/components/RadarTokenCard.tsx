@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { InfoBadge } from "@/components/ui/info-badge";
+import {
+  InfoBadge,
+  InfoBadgeTooltipGrid,
+  InfoBadgeTooltipRow,
+} from "@/components/ui/info-badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import type { Token } from "@/features/market/market.type";
 import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
@@ -39,6 +43,92 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { NetworkSolana } from "@web3icons/react";
+
+const TransactionInfo = ({ token }: { token: Token }) => {
+  return (
+    <div className="flex flex-col">
+      <div className="flex gap-2">
+        <InfoBadge>
+          V
+          <span className="text-foreground">
+            {formatCompactCurrency(token.volumeUsd)}
+          </span>
+        </InfoBadge>
+        <InfoBadge>
+          MC
+          <span className="text-foreground">
+            {formatCompactCurrency(token.marketCapUsd)}
+          </span>
+        </InfoBadge>
+      </div>
+      <div className="flex gap-2">
+        <InfoBadge
+          className="gap-0.5"
+          tooltip={
+            <InfoBadgeTooltipRow
+              label="Prio & Tip & Trading Fees"
+              value={`${token.fees.totalFeeSol} SOL`}
+            />
+          }
+        >
+          F
+          <NetworkSolana className="size-4" />
+          <span className="[--accent:var(--color-foreground)]">
+            {formatCompactNumber(token.fees.totalFeeSol)}
+          </span>
+        </InfoBadge>
+
+        <InfoBadge tooltip="Net buy">
+          N
+          <span className="[--accent:var(--color-up)]">
+            {formatCompactNumber(token.netBuyUsd)}
+          </span>
+        </InfoBadge>
+
+        <InfoBadge
+          tooltip={
+            <InfoBadgeTooltipGrid>
+              <InfoBadgeTooltipRow
+                label={`TXs`}
+                value={`${formatCompactNumber(token.totalTransaction)}`}
+              />
+              <InfoBadgeTooltipRow
+                label={`Buys`}
+                value={
+                  <span className="text-up">
+                    {formatCompactNumber(token.buys)}
+                  </span>
+                }
+              />
+              <InfoBadgeTooltipRow
+                label={`Sells`}
+                value={
+                  <span className="text-down">
+                    {formatCompactNumber(token.sells)}
+                  </span>
+                }
+              />
+            </InfoBadgeTooltipGrid>
+          }
+        >
+          TX
+          <span className="flex items-center gap-0.5 [--accent:var(--color-down)]">
+            {formatCompactNumber(token.totalTransaction)}
+            <div
+              className="relative h-0.75 w-7 overflow-hidden rounded-full bg-down before:absolute before:inset-y-0 before:left-0 before:w-(--buy-percent) before:rounded-s-full before:bg-up before:transition"
+              style={
+                {
+                  "--buy-percent": `${(token.buys / token.totalTransaction) * 100}%`,
+                } as React.CSSProperties
+              }
+            />
+          </span>
+        </InfoBadge>
+      </div>
+    </div>
+  );
+};
 
 const RADAR_METRICS: Array<(props: { token: Token }) => React.JSX.Element> = [
   TopHolders,
@@ -79,51 +169,37 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
 
           {/* RIGHT COLUMN */}
           <div className="flex min-w-0 flex-1 flex-col">
+            {/* Token Name + Token Info Row */}
             <div className="flex items-start justify-between">
-              <TokenNameAndSymbol token={token} />
-              <div className="flex gap-1">
-                <InfoBadge>
-                  V {formatCompactCurrency(token.volumeUsd)}
-                </InfoBadge>
-                <InfoBadge className="[--accent:var(--color-warn)]">
-                  MC {formatCompactCurrency(token.marketCapUsd)}
-                </InfoBadge>
+              <div className="flex flex-col">
+                <TokenNameAndSymbol token={token} />
+                <div className="flex items-center gap-1">
+                  {token.socials.twitterHandle && (
+                    <InfoBadge className="[--accent:var(--color-info)]">
+                      @{token.socials.twitterHandle}
+                    </InfoBadge>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-x-1">
+                  <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
+                    {formatDistanceToNowStrict(token.updatedAt).replace(
+                      /^.*?(\d+)\s*(\w).*$/,
+                      "$1$2",
+                    )}
+                  </InfoBadge>
+                  <CashbackNotice token={token} />
+                  <TokenDescription token={token} />
+                  <TokenSocialSearch token={token} />
+                  <TokenLatestPost token={token} />
+                  <TokenConnection token={token} />
+                  <TokenWebsite token={token} />
+                  <DevMigratedAndLaunch token={token} />
+                  <TotalHolders token={token} />
+                  <TokenViewCount token={token} />
+                </div>
               </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-1">
-              <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-                {formatDistanceToNowStrict(token.updatedAt).replace(
-                  /^.*?(\d+)\s*(\w).*$/,
-                  "$1$2",
-                )}
-              </InfoBadge>
-              <CashbackNotice token={token} />
-              <TokenDescription token={token} />
-              <TokenSocialSearch token={token} />
-              <TokenLatestPost token={token} />
-              <TokenConnection token={token} />
-              <TokenWebsite token={token} />
-              <DevMigratedAndLaunch token={token} />
-              <TotalHolders token={token} />
-              <TokenViewCount token={token} />
-              <InfoBadge className="ml-auto">
-                <span>N </span>
-                <span className="[--accent:var(--color-up)]">
-                  +{formatCompactNumber(token.buys)} B
-                </span>{" "}
-                TX
-                <span className="[--accent:var(--color-down)]">
-                  {formatCompactNumber(token.totalTransaction)} —
-                </span>
-              </InfoBadge>
-            </div>
 
-            <div className="flex items-center gap-1">
-              {token.socials.twitterHandle && (
-                <InfoBadge className="[--accent:var(--color-info)]">
-                  @{token.socials.twitterHandle}
-                </InfoBadge>
-              )}
+              <TransactionInfo token={token} />
             </div>
 
             <div className="flex w-full min-w-0 items-end justify-between gap-1">
@@ -148,7 +224,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent>Bonding: {token.bondingPercent}%</TooltipContent>
+      <TooltipContent>Bonding: {token.bonding.bondingPct}%</TooltipContent>
     </Tooltip>
   );
 }

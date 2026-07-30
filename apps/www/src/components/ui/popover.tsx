@@ -7,6 +7,10 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
+namespace Popover {
+  export type Props = PopoverPrimitive.Root.Props;
+}
+
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
   return (
     <PopoverPrimitive.Root

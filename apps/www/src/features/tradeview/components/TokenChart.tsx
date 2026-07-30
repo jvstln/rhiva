@@ -104,7 +104,7 @@ export const TokenChart = ({ token }: TokenChartProps) => {
   );
 
   return (
-    <div style={{ height: "500px", width: "100%" }}>
+    <div className="size-full">
       <TradeViewChart
         datafeedArgs={datafeedArgs}
         symbol={token.mint}

@@ -5,14 +5,11 @@ import {
   useUser,
   useSigners,
   PrivyProvider as PrivyProviderPrimitive,
-  type ConnectedWallet,
   type WalletWithMetadata,
-  type BaseConnectedWalletType,
   usePrivy,
 } from "@privy-io/react-auth";
 
 import { env } from "@/lib/env";
-import { DisconnectWalletDialog } from "@/features/auth/components/DisconnectWalletDialog";
 
 type PrivyProviderProps = Partial<
   React.ComponentProps<typeof PrivyProviderPrimitive>
@@ -65,14 +62,6 @@ const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
       value={{ authenticated, activeWallet: activeWallet! }}
     >
       {children}
-      {activeWallet && (
-        <DisconnectWalletDialog
-          user={user}
-          activeWallet={
-            activeWallet as unknown as ConnectedWallet | BaseConnectedWalletType
-          }
-        />
-      )}
     </AuthContext.Provider>
   );
 };

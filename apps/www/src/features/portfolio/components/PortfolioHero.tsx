@@ -1,5 +1,5 @@
 "use client";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowDown, ArrowDownUp, ArrowUp, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,13 @@ import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
 import { cn, currencies } from "@/lib/utils";
 import { SwapDialog } from "./SwapDialog";
 import { TokenDialog } from "./TokenDialog";
+import { DepositDialog } from "../../transaction/components/DepositDialog";
+import { SendDialog } from "./SendDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function PortfolioHero() {
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
@@ -63,10 +70,7 @@ export function PortfolioHero() {
           </SelectTrigger>
           <SelectContent>
             {currencies.map((curr) => (
-              <SelectItem
-                key={curr.value}
-                value={curr}
-              >
+              <SelectItem key={curr.value} value={curr}>
                 {curr.label} ({curr.value})
               </SelectItem>
             ))}
@@ -83,13 +87,47 @@ export function PortfolioHero() {
           : ""}
       </p>
 
-      <div className="mt-6 flex min-w-xs items-center gap-3 *:grow">
-        <TokenDialog>
-          <Button variant="outline">Token</Button>
-        </TokenDialog>
-        <SwapDialog>
-          <Button>Swap</Button>
-        </SwapDialog>
+      <div className="mt-6 flex min-w-xs items-center justify-center gap-3">
+        <Tooltip>
+          {({ payload }: { payload?: string }) => (
+            <>
+              <TokenDialog>
+                <TooltipTrigger
+                  payload={"View tokens"}
+                  render={<Button className="grow" variant="outline" />}
+                >
+                  Token
+                </TooltipTrigger>
+              </TokenDialog>
+              <SwapDialog>
+                <TooltipTrigger
+                  payload={"Swap"}
+                  render={<Button variant="outline" size="icon" />}
+                >
+                  <ArrowDownUp />
+                </TooltipTrigger>
+              </SwapDialog>
+              <SendDialog>
+                <TooltipTrigger
+                  payload={"Send"}
+                  render={<Button variant="outline" size="icon" />}
+                >
+                  <ArrowUp />
+                </TooltipTrigger>
+              </SendDialog>
+              <DepositDialog address={"Wallet address"}>
+                <TooltipTrigger
+                  payload={"Receive"}
+                  render={<Button variant="outline" size="icon" />}
+                >
+                  <ArrowDown />
+                </TooltipTrigger>
+              </DepositDialog>
+
+              <TooltipContent>{payload}</TooltipContent>
+            </>
+          )}
+        </Tooltip>
       </div>
     </div>
   );

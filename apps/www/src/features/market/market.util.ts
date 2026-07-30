@@ -1,58 +1,60 @@
+import type { Timeframe } from "./market.schema";
 import type { RawToken } from "./market.token.type";
 
-export function mapToken(raw: RawToken) {
+export function mapToken(raw: RawToken, filters?: { timeframe?: Timeframe }) {
   const safeRaw = raw || ({} as RawToken);
   const live = safeRaw.live ?? null;
   const rawHolders = safeRaw.holders ?? null;
   const social = safeRaw.social ?? null;
   const bonding = safeRaw.bonding ?? null;
 
-  // Extract / normalize timeframes
-  const rawTimeframes = safeRaw.timeframes as any;
-  const timeframesMap: Record<string, any> = {};
+  const currentTimeframe = filters?.timeframe
+    ? safeRaw.timeframes?.windows?.[filters?.timeframe]
+    : Object.values(safeRaw.timeframes?.windows ?? {})[0];
 
-  if (rawTimeframes?.windows) {
-    Object.keys(rawTimeframes.windows).forEach((tf) => {
-      const w = rawTimeframes.windows[tf];
-      timeframesMap[tf] = {
-        ...w,
-        volume_usd: w.volume_usd ?? null,
-        trade_count: w.swaps ?? w.trade_count ?? 0,
-        buy: w.buys ?? w.buy ?? 0,
-        sell: w.sells ?? w.sell ?? 0,
-        volume_buy_usd:
-          w.volume_buy_usd ??
-          (w.volume_usd && w.swaps ? w.volume_usd * (w.buys / w.swaps) : null),
-        volume_sell_usd:
-          w.volume_sell_usd ??
-          (w.volume_usd && w.swaps ? w.volume_usd * (w.sells / w.swaps) : null),
-        unique_wallet: w.traders ?? w.unique_wallet ?? 0,
-        price_change_percent:
-          w.price_change_pct ?? w.price_change_percent ?? null,
-      };
-    });
-  } else if (rawTimeframes && typeof rawTimeframes === "object") {
-    Object.assign(timeframesMap, rawTimeframes);
-  }
-
-  const marketCapUsd =
+  const marketCapUsd = Number(
     safeRaw.market_cap_usd ??
-    live?.dexscreener_market_cap_usd ??
-    safeRaw.ath_mcap_usd ??
-    0;
+      live?.dexscreener_market_cap_usd ??
+      safeRaw.ath_mcap_usd ??
+      0,
+  );
+  const marketCapSol = Number(safeRaw.market_cap_sol ?? 0);
 
-  const priceUsd =
-    safeRaw.price_usd ??
-    rawTimeframes?.last_price_usd ??
-    live?.price_usd ??
-    live?.dexscreener_price_usd ??
-    0;
+  const volumeUsd = Number(currentTimeframe?.volume_usd ?? 0);
+  const volumeSol = Number(currentTimeframe?.volume_sol ?? 0);
 
-  const liquidityUsd =
-    safeRaw.liquidity_usd ?? live?.dexscreener_liquidity_usd ?? 0;
+  const priceUsd = Number(
+    safeRaw.price_usd ?? safeRaw.timeframes?.last_price_usd ?? 0,
+  );
 
-  const bondingPct =
-    bonding?.completion_pct ?? (safeRaw.stage === "completed" ? 100 : 0);
+  const priceChangePct = Number(
+    currentTimeframe?.price_change_pct ?? safeRaw.price_change_percent ?? 0,
+  );
+
+  const liquidityUsd = Number(
+    safeRaw.liquidity_usd ?? live?.dexscreener_liquidity_usd ?? 0,
+  );
+
+  const bondingPct = Number(
+    (
+      bonding?.completion_pct ?? (safeRaw.stage === "completed" ? 100 : 0)
+    ).toFixed(2),
+  );
+
+  const buys = Number(
+    currentTimeframe?.buys ??
+      safeRaw.buys ??
+      (safeRaw as any).buy_24h ??
+      (safeRaw as any).buy ??
+      0,
+  );
+  const sells = Number(
+    currentTimeframe?.sells ??
+      safeRaw.sells ??
+      (safeRaw as any).sell_24h ??
+      (safeRaw as any).sell ??
+      0,
+  );
 
   return {
     ...safeRaw,
@@ -116,35 +118,35 @@ export function mapToken(raw: RawToken) {
     },
 
     bonding: {
-      completion_pct: bondingPct,
+      bondingPct,
       stage: bonding?.stage ?? safeRaw.stage ?? null,
       virtual_sol_reserves: bonding?.virtual_sol_reserves ?? null,
     },
 
-    timeframes: timeframesMap,
-    totalSupply: Number(safeRaw.total_supply) || 0,
-    totalTransaction: Number(0),
-    timeframe: "1h",
-    dexPaid: Number(0),
-    bondingPercent: Number(bondingPct),
-    viewCount: Number(0),
-    marketCapUsd: Number(marketCapUsd),
-    liquidityUsd: Number(liquidityUsd),
-    priceUsd: Number(priceUsd),
-    volumeUsd: Number(
-      timeframesMap["24h"]?.volume_usd ?? timeframesMap["1h"]?.volume_usd ?? 0,
-    ),
-    athUsd: Number(safeRaw.ath_mcap_usd),
-    priceChangePercent: Number(
-      safeRaw.price_change_percent ??
-        timeframesMap["24h"]?.price_change_percent ??
-        timeframesMap["1h"]?.price_change_percent ??
-        0,
-    ),
-    updatedAt: new Date(safeRaw.live?.updated_at ?? Date.now()),
+    fees: {
+      totalCashbackSol: safeRaw.timeframes?.fees?.total_cashback_sol ?? 0,
+      totalFeeSol: safeRaw.timeframes?.fees?.total_fee_sol ?? 0,
+    },
 
-    buys: safeRaw.buys ?? (safeRaw as any).buy_24h ?? (safeRaw as any).buy ?? 0,
-    sells:
-      safeRaw.sells ?? (safeRaw as any).sell_24h ?? (safeRaw as any).sell ?? 0,
+    totalSupply: Number(safeRaw.total_supply) || 0,
+    timeframe: filters?.timeframe,
+    timeframes: Object.keys(safeRaw.timeframes?.windows ?? {}) as Timeframe[],
+    dexPaid: Number(0),
+    viewCount: Number(0),
+    marketCapUsd,
+    marketCapSol,
+    liquidityUsd,
+    priceUsd,
+    volumeUsd,
+    volumeSol,
+    athUsd: Number(safeRaw.ath_mcap_usd),
+    priceChangePct,
+    updatedAt: new Date(safeRaw.live?.updated_at ?? Date.now()),
+    original: raw,
+
+    buys,
+    sells,
+    totalTransaction: buys + sells,
+    netBuyUsd: Number(0),
   };
 }

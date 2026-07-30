@@ -3,7 +3,7 @@ import { ArrowUpDown, Share } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import CopyButton from "@/components/ui/button/copy-button";
+import { CopyButton } from "@/components/ui/button/copy-button";
 import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { POSITIONS } from "@/components/ui/data/portfolio-data";

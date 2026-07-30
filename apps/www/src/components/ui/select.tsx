@@ -5,6 +5,7 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
 import { inputVariants } from "./input";
+import { labelVariant } from "./label";
 
 const Select = SelectPrimitive.Root;
 
@@ -104,8 +105,21 @@ function SelectLabel({
   ...props
 }: SelectPrimitive.GroupLabel.Props) {
   return (
-    <SelectPrimitive.GroupLabel
+    <SelectPrimitive.Label
       data-slot="select-label"
+      className={cn(labelVariant(), className)}
+      {...props}
+    />
+  );
+}
+
+function SelectGroupLabel({
+  className,
+  ...props
+}: SelectPrimitive.GroupLabel.Props) {
+  return (
+    <SelectPrimitive.GroupLabel
+      data-slot="select-group-label"
       className={cn("px-1.5 py-1 text-muted-foreground text-xs", className)}
       {...props}
     />
@@ -195,6 +209,7 @@ export {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectGroupLabel,
   SelectScrollDownButton,
   SelectScrollUpButton,
   SelectSeparator,

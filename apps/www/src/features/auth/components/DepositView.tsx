@@ -2,7 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { ArrowLeft, Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import CopyButton from "@/components/ui/button/copy-button";
+import { CopyButton } from "@/components/ui/button/copy-button";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface DepositViewProps {
@@ -31,10 +31,7 @@ export default function DepositView({
       </DialogHeader>
       <div className="flex flex-col items-center space-y-5 py-3">
         <div className="flex size-52 items-center justify-center rounded-xl border bg-white p-4 shadow-md">
-          <QRCodeSVG
-            value={walletAddress}
-            className="size-44"
-          />
+          <QRCodeSVG value={walletAddress} className="size-44" />
         </div>
         <div className="w-full space-y-2 text-center">
           <p className="text-muted-foreground text-xs">

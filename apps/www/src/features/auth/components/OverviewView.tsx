@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { ParsedTokenAccount } from "@/queries";
-import CopyButton from "@/components/ui/button/copy-button";
+import { CopyButton } from "@/components/ui/button/copy-button";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface OverviewViewProps {

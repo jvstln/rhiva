@@ -14,11 +14,11 @@ import {
   UserStar,
 } from "lucide-react";
 import { FishIcon, MouseLabIcon } from "@/components/ui/icons";
+import type { TokenInfoProps } from "./TokenInfo";
 
-type HoldersProps = { token: Token };
-
-export const TopHolders = ({ token }: HoldersProps) => {
+export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
   const holdersPercent = token.holders.top10;
+  const value = `${formatCompactNumber(holdersPercent)}%`;
 
   return (
     <InfoBadge
@@ -38,23 +38,30 @@ export const TopHolders = ({ token }: HoldersProps) => {
           }
         />
       }
+      {...props}
     >
-      <UserStar />
-      {`${formatCompactNumber(holdersPercent)}%`}
+      {children ? (
+        children({ value, icon: UserStar })
+      ) : (
+        <>
+          <UserStar />
+          {value}
+        </>
+      )}
     </InfoBadge>
   );
 };
 
-export const TotalHolders = ({ token }: { token: Token }) => {
+export const TotalHolders = ({ token, ...props }: TokenInfoProps) => {
   return (
-    <InfoBadge tooltip={"Total holders"}>
+    <InfoBadge tooltip={"Total holders"} {...props}>
       <Users />
       {formatCompactNumber(token.holders.total)}
     </InfoBadge>
   );
 };
 
-export const InsidersHold = ({ token }: HoldersProps) => {
+export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
   const holdersPercent = token.holders.insiders;
 
   return (
@@ -75,6 +82,7 @@ export const InsidersHold = ({ token }: HoldersProps) => {
           }
         />
       }
+      {...props}
     >
       <MouseLabIcon />
       {`${formatCompactNumber(holdersPercent)}%`}
@@ -82,7 +90,7 @@ export const InsidersHold = ({ token }: HoldersProps) => {
   );
 };
 
-export const FreshHold = ({ token }: HoldersProps) => {
+export const FreshHold = ({ token, ...props }: TokenInfoProps) => {
   const holdersPercent = token.holders.fresh;
 
   return (
@@ -103,6 +111,7 @@ export const FreshHold = ({ token }: HoldersProps) => {
           }
         />
       }
+      {...props}
     >
       <Sprout />
       {`${formatCompactNumber(holdersPercent)}%`}
@@ -110,7 +119,7 @@ export const FreshHold = ({ token }: HoldersProps) => {
   );
 };
 
-export const PhishingsHold = ({ token }: HoldersProps) => {
+export const PhishingsHold = ({ token, ...props }: TokenInfoProps) => {
   const holdersPercent = token.holders.phishings;
 
   return (
@@ -131,13 +140,15 @@ export const PhishingsHold = ({ token }: HoldersProps) => {
           }
         />
       }
+      {...props}
     >
       <FishIcon />
       {`${formatCompactNumber(holdersPercent)}%`}
     </InfoBadge>
   );
 };
-export const SnipersHold = ({ token }: HoldersProps) => {
+
+export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
   const holdersPercent = token.holders.snipers;
 
   return (
@@ -158,6 +169,7 @@ export const SnipersHold = ({ token }: HoldersProps) => {
           }
         />
       }
+      {...props}
     >
       <LocateFixed />
       {`${formatCompactNumber(holdersPercent)}%`}
@@ -165,7 +177,7 @@ export const SnipersHold = ({ token }: HoldersProps) => {
   );
 };
 
-export const BundlersHold = ({ token }: HoldersProps) => {
+export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
   return (
     <InfoBadge
       variant={"badge"}
@@ -208,6 +220,7 @@ export const BundlersHold = ({ token }: HoldersProps) => {
           </InfoBadgeTooltipGrid>
         </div>
       }
+      {...props}
     >
       <Layers />
       {`${formatCompactNumber(token.holders.totalBundlers)}%`}
@@ -215,11 +228,11 @@ export const BundlersHold = ({ token }: HoldersProps) => {
   );
 };
 
-export const KolHold = ({ token }: { token: Token }) => {
+export const KolHold = ({ token, ...props }: { token: Token }) => {
   return (
-    <InfoBadge tooltip="KOL Hold">
+    <InfoBadge tooltip="KOL Hold" {...props}>
       <Trophy />
-      {(token.bonding?.completion_pct ?? 0).toFixed(0)}
+      {(token.bonding?.bondingPct ?? 0).toFixed(0)}
     </InfoBadge>
   );
 };

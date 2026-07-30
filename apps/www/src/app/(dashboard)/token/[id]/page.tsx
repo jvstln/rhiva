@@ -1,5 +1,4 @@
 "use client";
-import { getToken } from "@/features/market/market.api";
 import { TokenDetailPage } from "@/features/market/components/TokenDetailPage";
 import { useParams } from "next/navigation";
 import { useToken } from "@/features/market/market.hook";

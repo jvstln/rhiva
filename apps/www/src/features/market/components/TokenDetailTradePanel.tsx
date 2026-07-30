@@ -5,55 +5,41 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
-import { cn } from "@/lib/utils";
-import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
-import { XIcon } from "../ui/icons";
+import { cn, formatCompactCurrency } from "@/lib/utils";
+import { SettingsDialog } from "../../settings/components/SettingsDialog";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-} from "../ui/input-group";
+} from "../../../components/ui/input-group";
 import type { Token } from "@/features/market/market.token.type";
 
 const QUICK_AMOUNTS = ["0.01", "0.1", "0.5", "1"] as const;
 
-type TradePanelProps = { token: Token };
-
-export function TradePanel({ token }: TradePanelProps) {
+export function TokenDetailTradePanel({ token }: { token: Token }) {
   const [side, setSide] = useState<"buy" | "sell" | "lp">("buy");
   const [amount, setAmount] = useState("");
 
-  const marketCap =
-    token.live?.dexscreener_market_cap_usd ?? token.ath_mcap_usd;
-  const price =
-    token.live?.dexscreener_price_usd ?? token.live?.price_usd ?? null;
-
   return (
-    <div className="space-y-3 border-border/70 border-t p-4">
-      <div className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2">
-        <div className="flex items-center justify-between text-b-4">
-          <span className="text-gray">
-            {token.name ?? token.symbol ?? "Token"}
-          </span>
-          <span className="font-medium text-white">
-            {token.symbol ?? "--"}
-            {marketCap !== undefined && marketCap !== null
-              ? ` (ATH MC $${Math.round(marketCap).toLocaleString("en-US")})`
-              : ""}
-          </span>
-        </div>
+    <div className="space-y-3 p-4">
+      <div className="flex items-center justify-between rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm">
+        <span className="text-muted-foreground">{token.name}</span>
+        <span className="font-medium text-white">
+          {token.symbol}
+          (ATH MC {formatCompactCurrency(token.athUsd)})
+        </span>
       </div>
 
-      <div className="flex items-center justify-between rounded-md border border-border/70 px-3 py-1">
+      {/* <div className="flex items-center justify-between rounded-md border border-border/70 px-3 py-1">
         <span className="flex items-center gap-1.5 font-medium text-b-3 text-white">
           <XIcon />
           Connection
         </span>
         <span className="font-semibold text-b-3 text-white">
-          {token.holders?.total ?? "--"}
+          {token}
         </span>
-      </div>
+      </div> */}
 
       <div className="flex items-center justify-between">
         <BondingCurveToggle />
@@ -88,12 +74,10 @@ export function TradePanel({ token }: TradePanelProps) {
         </TabsList>
 
         <div className="flex items-center justify-end text-b-4 text-gray">
-          {price
-            ? `Price: $${price.toLocaleString("en-US", { maximumFractionDigits: 6 })}`
-            : "Price: N/A"}
+          Price: {formatCompactCurrency(token.priceUsd)}
         </div>
 
-        <div className="">
+        <div>
           <InputGroup className="rounded-md rounded-b-none">
             <InputGroupInput
               value={amount}
@@ -106,22 +90,21 @@ export function TradePanel({ token }: TradePanelProps) {
           </InputGroup>
           <div className="grid grid-cols-4">
             {QUICK_AMOUNTS.map((amt) => (
-              <button
-                type="button"
+              <Button
                 key={amt}
+                variant="outline"
+                size="sm"
                 onClick={() => setAmount(amt)}
-                className="border border-border/70 py-1.5 font-medium text-b-4 text-gray first:rounded-bl-md last:rounded-br-md hover:border-primary/50 hover:text-white"
+                className="rounded-none first:rounded-bl-md last:rounded-br-md"
               >
                 {amt}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
         <p className="text-b-5 text-gray">
-          {price
-            ? `Price USD: $${Number(price).toLocaleString("en-US", { maximumFractionDigits: 6 })}`
-            : "Price USD: N/A"}
+          Price USD: {formatCompactCurrency(token.priceUsd)}
         </p>
 
         <TabsContent value="buy">

@@ -159,8 +159,12 @@ function InputGroupInput({
 
 function InputGroupTextarea({
   className,
+  onChange,
+  onValueChange,
   ...props
-}: React.ComponentProps<"textarea">) {
+}: React.ComponentProps<"textarea"> & {
+  onValueChange?: (value: string) => void;
+}) {
   return (
     <Textarea
       data-slot="input-group-control"
@@ -168,6 +172,10 @@ function InputGroupTextarea({
         "flex-1 resize-none rounded-none border-0 bg-transparent py-2 shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent",
         className,
       )}
+      onChange={(...args) => {
+        onChange?.(...args);
+        onValueChange?.(args[0].target.value);
+      }}
       {...props}
     />
   );

@@ -3,9 +3,9 @@ import type { Token } from "../../market.token.type";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { EagleIcon } from "@/components/ui/icons";
 import { Bot, HandCoins } from "lucide-react";
+import type { TokenInfoProps } from "./TokenInfo";
 
-type DexProps = { token: Token };
-export const DexPaid = ({ token }: DexProps) => {
+export const DexPaid = ({ token, ...props }: TokenInfoProps) => {
   return (
     <InfoBadge
       variant={"badge"}
@@ -15,6 +15,7 @@ export const DexPaid = ({ token }: DexProps) => {
           : "[--accent:var(--color-down)]",
       )}
       tooltip={<InfoBadgeTooltipRow label="Dex Paid" />}
+      {...props}
     >
       <EagleIcon />
       {token.dexPaid > 0
@@ -24,28 +25,32 @@ export const DexPaid = ({ token }: DexProps) => {
   );
 };
 
-export const BotSummary = ({ token }: DexProps) => {
+export const BotActivity = ({ token, ...props }: TokenInfoProps) => {
   return (
     <InfoBadge
       variant={"badge"}
-      tooltip={
-        <InfoBadgeTooltipRow label="141 wallets that used Axiom, Padre, Photon etc., and current holding 31.47%" />
-      }
+      tooltip={<InfoBadgeTooltipRow label="Bot activity" />}
+      {...props}
     >
       <Bot />
-      {`${formatCompactNumber(141)} / '31.47%`}
+      {`${formatCompactNumber(token.bot_activity)}`}
     </InfoBadge>
   );
 };
 
-export const GlobalFees = ({ token }: { token: Token }) => {
+export const TotalFees = ({ token }: { token: Token }) => {
   return (
     <InfoBadge
       className="[--accent:var(--color-warn)]"
-      tooltip="Prio & Tip & Trading Fees 23.10 SOL"
+      tooltip={
+        <InfoBadgeTooltipRow
+          label="Prio & Tip & Trading Fees"
+          value={`${token.global_fees_paid ?? 0} SOL`}
+        />
+      }
     >
       <HandCoins />
-      {(token.global_fees_paid ?? 0).toFixed(2)}
+      {formatCompactNumber(token.global_fees_paid ?? 0)}
     </InfoBadge>
   );
 };

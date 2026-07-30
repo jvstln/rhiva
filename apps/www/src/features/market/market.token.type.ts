@@ -27,14 +27,6 @@ export type TimeframeWindowMetrics = {
   high?: number;
   low?: number;
   close?: number;
-  // Legacy aliases
-  trade_count?: number;
-  buy?: number;
-  sell?: number;
-  volume_buy_usd?: number | null;
-  volume_sell_usd?: number | null;
-  unique_wallet?: number;
-  price_change_percent?: number | null;
 };
 
 export type RawTokenTimeframes = {
@@ -165,10 +157,8 @@ export type RawToken = {
     virtual_sol_reserves?: number | null;
   }> | null;
 
-  timeframes?:
-    | RawTokenTimeframes
-    | Partial<Record<Timeframe, TimeframeMetrics>>
-    | null;
+  timeframes?: RawTokenTimeframes;
+
   snipers?: RawSnipers | null;
   bundlers?: RawBundlers | null;
   insiders?: RawInsiders | null;

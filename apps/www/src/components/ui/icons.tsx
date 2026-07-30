@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 import type * as React from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 
 export type IconProps = React.ComponentProps<"svg">;
+export type IconType = LucideIcon;
 
 export const TelegramIcon = ({ className, ...props }: IconProps) => (
   <svg
