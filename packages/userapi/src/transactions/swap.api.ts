@@ -1,4 +1,4 @@
-import { ApiImpl } from "./api-impl";
+import { ApiImpl } from "../api-impl";
 import type {
   swapSchema,
   swapQuoteSchema,

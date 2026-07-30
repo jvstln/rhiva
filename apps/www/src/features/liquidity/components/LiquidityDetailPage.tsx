@@ -16,7 +16,7 @@ import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CoinIcon, MeteoraIcon, SolanaIcon } from "@/components/ui/icons";
-import { LIQUIDITY_BINS } from "@/data/liquidity-detail-data";
+import { LIQUIDITY_BINS } from "@/components/ui/data/liquidity-detail-data";
 import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog";
 import { cn } from "@/lib/utils";
 import { useLiquidityPool } from "../liquidity.hook";

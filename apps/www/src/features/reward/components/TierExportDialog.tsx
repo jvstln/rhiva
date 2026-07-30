@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { RewardTier } from "@/data/reward-data";
+import type { RewardTier } from "@/components/ui/data/reward-data";
 import { downloadLink } from "@/lib/file.util";
 import { share } from "@/lib/utils";
 

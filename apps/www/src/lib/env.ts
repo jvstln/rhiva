@@ -2,6 +2,7 @@ import z from "zod";
 
 const EnvSchema = z
   .object({
+    SOLANA_RPC_URL: z.string(),
     APP_NAME: z.string().default("Rhiva"),
     APP_ORIGIN: z.url().default("https://rhiva.fun"),
     PRIVY_APP_ID: z.string(),
@@ -15,6 +16,7 @@ const EnvSchema = z
   });
 
 export const env = EnvSchema.parse({
+  SOLANA_RPC_URL: process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
   APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
   APP_ORIGIN: process.env.NEXT_PUBLIC_APP_ORIGIN,
   PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,

@@ -10,7 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
-import type { Candle } from "@/data/token-detail-data";
+import type { Candle } from "@/components/ui/data/token-detail-data";
 
 interface CandleShapeProps {
   x?: number;
@@ -59,7 +59,7 @@ function CandleShape({ x, width, payload, yAxis }: CandleShapeProps) {
 export function CandlestickChart({ data }: { data: Candle[] }) {
   return (
     <div className="flex flex-col">
-      <div className="h-[340px] w-full">
+      <div className="h-85 w-full">
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -96,7 +96,7 @@ export function CandlestickChart({ data }: { data: Candle[] }) {
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[90px] w-full border-border/70 border-t">
+      <div className="h-22.5 w-full border-border/70 border-t">
         <ResponsiveContainer
           width="100%"
           height="100%"

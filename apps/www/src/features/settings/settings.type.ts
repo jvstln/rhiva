@@ -1,22 +1,23 @@
-export type BroadcastMode = "priority-fee" | "jito-only" | "mixed";
-export type PriorityLevel = "fast" | "turbo" | "ultra";
+import z from "zod";
+import { feeConfig } from "@rhivadotfun/api";
+import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
+
 export type RebalancingType = "swap" | "swapless";
+export type PriorityLevel = "fast" | "turbo" | "ultra";
+export type BroadcastMode = "priority-fee" | "jito-only" | "mixed";
 
-export type SlippagePreset = "0.1" | "0.5" | "1" | "custom";
-
-export type ZapCurveType = "spot" | "curve" | "bid-ask";
-
-export type TradingPresetId = "preset-1" | "preset-2" | "preset-3";
 export type BuySellMode = "buy" | "sell";
+export type TradingPresetId = "preset-1" | "preset-2" | "preset-3";
 
-export interface TradingConfig {
-  slippage: string;
-  priority: string;
-  bribe: string;
-  autoFee: boolean;
-  maxFee: string;
-  rpc: string;
-}
+const tradingConfigSchema = z
+  .object({
+    bribe: z.number().optional(),
+    rpc: z.url().optional(),
+    slippage: z.number(),
+  })
+  .and(feeConfig);
+
+export type TradingConfig = z.infer<typeof tradingConfigSchema>;
 
 export interface TradingPresetConfig {
   buy: TradingConfig;
@@ -36,19 +37,18 @@ export interface TransactionSettings {
 }
 
 export interface DlmmSettings {
-  liquiditySlippagePreset: SlippagePreset;
-  liquiditySlippageCustom: string;
-  swapSlippagePreset: SlippagePreset;
-  swapSlippageCustom: string;
+  liquiditySlippage: number;
+  swapSlippage?: number;
 }
 
 export interface ZapInSettings {
-  amount: string;
-  liquiditySlippage: string;
-  swapSlippage: string;
-  swapPriceImpact: string;
-  curveType: ZapCurveType;
-  quoteToken: string;
+  amount: number;
+  swapSlippage?: number;
+  swapPriceImpact?: number;
+  liquiditySlippage?: number;
+  side: "base" | "quote" | "custom";
+  rangeFromCurrentPrice?: [number, number];
+  curveType: keyof typeof Strategy;
 }
 
 export interface TradingSettings {
@@ -63,8 +63,6 @@ export interface SettingsState {
   zapIn: ZapInSettings;
   trading: TradingSettings;
   notifications: NotificationSetting[];
-
-  // Actions
   setTransactionSettings: (settings: Partial<TransactionSettings>) => void;
   setDlmmSettings: (settings: Partial<DlmmSettings>) => void;
   setZapInSettings: (settings: Partial<ZapInSettings>) => void;

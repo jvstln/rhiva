@@ -2,7 +2,6 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Star } from "lucide-react";
-import { useMemo } from "react";
 import { QueryState } from "@/components/layout/QueryState";
 import { Button } from "@/components/ui/button";
 import { InfoBadge } from "@/components/ui/info-badge";
@@ -40,8 +39,8 @@ import {
 } from "./tooltips/Holders";
 import { DexPaid, TotalFees } from "./tooltips/DexInfo";
 import { formatDistanceToNowStrict } from "date-fns";
-import { ChartContainer } from "@/components/ui/chart";
-import { Area, AreaChart } from "recharts";
+// import { ChartContainer } from "@/components/ui/chart";
+// import { Area, AreaChart } from "recharts";
 
 export function AddToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
@@ -71,30 +70,30 @@ export function AddToWatchlistButton({ mint }: { mint: string }) {
 /* Mini chart                                                         */
 /* ------------------------------------------------------------------ */
 
-function TokenMiniChart({ data }: { data: number[] }) {
-  const chartData = useMemo(() => {
-    return data.map((value, i) => ({
-      x: String(i),
-      y: String(value),
-    }));
-  }, [data]);
+// function TokenMiniChart({ data }: { data: number[] }) {
+//   const chartData = useMemo(() => {
+//     return data.map((value, i) => ({
+//       x: String(i),
+//       y: String(value),
+//     }));
+//   }, [data]);
 
-  return (
-    <div className="h-20 w-24">
-      <ChartContainer config={{}}>
-        <AreaChart accessibilityLayer data={chartData}>
-          <Area
-            dataKey="y"
-            type="natural"
-            fill="var(--color-up)"
-            fillOpacity={0.4}
-            stroke="var(--color-up)"
-          />
-        </AreaChart>
-      </ChartContainer>
-    </div>
-  );
-}
+//   return (
+//     <div className="h-20 w-24">
+//       <ChartContainer config={{}}>
+//         <AreaChart accessibilityLayer data={chartData}>
+//           <Area
+//             dataKey="y"
+//             type="natural"
+//             fill="var(--color-up)"
+//             fillOpacity={0.4}
+//             stroke="var(--color-up)"
+//           />
+//         </AreaChart>
+//       </ChartContainer>
+//     </div>
+//   );
+// }
 
 /* ------------------------------------------------------------------ */
 /* Pair info cell (star, avatar, name, sub-icons, watcher count)       */

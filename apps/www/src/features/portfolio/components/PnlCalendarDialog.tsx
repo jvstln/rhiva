@@ -30,7 +30,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { PNL_CALENDAR_DAYS, PNL_CALENDAR_METRICS } from "@/data/portfolio-data";
+import {
+  PNL_CALENDAR_DAYS,
+  PNL_CALENDAR_METRICS,
+} from "@/components/ui/data/portfolio-data";
 import { Timeframe } from "@/features/market/market.schema";
 import { cn } from "@/lib/utils";
 import type { PortfolioTab } from "../portfolio.schema";

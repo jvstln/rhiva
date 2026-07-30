@@ -9,11 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PORTFOLIO_SUMMARY } from "@/data/portfolio-data";
+import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
 import { cn, currencies } from "@/lib/utils";
 import { SwapDialog } from "./SwapDialog";
 import { TokenDialog } from "./TokenDialog";
-import { ReceiveDialog } from "./ReceiveDialog";
+import { DepositDialog } from "../../transaction/components/DepositDialog";
 import { SendDialog } from "./SendDialog";
 import {
   Tooltip,
@@ -70,10 +70,7 @@ export function PortfolioHero() {
           </SelectTrigger>
           <SelectContent>
             {currencies.map((curr) => (
-              <SelectItem
-                key={curr.value}
-                value={curr}
-              >
+              <SelectItem key={curr.value} value={curr}>
                 {curr.label} ({curr.value})
               </SelectItem>
             ))}
@@ -97,12 +94,7 @@ export function PortfolioHero() {
               <TokenDialog>
                 <TooltipTrigger
                   payload={"View tokens"}
-                  render={
-                    <Button
-                      className="grow"
-                      variant="outline"
-                    />
-                  }
+                  render={<Button className="grow" variant="outline" />}
                 >
                   Token
                 </TooltipTrigger>
@@ -110,12 +102,7 @@ export function PortfolioHero() {
               <SwapDialog>
                 <TooltipTrigger
                   payload={"Swap"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
+                  render={<Button variant="outline" size="icon" />}
                 >
                   <ArrowDownUp />
                 </TooltipTrigger>
@@ -123,29 +110,19 @@ export function PortfolioHero() {
               <SendDialog>
                 <TooltipTrigger
                   payload={"Send"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
+                  render={<Button variant="outline" size="icon" />}
                 >
                   <ArrowUp />
                 </TooltipTrigger>
               </SendDialog>
-              <ReceiveDialog>
+              <DepositDialog address={"Wallet address"}>
                 <TooltipTrigger
                   payload={"Receive"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
+                  render={<Button variant="outline" size="icon" />}
                 >
                   <ArrowDown />
                 </TooltipTrigger>
-              </ReceiveDialog>
+              </DepositDialog>
 
               <TooltipContent>{payload}</TooltipContent>
             </>

@@ -1,20 +1,19 @@
 import { merge } from "lodash";
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { devtools, persist } from "zustand/middleware";
+
 import type {
+  DlmmSettings,
   SettingsState,
   TradingConfig,
+  ZapInSettings,
   TradingPresetConfig,
+  TransactionSettings,
 } from "./settings.type";
 
 const defaultTradingConfig: TradingConfig = {
-  slippage: "20%",
-  priority: "0.001",
-  bribe: "0.01",
-  autoFee: false,
-  maxFee: "0.01",
-  rpc: "RPC https://a...e.com",
+  slippage: 20,
 };
 
 const defaultPresetConfig: TradingPresetConfig = {
@@ -22,26 +21,20 @@ const defaultPresetConfig: TradingPresetConfig = {
   sell: { ...defaultTradingConfig },
 };
 
-const defaultTransactionSettings = {
-  broadcastMode: "jito-only" as const,
-  priorityLevel: "ultra" as const,
-  rebalancingType: "swap" as const,
+const defaultTransactionSettings: TransactionSettings = {
+  broadcastMode: "jito-only",
+  priorityLevel: "ultra",
+  rebalancingType: "swap",
 };
 
-const defaultDlmmSettings = {
-  liquiditySlippagePreset: "custom" as const,
-  liquiditySlippageCustom: "3%",
-  swapSlippagePreset: "custom" as const,
-  swapSlippageCustom: "3%",
+const defaultDlmmSettings: DlmmSettings = {
+  liquiditySlippage: 2,
 };
 
-const defaultZapInSettings = {
-  amount: "0.1",
-  liquiditySlippage: "3 %",
-  swapSlippage: "3 %",
-  swapPriceImpact: "2 %",
-  curveType: "spot" as const,
-  quoteToken: "quote token",
+const defaultZapInSettings: ZapInSettings = {
+  amount: 0.1,
+  curveType: "Spot",
+  side: "custom",
 };
 
 const defaultNotifications = [

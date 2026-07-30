@@ -1,5 +1,5 @@
 import { InfoRow } from "@/components/token-detail/InfoSection";
-import { POOL_DETAIL } from "@/data/liquidity-detail-data";
+import { POOL_DETAIL } from "@/components/ui/data/liquidity-detail-data";
 import { cn } from "@/lib/utils";
 
 export function PoolFeeDetails() {

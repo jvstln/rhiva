@@ -1,17 +1,17 @@
 import type {
-  orca,
+  raydium,
   buildTransactionResponseSchema,
   estimateOpenPositionFeeResponseSchema,
   buildOpenPositionTransactionResponseSchema,
 } from "@rhivadotfun/api";
 
-import { ApiImpl } from "../../api-impl";
+import { ApiImpl } from "../../../api-impl";
 
-export class WhirlpoolAPI extends ApiImpl {
-  protected path?: string = "/transactions/lp/orca/whirlpool";
+export class CLMMAPI extends ApiImpl {
+  protected path?: string = "/transactions/lp/raydium/clmm";
 
   estimateOpenPositionFee(
-    params: ReturnType<typeof orca.estimateOpenPositionFeeSchema.encode>,
+    params: ReturnType<typeof raydium.estimateOpenPositionFeeSchema.encode>,
   ) {
     return ApiImpl.getData(
       this.xior.post<
@@ -21,7 +21,7 @@ export class WhirlpoolAPI extends ApiImpl {
   }
 
   async buildTransaction(
-    params: ReturnType<typeof orca.buildTransactionSchema.encode>,
+    params: ReturnType<typeof raydium.buildTransactionSchema.encode>,
   ) {
     const data = await ApiImpl.getData(
       this.xior.post(this.buildPath("/build-transaction"), params),

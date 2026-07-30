@@ -1,5 +1,5 @@
 import type { XiorInstance } from "xior";
-import { WhirlpoolAPI } from "../orca";
+import { WhirlpoolAPI } from ".";
 
 export * from "./whirlpool.api";
 

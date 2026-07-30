@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { LP_POSITIONS } from "@/data/portfolio-data";
+import { LP_POSITIONS } from "@/components/ui/data/portfolio-data";
 import { POOLS } from "@/features/liquidity/liquidity.schema";
 import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
 import { capitalize } from "@/lib/utils";

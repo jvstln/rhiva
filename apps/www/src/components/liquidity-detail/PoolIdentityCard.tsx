@@ -1,4 +1,7 @@
-import { LIQUIDITY_BINS, POOL_DETAIL } from "@/data/liquidity-detail-data";
+import {
+  LIQUIDITY_BINS,
+  POOL_DETAIL,
+} from "@/components/ui/data/liquidity-detail-data";
 import { cn } from "@/lib/utils";
 
 export function PoolIdentityCard() {

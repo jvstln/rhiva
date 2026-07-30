@@ -5,7 +5,7 @@ import {
   DashboardSlot,
 } from "@/components/layout/DashboardUi";
 import { Separator } from "@/components/ui/separator";
-import { LIQUIDITY_SUMMARY } from "@/data/liquidity-data";
+import { LIQUIDITY_SUMMARY } from "@/components/ui/data/liquidity-data";
 import { PoolsTable } from "@/features/liquidity/components/PoolsTable";
 import { PoolsToolbar } from "./PoolsToolbar";
 

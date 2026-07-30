@@ -20,7 +20,7 @@ import {
   DashboardSlot,
 } from "@/components/layout/DashboardUi";
 import { Button } from "@/components/ui/button";
-import CopyButton from "@/components/ui/button/copy-button";
+import { CopyButton } from "@/components/ui/button/copy-button";
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,7 @@ import {
   mockRewardAccount,
   REWARD_TIERS,
   type RewardTier,
-} from "@/data/reward-data";
+} from "@/components/ui/data/reward-data";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
 import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
@@ -147,11 +147,7 @@ function CurrentTierCard() {
 
       <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
         <div className="flex shrink-0 flex-col items-center gap-1">
-          <TierBadge
-            tier={currentTier}
-            locked={false}
-            size={110}
-          />
+          <TierBadge tier={currentTier} locked={false} size={110} />
           <span className="text-foreground/80 text-lg">1x</span>
           <span className="text-muted-foreground/60 text-sm">
             10% Referral Rate
@@ -168,10 +164,7 @@ function CurrentTierCard() {
             </p>
 
             <TierExportDialog tier={currentTier}>
-              <Button
-                size="sm"
-                variant="outline"
-              >
+              <Button size="sm" variant="outline">
                 <Share2 />
                 Share
               </Button>
@@ -299,11 +292,7 @@ function RoadmapStep({
         index === 4 && "hidden md:flex",
       )}
     >
-      <TierBadge
-        tier={tier}
-        locked={!unlocked}
-        size={100}
-      />
+      <TierBadge tier={tier} locked={!unlocked} size={100} />
       <div className="flex flex-col items-center gap-0.5">
         <span
           className={cn(
@@ -338,11 +327,7 @@ function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
             Progress through the ranks and unlock exclusive badges
           </p>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onViewAll}
-        >
+        <Button size="sm" variant="outline" onClick={onViewAll}>
           View All Tiers
         </Button>
       </div>
@@ -364,10 +349,7 @@ function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
           {/* connecting line, sits behind the badges */}
           <div className="absolute top-[50px] right-[10%] left-[10%] -z-10 h-px bg-white/10" />
         </div>
-        <ScrollBar
-          orientation="horizontal"
-          showIndicator
-        />
+        <ScrollBar orientation="horizontal" showIndicator />
       </ScrollArea>
 
       <div className="flex items-center gap-3 rounded-lg bg-primary/4 p-4">
@@ -394,10 +376,7 @@ function TierRoadmapDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Tier Roadmap</DialogTitle>
@@ -410,15 +389,8 @@ function TierRoadmapDialog({
           {REWARD_TIERS.map((tier) => {
             const unlocked = mockRewardAccount.currentXp >= tier.minXp;
             return (
-              <div
-                key={tier.id}
-                className="flex flex-col items-center gap-2"
-              >
-                <TierBadge
-                  tier={tier}
-                  locked={!unlocked}
-                  size={84}
-                />
+              <div key={tier.id} className="flex flex-col items-center gap-2">
+                <TierBadge tier={tier} locked={!unlocked} size={84} />
                 <span
                   className={cn(
                     "font-medium text-sm",
@@ -485,10 +457,7 @@ function ReferralCard() {
             Your Referral Link
           </p>
           <InputGroup>
-            <InputGroupInput
-              readOnly
-              value={mockRewardAccount.referralLink}
-            />
+            <InputGroupInput readOnly value={mockRewardAccount.referralLink} />
             <InputGroupAddon align={"inline-end"}>
               <CopyButton
                 size="icon-lg"
@@ -550,10 +519,7 @@ function RadialProgress({
   const offset = circumference * (1 - progressPercent / 100);
 
   return (
-    <div
-      className="relative"
-      style={{ width: size, height: size }}
-    >
+    <div className="relative" style={{ width: size, height: size }}>
       <svg
         width={size}
         height={size}

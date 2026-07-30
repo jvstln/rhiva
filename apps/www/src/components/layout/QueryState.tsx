@@ -1,18 +1,19 @@
-import type { UseQueryResult } from "@tanstack/react-query";
-import { AlertTriangle, FolderOpenIcon } from "lucide-react";
 import type React from "react";
 import { isValidElement } from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { AlertTriangle, FolderOpenIcon } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import { Spinner } from "../ui/spinner";
 import {
   Empty,
-  EmptyContent,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  EmptyContent,
+  EmptyDescription,
 } from "../ui/empty";
-import { Spinner } from "../ui/spinner";
 
 type QueryStateProps<
   TData = unknown,

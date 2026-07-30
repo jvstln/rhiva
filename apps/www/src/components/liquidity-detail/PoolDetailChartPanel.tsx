@@ -3,7 +3,7 @@ import { ChevronUp } from "lucide-react";
 import { CandlestickChart } from "@/components/token-detail/CandlestickChart";
 import { ChartToolbar } from "@/components/token-detail/ChartToolbar";
 import { ChartToolRail } from "@/components/token-detail/ChartToolRail";
-import { CANDLES } from "@/data/token-detail-data";
+import { CANDLES } from "@/components/ui/data/token-detail-data";
 import { PositionsPanel } from "./PositionsPanel";
 
 export function PoolDetailChartPanel() {

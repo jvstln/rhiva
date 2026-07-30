@@ -1,5 +1,5 @@
+import type { PoolRow } from "@/components/ui/data/liquidity-data";
 import type { RawLiquidityPool } from "./liquidity.type";
-import type { PoolRow } from "@/data/liquidity-data";
 import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 
 const formatPercent = (value?: number | null): string => {

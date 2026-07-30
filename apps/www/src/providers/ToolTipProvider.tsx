@@ -4,7 +4,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-} from "./ui/tooltip";
+} from "../components/ui/tooltip";
 
 const CustomTooltipProvider = ({ children }: { children: React.ReactNode }) => {
   return (

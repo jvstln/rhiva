@@ -1,9 +1,15 @@
 "use client";
 
 import { Info } from "lucide-react";
-import type * as React from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useSettingsStore } from "../settings.store";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "../../../components/ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { useSettingsStore } from "../settings.store";
-import type { SlippagePreset } from "../settings.type";
-import { Field, FieldLabel } from "@/components/ui/field";
 
 /* ------------------------------------------------------------------ */
 /* Shared types                                                         */
@@ -42,21 +41,21 @@ const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
 /* Shared building blocks                                               */
 /* ------------------------------------------------------------------ */
 
-interface SegmentedOption<T extends string> {
-  value: T;
+interface SegmentedOption<T extends string | number> {
+  value: T | "custom";
   label: string;
   icon?: React.ComponentType<{ className?: string }>;
 }
 
-interface SegmentedControlProps<T extends string> {
+interface SegmentedControlProps<T extends string | number> {
   options: SegmentedOption<T>[];
-  value: T;
+  value: T | "custom";
   onChange: (value: T) => void;
   tone?: "solid" | "soft" | "neutral";
   className?: string;
 }
 
-function SegmentedControl<T extends string>({
+function SegmentedControl<T extends string | number>({
   options,
   value,
   onChange,
@@ -78,7 +77,10 @@ function SegmentedControl<T extends string>({
           <button
             key={option.value}
             type="button"
-            onClick={() => onChange(option.value)}
+            disabled={option.value === "custom"}
+            onClick={() => {
+              if (option.value !== "custom") onChange(option.value);
+            }}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 font-medium text-sm transition-colors",
               !isActive && "text-muted-foreground hover:text-foreground",
@@ -98,17 +100,17 @@ function SegmentedControl<T extends string>({
   );
 }
 
-interface ValueInputRowProps {
+interface ValueInputRowProps<T extends string | number> {
   label?: string;
-  placeholder: string;
-  defaultValue?: string;
-  value?: string;
-  onChange?: (value: string) => void;
-  suffix?: React.ReactNode;
+  value?: T;
+  defaultValue?: T;
   className?: string;
+  placeholder: string;
+  suffix?: React.ReactNode;
+  onChange?: (value: string) => void;
 }
 
-function ValueInputRow({
+function ValueInputRow<T extends string | number>({
   label,
   placeholder,
   defaultValue,
@@ -116,15 +118,18 @@ function ValueInputRow({
   onChange,
   suffix,
   className,
-}: ValueInputRowProps) {
-  const [localValue, setLocalValue] = useState(defaultValue ?? "");
+}: ValueInputRowProps<T>) {
+  const [localValue, setLocalValue] = useState<string>(
+    defaultValue ? defaultValue.toString() : String(),
+  );
+
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : localValue;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (!isControlled) setLocalValue(val);
-    onChange?.(val);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (!isControlled) setLocalValue(value);
+    onChange?.(value);
   };
 
   return (
@@ -294,36 +299,44 @@ function TransactionTab() {
 
 function SlippagePresetField({
   label,
-  preset,
-  onPresetChange,
-  customValue,
-  onCustomValueChange,
+  value,
+  onValueChange,
 }: {
   label: string;
-  preset: SlippagePreset;
-  onPresetChange: (preset: SlippagePreset) => void;
-  customValue: string;
-  onCustomValueChange: (val: string) => void;
+  value?: number;
+  onValueChange: (value: number) => void;
 }) {
+  const options: SegmentedOption<number>[] = useMemo(
+    () => [
+      { value: 0.1, label: "0.1%" },
+      { value: 0.5, label: "0.5%" },
+      { value: 1, label: "1%" },
+      { value: "custom" as const, label: "Custom" },
+    ],
+    [],
+  );
+
+  const preset = useMemo(() => {
+    const option = options.find((option) => option.value === value);
+    return option ? option.value : "custom";
+  }, [value, options]);
+
   return (
     <div>
       <p className="mb-3 font-semibold text-foreground text-sm">{label}</p>
       <SegmentedControl
         tone="neutral"
         value={preset}
-        onChange={onPresetChange}
-        options={[
-          { value: "0.1", label: "0.1%" },
-          { value: "0.5", label: "0.5%" },
-          { value: "1", label: "1%" },
-          { value: "custom", label: "Custom" },
-        ]}
+        onChange={onValueChange}
+        options={options}
       />
       <ValueInputRow
         className="mt-3"
         placeholder="Value"
-        value={customValue}
-        onChange={onCustomValueChange}
+        value={value}
+        onChange={(value) => {
+          onValueChange(parseFloat(value));
+        }}
       />
     </div>
   );
@@ -337,23 +350,13 @@ function DlmmTab() {
     <div className="space-y-6">
       <SlippagePresetField
         label="Liquidity Spillage"
-        preset={dlmm.liquiditySlippagePreset}
-        onPresetChange={(val) =>
-          setDlmmSettings({ liquiditySlippagePreset: val })
-        }
-        customValue={dlmm.liquiditySlippageCustom}
-        onCustomValueChange={(val) =>
-          setDlmmSettings({ liquiditySlippageCustom: val })
-        }
+        value={dlmm.liquiditySlippage}
+        onValueChange={(value) => setDlmmSettings({ liquiditySlippage: value })}
       />
       <SlippagePresetField
         label="Swap Slippage"
-        preset={dlmm.swapSlippagePreset}
-        onPresetChange={(val) => setDlmmSettings({ swapSlippagePreset: val })}
-        customValue={dlmm.swapSlippageCustom}
-        onCustomValueChange={(val) =>
-          setDlmmSettings({ swapSlippageCustom: val })
-        }
+        value={dlmm.swapSlippage}
+        onValueChange={(value) => setDlmmSettings({ swapSlippage: value })}
       />
     </div>
   );
@@ -384,7 +387,7 @@ function ZapInTab() {
         label="Amount"
         placeholder="Zap in amount"
         value={zapIn.amount}
-        onChange={(val) => setZapInSettings({ amount: val })}
+        onChange={(value) => setZapInSettings({ amount: parseFloat(value) })}
         suffix={<TokenGlyph />}
       />
 
@@ -394,12 +397,16 @@ function ZapInTab() {
           <ValueInputRow
             placeholder="Liquidity Slippage"
             value={zapIn.liquiditySlippage}
-            onChange={(val) => setZapInSettings({ liquiditySlippage: val })}
+            onChange={(value) =>
+              setZapInSettings({ liquiditySlippage: parseFloat(value) })
+            }
           />
           <ValueInputRow
             placeholder="Swap Slippage"
             value={zapIn.swapSlippage}
-            onChange={(val) => setZapInSettings({ swapSlippage: val })}
+            onChange={(value) =>
+              setZapInSettings({ swapSlippage: parseFloat(value) })
+            }
           />
         </div>
       </div>
@@ -408,23 +415,25 @@ function ZapInTab() {
         label="Swap Price Impact"
         placeholder="Max Price Impact"
         value={zapIn.swapPriceImpact}
-        onChange={(val) => setZapInSettings({ swapPriceImpact: val })}
+        onChange={(value) =>
+          setZapInSettings({ swapPriceImpact: parseFloat(value) })
+        }
       />
 
       <SegmentedControl
         tone="soft"
         value={zapIn.curveType}
-        onChange={(val) => setZapInSettings({ curveType: val })}
+        onChange={(value) => setZapInSettings({ curveType: value })}
         options={[
-          { value: "spot", label: "Spot" },
-          { value: "curve", label: "Curve" },
-          { value: "bid-ask", label: "Bid Ask" },
+          { value: "Spot", label: "Spot" },
+          { value: "Curve", label: "Curve" },
+          { value: "BidAsk", label: "Bid Ask" },
         ]}
       />
 
       <div className="flex items-center justify-end gap-2 rounded-lg border border-border px-4 py-3">
         <span className="size-3 rounded-sm bg-primary" />
-        <span className="text-foreground text-sm">{zapIn.quoteToken}</span>
+        <span className="text-foreground text-sm">{zapIn.side}</span>
       </div>
     </div>
   );
@@ -443,16 +452,14 @@ function TradingSettingsTab() {
     (state) => state.updateTradingConfig,
   );
 
-  const activeConfig = trading.presets[trading.activePreset]?.[
-    trading.activeBuySellMode
-  ] ?? {
-    slippage: "20%",
-    priority: "0.001",
-    bribe: "0.01",
-    autoFee: false,
-    maxFee: "0.01",
-    rpc: "RPC https://a...e.com",
-  };
+  const activeConfig = useMemo(() => {
+    return trading.presets[trading.activePreset]?.[trading.activeBuySellMode];
+  }, [trading.presets, trading.activePreset, trading.activeBuySellMode]);
+
+  const autoFee = useMemo(
+    () => !("priorityFee" in activeConfig),
+    [activeConfig],
+  );
 
   return (
     <div className="space-y-6">
@@ -481,29 +488,31 @@ function TradingSettingsTab() {
         label="Slippage"
         placeholder="value"
         value={activeConfig.slippage}
-        onChange={(val) =>
+        onChange={(value) =>
           updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
-            slippage: val,
+            slippage: parseFloat(value),
           })
         }
       />
       <ValueInputRow
         label="Priority"
         placeholder="value"
-        value={activeConfig.priority}
-        onChange={(val) =>
+        value={
+          "priorityFee" in activeConfig ? activeConfig.priorityFee : undefined
+        }
+        onChange={(value) =>
           updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
-            priority: val,
+            priorityFee: parseFloat(value),
           })
         }
       />
       <ValueInputRow
         label="Bribe"
         placeholder="value"
-        value={activeConfig.bribe}
-        onChange={(val) =>
+        value={"bribe" in activeConfig ? activeConfig.bribe : undefined}
+        onChange={(value) =>
           updateTradingConfig(trading.activePreset, trading.activeBuySellMode, {
-            bribe: val,
+            bribe: parseFloat(value),
           })
         }
       />
@@ -514,12 +523,28 @@ function TradingSettingsTab() {
           className="w-fit"
         >
           <Checkbox
-            checked={activeConfig.autoFee}
+            checked={autoFee}
             onCheckedChange={(checked) =>
               updateTradingConfig(
                 trading.activePreset,
                 trading.activeBuySellMode,
-                { autoFee: checked === true },
+                checked
+                  ? {
+                      maxFee:
+                        "maxFee" in activeConfig
+                          ? activeConfig.maxFee
+                          : undefined,
+                    }
+                  : {
+                      maxFee:
+                        "maxFee" in activeConfig
+                          ? activeConfig.maxFee
+                          : undefined,
+                      priorityFee:
+                        "priorityFee" in activeConfig
+                          ? activeConfig.priorityFee
+                          : undefined,
+                    },
               )
             }
           />
@@ -528,12 +553,12 @@ function TradingSettingsTab() {
         <ValueInputRow
           className="flex-1"
           placeholder="Max Fee"
-          value={activeConfig.maxFee}
-          onChange={(val) =>
+          value={"maxFee" in activeConfig ? activeConfig.maxFee : undefined}
+          onChange={(value) =>
             updateTradingConfig(
               trading.activePreset,
               trading.activeBuySellMode,
-              { maxFee: val },
+              { maxFee: parseFloat(value) },
             )
           }
         />
