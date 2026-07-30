@@ -85,7 +85,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "[--padding-x:--spacing(4)]",
-          "-translate-x-1/2 -translate-y-1/2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 fixed inset-s-1/2 top-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] gap-4 overflow-y-auto rounded-xl bg-popover px-(--padding-x) py-(--padding-x) text-popover-foreground text-sm outline-none ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-open:animate-in sm:max-w-xl rtl:translate-x-1/2",
+          "data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 fixed inset-s-1/2 top-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl bg-popover px-(--padding-x) py-(--padding-x) text-popover-foreground text-sm outline-none ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-open:animate-in sm:max-w-xl rtl:translate-x-1/2",
           className,
         )}
         {...props}

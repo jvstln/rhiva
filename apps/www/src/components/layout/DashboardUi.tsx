@@ -8,7 +8,7 @@ export const DashboardHeader = ({
   const element = useRender({
     defaultTagName: "h1",
     props: mergeProps(
-      { className: cn("text-h4 font-bold text-primary", className) },
+      { className: cn("font-bold text-h4 text-primary", className) },
       props,
     ),
     state: { slot: "dashboard-header" },
@@ -26,7 +26,7 @@ export const DashboardDescription = ({
     props: mergeProps(
       {
         className: cn(
-          "[[data-slot=dashboard-header]~*]:mt-1 text-b-2",
+          "text-b-2 [[data-slot=dashboard-header]~*]:mt-1",
           className,
         ),
       },
@@ -47,7 +47,7 @@ export const DashboardSlot = ({
     props: mergeProps(
       {
         className: cn(
-          "flex flex-col min-h-0 gap-6 px-(--padding-x) [--padding-x:--spacing(6)] pt-9 pb-6",
+          "flex min-h-0 flex-col gap-6 px-(--padding-x) pt-9 pb-6 [--padding-x:--spacing(6)]",
           className,
         ),
       },

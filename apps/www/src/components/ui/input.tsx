@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 const inputVariants = cva(
   cn(
     "flex w-full min-w-0 rounded-full border border-input bg-transparent text-b-2 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-    "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+    "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
   ),
   {
     variants: {

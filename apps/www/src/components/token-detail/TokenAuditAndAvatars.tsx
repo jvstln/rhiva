@@ -55,11 +55,20 @@ export function TokenAuditCard({ token }: TokenAuditCardProps) {
 
 export function AvatarReusedCard({ items }: { items: AvatarItem[] }) {
   return (
-    <InfoSection title="Avatar Reused Tokens" aside={<span>MC</span>}>
+    <InfoSection
+      title="Avatar Reused Tokens"
+      aside={<span>MC</span>}
+    >
       <div className="space-y-2">
         {items.map((item) => (
-          <div key={item.wallet} className="flex items-center gap-2">
-            <TokenThumbnail badge={undefined} className="size-8" />
+          <div
+            key={item.wallet}
+            className="flex items-center gap-2"
+          >
+            <TokenThumbnail
+              badge={undefined}
+              className="size-8"
+            />
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-b-4 text-white">
                 {item.name}

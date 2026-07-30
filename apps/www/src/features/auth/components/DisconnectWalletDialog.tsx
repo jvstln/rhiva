@@ -28,7 +28,10 @@ export function DisconnectWalletDialog({
   const currentWallet = wallets[0];
 
   return (
-    <Dialog handle={disconnectWalletDialogHandle} {...props}>
+    <Dialog
+      handle={disconnectWalletDialogHandle}
+      {...props}
+    >
       {children && <DialogTrigger render={children} />}
 
       <DialogContent>

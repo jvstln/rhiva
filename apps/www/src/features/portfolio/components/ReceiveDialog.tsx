@@ -21,7 +21,10 @@ export function ReceiveDialog({
   const { copy } = useCopyToClipboard();
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       {children && <DialogTrigger render={children} />}
       <DialogContent>
         <DialogHeader>
@@ -41,7 +44,10 @@ export function ReceiveDialog({
           <p className="text-center text-muted-foreground">
             Only send Solana Network tokens (SPL) to this address
           </p>
-          <Button className="w-full" onClick={() => copy("Wallet address")}>
+          <Button
+            className="w-full"
+            onClick={() => copy("Wallet address")}
+          >
             Copy addess
           </Button>
         </DialogFooter>

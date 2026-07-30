@@ -51,7 +51,10 @@ export function UserPopover({
 
         <Separator />
 
-        <Button variant="ghost" onClick={logout}>
+        <Button
+          variant="ghost"
+          onClick={logout}
+        >
           <LogOut />
           Disconnect
         </Button>

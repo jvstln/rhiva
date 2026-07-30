@@ -20,13 +20,13 @@ export function PoolNotFound() {
 
         {/* Error code */}
         <div className="space-y-2">
-          <p className="font-mono text-[5rem]/none font-bold tracking-tighter text-white/10">
+          <p className="font-bold font-mono text-[5rem]/none text-white/10 tracking-tighter">
             404
           </p>
-          <h2 className="font-heading text-xl font-semibold text-white">
+          <h2 className="font-heading font-semibold text-white text-xl">
             Pool not found
           </h2>
-          <p className="text-balance text-sm text-muted-foreground">
+          <p className="text-balance text-muted-foreground text-sm">
             The liquidity pool you're looking for doesn't exist or may have been
             removed. Check the pool address and try again.
           </p>

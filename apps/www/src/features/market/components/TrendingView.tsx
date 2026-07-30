@@ -71,7 +71,7 @@ export function AddToWatchlistButton({ mint }: { mint: string }) {
 /* Mini chart                                                         */
 /* ------------------------------------------------------------------ */
 
-function _TokenMiniChart({ data }: { data: number[] }) {
+function TokenMiniChart({ data }: { data: number[] }) {
   const chartData = useMemo(() => {
     return data.map((value, i) => ({
       x: String(i),
@@ -82,10 +82,7 @@ function _TokenMiniChart({ data }: { data: number[] }) {
   return (
     <div className="h-20 w-24">
       <ChartContainer config={{}}>
-        <AreaChart
-          accessibilityLayer
-          data={chartData}
-        >
+        <AreaChart accessibilityLayer data={chartData}>
           <Area
             dataKey="y"
             type="natural"
@@ -105,10 +102,7 @@ function _TokenMiniChart({ data }: { data: number[] }) {
 
 function PairInfoCell({ token }: { token: Token }) {
   return (
-    <div
-      data-token-id={token.mint}
-      className="flex items-center gap-3"
-    >
+    <div data-token-id={token.mint} className="flex items-center gap-3">
       <AddToWatchlistButton mint={token.mint} />
       <TokenAvatar token={token} />
 
@@ -195,10 +189,7 @@ function ActionButtons() {
   return (
     <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
-        <Button
-          variant="sell"
-          size="sm"
-        >
+        <Button variant="sell" size="sm">
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
           </span>
@@ -379,10 +370,7 @@ export function WatchlistView() {
     .filter((t): t is Token => !!t);
 
   return (
-    <QueryState
-      query={{ data: tokens }}
-      getIsLoading={() => isPending}
-    >
+    <QueryState query={{ data: tokens }} getIsLoading={() => isPending}>
       <TrendingTable tokens={tokens} />
     </QueryState>
   );

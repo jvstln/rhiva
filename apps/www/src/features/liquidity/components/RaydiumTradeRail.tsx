@@ -67,8 +67,8 @@ export function RaydiumTradeRail() {
             {/* Handles */}
             <div className="absolute top-0 bottom-[-16px] left-[33%] z-10 w-0.5 bg-white" />
             <div className="absolute top-0 bottom-[-16px] left-[68%] z-10 w-0.5 bg-white" />
-            <div className="-translate-x-1/2 absolute bottom-[-16px] left-[33%] h-4 w-1.5 rounded-sm bg-white" />
-            <div className="-translate-x-1/2 absolute bottom-[-16px] left-[68%] h-4 w-1.5 rounded-sm bg-white" />
+            <div className="absolute bottom-[-16px] left-[33%] h-4 w-1.5 -translate-x-1/2 rounded-sm bg-white" />
+            <div className="absolute bottom-[-16px] left-[68%] h-4 w-1.5 -translate-x-1/2 rounded-sm bg-white" />
           </div>
 
           <div className="mt-4 flex justify-between text-[10px] text-white">

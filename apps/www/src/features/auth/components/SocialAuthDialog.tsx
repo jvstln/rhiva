@@ -37,18 +37,18 @@ export const SocialAuthDialog = ({
       {children && <DialogTrigger render={children} />}
       <DialogContent>
         <DialogHeader>
-          <div className="flex relative items-center gap-2">
+          <div className="relative flex items-center gap-2">
             {step === "email" && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setStep("login")}
-                className="absolute bottom-1/2 "
+                className="absolute bottom-1/2"
               >
                 <ChevronLeft />
               </Button>
             )}
-            <DialogTitle className="text-center mx-auto">
+            <DialogTitle className="mx-auto text-center">
               Social Login
             </DialogTitle>
           </div>

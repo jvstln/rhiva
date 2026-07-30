@@ -68,7 +68,10 @@ export function PoolsToolbar() {
           </SelectTrigger>
           <SelectContent>
             {TIMEFRAMES.map((tf) => (
-              <SelectItem key={tf} value={tf}>
+              <SelectItem
+                key={tf}
+                value={tf}
+              >
                 {tf}
               </SelectItem>
             ))}
@@ -76,7 +79,10 @@ export function PoolsToolbar() {
         </Select>
 
         <PoolFiltersDialog>
-          <Button variant="ghost" size="sm">
+          <Button
+            variant="ghost"
+            size="sm"
+          >
             <Filter className="text-muted-foreground" />
             Filter
           </Button>
@@ -106,7 +112,11 @@ const ZapInInput = ({
 
   return (
     <div className="flex w-36 rounded-full border *:rounded-none *:border-0 *:first:rounded-s-full *:last:rounded-e-full *:[button]:h-auto">
-      <Button size="sm" variant="soft" onClick={onSettingsDialogOpen}>
+      <Button
+        size="sm"
+        variant="soft"
+        onClick={onSettingsDialogOpen}
+      >
         <Rocket />
         Zap in
       </Button>

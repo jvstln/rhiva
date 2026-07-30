@@ -59,14 +59,23 @@ export function TradePanel({ token }: TradePanelProps) {
         <BondingCurveToggle />
 
         <SettingsDialog defaultTab="trading-settings">
-          <Button size={"icon"} variant={"ghost"}>
+          <Button
+            size={"icon"}
+            variant={"ghost"}
+          >
             <Settings />
           </Button>
         </SettingsDialog>
       </div>
 
-      <Tabs value={side} onValueChange={(v) => setSide(v as typeof side)}>
-        <TabsList variant={"soft"} className={"w-full"}>
+      <Tabs
+        value={side}
+        onValueChange={(v) => setSide(v as typeof side)}
+      >
+        <TabsList
+          variant={"soft"}
+          className={"w-full"}
+        >
           {(["Buy", "Sell"] as const).map((s) => (
             <TabsTrigger
               key={s}
@@ -119,7 +128,10 @@ export function TradePanel({ token }: TradePanelProps) {
           <Button className="w-full">Buy</Button>
         </TabsContent>
         <TabsContent value="sell">
-          <Button className="w-full" variant={"sell"}>
+          <Button
+            className="w-full"
+            variant={"sell"}
+          >
             Sell
           </Button>
         </TabsContent>

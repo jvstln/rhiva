@@ -87,7 +87,7 @@ export const TierExportDialog = ({
             boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
           }}
         >
-          <div className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-0 left-1/2 size-32 rounded-full bg-foreground/30 blur-[100px]" />
+          <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-2 font-medium text-xl">
               Current Point:{" "}

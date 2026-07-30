@@ -47,7 +47,10 @@ export const RadarView = () => {
             </div>
 
             <ScrollArea className="h-full min-h-0 flex-1">
-              <QueryState query={query} getIsLoading={(q) => q.isPending}>
+              <QueryState
+                query={query}
+                getIsLoading={(q) => q.isPending}
+              >
                 {query.data?.tokens.map((token) => (
                   <RadarTokenCard
                     key={token.mint}
@@ -56,7 +59,10 @@ export const RadarView = () => {
                   />
                 ))}
               </QueryState>
-              <ScrollBar showScrollBar showIndicator />
+              <ScrollBar
+                showScrollBar
+                showIndicator
+              />
             </ScrollArea>
           </section>
         );

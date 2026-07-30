@@ -6,7 +6,7 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 const avatarVariants = cva(
-  "group/avatar relative flex  shrink-0 select-none  bg-muted after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken  dark:after:mix-blend-lighten",
+  "group/avatar relative flex shrink-0 select-none bg-muted after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten",
   {
     variants: {
       variant: {
@@ -93,7 +93,7 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="avatar-group"
       className={cn(
-        "group/avatar-group -space-x-2 flex *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background",
+        "group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background",
         className,
       )}
       {...props}

@@ -34,7 +34,6 @@ import {
 import { SurgeFilters } from "../market.schema";
 import { capitalize } from "@/lib/utils";
 import { useMarketStore } from "../market.store";
-import { debounce } from "lodash";
 
 const PROTOCOLS = [
   {

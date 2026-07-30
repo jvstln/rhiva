@@ -1,7 +1,6 @@
 import type {
   Preset,
   RadarColumns,
-  SurgeFilters,
   SurgeFiltersInput,
   Timeframe,
 } from "./market.schema";

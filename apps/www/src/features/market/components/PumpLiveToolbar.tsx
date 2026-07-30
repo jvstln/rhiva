@@ -54,7 +54,10 @@ export const PumpLiveToolbar = () => {
       </div>
 
       <SettingsDialog defaultTab="trading-settings">
-        <Button variant="ghost" size="sm">
+        <Button
+          variant="ghost"
+          size="sm"
+        >
           <Settings className="text-purple-500" />
           Settings
         </Button>

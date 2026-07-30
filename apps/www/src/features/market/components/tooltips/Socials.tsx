@@ -48,7 +48,7 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
 
           <div className="flex flex-col gap-4">
             {/* Profile Info */}
-            <div className="-mt-2/3 relative flex items-start justify-between">
+            <div className="relative -mt-2/3 flex items-start justify-between">
               <Avatar>
                 <AvatarImage src={token.image || ""} />
                 <AvatarFallback>

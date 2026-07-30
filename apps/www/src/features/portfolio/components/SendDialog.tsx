@@ -17,7 +17,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectLabel,
 } from "@/components/ui/select";
 import { NetworkSolana } from "@web3icons/react";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -33,7 +32,10 @@ export function SendDialog({
   const [sendAmount, setSendAmount] = React.useState("0");
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       {children && <DialogTrigger render={children} />}
       <DialogContent>
         <DialogHeader>
@@ -42,7 +44,10 @@ export function SendDialog({
 
         <div className="relative flex justify-between">
           <div className="flex flex-col">
-            <AmountInput value={sendAmount} onValueChange={setSendAmount} />
+            <AmountInput
+              value={sendAmount}
+              onValueChange={setSendAmount}
+            />
             <span className="text-muted-foreground">$0.00</span>
           </div>
 
@@ -70,7 +75,10 @@ export function SendDialog({
             <SelectContent>
               <SelectGroup>
                 {TOKEN_ITEMS.map((item) => (
-                  <SelectItem key={item.value} value={item}>
+                  <SelectItem
+                    key={item.value}
+                    value={item}
+                  >
                     <item.icon />
                     <span className="text-muted-foreground">{item.value}</span>
                   </SelectItem>

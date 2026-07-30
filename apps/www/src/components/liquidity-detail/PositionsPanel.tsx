@@ -25,7 +25,7 @@ export function PositionsPanel() {
           >
             {t}
             {tab === t && (
-              <span className="-bottom-px absolute inset-x-0 h-0.5 bg-primary" />
+              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />
             )}
           </button>
         ))}
