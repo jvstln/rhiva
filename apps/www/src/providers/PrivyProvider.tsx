@@ -1,5 +1,4 @@
 "use client";
-import { env } from "@/lib/env";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
 import {
   useUser,
@@ -7,6 +6,7 @@ import {
   PrivyProvider as PrivyProviderPrimitive,
 } from "@privy-io/react-auth";
 
+import { env } from "@/lib/env";
 import { DisconnectWalletDialog } from "@/features/auth/components/DisconnectWalletDialog";
 
 type PrivyProviderProps = Partial<
@@ -20,8 +20,7 @@ const InnerPrivyProvider = () => {
   const { wallet } = useActiveWallet();
 
   return (
-    wallet &&
-    user && (
+    wallet && (
       <DisconnectWalletDialog
         user={user}
         activeWallet={wallet}

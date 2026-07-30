@@ -1,5 +1,4 @@
 "use client";
-
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -26,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 
 type DisconnectWalletDialogProps = Dialog.Props & {
-  user: User;
+  user?: User | null;
   children?: React.ReactElement;
   activeWallet: ConnectedWallet | BaseConnectedWalletType;
 };
@@ -110,7 +109,7 @@ export function DisconnectWalletDialog({
             </TabPanel>
             <TabPanel className="outline-none focus:outline-none">
               <DepositView
-                walletAddress={activeWallet.address}
+                walletAddress={activeWallet?.address}
                 onBack={() => setView("overview")}
               />
             </TabPanel>

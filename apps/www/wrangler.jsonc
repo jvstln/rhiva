@@ -28,7 +28,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "rhiva"
+      "service": "rhiva-alpha"
     }
   ],
   "kv_namespaces": [
