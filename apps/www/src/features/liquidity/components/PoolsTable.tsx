@@ -24,6 +24,7 @@ import { POOLS, type PoolDex } from "../liquidity.schema";
 import { useLiquidityStore } from "../liquidity.store";
 import type { LiquidityPool } from "../liquidity.type";
 import { useRouter } from "next/navigation";
+import { QueryState } from "@/components/layout/QueryState";
 
 const formatPercentString = (value?: string | number | null): string => {
   if (value === undefined || value === null || value === "") return "N/A";
@@ -232,10 +233,7 @@ export function PoolsTable() {
             >
               <ToggleGroupItem value="all">All pools</ToggleGroupItem>
               {POOLS.map((pool) => (
-                <ToggleGroupItem
-                  key={pool.id}
-                  value={pool.id}
-                >
+                <ToggleGroupItem key={pool.id} value={pool.id}>
                   <pool.icon />
                 </ToggleGroupItem>
               ))}
@@ -390,19 +388,11 @@ export function PoolsTable() {
             <Popover>
               <PopoverTrigger
                 openOnHover
-                render={
-                  <Button
-                    size="sm"
-                    variant="outline"
-                  />
-                }
+                render={<Button size="sm" variant="outline" />}
               >
                 More
               </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="p-0"
-              >
+              <PopoverContent align="end" className="p-0">
                 <div className="flex flex-col py-1">
                   {stats.map((stat) => (
                     <div
@@ -445,10 +435,8 @@ export function PoolsTable() {
     [pool, stats],
   );
 
-  const poolRows = React.useMemo(() => pools.data?.pools ?? [], [pools.data]);
-
   const table = useDataTable({
-    data: poolRows,
+    data: pools.data?.pools ?? [],
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -460,35 +448,34 @@ export function PoolsTable() {
   );
 
   return (
-    <nav
-      onClick={(e) => {
-        if (!(e.target instanceof HTMLElement)) return;
-
-        const poolId = e.target
-          .closest("tr:has([data-pool-id])")
-          ?.querySelector<HTMLElement>("[data-pool-id]")?.dataset.poolId;
-
-        if (poolId) {
-          const route = `/liquidity/pool/${poolId}` as Parameters<
-            typeof router.push
-          >[0];
-
-          router.push(route);
-        }
-      }}
-      onKeyDown={() => null}
-    >
-      <DataTable
-        table={table}
-        classNames={{
-          table: "w-full",
-          th: cn("normal-case", pinnedColumnClassName),
-          td: cn(
-            "has-data-[slot=value-change-cell]:text-center",
-            pinnedColumnClassName,
-          ),
+    <QueryState query={pools}>
+      <nav
+        onClick={(e) => {
+          if (!(e.target instanceof HTMLElement)) return;
+          const poolId = e.target
+            .closest("tr:has([data-pool-id])")
+            ?.querySelector<HTMLElement>("[data-pool-id]")?.dataset.poolId;
+          if (poolId) {
+            const route = `/liquidity/pool/${poolId}` as Parameters<
+              typeof router.push
+            >[0];
+            router.push(route);
+          }
         }}
-      />
-    </nav>
+        onKeyDown={() => null}
+      >
+        <DataTable
+          table={table}
+          classNames={{
+            table: "w-full",
+            th: cn("normal-case", pinnedColumnClassName),
+            td: cn(
+              "has-data-[slot=value-change-cell]:text-center",
+              pinnedColumnClassName,
+            ),
+          }}
+        />
+      </nav>
+    </QueryState>
   );
 }
