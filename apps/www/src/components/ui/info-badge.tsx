@@ -10,7 +10,7 @@ const infoBadgeVariants = cva(
       variant: {
         inline: "",
         badge:
-          "rounded-md border border-border/30 bg-accent/5 px-1 py-0.25 font-medium text-[11px]",
+          "rounded-md border border-border/30 bg-accent/5 px-1 py-px font-medium text-[11px]",
       },
       tone: {
         default: "[--accent:var(--color-gray)]",
@@ -28,10 +28,11 @@ const infoBadgeVariants = cva(
   },
 );
 
-export interface InfoBadgeProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof infoBadgeVariants> {
-  tooltip?: React.ReactNode;
+export namespace InfoBadge {
+  export type Props = React.HTMLAttributes<HTMLElement> &
+    VariantProps<typeof infoBadgeVariants> & {
+      tooltip?: React.ReactNode;
+    };
 }
 
 export const InfoBadge = ({
@@ -41,7 +42,7 @@ export const InfoBadge = ({
   children,
   tooltip,
   ...props
-}: InfoBadgeProps) => {
+}: InfoBadge.Props) => {
   const variableClassName = className?.split(/\s+/).filter((c) => /--/.test(c));
 
   const content = (
@@ -66,7 +67,7 @@ export const InfoBadge = ({
       <TooltipContent
         side="bottom"
         align="center"
-        className={cn("max-w-[280px] font-geist", variableClassName)}
+        className={cn("max-w-70 font-geist", variableClassName)}
       >
         {tooltip}
       </TooltipContent>

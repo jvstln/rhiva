@@ -7,12 +7,12 @@ import {
 import type { Token } from "../../market.token.type";
 import { TokenSOL } from "@web3icons/react";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
-import { BadgeDollarSign, ChefHat, Crown } from "lucide-react";
+import { BadgeDollarSign, Check, ChefHat, Copy, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { TokenInfoProps } from "./TokenInfo";
+import { useCopyToClipboard } from "@/hooks/use-clipboard";
 
-type DevHoldOrDevSellProps = { token: Token; children?: React.ReactNode };
-
-export const DevHoldOrDevSell = ({ token }: DevHoldOrDevSellProps) => {
+export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
   const devHoldPercent = token.dev.tokenBalance / token.totalSupply || 0;
   const hasDevSoldAll = devHoldPercent === 0;
 
@@ -95,6 +95,7 @@ export const DevHoldOrDevSell = ({ token }: DevHoldOrDevSellProps) => {
           </InfoBadgeTooltipGrid>
         </div>
       }
+      {...props}
     >
       <ChefHat />
       {hasDevSoldAll ? "DS" : `${formatCompactNumber(devHoldPercent)}%`}

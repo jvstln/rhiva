@@ -20,16 +20,18 @@ export function PoolFeeDetails() {
 
       <div className="space-y-1">
         {POOL_DETAIL.feeSchedule.map((row) => (
-          <InfoRow
+          <div
             key={row.label}
-            label={row.label}
-            value={row.value}
-          />
+            className="flex items-center justify-between py-0.5 text-b-4"
+          >
+            <span className="text-gray">{row.label}</span>
+            <span>{row.value}</span>
+          </div>
         ))}
-        <InfoRow
-          label="Fee Collection Token"
-          value={POOL_DETAIL.feeCollectionToken}
-        />
+        <div className="flex items-center justify-between py-0.5 text-b-4">
+          <span className="text-gray">{"Fee Collection Token"}</span>
+          <span>{POOL_DETAIL.feeCollectionToken}</span>
+        </div>
       </div>
     </div>
   );

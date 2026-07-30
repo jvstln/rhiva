@@ -1,6 +1,5 @@
 import type { RawLiquidityPool } from "./liquidity.type";
 import type { PoolRow } from "@/data/liquidity-data";
-import { formatAge } from "@/lib/utils";
 import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 
 const formatPercent = (value?: number | null): string => {
@@ -40,7 +39,7 @@ export const mapLiquidityPool = (
     pair: `${shortId(pool.token_mint_a)}/${shortId(pool.token_mint_b)}`,
     tickSpacing: pool.tick_spacing ?? 0,
     fee: feeLabel,
-    age: formatAge(pool.last_update_ms),
+    age: String(pool.last_update_ms),
     marketCap:
       pool.market_cap_usd !== undefined && pool.market_cap_usd !== null
         ? formatCompactCurrency(pool.market_cap_usd)

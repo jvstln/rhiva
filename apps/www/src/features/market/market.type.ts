@@ -57,5 +57,12 @@ export type RadarFilters = Record<
   }
 >;
 
+export type TokenDetailFilters = Partial<{
+  timeframe: Timeframe;
+  quickBuy: number | null;
+  quickSell: number | null;
+  preset: Preset;
+}>;
+
 export type * from "./market.token.type";
 export type * from "./market.schema";

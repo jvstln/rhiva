@@ -3,9 +3,9 @@ import type { Token } from "../../market.token.type";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { EagleIcon } from "@/components/ui/icons";
 import { Bot, HandCoins } from "lucide-react";
+import type { TokenInfoProps } from "./TokenInfo";
 
-type DexProps = { token: Token };
-export const DexPaid = ({ token }: DexProps) => {
+export const DexPaid = ({ token, ...props }: TokenInfoProps) => {
   return (
     <InfoBadge
       variant={"badge"}
@@ -15,6 +15,7 @@ export const DexPaid = ({ token }: DexProps) => {
           : "[--accent:var(--color-down)]",
       )}
       tooltip={<InfoBadgeTooltipRow label="Dex Paid" />}
+      {...props}
     >
       <EagleIcon />
       {token.dexPaid > 0
@@ -24,11 +25,12 @@ export const DexPaid = ({ token }: DexProps) => {
   );
 };
 
-export const BotActivity = ({ token }: DexProps) => {
+export const BotActivity = ({ token, ...props }: TokenInfoProps) => {
   return (
     <InfoBadge
       variant={"badge"}
       tooltip={<InfoBadgeTooltipRow label="Bot activity" />}
+      {...props}
     >
       <Bot />
       {`${formatCompactNumber(token.bot_activity)}`}

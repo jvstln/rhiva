@@ -28,7 +28,7 @@ export function mapToken(raw: RawToken, filters?: { timeframe?: Timeframe }) {
   );
 
   const priceChangePct = Number(
-    safeRaw.price_change_percent ?? currentTimeframe?.price_change_pct ?? 0,
+    currentTimeframe?.price_change_pct ?? safeRaw.price_change_percent ?? 0,
   );
 
   const liquidityUsd = Number(
@@ -130,6 +130,7 @@ export function mapToken(raw: RawToken, filters?: { timeframe?: Timeframe }) {
 
     totalSupply: Number(safeRaw.total_supply) || 0,
     timeframe: filters?.timeframe,
+    timeframes: Object.keys(safeRaw.timeframes?.windows ?? {}) as Timeframe[],
     dexPaid: Number(0),
     viewCount: Number(0),
     marketCapUsd,
@@ -146,6 +147,6 @@ export function mapToken(raw: RawToken, filters?: { timeframe?: Timeframe }) {
     buys,
     sells,
     totalTransaction: buys + sells,
-    netBuy: Number(0),
+    netBuyUsd: Number(0),
   };
 }

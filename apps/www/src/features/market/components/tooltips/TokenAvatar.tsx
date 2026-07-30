@@ -113,39 +113,20 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
 
           {/* Actions */}
           <div className="pointer-events-none absolute -top-3 left-0 flex -translate-x-1/2 flex-col opacity-0 transition-all *:bg-background group-hover/token-avatar:pointer-events-auto group-hover/token-avatar:opacity-100">
-            <Button
-              size="icon-xs"
-              variant="outline"
-              tooltip="Hide token"
-            >
+            <Button size="icon-xs" variant="outline" tooltip="Hide token">
               <EyeOff />
             </Button>
-            <Button
-              size="icon-xs"
-              variant="outline"
-              tooltip="Blacklist dev"
-            >
+            <Button size="icon-xs" variant="outline" tooltip="Blacklist dev">
               <ChefHat />
             </Button>
-            <Button
-              size="icon-xs"
-              variant="outline"
-              tooltip="Blacklist handle"
-            >
+            <Button size="icon-xs" variant="outline" tooltip="Blacklist handle">
               <AtSign />
             </Button>
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent
-        side="right"
-        align="start"
-        className="px-2 py-2"
-      >
-        <Avatar
-          variant="square"
-          className={"size-59"}
-        >
+      <TooltipContent side="right" align="start" className="px-2 py-2">
+        <Avatar variant="square" className={"size-59"}>
           <AvatarImage src={token.image ?? ""} />
           <AvatarFallback>
             {token.name ? getInitials(token.name) : <User />}
@@ -162,10 +143,7 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
   return (
     <DropdownMenu>
       <div className="flex max-w-[20ch] items-center gap-1 text-sm">
-        <span
-          className="font-semibold"
-          data-slot={"token-symbol"}
-        >
+        <span className="font-semibold" data-slot={"token-symbol"}>
           {token.symbol}
         </span>
         <DropdownMenuTrigger
@@ -177,20 +155,14 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
           openOnHover
           delay={0}
         >
-          <span
-            className="truncate"
-            data-slot={"token-name"}
-          >
+          <span className="truncate" data-slot={"token-name"}>
             {token.name}
           </span>
           <Copy className="size-3 shrink-0" />
         </DropdownMenuTrigger>
       </div>
 
-      <DropdownMenuContent
-        align="center"
-        className="w-fit max-w-62.5"
-      >
+      <DropdownMenuContent align="center" className="w-fit max-w-62.5">
         <DropdownMenuItem onClick={() => copy(token.mint)}>
           <Copy />
           Copy
@@ -215,11 +187,8 @@ export function TokenNameAndSymbol({ token }: { token: Token }) {
           href={`https://x.com/search?q=${token.symbol}+token&src=typed_query`}
           className="truncate"
         >
-          <SimpleIcon
-            icon={siX}
-            className="text-foreground"
-          />
-          X search for <span className="truncate">{token.symbol}</span>
+          <SimpleIcon icon={siX} className="text-foreground" />X search for{" "}
+          <span className="truncate">{token.symbol}</span>
         </DropdownMenuLinkItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -236,7 +205,7 @@ export function TokenSymbolCopy({ token }: { token: Token }) {
         e.preventDefault();
         copy(token.mint);
       }}
-      className="text-sm"
+      className="cursor-pointer text-sm"
     >
       {token.mint.slice(0, 4)}...{token.mint.slice(-4)}{" "}
       {copyState === "copied" ? <Check /> : <Copy />}

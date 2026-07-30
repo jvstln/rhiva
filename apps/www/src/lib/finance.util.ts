@@ -37,24 +37,6 @@ export function formatCompactNumber(value?: number | null): string {
 
   return new Intl.NumberFormat("en-US", { notation: "compact" }).format(value);
 }
-export function formatAge(unixTime?: number | null): string {
-  if (!unixTime) return "N/A";
-  const isSeconds = unixTime < 1e12;
-  const timestamp = isSeconds ? unixTime * 1000 : unixTime;
-
-  const diff = Date.now() - timestamp;
-  if (diff < 0) return "N/A";
-
-  const diffSeconds = Math.floor(diff / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffDays > 0) return `${diffDays}d`;
-  if (diffHours > 0) return `${diffHours}h`;
-  if (diffMinutes > 0) return `${diffMinutes}m`;
-  return `${diffSeconds}s`;
-}
 
 export const currencies = [
   { value: "USD", symbol: "$", icon: DollarSign, label: "US Dollar" },
@@ -68,3 +50,39 @@ export const currencies = [
   { value: "BTC", symbol: "BTC", icon: NetworkBitcoin, label: "Bitcoin" },
   { value: "ETH", symbol: "ETH", icon: NetworkEthereum, label: "Ethereum" },
 ];
+
+export function formatNumberWithSubscriptZeros(
+  value: string | number = 0,
+  intl?: Intl.NumberFormat,
+): string {
+  const valueIsString = typeof value === "string";
+  const valueNumber = valueIsString ? parseFloat(value) : value;
+  if (!Number.isFinite(valueNumber))
+    return valueIsString ? value : valueNumber.toString();
+
+  const [wholeNumber, fractionalNumber] = valueNumber
+    .toLocaleString("en-US", { useGrouping: false, maximumFractionDigits: 20 })
+    .split(/\./g);
+
+  if (wholeNumber === "0" && fractionalNumber && fractionalNumber.length > 2) {
+    let leadingZeros = 0;
+    for (let index = 0; index < fractionalNumber.length; index++) {
+      if (fractionalNumber[index] === "0") leadingZeros++;
+      else break;
+    }
+
+    if (leadingZeros > 3) {
+      const sub = leadingZeros
+        .toString()
+        .split("")
+        .map((digit) => String.fromCharCode(8320 + parseInt(digit, 10)))
+        .join("");
+
+      return `0.0${sub}${fractionalNumber.slice(leadingZeros, leadingZeros + 3)}`;
+    }
+
+    return valueNumber.toFixed(Math.min(leadingZeros + 1, 20));
+  }
+
+  return intl ? intl.format(valueNumber) : value.toString();
+}
