@@ -1,5 +1,5 @@
-import { Xior, type XiorInstance } from "xior";
 import { format } from "util";
+import { Xior, type XiorInstance } from "xior";
 
 import UserAPI from "./user.api";
 import TransactionApi from "./transactions";
