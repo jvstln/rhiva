@@ -4,13 +4,14 @@ import Image from "next/image";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { Bell, Settings, Wallet, XIcon } from "lucide-react";
-import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
+import { useLogin, usePrivy, useSigners } from "@privy-io/react-auth";
 
+import { env } from "@/lib/env";
+import { useAuth } from "@/hooks";
 import logo from "@/public/logo.svg";
 import { Skeleton } from "../ui/skeleton";
 import { SearchInput } from "../ui/search-input";
 import { cn, truncateString } from "@/lib/utils";
-import { useAuth } from "@/features/auth/auth.hook";
 import { DiscordIcon, TelegramIcon } from "../ui/icons";
 import { NotificationPopover } from "./NotificationPopover";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -33,9 +34,20 @@ const NAV_LINKS = [
 ] as const satisfies Array<{ label: string; url: Route }>;
 
 export function Navbar() {
+  const auth = useAuth();
+  const { ready } = usePrivy();
   const pathname = usePathname();
-  const { wallet } = useActiveWallet();
-  const { ready, authenticated, user, login } = usePrivy();
+  const { addSigners } = useSigners();
+  const { login } = useLogin({
+    async onComplete({ user, isNewUser }) {
+      if (isNewUser && user.wallet) {
+        await addSigners({
+          address: user.wallet.address,
+          signers: [{ signerId: env.PRIVY_SIGNER_ID }],
+        });
+      }
+    },
+  });
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
@@ -139,15 +151,14 @@ export function Navbar() {
           10K XP
         </Link>
         {ready ? (
-          wallet && authenticated ? (
+          auth.authenticated ? (
             <Button
               variant="outline"
               onClick={() => disconnectWalletDialogHandle.open(null)}
               data-active
-              tooltip={wallet.address}
             >
               <Wallet />
-              <span> {truncateString(wallet.address)}</span>
+              <span> {truncateString(auth.activeWallet.address)}</span>
             </Button>
           ) : (
             <Button

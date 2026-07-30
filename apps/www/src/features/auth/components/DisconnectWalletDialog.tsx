@@ -100,7 +100,6 @@ export function DisconnectWalletDialog({
                 isLoadingBalances={isFetching}
                 onFetchBalances={refetch}
                 onDisconnect={() => {
-                  activeWallet?.disconnect();
                   toast.success("Wallet disconnected successfully");
                   disconnectWalletDialogHandle.close();
                 }}

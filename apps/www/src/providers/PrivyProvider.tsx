@@ -1,9 +1,14 @@
 "use client";
+import { createContext, useEffect, useMemo } from "react";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
 import {
   useUser,
-  useActiveWallet,
+  useSigners,
   PrivyProvider as PrivyProviderPrimitive,
+  type ConnectedWallet,
+  type WalletWithMetadata,
+  type BaseConnectedWalletType,
+  usePrivy,
 } from "@privy-io/react-auth";
 
 import { env } from "@/lib/env";
@@ -15,17 +20,60 @@ type PrivyProviderProps = Partial<
 
 const solanaConnectors = toSolanaWalletConnectors({ shouldAutoConnect: true });
 
-const InnerPrivyProvider = () => {
+export type TAuthContext =
+  | {
+      authenticated: true;
+      activeWallet: WalletWithMetadata;
+    }
+  | { authenticated: false };
+
+export const AuthContext = createContext<TAuthContext | null>(null);
+
+const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
   const { user } = useUser();
-  const { wallet } = useActiveWallet();
+  const { addSigners } = useSigners();
+  const { authenticated } = usePrivy();
+
+  const activeWallet = useMemo(
+    () =>
+      user?.linkedAccounts.find(
+        (account): account is WalletWithMetadata =>
+          account.type === "wallet" && account.delegated,
+      ),
+    [user],
+  );
+
+  useEffect(() => {
+    const embeddedWallets = user?.linkedAccounts.filter(
+      (account): account is WalletWithMetadata =>
+        account.type === "wallet" && account.connectorType === "embedded",
+    );
+    if (embeddedWallets && embeddedWallets.length > 0) {
+      embeddedWallets
+        .filter((wallet) => !wallet.delegated)
+        .map((embeddedWallet) =>
+          addSigners({
+            address: embeddedWallet.address,
+            signers: [{ signerId: env.PRIVY_SIGNER_ID }],
+          }),
+        );
+    }
+  }, [user, addSigners]);
 
   return (
-    wallet && (
-      <DisconnectWalletDialog
-        user={user}
-        activeWallet={wallet}
-      />
-    )
+    <AuthContext.Provider
+      value={{ authenticated, activeWallet: activeWallet! }}
+    >
+      {children}
+      {activeWallet && (
+        <DisconnectWalletDialog
+          user={user}
+          activeWallet={
+            activeWallet as unknown as ConnectedWallet | BaseConnectedWalletType
+          }
+        />
+      )}
+    </AuthContext.Provider>
   );
 };
 
@@ -49,6 +97,7 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
             "wallet_connect",
           ],
         },
+
         externalWallets: { solana: { connectors: solanaConnectors } },
         embeddedWallets: {
           solana: { createOnLogin: "all-users" },
@@ -56,8 +105,7 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
       }}
       {...props}
     >
-      {children}
-      <InnerPrivyProvider />
+      <InnerPrivyProvider>{children}</InnerPrivyProvider>
     </PrivyProviderPrimitive>
   );
 }
