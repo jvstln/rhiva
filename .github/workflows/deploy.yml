@@ -9,10 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy www
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_GITHUB_TOKEN }}
       - uses: ./.github/actions/cloudflare
         with:
           path: "apps/www"
-          githubToken: ${{ secrets.SUBMODULE_GITHUB_TOKEN }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           envVars: |

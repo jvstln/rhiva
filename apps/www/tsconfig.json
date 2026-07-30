@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "es2022",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -20,7 +20,13 @@
     ],
     "paths": {
       "@/public/*": ["./public/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@rhivadotfun/zap": ["../../modules/server/modules/zap/dist/index.d.ts"],
+      "@rhivadotfun/zap/*": [
+        "../../modules/server/modules/zap/dist/*.d.ts",
+        "../../modules/server/modules/zap/dist/*/index.d.ts"
+      ],
+      "@meteora-ag/dlmm": ["./src/types/dlmm.d.ts"]
     }
   },
   "include": [
@@ -29,7 +35,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "../../modules/server/modules/zap/app/global.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "../../node_modules"]
 }

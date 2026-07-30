@@ -1,15 +1,15 @@
 import { format } from "util";
 import { Xior, type XiorInstance } from "xior";
 
-import UserAPI from "./user.api";
 import TransactionApi from "./transactions";
 import NotificationAPI from "./notification.api";
+import * as PrimitiveUserAPI from "./user.api";
 
-export default class {
+export default class UserAPI {
   private xior!: XiorInstance;
-  readonly user: UserAPI;
   readonly transaction: TransactionApi;
   readonly notification: NotificationAPI;
+  readonly user: PrimitiveUserAPI.default;
 
   constructor(
     private readonly _baseURL: string,
@@ -17,9 +17,9 @@ export default class {
     private _wallet: string,
   ) {
     this.initXior();
-    this.user = new UserAPI(this.xior);
     this.transaction = new TransactionApi(this.xior);
     this.notification = new NotificationAPI(this.xior);
+    this.user = new PrimitiveUserAPI.default(this.xior);
   }
 
   initXior() {

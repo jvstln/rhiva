@@ -1,13 +1,21 @@
 "use client";
-import { Bell, Settings, XIcon } from "lucide-react";
-import type { Route } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Bell, Settings, Wallet, XIcon } from "lucide-react";
+import { useActiveWallet, usePrivy } from "@privy-io/react-auth";
+
 import logo from "@/public/logo.svg";
+import { Skeleton } from "../ui/skeleton";
+import { SearchInput } from "../ui/search-input";
+import { cn, truncateString } from "@/lib/utils";
+import { useAuth } from "@/features/auth/auth.hook";
 import { DiscordIcon, TelegramIcon } from "../ui/icons";
+import { NotificationPopover } from "./NotificationPopover";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
+import { disconnectWalletDialogHandle } from "../../features/auth/components/DisconnectWalletDialog";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,12 +24,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "../ui/navigation-menu";
-import { SearchInput } from "../ui/search-input";
-import { disconnectWalletDialogHandle } from "../../features/auth/components/DisconnectWalletDialog";
-import { NotificationPopover } from "./NotificationPopover";
-import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
-import { useAuth } from "@/features/auth/auth.hook";
-import { Skeleton } from "../ui/skeleton";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
@@ -32,7 +34,8 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { wallets, isPending, connectWallet } = useAuth();
+  const { wallet } = useActiveWallet();
+  const { ready, authenticated, user, login } = usePrivy();
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height,--spacing(16)) shrink-0 items-center gap-6 border-border border-b bg-background/95 px-6 backdrop-blur">
@@ -135,7 +138,27 @@ export function Navbar() {
         >
           10K XP
         </Link>
-        {isPending ? (
+        {ready ? (
+          wallet && authenticated ? (
+            <Button
+              variant="outline"
+              onClick={() => disconnectWalletDialogHandle.open(null)}
+              data-active
+              tooltip={wallet.address}
+            >
+              <Wallet />
+              <span> {truncateString(wallet.address)}</span>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => login({ walletChainType: "solana-only" })}
+              data-active
+            >
+              Connect wallet
+            </Button>
+          )
+        ) : (
           <Skeleton
             className={buttonVariants({
               variant: "outline",
@@ -143,23 +166,6 @@ export function Navbar() {
             })}
             data-active
           />
-        ) : wallets.length === 0 ? (
-          <Button
-            variant="outline"
-            onClick={() => connectWallet()}
-            data-active
-          >
-            Connect wallet
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            onClick={() => disconnectWalletDialogHandle.open(null)}
-            data-active
-            tooltip={wallets[0].address}
-          >
-            {wallets[0].address.slice(0, 10)}...
-          </Button>
         )}
       </div>
     </header>

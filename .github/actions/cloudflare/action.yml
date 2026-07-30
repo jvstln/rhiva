@@ -8,9 +8,6 @@ inputs:
     required: false
     default: "."
     description: "Folder to build & deploy"
-  githubToken:
-    required: true
-    description: "Cloudflare apiToken"
   apiToken:
     required: true
     description: "Cloudflare apiToken"
@@ -48,12 +45,6 @@ runs:
       shell: bash
       run: |
         echo '${{ inputs.envVars }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> "$GITHUB_ENV"
-
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        submodules: recursive
-        token: ${{ input.githubToken }}
 
     - uses: oven-sh/setup-bun@v1
       if: steps.changes.outputs.changed == 'true'

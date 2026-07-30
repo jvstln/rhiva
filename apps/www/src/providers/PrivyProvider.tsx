@@ -1,15 +1,34 @@
 "use client";
 import { env } from "@/lib/env";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
-import { PrivyProvider as PrivyProviderPrimitive } from "@privy-io/react-auth";
+import {
+  useUser,
+  useActiveWallet,
+  PrivyProvider as PrivyProviderPrimitive,
+} from "@privy-io/react-auth";
 
-import { DisconnectWalletDialog } from "../features/auth/components/DisconnectWalletDialog";
+import { DisconnectWalletDialog } from "@/features/auth/components/DisconnectWalletDialog";
 
 type PrivyProviderProps = Partial<
   React.ComponentProps<typeof PrivyProviderPrimitive>
 >;
 
 const solanaConnectors = toSolanaWalletConnectors({ shouldAutoConnect: true });
+
+const InnerPrivyProvider = () => {
+  const { user } = useUser();
+  const { wallet } = useActiveWallet();
+
+  return (
+    wallet &&
+    user && (
+      <DisconnectWalletDialog
+        user={user}
+        activeWallet={wallet}
+      />
+    )
+  );
+};
 
 export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
   return (
@@ -18,6 +37,8 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
       config={{
         loginMethods: ["email", "google", "twitter", "apple", "wallet"],
         appearance: {
+          theme: "dark",
+          showWalletLoginFirst: true,
           walletChainType: "solana-only",
           walletList: [
             "phantom",
@@ -37,7 +58,7 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
       {...props}
     >
       {children}
-      <DisconnectWalletDialog />
+      <InnerPrivyProvider />
     </PrivyProviderPrimitive>
   );
 }

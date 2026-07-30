@@ -1,9 +1,11 @@
 "use client";
-import { Bot, Send } from "lucide-react";
 import { useRef } from "react";
-import { useGSAP } from "@/lib/gsap.util";
-import { Button } from "../ui/button";
+import { Bot, Send } from "lucide-react";
+
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { useGSAP } from "@/lib/gsap.util";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import {
   Popover,
   PopoverClose,
@@ -14,7 +16,6 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../ui/popover";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 export function AssistantBubble() {
   const containerRef = useRef<HTMLButtonElement | null>(null);

@@ -1,14 +1,15 @@
-import { X } from "lucide-react";
 import type React from "react";
-import { MOCK_NOTIFICATIONS } from "@/components/ui/data/notification-data";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { X } from "lucide-react";
+
 import { Button } from "../ui/button";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { MOCK_NOTIFICATIONS } from "@/components/ui/data/notification-data";
 import {
   Popover,
-  PopoverContent,
-  PopoverHeader,
   PopoverTitle,
+  PopoverHeader,
   PopoverTrigger,
+  PopoverContent,
 } from "../ui/popover";
 
 type NotificationsContentProps = React.ComponentProps<typeof Popover> & {

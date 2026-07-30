@@ -1,5 +1,6 @@
-import { type ClassValue, clsx } from "clsx";
+import { format } from "util";
 import { debounce } from "lodash";
+import { type ClassValue, clsx } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
 const customTwMerge = extendTailwindMerge({
@@ -94,3 +95,6 @@ export const debounceInput = (func: () => void) => {
 
 export * from "./error.util";
 export * from "./finance.util";
+
+export const truncateString = (value: string, length: number = 4) =>
+  format("%s...%s", value.slice(0, length), value.slice(-length));
