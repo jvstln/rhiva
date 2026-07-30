@@ -53,8 +53,8 @@ runs:
       shell: bash
       if: steps.changes.outputs.changed == 'true'
       run: |
-        cd ${{ inputs.path }} && bun install --frozen-lockfile
-        bun x opennextjs-cloudflare build
+        cd ${{ inputs.path }} && bun install --frozen-lockfile &&
+        bun x turbo build && bun x opennextjs-cloudflare build
 
     - name: Deploy
       if: steps.changes.outputs.changed == 'true'
