@@ -21,13 +21,15 @@ const inputVariants = cva(
   },
 );
 
-export type InputVariants = VariantProps<typeof inputVariants>;
+export namespace Input {
+  export type Variants = VariantProps<typeof inputVariants>;
 
-export type InputProps = InputPrimitive.Props &
-  Omit<InputVariants, "size"> & {
-    "data-size"?: InputVariants["size"];
-    onDebouncedValueChange?: InputPrimitive.Props["onValueChange"];
-  };
+  export type Props = InputPrimitive.Props &
+    Omit<Input.Variants, "size"> & {
+      "data-size"?: Input.Variants["size"];
+      onDebouncedValueChange?: InputPrimitive.Props["onValueChange"];
+    };
+}
 
 function Input({
   className,
@@ -35,7 +37,7 @@ function Input({
   type,
   "data-size": size,
   ...props
-}: InputProps) {
+}: Input.Props) {
   return (
     <InputPrimitive
       type={type}

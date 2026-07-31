@@ -7,6 +7,13 @@ import { cn } from "@/lib/utils";
 import { inputVariants } from "./input";
 import { labelVariant } from "./label";
 
+export namespace Select {
+  export type Props<
+    Value,
+    Multiple extends boolean | undefined = false,
+  > = SelectPrimitive.Root.Props<Value, Multiple>;
+}
+
 const Select = SelectPrimitive.Root;
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {

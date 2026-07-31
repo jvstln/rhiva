@@ -14,16 +14,18 @@ import { cn, currencies } from "@/lib/utils";
 import { SwapDialog } from "./SwapDialog";
 import { TokenDialog } from "./TokenDialog";
 import { DepositDialog } from "../../transaction/components/DepositDialog";
-import { SendDialog } from "./SendDialog";
+import { SendDialog } from "../../transaction/components/SendDialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks";
 
 export function PortfolioHero() {
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
   const [balanceHidden, setBalanceHidden] = useState(false);
+  const auth = useAuth();
 
   return (
     <div
@@ -70,10 +72,7 @@ export function PortfolioHero() {
           </SelectTrigger>
           <SelectContent>
             {currencies.map((curr) => (
-              <SelectItem
-                key={curr.value}
-                value={curr}
-              >
+              <SelectItem key={curr.value} value={curr}>
                 {curr.label} ({curr.value})
               </SelectItem>
             ))}
@@ -97,51 +96,43 @@ export function PortfolioHero() {
               <TokenDialog>
                 <TooltipTrigger
                   payload={"View tokens"}
-                  render={
-                    <Button
-                      className="grow"
-                      variant="outline"
-                    />
-                  }
+                  render={<Button className="grow" variant="outline" />}
                 >
                   Token
                 </TooltipTrigger>
               </TokenDialog>
+
               <SwapDialog>
                 <TooltipTrigger
                   payload={"Swap"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
+                  render={<Button variant="outline" size="icon" />}
                 >
                   <ArrowDownUp />
                 </TooltipTrigger>
               </SwapDialog>
-              <SendDialog>
+
+              {auth.authenticated ? (
+                <SendDialog activeWallet={auth.activeWallet}>
+                  <TooltipTrigger
+                    payload={"Send"}
+                    render={<Button variant="outline" size="icon" />}
+                  >
+                    <ArrowUp />
+                  </TooltipTrigger>
+                </SendDialog>
+              ) : (
                 <TooltipTrigger
                   payload={"Send"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
+                  render={<Button variant="outline" size="icon" disabled />}
                 >
                   <ArrowUp />
                 </TooltipTrigger>
-              </SendDialog>
+              )}
+
               <DepositDialog address={"Wallet address"}>
                 <TooltipTrigger
                   payload={"Receive"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
+                  render={<Button variant="outline" size="icon" />}
                 >
                   <ArrowDown />
                 </TooltipTrigger>
