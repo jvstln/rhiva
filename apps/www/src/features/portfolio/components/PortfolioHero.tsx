@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
 import { cn, currencies } from "@/lib/utils";
-import { SwapDialog } from "./SwapDialog";
+import { SwapDialog } from "../../transaction/components/SwapDialog";
 import { TokenDialog } from "./TokenDialog";
 import { DepositDialog } from "../../transaction/components/DepositDialog";
 import { SendDialog } from "../../transaction/components/SendDialog";

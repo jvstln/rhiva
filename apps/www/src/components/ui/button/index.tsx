@@ -80,6 +80,7 @@ function Button({
         props["aria-label"] ||
         (typeof tooltip === "string" ? tooltip : undefined)
       }
+      disabled={loading || props.disabled}
     >
       {loading ? <Spinner /> : props.children}
     </ButtonPrimitive>

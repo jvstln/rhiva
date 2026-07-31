@@ -1,10 +1,11 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { NATIVE_MINT } from "@solana/spl-token";
 import type UserAPI from "@rhivadotfun/userapi";
 
 import { toBps } from "@/lib/math.util";
 import { useUserApi } from "./use-user-api";
 import { useSettingsStore } from "@/features/settings/settings.store";
+import { useMutation } from "@tanstack/react-query";
 
 type BaseSwapParams = {
   amount: number;
@@ -37,8 +38,8 @@ export const useSwap = () => {
     [tradingSettings.presets, tradingSettings.activePreset],
   );
 
-  return useCallback(
-    async (params: SwapParams) => {
+  return useMutation({
+    mutationFn: async (params: SwapParams) => {
       const preset =
         params.action === "buy" ? activePreset.buy : activePreset.sell;
       const slippageBps = params.slippage
@@ -78,6 +79,5 @@ export const useSwap = () => {
         ...quoteResponse,
       });
     },
-    [activePreset, userApi.transaction.swap],
-  );
+  });
 };

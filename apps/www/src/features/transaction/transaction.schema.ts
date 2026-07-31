@@ -9,11 +9,16 @@ export const TokenAccount = z.custom<ParsedTokenAccount>();
 //   }),
 // );
 
+const Amount = z
+  .union([z.string(), z.number()])
+  .transform((val) => Number(val))
+  .pipe(z.number().gt(0, "Amount must be greater than zero"));
+
 export const Send = z
   .object({
     token: TokenAccount,
     recipient: z.string().min(1, "Recipient address is required"),
-    amount: z.coerce.number().gt(0, "Amount must be greater than zero"),
+    amount: Amount,
   })
   .refine(
     (value) => {
@@ -30,10 +35,7 @@ export type SendOutput = z.infer<typeof Send>;
 export const Withdraw = z
   .object({
     token: TokenAccount,
-    amount: z.coerce
-      .number()
-      .gt(0, "Amount must be greater than zero")
-      .optional(),
+    amount: Amount.optional(),
     destination: z.string().min(1, "Recipient address is required"),
   })
   .refine(
@@ -49,3 +51,26 @@ export const Withdraw = z
 
 export type WithdrawInput = z.input<typeof Withdraw>;
 export type WithdrawOutput = z.infer<typeof Withdraw>;
+
+export const Swap = z
+  .object({
+    action: z.enum(["buy", "sell"]).default("sell"),
+    inputAmount: Amount.optional(),
+    outputAmount: Amount.optional(),
+    slippage: z.coerce.number().optional(),
+    inputToken: TokenAccount,
+    outputToken: TokenAccount,
+  })
+  .refine(
+    (value) => {
+      if (typeof value.inputAmount !== "number") return true;
+
+      const maxAmount = value.inputToken.info.tokenAmount.uiAmount;
+      if (value.inputAmount > maxAmount) return false;
+      return true;
+    },
+    { error: "Amount must be less than or equal to max amount" },
+  );
+
+export type SwapInput = z.input<typeof Swap>;
+export type SwapOutput = z.infer<typeof Swap>;
