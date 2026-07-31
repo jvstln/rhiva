@@ -104,7 +104,11 @@ export function TokenDetailDataSections({ token }: { token: Token }) {
 
       <Section title="Basic Data">
         {basicDataItems.map((item) => (
-          <Row key={item.label} label={item.label} value={item.value} />
+          <Row
+            key={item.label}
+            label={item.label}
+            value={item.value}
+          />
         ))}
       </Section>
 

@@ -41,11 +41,9 @@ export function useTrendingTokens(filters: TrendingFilters) {
 export function useWatchlistTokens() {
   const watchlist = useMarketStore((state) => state.watchlist.items);
 
-  return useQueries({
-    queries: watchlist.map((mint) => ({
-      queryKey: ["token", mint],
-      queryFn: () => getToken(mint),
-    })),
+  return useQuery({
+    queryKey: ["token", "watchlist", ...watchlist],
+    queryFn: async () => getToken(...watchlist),
   });
 }
 

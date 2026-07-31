@@ -54,7 +54,10 @@ export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
 
 export const TotalHolders = ({ token, ...props }: TokenInfoProps) => {
   return (
-    <InfoBadge tooltip={"Total holders"} {...props}>
+    <InfoBadge
+      tooltip={"Total holders"}
+      {...props}
+    >
       <Users />
       {formatCompactNumber(token.holders.total)}
     </InfoBadge>
@@ -230,7 +233,10 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
 
 export const KolHold = ({ token, ...props }: { token: Token }) => {
   return (
-    <InfoBadge tooltip="KOL Hold" {...props}>
+    <InfoBadge
+      tooltip="KOL Hold"
+      {...props}
+    >
       <Trophy />
       {(token.bonding?.bondingPct ?? 0).toFixed(0)}
     </InfoBadge>

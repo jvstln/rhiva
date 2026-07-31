@@ -10,7 +10,7 @@ export default class SwapAPI extends ApiImpl {
 
   getQuote(params: ReturnType<typeof swapQuoteSchema.encode>) {
     return ApiImpl.getData(
-      this.xior.post<ReturnType<typeof swapSchema.encode>>(
+      this.xior.post<Omit<ReturnType<typeof swapSchema.encode>, "feeConfig">>(
         this.buildPath("/quote"),
         params,
       ),

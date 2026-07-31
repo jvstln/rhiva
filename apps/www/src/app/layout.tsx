@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Inter } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
+
 import "./globals.css";
+import { cn } from "@/lib/utils";
 import Providers from "@/providers";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const geist = Geist({
+const defaultFont = IBM_Plex_Sans({
   variable: "--geist",
 });
 
@@ -26,9 +23,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geist.variable} h-full antialiased`}
+      className={cn(`h-full antialiased`, defaultFont.className)}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <Providers>{children}</Providers>
       </body>
     </html>

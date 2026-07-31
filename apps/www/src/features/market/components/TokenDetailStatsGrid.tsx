@@ -15,35 +15,75 @@ export function TokenDetailStatsGrid({ token }: { token: Token }) {
   const items = [
     {
       label: "Top 10",
-      infoBadge: <TopHolders token={token} variant={"inline"} />,
+      infoBadge: (
+        <TopHolders
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "DEV",
-      infoBadge: <DevHoldOrDevSell token={token} variant={"inline"} />,
+      infoBadge: (
+        <DevHoldOrDevSell
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "Holders",
-      infoBadge: <TotalHolders token={token} variant={"inline"} />,
+      infoBadge: (
+        <TotalHolders
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "Snipers",
-      infoBadge: <SnipersHold token={token} variant={"inline"} />,
+      infoBadge: (
+        <SnipersHold
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "Insiders",
-      infoBadge: <InsidersHold token={token} variant={"inline"} />,
+      infoBadge: (
+        <InsidersHold
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "Phishing",
-      infoBadge: <PhishingsHold token={token} variant={"inline"} />,
+      infoBadge: (
+        <PhishingsHold
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "Bundler",
-      infoBadge: <BundlersHold token={token} variant={"inline"} />,
+      infoBadge: (
+        <BundlersHold
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
     {
       label: "Dex Paid",
-      infoBadge: <DexPaid token={token} variant={"inline"} />,
+      infoBadge: (
+        <DexPaid
+          token={token}
+          variant={"inline"}
+        />
+      ),
     },
 
     // Unknown properties
@@ -74,7 +114,10 @@ export function TokenDetailStatsGrid({ token }: { token: Token }) {
         if (!item.infoBadge) return null;
 
         return (
-          <div key={item.label} className="flex flex-col items-start gap-1 p-4">
+          <div
+            key={item.label}
+            className="flex flex-col items-start gap-1 p-4"
+          >
             <p className="text-gray text-xs">{item.label}</p>
             {item.infoBadge}
           </div>

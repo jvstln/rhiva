@@ -1,17 +1,20 @@
+import { format } from "util";
 import { api } from "@/lib/api";
+import { mapToken } from "./market.util";
 import type {
+  Token,
   RadarFilters,
   SurgeFilters,
-  Token,
   TokenCandle,
-  TokenCandleFilters,
   TrendingFilters,
+  TokenCandleFilters,
 } from "./market.type";
-import { mapToken } from "./market.util";
 
-export const getToken = async (mint: string) => {
-  const response = await api.get(`/token/${mint}`);
-  return mapToken(response.data);
+export const getToken = async (
+  ...mints: string[]
+): Promise<ReturnType<typeof mapToken>[]> => {
+  const response = await api.get(format(`/tokens?mints=%s`, mints.join(",")));
+  return response.data.map(mapToken);
 };
 
 export const getTrendingTokens = async (
@@ -23,18 +26,8 @@ export const getTrendingTokens = async (
     params: { window: filters.timeframe },
   });
 
-  const tokens = (
-    await Promise.allSettled(
-      trendingResponse.data.map(({ mint }) => {
-        return getToken(mint);
-      }),
-    )
-  )
-    .map((p) => {
-      if (p.status === "rejected") return null;
-      return p.value;
-    })
-    .filter((token) => token !== null);
+  const mints = trendingResponse.data.map(({ mint }) => mint);
+  const tokens = await getToken(...mints);
 
   return { tokens: tokens };
 };
@@ -54,18 +47,8 @@ export const getRadarTokens = async (
     },
   });
 
-  const tokens = (
-    await Promise.allSettled(
-      radarResponse.data.map(({ mint }) => {
-        return getToken(mint);
-      }),
-    )
-  )
-    .map((p) => {
-      if (p.status === "rejected") return null;
-      return p.value;
-    })
-    .filter((token) => token !== null);
+  const mints = radarResponse.data.map(({ mint }) => mint);
+  const tokens = await getToken(...mints);
 
   return { tokens: tokens };
 };
@@ -82,7 +65,7 @@ export const getSurgeTokens = async (params: SurgeFilters) => {
 
 export const getTokenCandles = async (filters: TokenCandleFilters) => {
   const response = await api.get<TokenCandle[]>(
-    `/token/${filters.mint}/candles`,
+    format(`/token/%s/candles`, filters.mint),
     {
       params: { tf: filters.timeframe, limit: filters.limit },
     },

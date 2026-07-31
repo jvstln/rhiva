@@ -51,7 +51,10 @@ export function DepositDialog({
             </AlertDescription>
           </Alert>
           <p className="text-center text-muted-foreground"></p>
-          <Button className="w-full" onClick={() => copy(address)}>
+          <Button
+            className="w-full"
+            onClick={() => copy(address)}
+          >
             Copy addess
           </Button>
         </DialogFooter>

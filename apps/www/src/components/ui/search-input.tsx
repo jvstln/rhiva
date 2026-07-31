@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import type { Input } from "./input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group";
@@ -18,7 +19,7 @@ export function SearchInput({
   return (
     <InputGroup
       size={size}
-      className={cn("w-full max-w-[297px] rounded-full", className)}
+      className={cn("w-full max-w-74.25 rounded-full", className)}
     >
       <InputGroupInput
         ref={ref}

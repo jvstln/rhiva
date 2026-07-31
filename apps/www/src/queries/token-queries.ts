@@ -21,7 +21,7 @@ export const tokens = {
     async queryFn(params: GetTokenMultiParams) {
       const { data } = await axios.get<Token[]>(
         format(
-          "https://datapi.rhiva.fun/tokens?mints=%s",
+          "https://dataapi.rhiva.fun/tokens?mints=%s",
           params.mints.join(","),
         ),
       );

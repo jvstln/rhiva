@@ -36,7 +36,11 @@ export const TokenDetailPage = ({
           <TokenChart token={token} />
           <TradesTable token={token} />
         </div>
-        <ScrollBar orientation="vertical" showIndicator showScrollBar={false} />
+        <ScrollBar
+          orientation="vertical"
+          showIndicator
+          showScrollBar={false}
+        />
       </ScrollArea>
 
       {/* Right rail */}
