@@ -4,7 +4,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   getRadarTokens,
   getSurgeTokens,
-  getToken,
+  getTokens,
   getTokenCandles,
   getTrendingTokens,
 } from "./market.api";
@@ -21,7 +21,10 @@ import { mapToken } from "./market.util";
 export function useToken(mint: string) {
   return useQuery({
     queryKey: ["token", mint],
-    queryFn: () => getToken(mint),
+    queryFn: async () => {
+      const tokens = await getTokens([mint]);
+      return tokens[0];
+    },
   });
 }
 
@@ -39,13 +42,11 @@ export function useTrendingTokens(filters: TrendingFilters) {
 }
 
 export function useWatchlistTokens() {
-  const watchlist = useMarketStore((state) => state.watchlist.items);
+  const watchlistMints = useMarketStore((state) => state.watchlist.items);
 
-  return useQueries({
-    queries: watchlist.map((mint) => ({
-      queryKey: ["token", mint],
-      queryFn: () => getToken(mint),
-    })),
+  return useQuery({
+    queryKey: ["tokens", watchlistMints.sort().join(",")],
+    queryFn: () => getTokens(watchlistMints),
   });
 }
 

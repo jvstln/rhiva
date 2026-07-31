@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import type {
   RadarFilters,
+  RawToken,
   SurgeFilters,
   Token,
   TokenCandle,
@@ -9,34 +10,23 @@ import type {
 } from "./market.type";
 import { mapToken } from "./market.util";
 
-export const getToken = async (mint: string) => {
-  const response = await api.get(`/token/${mint}`);
-  return mapToken(response.data);
+export const getTokens = async (mints: string[]) => {
+  const response = await api.get<RawToken[]>(
+    `/tokens?mints=${mints.join(",")}`,
+  );
+  return response.data.map((token) => mapToken(token));
 };
 
 export const getTrendingTokens = async (
   filters: TrendingFilters,
 ): Promise<{ tokens: Token[] }> => {
-  const trendingResponse = await api.get<
-    Array<{ mint: string; score: number }>
-  >("/trending", {
+  const trendingResponse = await api.get<Array<{ mint: string }>>("/trending", {
     params: { window: filters.timeframe },
   });
 
-  const tokens = (
-    await Promise.allSettled(
-      trendingResponse.data.map(({ mint }) => {
-        return getToken(mint);
-      }),
-    )
-  )
-    .map((p) => {
-      if (p.status === "rejected") return null;
-      return p.value;
-    })
-    .filter((token) => token !== null);
+  const tokens = await getTokens(trendingResponse.data.map((t) => t.mint));
 
-  return { tokens: tokens };
+  return { tokens };
 };
 
 export const getRadarTokens = async (
@@ -54,30 +44,25 @@ export const getRadarTokens = async (
     },
   });
 
-  const tokens = (
-    await Promise.allSettled(
-      radarResponse.data.map(({ mint }) => {
-        return getToken(mint);
-      }),
-    )
-  )
-    .map((p) => {
-      if (p.status === "rejected") return null;
-      return p.value;
-    })
-    .filter((token) => token !== null);
+  const tokens = await getTokens(radarResponse.data.map((t) => t.mint));
 
-  return { tokens: tokens };
+  return { tokens };
 };
 
 export const getSurgeTokens = async (params: SurgeFilters) => {
-  const response = await api.get<any[]>("/surge", {
+  const surgeResponse = await api.get<RawToken[]>("/surge", {
     params,
   });
 
-  const tokens: Token[] = response.data.map((r) => mapToken(r));
+  const tokens = await getTokens(surgeResponse.data.map((t) => t.mint));
+  const combinedTokens = tokens.map((token) => {
+    return mapToken({
+      ...token.original,
+      ...surgeResponse.data.find((t) => t.mint === token.mint),
+    });
+  });
 
-  return { tokens };
+  return { tokens: combinedTokens };
 };
 
 export const getTokenCandles = async (filters: TokenCandleFilters) => {

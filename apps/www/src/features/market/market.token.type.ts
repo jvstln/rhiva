@@ -172,6 +172,38 @@ export type RawToken = {
   ath_mcap_usd?: number;
   last_surge_pct?: number;
   rank?: string;
+
+  // New fields from surge
+  token_name?: string;
+  token_symbol?: string;
+  image_url?: string;
+  launchpad?: "believe" | string;
+  age_seconds?: number;
+  duplicate_name_count?: number;
+  last_direction?: "up" | "down";
+  entered_at_ms?: number;
+  entry_mcap_usd?: number;
+  pct_since_entry?: number;
+  ath_at_ms?: number;
+  pct_to_ath_from_entry?: number;
+  price_sol?: number;
+  volume_5m_usd?: number;
+  volume_1h_usd?: number;
+  swaps_5m?: number;
+  swaps_1h?: number;
+  traders_1h?: number;
+  holder_count?: number;
+  top10_holder_pct?: number;
+  dev_holder_pct?: number;
+  dev_sold?: number;
+  mint_auth_disabled?: number;
+  freeze_auth_disabled?: number;
+  has_socials?: number;
+  website_url?: string;
+  twitter_handle?: string;
+  telegram_url?: string;
+  dex_boost?: number;
+  dex_paid?: number;
 };
 
 export type TokenCandle = {
@@ -192,45 +224,4 @@ export type TokenCandleFilters = {
   mint: string;
   timeframe: Timeframe;
   limit?: number;
-};
-
-export type RawSurgeToken = {
-  mint: string;
-  token_name: string;
-  token_symbol: string;
-  image_url: string;
-  launchpad: "believe" | string;
-  age_seconds: number;
-  duplicate_name_count: number;
-  last_surge_pct: number;
-  last_direction: "up" | "down";
-  entered_at_ms: number;
-  entry_mcap_usd: number;
-  market_cap_usd: number;
-  market_cap_sol: number;
-  pct_since_entry: number;
-  ath_mcap_usd: number;
-  ath_at_ms: number;
-  pct_to_ath_from_entry: number;
-  price_usd: number;
-  price_sol: number;
-  volume_5m_usd: number;
-  volume_1h_usd: number;
-  liquidity_usd: number;
-  swaps_5m: number;
-  swaps_1h: number;
-  traders_1h: number;
-  holder_count: number;
-  top10_holder_pct: number;
-  dev_holder_pct: number;
-  dev_sold: number;
-  mint_auth_disabled: number;
-  freeze_auth_disabled: number;
-  has_socials: number;
-  website_url: string;
-  twitter_handle: string;
-  telegram_url: string;
-  dex_boost: number;
-  dex_paid: number;
-  stage: string;
 };

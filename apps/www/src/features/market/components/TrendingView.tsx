@@ -363,14 +363,9 @@ export function TrendingView() {
 export function WatchlistView() {
   const watchlistTokens = useWatchlistTokens();
 
-  const isPending = watchlistTokens.some((q) => q.isPending);
-  const tokens = watchlistTokens
-    .map((q) => q.data)
-    .filter((t): t is Token => !!t);
-
   return (
-    <QueryState query={{ data: tokens }} getIsLoading={() => isPending}>
-      <TrendingTable tokens={tokens} />
+    <QueryState query={watchlistTokens}>
+      {(query) => <TrendingTable tokens={query.data} />}
     </QueryState>
   );
 }
