@@ -7,6 +7,7 @@ import {
   getTokens,
   getTokenCandles,
   getTrendingTokens,
+  getTokenTrades,
 } from "./market.api";
 import type {
   RadarFilters,
@@ -72,5 +73,12 @@ export function useTokenCandles(filters: TokenCandleFilters) {
   return useQuery({
     queryKey: ["token", "candles", filters],
     queryFn: () => getTokenCandles(filters),
+  });
+}
+
+export function useTokenTrades(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "trades"],
+    queryFn: () => getTokenTrades(mint),
   });
 }

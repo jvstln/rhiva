@@ -9,6 +9,7 @@ const infoBadgeVariants = cva(
     variants: {
       variant: {
         inline: "",
+        none: "font-[inherit] text-[size:inherit]! text-inherit",
         badge:
           "rounded-md border border-border/30 bg-accent/5 px-1 py-px font-medium text-[11px]",
       },

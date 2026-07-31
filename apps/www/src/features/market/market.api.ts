@@ -8,6 +8,7 @@ import type {
   TokenCandle,
   TrendingFilters,
   TokenCandleFilters,
+  TokenTrade,
 } from "./market.type";
 
 export const getTokens = async (mints: string[]) => {
@@ -72,6 +73,12 @@ export const getTokenCandles = async (filters: TokenCandleFilters) => {
       params: { tf: filters.timeframe, limit: filters.limit },
     },
   );
+
+  return response.data;
+};
+
+export const getTokenTrades = async (mint: string) => {
+  const response = await api.get<TokenTrade[]>(`/token/${mint}/trades`);
 
   return response.data;
 };

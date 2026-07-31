@@ -225,3 +225,12 @@ export type TokenCandleFilters = {
   timeframe: Timeframe;
   limit?: number;
 };
+
+export type TokenTrade = {
+  wallet: string;
+  side: "sell";
+  sol_amount: number;
+  token_amount: number;
+  price_usd: number;
+  block_time: number;
+};
