@@ -1,14 +1,14 @@
 import { api } from "@/lib/api";
+import { mapToken } from "./market.util";
 import type {
+  Token,
   RadarFilters,
   RawToken,
   SurgeFilters,
-  Token,
   TokenCandle,
-  TokenCandleFilters,
   TrendingFilters,
+  TokenCandleFilters,
 } from "./market.type";
-import { mapToken } from "./market.util";
 
 export const getTokens = async (mints: string[]) => {
   const response = await api.get<RawToken[]>(

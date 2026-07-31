@@ -80,9 +80,15 @@ function TokenRow({ token }: TokenRowProps) {
                 "$1$2",
               )}
             </InfoBadge>
-            <Separator orientation="vertical" className="h-4/5 self-center" />
+            <Separator
+              orientation="vertical"
+              className="h-4/5 self-center"
+            />
             <TokenSymbolCopy token={token} />
-            <Separator orientation="vertical" className="h-4/5 self-center" />
+            <Separator
+              orientation="vertical"
+              className="h-4/5 self-center"
+            />
             <TokenLatestPost token={token} />
             <TokenConnection token={token} />
             <TokenDescription token={token} />
@@ -104,7 +110,10 @@ function TokenRow({ token }: TokenRowProps) {
         </div>
       </div>
 
-      <Separator orientation="vertical" className="" />
+      <Separator
+        orientation="vertical"
+        className=""
+      />
 
       {/* Market data */}
       <div className="flex min-w-0 flex-1 basis-2/4 flex-col justify-center gap-1.5 text-b-4">
@@ -154,7 +163,10 @@ function TokenRow({ token }: TokenRowProps) {
         </div>
       </div>
 
-      <Separator orientation="vertical" className="" />
+      <Separator
+        orientation="vertical"
+        className=""
+      />
 
       {/* Activity + buy */}
       <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
@@ -229,9 +241,15 @@ export function SurgeTable() {
 
   return (
     <div className="w-full">
-      <QueryState query={query} getIsLoading={(q) => q.isPending}>
+      <QueryState
+        query={query}
+        getIsLoading={(q) => q.isPending}
+      >
         {query.data?.tokens?.map((token) => (
-          <TokenRow key={token.mint} token={token} />
+          <TokenRow
+            key={token.mint}
+            token={token}
+          />
         ))}
       </QueryState>
     </div>
@@ -243,8 +261,14 @@ const SurgeBuyButton = () => {
 
   return (
     quickBuy !== null && (
-      <Button size="sm" variant={"soft"}>
-        <Zap className="size-3" fill="currentColor" />
+      <Button
+        size="sm"
+        variant={"soft"}
+      >
+        <Zap
+          className="size-3"
+          fill="currentColor"
+        />
 
         <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
           Buy

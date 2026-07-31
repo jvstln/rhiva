@@ -13,7 +13,7 @@ const tradingConfigSchema = z
   .object({
     bribe: z.number().optional(),
     rpc: z.url().optional(),
-    slippage: z.number(),
+    slippage: z.number().optional(),
   })
   .and(feeConfig);
 

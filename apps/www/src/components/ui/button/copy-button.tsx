@@ -26,7 +26,12 @@ export function CopyButton({
   };
 
   return (
-    <Button variant="ghost" size="icon-xs" {...props} onClick={handleCopy}>
+    <Button
+      variant="ghost"
+      size="icon-xs"
+      {...props}
+      onClick={handleCopy}
+    >
       {copied ? (
         <Check className="size-3 text-up transition-colors" />
       ) : (

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { type WalletWithMetadata, useUser } from "@privy-io/react-auth";
+import type { User, WalletWithMetadata } from "@privy-io/react-auth";
 
 import { wallet } from "@/queries";
 import DepositView from "./DepositView";
@@ -11,15 +11,17 @@ import OverviewView from "./OverviewView";
 import WithdrawView from "./WithdrawView";
 import TransferView from "./TransferView";
 import { useUserApi } from "@/hooks/use-user-api";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   createDialogHandle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
 
 type UserMenuDialogProps = Dialog.Props & {
+  user: User;
+  activeWallet: WalletWithMetadata;
   children?: React.ReactElement;
 };
 
@@ -28,20 +30,14 @@ type ViewType = (typeof VIEWS)[number];
 
 const userMenuDialogHandle = createDialogHandle();
 
-export function UserMenuDialog({ children, ...props }: UserMenuDialogProps) {
+export function UserMenuDialog({
+  user,
+  activeWallet,
+  children,
+  ...props
+}: UserMenuDialogProps) {
   const userApi = useUserApi();
   const { connection } = useConnection();
-
-  const { user } = useUser();
-  const activeWallet = useMemo(
-    () =>
-      user?.linkedAccounts.find(
-        (account): account is WalletWithMetadata =>
-          account.type === "wallet" && account.delegated,
-      ),
-    [user],
-  );
-
   const [view, setView] = useState<ViewType>("overview");
 
   const linkedWallets = useMemo(
@@ -76,12 +72,15 @@ export function UserMenuDialog({ children, ...props }: UserMenuDialogProps) {
       {children && <DialogTrigger render={children} />}
 
       <DialogContent className="sm:max-w-md">
-        <Tabs value={view} onValueChange={(value) => setView(value)}>
+        <Tabs
+          value={view}
+          onValueChange={(value) => setView(value)}
+        >
           <TabsContent value="overview">
             <OverviewView
               balances={balances}
-              address={activeWallet?.address ?? ""}
-              walletClientType={activeWallet?.walletClientType}
+              address={activeWallet.address}
+              walletClientType={activeWallet.walletClientType}
               isLoadingBalances={isFetching}
               onFetchBalances={refetch}
               onDisconnect={() => {
@@ -94,7 +93,7 @@ export function UserMenuDialog({ children, ...props }: UserMenuDialogProps) {
 
           <TabsContent value="deposit">
             <DepositView
-              walletAddress={activeWallet?.address ?? ""}
+              walletAddress={activeWallet.address}
               onBack={() => setView("overview")}
             />
           </TabsContent>

@@ -233,7 +233,10 @@ export function PoolsTable() {
             >
               <ToggleGroupItem value="all">All pools</ToggleGroupItem>
               {POOLS.map((pool) => (
-                <ToggleGroupItem key={pool.id} value={pool.id}>
+                <ToggleGroupItem
+                  key={pool.id}
+                  value={pool.id}
+                >
                   <pool.icon />
                 </ToggleGroupItem>
               ))}
@@ -388,11 +391,19 @@ export function PoolsTable() {
             <Popover>
               <PopoverTrigger
                 openOnHover
-                render={<Button size="sm" variant="outline" />}
+                render={
+                  <Button
+                    size="sm"
+                    variant="outline"
+                  />
+                }
               >
                 More
               </PopoverTrigger>
-              <PopoverContent align="end" className="p-0">
+              <PopoverContent
+                align="end"
+                className="p-0"
+              >
                 <div className="flex flex-col py-1">
                   {stats.map((stat) => (
                     <div
