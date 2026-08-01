@@ -8,7 +8,7 @@ const envSchema = z.object({
   env: z.string().default("development"),
   appOrigin: z.url().default("https://alpha.rhiva.fun"),
   userApiUrl: z.string().default("https://api.rhiva.fun"),
-  dataApiUrl: z.string().default("https://datapi.rhiva,fun"),
+  dataApiUrl: z.string().default("https://datapi.rhiva.fun"),
 });
 
 export const env = envSchema.parse({
@@ -18,4 +18,6 @@ export const env = envSchema.parse({
   privyAppId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
   privySignerId: process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID,
   solanaRpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
+  userApiUrl: process.env.NEXT_PUBLIC_URL_API_URL,
+  dataApiUrl: process.env.NEXT_PUBLIC_DATA_API_URL,
 });
