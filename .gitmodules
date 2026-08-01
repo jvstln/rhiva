@@ -4,3 +4,6 @@
 [submodule "apps/www/public/static/charting_library"]
 	path = apps/www/public/static/charting_library
 	url = https://github.com/rhivadotfun/tradeview.git
+[submodule "modules/terminal-trading-backend"]
+	path = modules/terminal-trading-backend
+	url = git@github.com:rhivadotfun/terminal-trading-backend.git

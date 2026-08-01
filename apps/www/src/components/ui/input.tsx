@@ -1,7 +1,8 @@
+import { debounce } from "lodash";
 import { Input as InputPrimitive } from "@base-ui/react/input";
 import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/lib/utils";
-import { debounce } from "lodash";
 
 const inputVariants = cva(
   cn(

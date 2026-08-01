@@ -1,9 +1,10 @@
 "use client";
 
+import type * as React from "react";
+import { XIcon } from "lucide-react";
 import { mergeProps, useRender } from "@base-ui/react";
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
-import { XIcon } from "lucide-react";
-import type * as React from "react";
+
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 

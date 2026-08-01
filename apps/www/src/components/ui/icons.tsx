@@ -1,7 +1,8 @@
-import { cn } from "@/lib/utils";
-import type { LucideIcon } from "lucide-react";
 import type * as React from "react";
+import type { LucideIcon } from "lucide-react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
+
+import { cn } from "@/lib/utils";
 
 export type IconProps = React.ComponentProps<"svg">;
 export type IconType = LucideIcon;

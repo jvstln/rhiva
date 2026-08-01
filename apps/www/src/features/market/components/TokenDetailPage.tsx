@@ -1,20 +1,20 @@
-import { BackButton } from "@/components/layout/BackButton";
-import type { Token } from "../market.token.type";
-import { TokenChart } from "@/features/tradeview/components/TokenChart";
-import { TokenDetailHeader } from "./TokenDetailHeader";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useState } from "react";
-import { mapToken } from "../market.util";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { TokenDetailHeader } from "./TokenDetailHeader";
 import type { TokenDetailFilters } from "../market.type";
+import { BackButton } from "@/components/layout/BackButton";
+import { TokenDetailTradesTable } from "./TokenDetailTradesTable";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { TokenDetailDataSections } from "./TokenDetailDataSections";
+import { TokenChart } from "@/features/tradeview/components/TokenChart";
 import { TokenDetailTimeframeStats } from "./TokenDetailTimeframeStats";
 import { TokenDetailStatsGrid } from "@/features/market/components/TokenDetailStatsGrid";
 import { TokenDetailTradePanel } from "@/features/market/components/TokenDetailTradePanel";
-import { Separator } from "@/components/ui/separator";
-import { TokenDetailDataSections } from "./TokenDetailDataSections";
-import { Button } from "@/components/ui/button";
-import { TokenDetailTradesTable } from "./TokenDetailTradesTable";
 
-type TokenDetailPageProps = { token: Token };
+type TokenDetailPageProps = { token: TokenDetail };
 
 const TABLE_TABS = [
   "Trades",
@@ -28,18 +28,14 @@ const TABLE_TABS = [
   "Dev Token",
 ] as const;
 
-export const TokenDetailPage = ({
-  token: initialToken,
-}: TokenDetailPageProps) => {
+export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
   const [activeTable, setActiveTable] =
     useState<(typeof TABLE_TABS)[number]>("Trades");
   const [filters, setFilters] = useState<TokenDetailFilters>({});
-  const [token, setToken] = useState(initialToken);
 
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     const resolvedFilters = { ...filters, ...newFilters };
     setFilters(resolvedFilters);
-    setToken(mapToken(token.original, resolvedFilters));
   };
 
   return (

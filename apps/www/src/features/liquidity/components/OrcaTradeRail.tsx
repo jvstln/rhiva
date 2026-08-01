@@ -1,11 +1,12 @@
 "use client";
 
-import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { arrayWithId, capitalize, cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { arrayWithId, capitalize, cn } from "@/lib/utils";
 
 const TABS = ["full", "custom"] as const;
 type Tab = (typeof TABS)[number];

@@ -1,15 +1,16 @@
 import { Filter } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { useMarketStore } from "../market.store";
+import { SurgeFilterDialog } from "./SurgeFilterDialog";
+import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
-import { useMarketStore } from "../market.store";
-import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
-import { Select } from "@/components/ui/select";
-import { SurgeFilterDialog } from "./SurgeFilterDialog";
 
 export const SurgeToolbar = () => {
   const minMcap = useMarketStore((state) => state.surgeFilters.min_mcap);

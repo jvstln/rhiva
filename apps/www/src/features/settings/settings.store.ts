@@ -1,8 +1,8 @@
 import { merge } from "lodash";
 import { create } from "zustand";
-import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { immer } from "zustand/middleware/immer";
 import { devtools, persist } from "zustand/middleware";
+import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 import type {
   DlmmSettings,

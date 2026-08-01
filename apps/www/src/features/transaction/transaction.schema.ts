@@ -1,5 +1,6 @@
-import type { ParsedTokenAccount } from "@/queries";
 import z from "zod";
+
+import type { ParsedTokenAccount } from "@/queries";
 
 export const TokenAccount = z.custom<ParsedTokenAccount>();
 // .pipe(

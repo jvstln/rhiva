@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, XAxis } from "recharts";
+
+import { cn } from "@/lib/utils";
 import {
   POOL_DETAIL,
   TOKEN_INFO_COLUMNS,
   VOLUME_SERIES,
 } from "@/components/ui/data/liquidity-detail-data";
-import { cn } from "@/lib/utils";
 
 export function PoolVolumeAndTvl() {
   const [tokenTab, setTokenTab] = useState<"USDC" | "SOL">("USDC");

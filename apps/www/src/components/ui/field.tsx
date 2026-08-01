@@ -1,10 +1,11 @@
 "use client";
 
-import { cva, type VariantProps } from "class-variance-authority";
 import { useMemo } from "react";
-import { Label, labelVariant } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { Label, labelVariant } from "@/components/ui/label";
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (

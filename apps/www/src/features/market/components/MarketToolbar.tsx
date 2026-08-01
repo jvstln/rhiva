@@ -1,16 +1,17 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React from "react";
-import { buttonVariants } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 import { capitalize, cn } from "@/lib/utils";
 import { MarketView } from "../market.schema";
-import { PumpLiveToolbar } from "./PumpLiveToolbar";
 import { RadarToolbar } from "./RadarToolbar";
 import { SurgeToolbar } from "./SurgeToolbar";
+import { PumpLiveToolbar } from "./PumpLiveToolbar";
 import { TrendingToolbar } from "./TrendingToolbar";
+import { buttonVariants } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export function MarketToolbar() {
   const searchParams = useSearchParams();

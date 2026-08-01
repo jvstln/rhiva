@@ -1,7 +1,8 @@
 import { merge } from "lodash";
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { devtools, persist } from "zustand/middleware";
+
 import type { MarketState } from "./market.type";
 
 export const useMarketStore = create<MarketState>()(

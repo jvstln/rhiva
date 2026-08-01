@@ -1,9 +1,10 @@
 "use client";
 
-import { MapPin } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
+
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const TABS = ["Positions", "History"] as const;
 

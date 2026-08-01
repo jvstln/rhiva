@@ -25,6 +25,7 @@
     "@privy-io/react-auth": "^3.35.1",
     "@rhivadotfun/api": "*",
     "@rhivadotfun/userapi": "*",
+    "@rhivadotfun/dataapi": "*",
     "@rhivadotfun/zap": "*",
     "@solana-program/memo": "^0.12.0",
     "@solana/kit": "^7.0.0",

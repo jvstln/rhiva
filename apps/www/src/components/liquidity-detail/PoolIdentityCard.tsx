@@ -1,8 +1,8 @@
+import { cn } from "@/lib/utils";
 import {
   LIQUIDITY_BINS,
   POOL_DETAIL,
 } from "@/components/ui/data/liquidity-detail-data";
-import { cn } from "@/lib/utils";
 
 export function PoolIdentityCard() {
   const { tokenA, tokenB, binStep, fee } = POOL_DETAIL;

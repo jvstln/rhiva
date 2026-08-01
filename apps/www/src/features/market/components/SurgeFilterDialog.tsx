@@ -1,3 +1,4 @@
+import type * as React from "react";
 import {
   CircleDashed,
   Droplets,
@@ -6,9 +7,25 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import type * as React from "react";
+
+import { capitalize } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SurgeFilters } from "../market.schema";
+import { useMarketStore } from "../market.store";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogClose,
@@ -18,22 +35,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { SurgeFilters } from "../market.schema";
-import { capitalize } from "@/lib/utils";
-import { useMarketStore } from "../market.store";
 
 const PROTOCOLS = [
   {

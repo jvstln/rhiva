@@ -1,25 +1,21 @@
 import z from "zod";
 
-const EnvSchema = z
-  .object({
-    SOLANA_RPC_URL: z.string(),
-    APP_NAME: z.string().default("Rhiva"),
-    APP_ORIGIN: z.url().default("https://rhiva.fun"),
-    PRIVY_APP_ID: z.string(),
-    ENV: z.string().default("development"),
-    PRIVY_SIGNER_ID: z.string(),
-  })
-  .catch((error) => {
-    throw new Error(
-      `Invalid environment variables: ${error.issues.map((iss) => iss.message).join(",")}`,
-    );
-  });
+const envSchema = z.object({
+  privyAppId: z.string(),
+  solanaRpcUrl: z.string(),
+  privySignerId: z.string(),
+  appName: z.string().default("Rhiva"),
+  env: z.string().default("development"),
+  appOrigin: z.url().default("https://alpha.rhiva.fun"),
+  userApiUrl: z.string().default("https://api.rhiva.fun"),
+  dataApiUrl: z.string().default("https://datapi.rhiva,fun"),
+});
 
-export const env = EnvSchema.parse({
-  SOLANA_RPC_URL: process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
-  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-  APP_ORIGIN: process.env.NEXT_PUBLIC_APP_ORIGIN,
-  PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
-  PRIVY_SIGNER_ID: process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID,
-  ENV: process.env.NEXT_PUBLIC_ENV,
+export const env = envSchema.parse({
+  env: process.env.NODE_ENV,
+  appName: process.env.NEXT_PUBLIC_APP_NAME,
+  appOrigin: process.env.NEXT_PUBLIC_APP_ORIGIN,
+  privyAppId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+  privySignerId: process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID,
+  solanaRpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
 });

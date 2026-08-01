@@ -1,29 +1,30 @@
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+import { siGoogle, siTiktok, siX, siYoutube } from "simple-icons";
 import {
+  Eye,
+  User,
+  Globe,
+  Search,
   AlertCircle,
   BadgeCheck,
   CalendarDays,
   ExternalLink,
-  Eye,
-  Globe,
-  Search,
-  User,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { getInitials } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { LeafIcon, SimpleIcon, XIcon } from "@/components/ui/icons";
-import { getInitials } from "@/lib/utils";
-import type { Token } from "../../market.token.type";
+import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLinkItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
-import { siGoogle, siTiktok, siX, siYoutube } from "simple-icons";
 
 interface SocialHoverTooltipProps {
-  token: Token;
+  token: TokenDetail;
 }
 
 export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
@@ -35,11 +36,11 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
         <div className="flex flex-col">
           {/* Top Banner Section */}
           <div className="relative flex h-28 w-full items-center justify-center bg-linear-to-t from-violet-900 to-violet-600">
-            {token.image && (
+            {token.logo_uri && (
               <picture>
                 <img
-                  src={token.image}
-                  alt={token.name}
+                  src={token.logo_uri}
+                  alt={token.name ?? "Token"}
                   className="h-16 w-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]"
                 />
               </picture>
@@ -50,7 +51,7 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
             {/* Profile Info */}
             <div className="relative -mt-2/3 flex items-start justify-between">
               <Avatar>
-                <AvatarImage src={token.image || ""} />
+                <AvatarImage src={token.logo_uri || ""} />
                 <AvatarFallback>
                   {token.name ? getInitials(token.name) : <User />}
                 </AvatarFallback>
@@ -59,8 +60,8 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
                 size="icon-sm"
                 variant={"ghost"}
                 onClick={() =>
-                  token.socials.twitterUrl
-                    ? window.open(token.socials.twitterUrl, "_blank")
+                  token.social?.twitter_url
+                    ? window.open(token.social.twitter_url, "_blank")
                     : undefined
                 }
               >
@@ -75,13 +76,17 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
                 <XIcon className="size-3.5" />
               </div>
               <span className="text-muted-foreground text-sm">
-                @{token.socials.twitterHandle}
+                {token.social?.twitter_handle
+                  ? `@${token.social.twitter_handle}`
+                  : "N/A"}
               </span>
             </div>
 
             {/* Bio */}
             <p className="text-muted-foreground text-sm">
-              {token.socials.twitterHandle}
+              {token.social?.twitter_handle
+                ? `@${token.social.twitter_handle}`
+                : "N/A"}
             </p>
 
             {/* Joined Date */}
@@ -102,9 +107,9 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
               </div>
             </div>
 
-            {token.socials.twitterUrl && (
+            {token.social?.twitter_url && (
               <a
-                href={token.socials.twitterUrl}
+                href={token.social.twitter_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({ variant: "default", size: "sm" })}
@@ -171,17 +176,19 @@ export function TokenSocialSearch({ token }: SocialHoverTooltipProps) {
           />
           X search for <span className="truncate">{token.mint}</span>
         </DropdownMenuLinkItem>
-        <DropdownMenuLinkItem
-          target="_blank"
-          href={`https://x.com/search?q=${token.dev.address}`}
-          className="truncate"
-        >
-          <SimpleIcon
-            icon={siX}
-            className="text-foreground"
-          />
-          X search for DEV <span className="truncate">{token.dev.address}</span>
-        </DropdownMenuLinkItem>
+        {token.creator && (
+          <DropdownMenuLinkItem
+            target="_blank"
+            href={`https://x.com/search?q=${token.creator}`}
+            className="truncate"
+          >
+            <SimpleIcon
+              icon={siX}
+              className="text-foreground"
+            />
+            X search for DEV <span className="truncate">{token.creator}</span>
+          </DropdownMenuLinkItem>
+        )}
         <DropdownMenuLinkItem
           target="_blank"
           href={`https://x.com/search?q=${token.symbol}`}
@@ -206,16 +213,16 @@ export function TokenSocialSearch({ token }: SocialHoverTooltipProps) {
   );
 }
 
-export function TokenViewCount({ token }: { token: Token }) {
+export function TokenViewCount({ token }: { token: TokenDetail }) {
   return (
     <InfoBadge tooltip={"Currently viewing"}>
-      <Eye /> {token.viewCount}
+      <Eye /> N/A
     </InfoBadge>
   );
 }
 
-export function TokenWebsite({ token }: { token: Token }) {
-  if (!token.socials.websiteUrl) return null;
+export function TokenWebsite({ token }: { token: TokenDetail }) {
+  if (!token.social?.website_url) return null;
 
   return (
     <InfoBadge
@@ -224,11 +231,11 @@ export function TokenWebsite({ token }: { token: Token }) {
           label="Website"
           value={
             <a
-              href={token.socials.websiteUrl}
+              href={token.social.website_url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {token.socials.websiteUrl}
+              {token.social.website_url}
             </a>
           }
         />
@@ -240,8 +247,8 @@ export function TokenWebsite({ token }: { token: Token }) {
   );
 }
 
-export function TokenConnection({ token }: { token: Token }) {
-  if (!token.socials.twitterUrl) return null;
+export function TokenConnection({ token }: { token: TokenDetail }) {
+  if (!token.social?.twitter_url) return null;
 
   return (
     <InfoBadge
@@ -250,11 +257,11 @@ export function TokenConnection({ token }: { token: Token }) {
           label="X Connection"
           value={
             <a
-              href={token.socials.twitterUrl}
+              href={token.social.twitter_url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {token.socials.twitterUrl}
+              {token.social.twitter_url}
             </a>
           }
         />

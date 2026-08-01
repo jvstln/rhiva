@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   CircleDollarSign,
@@ -10,17 +12,17 @@ import {
   Wallet,
   XSquare,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+
+import { cn, getInitials } from "@/lib/utils";
+import { useLiquidityPool } from "../liquidity.hook";
+import { QueryState } from "@/components/layout/QueryState";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CoinIcon, MeteoraIcon, SolanaIcon } from "@/components/ui/icons";
 import { LIQUIDITY_BINS } from "@/components/ui/data/liquidity-detail-data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog";
-import { cn } from "@/lib/utils";
-import { useLiquidityPool } from "../liquidity.hook";
-import { QueryState } from "@/components/layout/QueryState";
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -34,6 +36,45 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
         const currentPriceNum = p.sqrt_price ? Number(p.sqrt_price) ** 2 : 0;
         const currentPriceStr =
           currentPriceNum > 0 ? currentPriceNum.toExponential(4) : "N/A";
+
+        const symbolA = p.token_a?.symbol ?? p.token_mint_a.slice(0, 6);
+        const symbolB = p.token_b?.symbol ?? p.token_mint_b.slice(0, 6);
+        const pair = `${symbolA}/${symbolB}`;
+
+        const baseToken =
+          p.token_mint_a === p.base_mint ? p.token_a : p.token_b;
+        const logoUri =
+          baseToken?.logo_uri ??
+          p.token_a?.logo_uri ??
+          p.token_b?.logo_uri ??
+          "";
+
+        const totalFeePct = Number(
+          p.total_fee_pct ?? p.base_fee_pct ?? p.dynamic_fee_pct ?? 0,
+        );
+        const feeLabel =
+          totalFeePct > 0 ? `${totalFeePct.toFixed(2)}%` : `${p.bin_step}%`;
+
+        const activeTvlNum = (p as any).active_tvl_usd ?? p.tvl_usd ?? 0;
+        const volume24h = p.volume_24h_usd ?? 0;
+        const feesValue =
+          (p as any).fees_usd ?? volume24h * (totalFeePct / 100);
+
+        const tvlStr = formatCompactCurrency(p.tvl_usd);
+        const activeTvlStr = formatCompactCurrency(activeTvlNum);
+        const volumeStr = formatCompactCurrency(volume24h);
+        const feesStr = formatCompactCurrency(feesValue);
+        const feesChangeStr = formatSignedPercent(
+          (p as any).fees_change_pct ?? null,
+        );
+        const feesRatioStr =
+          activeTvlNum > 0
+            ? `${((feesValue / activeTvlNum) * 100).toFixed(2)}%`
+            : "N/A";
+        const feesRatioChangeStr = formatSignedPercent(
+          (p as any).fees_ratio_change_pct ?? null,
+        );
+        const marketCapChangeStr = formatSignedPercent(p.price_change_24h_pct);
 
         return (
           <DashboardSlot>
@@ -50,13 +91,11 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
 
               <div className="flex items-center gap-4">
                 <Avatar>
-                  <AvatarImage src="" />
-                  <AvatarFallback>
-                    <SolanaIcon />
-                  </AvatarFallback>
+                  <AvatarImage src={logoUri} />
+                  <AvatarFallback>{getInitials(pair)}</AvatarFallback>
                 </Avatar>
                 <h1 className="flex items-center gap-2 font-bold text-xl">
-                  {p.pair}
+                  {pair}
                   <MeteoraIcon className="size-4" />
                 </h1>
                 <div className="ml-2 flex items-center gap-3 border-border/70 border-l pl-4 text-gray text-sm">
@@ -64,7 +103,7 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                     Bin Step: <span className="text-white">{p.bin_step}</span>
                   </p>
                   <p>
-                    Fee: <span className="text-white">{p.fee}</span>
+                    Fee: <span className="text-white">{feeLabel}</span>
                   </p>
                 </div>
               </div>
@@ -83,7 +122,7 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                       Current Price:{" "}
                       <span className="text-white">{currentPriceStr}</span>
                       <br />
-                      {p.pair.replace("/", " per ")}
+                      {pair.replace("/", " per ")}
                     </div>
                   </div>
 
@@ -113,13 +152,13 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   <div className="flex items-center justify-between gap-2 rounded-lg border bg-background/50 p-4">
                     <TokenBalanceRow
                       symbol={p.token_b?.symbol ?? "Token A"}
-                      balance={p.tvl}
-                      usdValue={p.activeTvl}
+                      balance={tvlStr}
+                      usdValue={activeTvlStr}
                     />
                     <TokenBalanceRow
                       symbol={p.token_a?.symbol ?? "Token B"}
-                      balance={p.volume}
-                      usdValue={p.volume}
+                      balance={volumeStr}
+                      usdValue={volumeStr}
                     />
                   </div>
                 </div>
@@ -132,13 +171,13 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border bg-background/50 p-4">
                     <TokenBalanceRow
                       symbol={p.token_b?.symbol ?? "Token A"}
-                      balance={p.fees}
-                      usdValue={p.feesChange}
+                      balance={feesStr}
+                      usdValue={feesChangeStr}
                     />
                     <TokenBalanceRow
                       symbol={p.token_a?.symbol ?? "Token B"}
-                      balance={p.feesRatio}
-                      usdValue={p.feesRatioChange}
+                      balance={feesRatioStr}
+                      usdValue={feesRatioChangeStr}
                     />
                   </div>
                   <div className="flex gap-3">
@@ -159,17 +198,17 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   <StatCard
                     label="Current pool price"
                     value={currentPriceStr}
-                    meta={`${p.pair.replace("/", "/")} ⇄`}
+                    meta={`${pair.replace("/", "/")} ⇄`}
                     icon={<CircleDollarSign className="size-4" />}
                   />
                   <StatCard
                     label="Total Liquidity"
-                    value={p.tvl}
+                    value={tvlStr}
                     icon={<Wallet className="size-4" />}
                   />
                   <StatCard
                     label="Fees Earned (Claimed)"
-                    value={p.fees}
+                    value={feesStr}
                     icon={<Coins className="size-4" />}
                   />
                 </div>
@@ -179,27 +218,27 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   <div className="mb-6">
                     <p className="font-medium text-sm">{currentPriceStr} ⇋</p>
                     <p className="mt-1 text-gray text-xs">
-                      {p.pair.replace("/", " per ")}
+                      {pair.replace("/", " per ")}
                     </p>
                   </div>
 
                   <div className="space-y-0 text-sm">
                     <DetailRow
                       label="PnL"
-                      value={`${p.marketCapChange} (${p.marketCapChange})`}
+                      value={`${marketCapChangeStr} (${marketCapChangeStr})`}
                       valueClass="text-up"
                     />
                     <DetailRow
                       label="Unclaimed Fees"
-                      value={p.fees}
+                      value={feesStr}
                     />
                     <DetailRow
                       label="Total Liquidity"
-                      value={p.tvl}
+                      value={tvlStr}
                     />
                     <DetailRow
                       label="24h Fee / TVL"
-                      value={p.feesRatio}
+                      value={feesRatioStr}
                     />
                     <div className="flex items-center justify-between border-border/30 border-b py-3">
                       <span className="text-gray">Range</span>
@@ -210,8 +249,8 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                     </div>
                     <DetailRow
                       label="Position Status"
-                      value={p.activeTvl ? "Active" : "Inactive"}
-                      valueClass={p.activeTvl ? "text-up" : "text-down"}
+                      value={activeTvlNum ? "Active" : "Inactive"}
+                      valueClass={activeTvlNum ? "text-up" : "text-down"}
                       noBorder
                     />
                   </div>

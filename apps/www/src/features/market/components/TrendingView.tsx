@@ -1,10 +1,22 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
+// import { ChartContainer } from "@/components/ui/chart";
+// import { Area, AreaChart } from "recharts";
+
+import { useMemo } from "react";
 import { Star } from "lucide-react";
-import { QueryState } from "@/components/layout/QueryState";
+import { useRouter } from "next/navigation";
+import { formatDistanceToNowStrict } from "date-fns";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
 import { Button } from "@/components/ui/button";
+import { useMarketStore } from "../market.store";
 import { InfoBadge } from "@/components/ui/info-badge";
+import { DexPaid, TotalFees } from "./tooltips/DexInfo";
+import { QueryState } from "@/components/layout/QueryState";
+import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevInfo";
+import { useTrendingTokens, useWatchlistTokens } from "../market.hook";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
   cn,
@@ -12,24 +24,6 @@ import {
   formatCompactNumber,
   formatSignedPercent,
 } from "@/lib/utils";
-import { useTrendingTokens, useWatchlistTokens } from "../market.hook";
-import { useMarketStore } from "../market.store";
-import type { Token } from "../market.type";
-import {
-  TokenConnection,
-  TokenLatestPost,
-  TokenSocialSearch,
-  TokenViewCount,
-  TokenWebsite,
-} from "./tooltips/Socials";
-import {
-  TokenAvatar,
-  TokenDescription,
-  TokenNameAndSymbol,
-  TokenSymbolCopy,
-} from "./tooltips/TokenAvatar";
-import { useRouter } from "next/navigation";
-import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevInfo";
 import {
   BundlersHold,
   InsidersHold,
@@ -37,10 +31,19 @@ import {
   SnipersHold,
   TopHolders,
 } from "./tooltips/Holders";
-import { DexPaid, TotalFees } from "./tooltips/DexInfo";
-import { formatDistanceToNowStrict } from "date-fns";
-// import { ChartContainer } from "@/components/ui/chart";
-// import { Area, AreaChart } from "recharts";
+import {
+  TokenAvatar,
+  TokenDescription,
+  TokenNameAndSymbol,
+  TokenSymbolCopy,
+} from "./tooltips/TokenAvatar";
+import {
+  TokenConnection,
+  TokenLatestPost,
+  TokenSocialSearch,
+  TokenViewCount,
+  TokenWebsite,
+} from "./tooltips/Socials";
 
 export function AddToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
@@ -99,7 +102,10 @@ export function AddToWatchlistButton({ mint }: { mint: string }) {
 /* Pair info cell (star, avatar, name, sub-icons, watcher count)       */
 /* ------------------------------------------------------------------ */
 
-function PairInfoCell({ token }: { token: Token }) {
+function PairInfoCell({ token }: { token: TokenDetail }) {
+  const updatedAt = token.live?.updated_at
+    ? new Date(Number(token.live.updated_at))
+    : new Date();
   return (
     <div
       data-token-id={token.mint}
@@ -118,10 +124,12 @@ function PairInfoCell({ token }: { token: Token }) {
 
         <div className="flex items-baseline gap-1">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-            {formatDistanceToNowStrict(token.updatedAt).replace(
-              /^.*?(\d+)\s*(\w).*$/,
-              "$1$2",
-            )}
+            {token.live?.updated_at
+              ? formatDistanceToNowStrict(updatedAt).replace(
+                  /^.*?(\d+)\s*(\w).*$/,
+                  "$1$2",
+                )
+              : "N/A"}
           </InfoBadge>
           <TokenSymbolCopy token={token} />
           <TokenLatestPost token={token} />
@@ -150,7 +158,7 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
   return (
     <div className="flex flex-col">
       <span className="font-medium text-sm text-white">{value}</span>
-      {changePercent !== undefined && (
+      {changePercent !== undefined && changePercent !== null ? (
         <InfoBadge
           className={cn(
             changePercent >= 0
@@ -160,6 +168,8 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
         >
           {formatSignedPercent(changePercent)}
         </InfoBadge>
+      ) : (
+        <span className="text-muted-foreground text-xs">N/A</span>
       )}
     </div>
   );
@@ -169,7 +179,7 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
 /* Token security badge grid                                           */
 /* ------------------------------------------------------------------ */
 
-type TokenMetric = (props: { token: Token }) => React.JSX.Element;
+type TokenMetric = (props: { token: TokenDetail }) => React.JSX.Element;
 const METRICS: TokenMetric[] = [
   TopHolders,
   DevHoldOrDevSell,
@@ -225,101 +235,133 @@ function ActionButtons() {
 /* Column definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-const trendingColumns: ColumnDef<Token>[] = [
-  {
-    id: "pairInfo",
-    header: "Pair Info",
-    cell: ({ row }) => <PairInfoCell token={row.original} />,
-    size: 500,
-  },
-  {
-    id: "marketCap",
-    header: "Market Cap",
-    cell: ({ row }) => (
-      <MetricCell
-        value={formatCompactCurrency(row.original.marketCapUsd)}
-        changePercent={row.original.priceChangePct}
-      />
-    ),
-  },
-  {
-    id: "liquidity",
-    header: "Liquidity",
-    cell: ({ row }) => (
-      <MetricCell value={formatCompactCurrency(row.original.liquidityUsd)} />
-    ),
-  },
-  {
-    id: "volume",
-    header: "Volume",
-    cell: ({ row }) => {
-      return (
-        <MetricCell value={formatCompactCurrency(row.original.volumeUsd)} />
-      );
-    },
-  },
-  {
-    id: "txns",
-    header: "TXNS",
-    cell: ({ row }) => {
-      console.log("tt", row.original.buys, row.original.sells);
-
-      return (
-        <div className="flex flex-col gap-0.5">
-          <span className="font-medium text-foreground text-sm">
-            {formatCompactNumber(row.original.totalTransaction)}
-          </span>
-          <span className="font-medium text-xs">
-            <span className="text-ocean-green">
-              {formatCompactNumber(row.original.buys)}
-            </span>
-            <span className="text-white/30"> / </span>
-            <span className="text-roman">
-              {formatCompactNumber(row.original.sells)}
-            </span>
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    id: "tokenInfo",
-    header: "Token Info",
-    cell: ({ row }) => {
-      return (
-        <div className="flex flex-wrap gap-1">
-          {METRICS.map((Metric, i) => {
-            return (
-              <Metric
-                // biome-ignore lint/suspicious/noArrayIndexKey: Order never changes
-                key={i}
-                token={row.original}
-              />
-            );
-          })}
-        </div>
-      );
-    },
-    size: 300,
-  },
-  {
-    id: "action",
-    header: () => <span className="">Action</span>,
-    cell: () => <ActionButtons />,
-    size: 130,
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* Table shell                                                          */
-/* ------------------------------------------------------------------ */
-
-export function TrendingTable({ tokens }: { tokens: Token[] }) {
+export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
   const router = useRouter();
+  const timeframe = useMarketStore((state) => state.trendingFilters.timeframe);
+
+  const columns = useMemo<ColumnDef<TokenDetail>[]>(() => {
+    return [
+      {
+        id: "pairInfo",
+        header: "Pair Info",
+        cell: ({ row }) => <PairInfoCell token={row.original} />,
+        size: 500,
+      },
+      {
+        id: "marketCap",
+        header: "Market Cap",
+        cell: ({ row }) => {
+          const mcap = row.original.market_cap_usd;
+          const pct =
+            row.original.timeframes?.windows?.[timeframe]?.price_change_pct;
+          return (
+            <MetricCell
+              value={
+                mcap !== null && mcap !== undefined
+                  ? formatCompactCurrency(mcap)
+                  : "N/A"
+              }
+              changePercent={
+                pct !== null && pct !== undefined ? pct : undefined
+              }
+            />
+          );
+        },
+      },
+      {
+        id: "liquidity",
+        header: "Liquidity",
+        cell: ({ row }) => {
+          const liq = row.original.liquidity_usd;
+          return (
+            <MetricCell
+              value={
+                liq !== null && liq !== undefined
+                  ? formatCompactCurrency(liq)
+                  : "N/A"
+              }
+            />
+          );
+        },
+      },
+      {
+        id: "volume",
+        header: "Volume",
+        cell: ({ row }) => {
+          const vol = row.original.timeframes?.windows?.[timeframe]?.volume_usd;
+          return (
+            <MetricCell
+              value={
+                vol !== null && vol !== undefined
+                  ? formatCompactCurrency(vol)
+                  : "N/A"
+              }
+            />
+          );
+        },
+      },
+      {
+        id: "txns",
+        header: "TXNS",
+        cell: ({ row }) => {
+          const window = row.original.timeframes?.windows?.[timeframe];
+          const buys = window?.buys !== undefined ? Number(window.buys) : null;
+          const sells = window?.sells ?? null;
+          const totalTransaction =
+            buys !== null && sells !== null ? buys + sells : null;
+
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-medium text-foreground text-sm">
+                {totalTransaction !== null
+                  ? formatCompactNumber(totalTransaction)
+                  : "N/A"}
+              </span>
+              <span className="font-medium text-xs">
+                <span className="text-ocean-green">
+                  {buys !== null ? formatCompactNumber(buys) : "N/A"}
+                </span>
+                <span className="text-white/30"> / </span>
+                <span className="text-roman">
+                  {sells !== null ? formatCompactNumber(sells) : "N/A"}
+                </span>
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        id: "tokenInfo",
+        header: "Token Info",
+        cell: ({ row }) => {
+          return (
+            <div className="flex flex-wrap gap-1">
+              {METRICS.map((Metric, i) => {
+                return (
+                  <Metric
+                    // biome-ignore lint/suspicious/noArrayIndexKey: Order never changes
+                    key={i}
+                    token={row.original}
+                  />
+                );
+              })}
+            </div>
+          );
+        },
+        size: 300,
+      },
+      {
+        id: "action",
+        header: () => <span className="">Action</span>,
+        cell: () => <ActionButtons />,
+        size: 130,
+      },
+    ];
+  }, [timeframe]);
 
   const table = useDataTable({
     data: tokens,
-    columns: trendingColumns,
+    columns,
   });
 
   const pinnedColumnClassName = cn(
@@ -342,7 +384,7 @@ export function TrendingTable({ tokens }: { tokens: Token[] }) {
       className="mx-auto w-full min-w-0 2xl:container"
     >
       <DataTable
-        key={tokens[0]?.timeframe}
+        key={tokens[0]?.mint}
         table={table}
         classNames={{
           table: "w-max table-fixed",
@@ -361,7 +403,7 @@ export function TrendingView() {
 
   return (
     <QueryState query={trendingTokens}>
-      <TrendingTable tokens={trendingTokens.data?.tokens ?? []} />
+      <TrendingTable tokens={trendingTokens.data ?? []} />
     </QueryState>
   );
 }
@@ -371,7 +413,7 @@ export function WatchlistView() {
 
   return (
     <QueryState query={watchlistTokens}>
-      {(query) => <TrendingTable tokens={query.data} />}
+      {(query) => <TrendingTable tokens={query.data ?? []} />}
     </QueryState>
   );
 }

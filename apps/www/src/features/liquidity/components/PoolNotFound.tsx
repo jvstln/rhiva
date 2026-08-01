@@ -1,10 +1,11 @@
 "use client";
 
-import { ChevronLeft, SearchX } from "lucide-react";
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { MeteoraIcon } from "@/components/ui/icons";
+import { ChevronLeft, SearchX } from "lucide-react";
+
 import { cn } from "@/lib/utils";
+import { MeteoraIcon } from "@/components/ui/icons";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 export function PoolNotFound() {
   return (

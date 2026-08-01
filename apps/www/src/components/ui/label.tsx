@@ -1,9 +1,9 @@
 "use client";
 
 import type * as React from "react";
+import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { cva } from "class-variance-authority";
 
 export const labelVariant = cva(
   cn(

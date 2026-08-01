@@ -1,7 +1,21 @@
 "use client";
-import { ArrowDown, ArrowDownUp, ArrowUp, Eye, EyeOff } from "lucide-react";
+
 import { useState } from "react";
+import { ArrowDown, ArrowDownUp, ArrowUp, Eye, EyeOff } from "lucide-react";
+
+import { useAuth } from "@/hooks";
+import { TokenDialog } from "./TokenDialog";
+import { cn, currencies } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { SwapDialog } from "../../transaction/components/SwapDialog";
+import { SendDialog } from "../../transaction/components/SendDialog";
+import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
+import { DepositDialog } from "../../transaction/components/DepositDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -9,18 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
-import { cn, currencies } from "@/lib/utils";
-import { SwapDialog } from "../../transaction/components/SwapDialog";
-import { TokenDialog } from "./TokenDialog";
-import { DepositDialog } from "../../transaction/components/DepositDialog";
-import { SendDialog } from "../../transaction/components/SendDialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks";
 
 export function PortfolioHero() {
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);

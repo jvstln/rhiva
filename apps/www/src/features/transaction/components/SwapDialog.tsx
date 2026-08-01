@@ -1,19 +1,17 @@
 "use client";
 
+import { toast } from "sonner";
 import { ArrowDownUp } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { cn } from "@/lib/utils";
+import { useSwap } from "@/hooks";
+import { TokenSelect } from "./TokenSelect";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { InputGroupInput } from "@/components/ui/input-group";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Controller, useForm } from "react-hook-form";
-import { TokenSelect } from "./TokenSelect";
+import { Swap, type SwapInput, type SwapOutput } from "../transaction.schema";
 import {
   Field,
   FieldContent,
@@ -22,11 +20,14 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Swap, type SwapInput, type SwapOutput } from "../transaction.schema";
-import { useSwap } from "@/hooks";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function SwapDialog({
   children,

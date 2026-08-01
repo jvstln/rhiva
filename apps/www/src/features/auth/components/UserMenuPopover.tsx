@@ -1,5 +1,7 @@
 "use client";
+
 import { toast } from "sonner";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { useConnection } from "@solana/wallet-adapter-react";
 import {
@@ -7,13 +9,6 @@ import {
   type User,
   type WalletWithMetadata,
 } from "@privy-io/react-auth";
-
-import { wallet } from "@/queries";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
 import {
   ArrowDownLeft,
   LogOut,
@@ -22,12 +17,18 @@ import {
   Send,
   Wallet,
 } from "lucide-react";
-import { Button, CopyButton } from "@/components/ui/button";
+
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { DepositDialog } from "@/features/transaction/components/DepositDialog";
+import { wallet } from "@/queries";
+import { Button, CopyButton } from "@/components/ui/button";
 import { SendDialog } from "@/features/transaction/components/SendDialog";
+import { DepositDialog } from "@/features/transaction/components/DepositDialog";
 import { WithdrawDialog } from "@/features/transaction/components/WithdrawDialog";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 type UserMenuPopoverProps = Popover.Props & {
   user: User;

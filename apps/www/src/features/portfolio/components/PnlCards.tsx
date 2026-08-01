@@ -1,6 +1,7 @@
-import { ChevronUp, Globe } from "lucide-react";
 import type React from "react";
 import type { ReactNode } from "react";
+import { ChevronUp, Globe } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 type CorePnlCardProps = {

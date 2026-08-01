@@ -1,33 +1,28 @@
-import { api } from "@/lib/api";
-import { mapToken } from "./market.util";
 import type {
-  Token,
-  RadarFilters,
-  RawToken,
-  SurgeFilters,
-  TokenCandle,
-  TrendingFilters,
-  TokenCandleFilters,
-  TokenTrade,
-} from "./market.type";
+  CandlesQuery,
+  SurgeQuery,
+  TokenDetail,
+} from "@rhivadotfun/dataapi";
+
+import { dataapi } from "@/lib/dataapi";
+import type { RadarFilters, TrendingFilters } from "./market.type";
 
 export const getTokens = async (mints: string[]) => {
-  const response = await api.get<RawToken[]>(
-    `/tokens?mints=${mints.join(",")}`,
-  );
-  return response.data.map((token) => mapToken(token));
+  const response = await dataapi.tokens.getTokensBatch({
+    mints: mints.join(","),
+  });
+  return response;
 };
 
 export const getTrendingTokens = async (
   filters: TrendingFilters,
-): Promise<{ tokens: Token[] }> => {
-  const trendingResponse = await api.get<Array<{ mint: string }>>("/trending", {
-    params: { window: filters.timeframe },
+): Promise<TokenDetail[]> => {
+  const response = await dataapi.tokens.getTrending({
+    limit: null,
+    window: filters.timeframe,
   });
 
-  const tokens = await getTokens(trendingResponse.data.map((t) => t.mint));
-
-  return { tokens };
+  return await getTokens(response.map((token) => token.mint));
 };
 
 export const getRadarTokens = async (
@@ -35,50 +30,42 @@ export const getRadarTokens = async (
 ) => {
   const stageMap: Record<keyof RadarFilters, string> = {
     fresh: "new_creation",
-    heatingUp: "near_completion",
     graduated: "completed",
+    heatingUp: "near_completion",
   };
 
-  const radarResponse = await api.get<Array<{ mint: string }>>("/trenches", {
-    params: {
-      stage: stageMap[filters.type],
-    },
+  const response = await dataapi.tokens.getTrenches({
+    limit: null,
+    stage: stageMap[filters.type],
   });
 
-  const tokens = await getTokens(radarResponse.data.map((t) => t.mint));
-
-  return { tokens };
+  return await getTokens(response.map(({ mint }) => mint));
 };
 
-export const getSurgeTokens = async (params: SurgeFilters) => {
-  const surgeResponse = await api.get<RawToken[]>("/surge", {
-    params,
-  });
+export const getSurgeTokens = async (params: SurgeQuery) => {
+  const response = await dataapi.tokens.getSurge(params);
 
-  const tokens = await getTokens(surgeResponse.data.map((t) => t.mint));
-  const combinedTokens = tokens.map((token) => {
-    return mapToken({
-      ...token.original,
-      ...surgeResponse.data.find((t) => t.mint === token.mint),
-    });
-  });
-
-  return { tokens: combinedTokens };
-};
-
-export const getTokenCandles = async (filters: TokenCandleFilters) => {
-  const response = await api.get<TokenCandle[]>(
-    `/token/${filters.mint}/candles`,
-    {
-      params: { tf: filters.timeframe, limit: filters.limit },
-    },
+  const tokens = new Map(
+    (await getTokens(response.map((token) => token.mint))).map((token) => [
+      token.mint,
+      token,
+    ]),
   );
+  const combinedTokens = response.map((data) => ({
+    ...tokens.get(data.mint),
+    ...data,
+  }));
 
-  return response.data;
+  return combinedTokens;
+};
+
+export const getTokenCandles = async (
+  params: CandlesQuery & { mint: string },
+) => {
+  const { mint, ...rest } = params;
+  return await dataapi.tokens.getTokenCandles(mint, rest);
 };
 
 export const getTokenTrades = async (mint: string) => {
-  const response = await api.get<TokenTrade[]>(`/token/${mint}/trades`);
-
-  return response.data;
+  return await dataapi.tokens.getTokenTrades(mint);
 };

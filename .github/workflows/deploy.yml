@@ -21,12 +21,15 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           envVars: |
             {
-              "PUBLISH_TOKEN": "${{ secrets.PUBLISH_TOKEN }}",
               "NEXT_PUBLIC_JITO_UUID": "${{ secrets.NEXT_PUBLIC_JITO_UUID }}",
               "NEXT_PUBLIC_JITO_API_URL": "${{ secrets.NEXT_PUBLIC_JITO_API_URL }}",
 
-              "NEXT_PUBLIC_API_URL": "${{ secrets.NEXT_PUBLIC_API_URL }}",
-              "NEXT_PUBLIC_BASE_URL": "${{ secrets.NEXT_PUBLIC_BASE_URL }}",
+              "NEXT_PUBLIC_APP_NAME": "${{ secrets.NEXT_PUBLIC_APP_NAME }}",
+              "NEXT_PUBLIC_APP_ORIGIN": "${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}",
+
+              "NEXT_PUBLIC_DATA_API_URL": "${{ secrets.NEXT_PUBLIC_DATA_API_URL }}",
+              "NEXT_PUBLIC_USER_API_URL": "${{ secrets.NEXT_PUBLIC_USER_API_URL }}",
+            
               "NEXT_PUBLIC_HELIUS_API_URL": "${{ secrets.NEXT_PUBLIC_HELIUS_API_URL }}",
               "NEXT_PUBLIC_HELIUS_API_KEY": "${{ secrets.NEXT_PUBLIC_HELIUS_API_KEY }}",
               "NEXT_PUBLIC_SOLANA_RPC_URL": "${{ secrets.NEXT_PUBLIC_SOLANA_RPC_URL }}",

@@ -1,11 +1,12 @@
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { Bell, MenuIcon, Settings, Wallet, XIcon } from "lucide-react";
 import { useCreateWallet } from "@privy-io/react-auth/solana";
 import { useLogin, usePrivy, useSigners } from "@privy-io/react-auth";
+import { Bell, MenuIcon, Settings, Wallet, XIcon } from "lucide-react";
 
 import { env } from "@/lib/env";
 import { useAuth } from "@/hooks";
@@ -46,10 +47,10 @@ export function Navbar() {
         if (isNewUser) {
           await addSigners({
             address: user.wallet.address,
-            signers: [{ signerId: env.PRIVY_SIGNER_ID }],
+            signers: [{ signerId: env.privySignerId }],
           });
         }
-      } else createWallet({ signers: [{ signerId: env.PRIVY_APP_ID }] });
+      } else createWallet({ signers: [{ signerId: env.privyAppId }] });
     },
   });
 

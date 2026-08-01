@@ -1,12 +1,13 @@
+import React from "react";
 import {
   NetworkBitcoin,
   NetworkEthereum,
   NetworkSolana,
 } from "@web3icons/react";
-import React from "react";
-import { InfoBadge } from "@/components/ui/info-badge";
-import { Separator } from "@/components/ui/separator";
+
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { InfoBadge } from "@/components/ui/info-badge";
 
 const DUMMY_TOKENS = [
   {

@@ -1,10 +1,4 @@
-import type {
-  Bar,
-  DatafeedConfiguration,
-  IBasicDataFeed,
-  LibrarySymbolInfo,
-  SearchSymbolResultItem,
-} from "@/public/tradeview";
+import { mapResolutionToTimeframe } from "./tradeview.util";
 import type {
   Aggregrate,
   ChartTimeframe,
@@ -12,7 +6,13 @@ import type {
   SearchResultItem,
   TradingViewDatafeedConfig,
 } from "./tradeview.type";
-import { mapResolutionToTimeframe } from "./tradeview.util";
+import type {
+  Bar,
+  DatafeedConfiguration,
+  IBasicDataFeed,
+  LibrarySymbolInfo,
+  SearchSymbolResultItem,
+} from "@/public/tradeview";
 
 export type CreateDataFeedArgs = {
   cachedSearchResults: Record<string, SearchResultItem>;

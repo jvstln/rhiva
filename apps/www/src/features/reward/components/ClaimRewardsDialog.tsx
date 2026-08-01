@@ -1,6 +1,12 @@
-import { useState, useRef } from "react";
-import { Draggable, gsap, useGSAP } from "@/lib/gsap.util";
+import Image from "next/image";
+import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import { mergeProps, useRender } from "@base-ui/react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Draggable, gsap, useGSAP } from "@/lib/gsap.util";
 import {
   createDialogHandle,
   Dialog,
@@ -10,11 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { mergeProps, useRender } from "@base-ui/react";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { toast } from "sonner";
 
 type Reward = {
   name: string;

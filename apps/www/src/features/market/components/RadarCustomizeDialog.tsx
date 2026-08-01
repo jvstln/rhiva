@@ -1,3 +1,6 @@
+// --- Primitives ---
+
+import * as React from "react";
 import {
   Activity,
   ChevronRight,
@@ -11,9 +14,21 @@ import {
   Square,
   Zap,
 } from "lucide-react";
-import * as React from "react";
+
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Toggle } from "@/components/ui/toggle";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemTitle,
+} from "@/components/ui/item";
 import {
   Dialog,
   DialogContent,
@@ -21,20 +36,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemTitle,
-} from "@/components/ui/item";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Toggle } from "@/components/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn } from "@/lib/utils";
-
-// --- Primitives ---
 
 const DATA_ROWS = [
   "Top10 Hold",

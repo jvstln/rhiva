@@ -1,30 +1,32 @@
 "use client";
 
+import * as React from "react";
+import { Rocket, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   type ColumnDef,
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
-import { Rocket, Star } from "lucide-react";
-import * as React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { gsap } from "@/lib/gsap.util";
+import { cn, getInitials } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useLiquidityPools } from "../liquidity.hook";
+import { useLiquidityStore } from "../liquidity.store";
+import type { LiquidityPool } from "../liquidity.type";
+import { POOLS, type PoolDex } from "../liquidity.schema";
+import { QueryState } from "@/components/layout/QueryState";
 import { MeteoraIcon, OrcaIcon, RaydiumIcon } from "@/components/ui/icons";
+import { DataTable, useDataTable } from "@/components/ui/table/data-table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DataTable, useDataTable } from "@/components/ui/table/data-table";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useLiquidityPools } from "../liquidity.hook";
-import { gsap } from "@/lib/gsap.util";
-import { cn, getInitials, formatCompactCurrency } from "@/lib/utils";
-import { POOLS, type PoolDex } from "../liquidity.schema";
-import { useLiquidityStore } from "../liquidity.store";
-import type { LiquidityPool } from "../liquidity.type";
-import { useRouter } from "next/navigation";
-import { QueryState } from "@/components/layout/QueryState";
 
 const formatPercentString = (value?: string | number | null): string => {
   if (value === undefined || value === null || value === "") return "N/A";
@@ -94,34 +96,37 @@ export function PoolsTable() {
   const pools = useLiquidityPools();
 
   const poolStats = React.useMemo(() => {
-    const poolsArr = pools.data?.pools ?? [];
+    const poolsArr = pools.data ?? [];
     const swapVolume = poolsArr.reduce(
-      (sum, pool) => sum + (pool.volume_24h_usd ?? 0),
+      (sum: number, pool) => sum + (pool.volume_24h_usd ?? 0),
       0,
     );
     const totalLpCount = poolsArr.reduce(
-      (sum, pool) => sum + (pool.total_lps ?? 0),
+      (sum: number, pool) => sum + Number(pool.total_lps ?? 0),
       0,
     );
     const tradersCount = poolsArr.reduce(
-      (sum, pool) => sum + (pool.traders_24h ?? 0),
+      (sum: number, pool) => sum + Number(pool.traders_24h ?? 0),
       0,
     );
     const netDeposit = poolsArr.reduce(
-      (sum, pool) => sum + (pool.net_deposit_usd ?? 0),
+      (sum: number, pool: any) => sum + (pool.net_deposit_usd ?? 0),
       0,
     );
     const holdersCount = poolsArr.reduce(
-      (sum, pool) => sum + (pool.holders_count ?? 0),
+      (sum: number, pool) => sum + (pool.holders_count ?? 0),
       0,
     );
     const avgVolume = poolsArr.length > 0 ? swapVolume / poolsArr.length : null;
-    const minVolatility = poolsArr.reduce<number | null>((current, pool) => {
-      const value = pool.min_volatility_pct;
-      if (value === undefined || value === null) return current;
-      if (current === null) return value;
-      return Math.min(current, value);
-    }, null);
+    const minVolatility = poolsArr.reduce<number | null>(
+      (current, pool: any) => {
+        const value = pool.min_volatility_pct;
+        if (value === undefined || value === null) return current;
+        if (current === null) return value;
+        return Math.min(current, value);
+      },
+      null,
+    );
     const top10Holders = poolsArr.reduce<number | null>((current, pool) => {
       const value = pool.top10_holder_pct;
       if (value === undefined || value === null) return current;
@@ -143,8 +148,14 @@ export function PoolsTable() {
       holders: holdersCount > 0 ? holdersCount : null,
       avgVolume,
       minVolatility,
-      top10Holders,
-      devBalance,
+      top10Holders:
+        top10Holders !== null && poolsArr.length > 0
+          ? top10Holders / poolsArr.length
+          : null,
+      devBalance:
+        devBalance !== null && poolsArr.length > 0
+          ? devBalance / poolsArr.length
+          : null,
     };
   }, [pools.data]);
 
@@ -247,14 +258,54 @@ export function PoolsTable() {
           const poolRow = row.original;
           const currentDex =
             pool === "all"
-              ? (["meteora", "orca", "raydium"] as const)[row.index % 3]
+              ? (["meteora-dlmm", "orca", "raydium-clmm"] as const)[
+                  row.index % 3
+                ]
               : pool;
           const Icon =
             currentDex === "orca"
               ? OrcaIcon
-              : currentDex === "raydium"
+              : currentDex === "raydium-clmm"
                 ? RaydiumIcon
                 : MeteoraIcon;
+
+          const symbolA =
+            poolRow.token_a?.symbol ?? poolRow.token_mint_a.slice(0, 6);
+          const symbolB =
+            poolRow.token_b?.symbol ?? poolRow.token_mint_b.slice(0, 6);
+          const pair = `${symbolA}/${symbolB}`;
+
+          const baseToken =
+            poolRow.token_mint_a === poolRow.base_mint
+              ? poolRow.token_a
+              : poolRow.token_b;
+          const logoUri =
+            baseToken?.logo_uri ??
+            poolRow.token_a?.logo_uri ??
+            poolRow.token_b?.logo_uri ??
+            "";
+
+          const totalFeePct = Number(
+            poolRow.total_fee_pct ??
+              poolRow.base_fee_pct ??
+              poolRow.dynamic_fee_pct ??
+              0,
+          );
+          const feeLabel =
+            totalFeePct > 0
+              ? `${totalFeePct.toFixed(2)}%`
+              : `${poolRow.bin_step}%`;
+
+          const formatAge = (seconds?: number) => {
+            if (seconds === undefined || seconds === null) return "N/A";
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h`;
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${minutes}m`;
+          };
+          const ageLabel = formatAge(poolRow.age_seconds);
 
           return (
             <div
@@ -275,22 +326,18 @@ export function PoolsTable() {
 
               <div className="flex items-center gap-3">
                 <Avatar className="size-9 ring-2 ring-background">
-                  <AvatarImage
-                    src={`https://picsum.photos/seed/${poolRow.pair}/200`}
-                  />
+                  <AvatarImage src={logoUri} />
                   <AvatarFallback className="shimmer text-xs">
-                    {getInitials(poolRow.pair)}
+                    {getInitials(pair)}
                   </AvatarFallback>
                   <Icon className="absolute right-0 bottom-0" />
                 </Avatar>
                 <div>
-                  <p className="font-semibold text-b-2 text-white">
-                    {poolRow.pair}
-                  </p>
+                  <p className="font-semibold text-b-2 text-white">{pair}</p>
                   <p className="text-muted-foreground text-xs">
-                    Tick Spacing: {poolRow.tickSpacing} Fee: {poolRow.fee}
+                    Tick Spacing: {poolRow.tick_spacing} Fee: {feeLabel}
                   </p>
-                  <p className="text-muted-foreground text-xs">{poolRow.age}</p>
+                  <p className="text-muted-foreground text-xs">{ageLabel}</p>
                 </div>
               </div>
             </div>
@@ -300,88 +347,133 @@ export function PoolsTable() {
       },
       {
         id: "marketCap",
-        accessorKey: "marketCap",
+        accessorKey: "market_cap_usd",
         header: "Market Cap",
         cell: ({ row }) => (
           <ValueChangeCell
-            value={row.original.marketCap}
-            change={row.original.marketCapChange}
+            value={formatCompactCurrency(row.original.market_cap_usd)}
+            change={formatSignedPercent(row.original.price_change_24h_pct)}
           />
         ),
         size: 100,
       },
       {
         id: "tvl",
-        accessorKey: "tvl",
+        accessorKey: "tvl_usd",
         header: "TVL",
         cell: ({ row }) => (
           <ValueChangeCell
-            value={row.original.tvl}
-            change={row.original.tvlChange}
+            value={formatCompactCurrency(row.original.tvl_usd)}
+            change={formatSignedPercent(
+              (row.original as any).tvl_change_pct ?? null,
+            )}
           />
         ),
         size: 100,
       },
       {
         id: "activeTvl",
-        accessorKey: "activeTvl",
+        accessorKey: "tvl_usd",
         header: "Active TVL",
         cell: ({ row }) => (
           <ValueChangeCell
-            value={row.original.activeTvl}
-            change={row.original.activeTvlChange}
+            value={formatCompactCurrency(
+              (row.original as any).active_tvl_usd ?? row.original.tvl_usd,
+            )}
+            change={formatSignedPercent(
+              (row.original as any).active_tvl_change_pct ?? null,
+            )}
           />
         ),
         size: 100,
       },
       {
         id: "fees",
-        accessorKey: "fees",
+        accessorKey: "volume_24h_usd",
         header: "Fees",
-        cell: ({ row }) => (
-          <ValueChangeCell
-            value={row.original.fees}
-            change={row.original.feesChange}
-          />
-        ),
-
+        cell: ({ row }) => {
+          const poolRow = row.original;
+          const totalFeePct = Number(
+            poolRow.total_fee_pct ??
+              poolRow.base_fee_pct ??
+              poolRow.dynamic_fee_pct ??
+              0,
+          );
+          const feesValue =
+            (poolRow as any).fees_usd ??
+            (poolRow.volume_24h_usd ?? 0) * (totalFeePct / 100);
+          return (
+            <ValueChangeCell
+              value={formatCompactCurrency(feesValue)}
+              change={formatSignedPercent(
+                (poolRow as any).fees_change_pct ?? null,
+              )}
+            />
+          );
+        },
         size: 100,
       },
       {
         id: "feesRatio",
-        accessorKey: "feesRatio",
+        accessorKey: "volume_24h_usd",
         header: "Fees/Active TVL",
-        cell: ({ row }) => (
-          <ValueChangeCell
-            value={row.original.feesRatio}
-            change={row.original.feesRatioChange}
-          />
-        ),
-
+        cell: ({ row }) => {
+          const poolRow = row.original;
+          const totalFeePct = Number(
+            poolRow.total_fee_pct ??
+              poolRow.base_fee_pct ??
+              poolRow.dynamic_fee_pct ??
+              0,
+          );
+          const feesValue =
+            (poolRow as any).fees_usd ??
+            (poolRow.volume_24h_usd ?? 0) * (totalFeePct / 100);
+          const activeTvl =
+            (poolRow as any).active_tvl_usd ?? poolRow.tvl_usd ?? 0;
+          const ratio = activeTvl > 0 ? (feesValue / activeTvl) * 100 : 0;
+          return (
+            <ValueChangeCell
+              value={ratio > 0 ? `${ratio.toFixed(2)}%` : "N/A"}
+              change={formatSignedPercent(
+                (poolRow as any).fees_ratio_change_pct ?? null,
+              )}
+            />
+          );
+        },
         size: 100,
       },
       {
-        accessorKey: "volume",
+        accessorKey: "volume_24h_usd",
         header: "Vol",
         cell: ({ row }) => (
           <ValueChangeCell
-            value={row.original.volume}
-            change={row.original.volumeChange}
+            value={formatCompactCurrency(row.original.volume_24h_usd)}
+            change={formatSignedPercent(row.original.volume_change_pct)}
           />
         ),
-
         size: 100,
       },
       {
-        accessorKey: "volumeRatio",
+        id: "volumeRatio",
+        accessorKey: "volume_24h_usd",
         header: "Vol/Active TVL",
-        cell: ({ row }) => (
-          <ValueChangeCell
-            value={row.original.volumeRatio}
-            change={row.original.volumeRatioChange}
-          />
-        ),
-
+        cell: ({ row }) => {
+          const poolRow = row.original;
+          const activeTvl =
+            (poolRow as any).active_tvl_usd ?? poolRow.tvl_usd ?? 0;
+          const ratio =
+            activeTvl > 0
+              ? ((poolRow.volume_24h_usd ?? 0) / activeTvl) * 100
+              : 0;
+          return (
+            <ValueChangeCell
+              value={ratio > 0 ? `${ratio.toFixed(2)}%` : "N/A"}
+              change={formatSignedPercent(
+                (poolRow as any).volume_ratio_change_pct ?? null,
+              )}
+            />
+          );
+        },
         size: 100,
       },
       columnHelper.display({
@@ -447,7 +539,7 @@ export function PoolsTable() {
   );
 
   const table = useDataTable({
-    data: pools.data?.pools ?? [],
+    data: pools.data ?? [],
     columns,
     state: { sorting },
     onSortingChange: setSorting,

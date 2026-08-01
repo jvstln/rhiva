@@ -1,5 +1,8 @@
 "use client";
 
+import Image from "next/image";
+import type * as React from "react";
+import { useMemo, useState } from "react";
 import {
   Coins,
   Globe,
@@ -11,16 +14,28 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
-import Image from "next/image";
-import type * as React from "react";
-import { useMemo, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { cn, formatCompactNumber } from "@/lib/utils";
+import { TierExportDialog } from "./TierExportDialog";
+import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
+import { CopyButton } from "@/components/ui/button/copy-button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+  mockRewardAccount,
+  REWARD_TIERS,
+  type RewardTier,
+} from "@/components/ui/data/reward-data";
 import {
   DashboardDescription,
   DashboardHeader,
   DashboardSlot,
 } from "@/components/layout/DashboardUi";
-import { Button } from "@/components/ui/button";
-import { CopyButton } from "@/components/ui/button/copy-button";
 import {
   Dialog,
   DialogContent,
@@ -28,20 +43,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import {
-  mockRewardAccount,
-  REWARD_TIERS,
-  type RewardTier,
-} from "@/components/ui/data/reward-data";
-import { cn, formatCompactNumber } from "@/lib/utils";
-import { TierExportDialog } from "./TierExportDialog";
-import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
 
 export type RewardQuest = {
   id: string;

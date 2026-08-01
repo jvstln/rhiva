@@ -1,8 +1,9 @@
 "use client";
 
+import type * as React from "react";
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
 import { cva, type VariantProps } from "class-variance-authority";
-import type * as React from "react";
+
 import { cn } from "@/lib/utils";
 
 const avatarVariants = cva(
