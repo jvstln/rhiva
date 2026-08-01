@@ -10,6 +10,7 @@ cd -
 
 cd modules/terminal-trading-backend
 git update-index --skip-worktree bun.lock
+git update-index --skip-worktree .DS_Store
 git update-index --skip-worktree biome.json 
 rm biome.json
 cd -
