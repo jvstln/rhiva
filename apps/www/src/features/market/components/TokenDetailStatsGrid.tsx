@@ -1,5 +1,8 @@
-import type { Token } from "@/features/market/market.token.type";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
 import { cn } from "@/lib/utils";
+import { DexPaid } from "./tooltips/DexInfo";
+import { DevHoldOrDevSell } from "./tooltips/DevInfo";
 import {
   BundlersHold,
   InsidersHold,
@@ -8,10 +11,8 @@ import {
   TopHolders,
   TotalHolders,
 } from "./tooltips/Holders";
-import { DevHoldOrDevSell } from "./tooltips/DevInfo";
-import { DexPaid } from "./tooltips/DexInfo";
 
-export function TokenDetailStatsGrid({ token }: { token: Token }) {
+export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
   const items = [
     {
       label: "Top 10",
@@ -90,15 +91,18 @@ export function TokenDetailStatsGrid({ token }: { token: Token }) {
     { label: "NoMint", value: "" },
     { label: "No Blacklist", value: "" },
     {
-      label: "Burnt",
-
-      value: token.bonding?.stage === "completed" ? "100%" : "N/A",
-    },
-    {
       label: "Rug %",
       value:
-        token.bot_activity !== undefined
-          ? `${token.bot_activity.toFixed(0)}%`
+        token.bot_activity !== undefined && token.bot_activity !== null
+          ? `${(token.bot_activity * 100).toFixed(0)}%`
+          : "N/A",
+    },
+    {
+      label: "Top 10",
+      value:
+        token.holders?.top10_holder_pct !== undefined &&
+        token.holders?.top10_holder_pct !== null
+          ? `${token.holders.top10_holder_pct.toFixed(0)}%`
           : "N/A",
     },
   ];

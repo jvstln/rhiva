@@ -1,23 +1,24 @@
 "use client";
 
-import { ChevronDown, Repeat, Settings, Zap } from "lucide-react";
 import { useState } from "react";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+import { ChevronDown, Repeat, Settings, Zap } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
 import { cn, formatCompactCurrency } from "@/lib/utils";
 import { SettingsDialog } from "../../settings/components/SettingsDialog";
+import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
 } from "../../../components/ui/input-group";
-import type { Token } from "@/features/market/market.token.type";
 
 const QUICK_AMOUNTS = ["0.01", "0.1", "0.5", "1"] as const;
 
-export function TokenDetailTradePanel({ token }: { token: Token }) {
+export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
   const [side, setSide] = useState<"buy" | "sell" | "lp">("buy");
   const [amount, setAmount] = useState("");
 
@@ -27,7 +28,12 @@ export function TokenDetailTradePanel({ token }: { token: Token }) {
         <span className="text-muted-foreground">{token.name}</span>
         <span className="font-medium text-white">
           {token.symbol}
-          (ATH MC {formatCompactCurrency(token.athUsd)})
+          (ATH MC{" "}
+          {token.all_time_high_market_cap_usd !== null &&
+          token.all_time_high_market_cap_usd !== undefined
+            ? formatCompactCurrency(token.all_time_high_market_cap_usd)
+            : "N/A"}
+          )
         </span>
       </div>
 
@@ -74,7 +80,10 @@ export function TokenDetailTradePanel({ token }: { token: Token }) {
         </TabsList>
 
         <div className="flex items-center justify-end text-b-4 text-gray">
-          Price: {formatCompactCurrency(token.priceUsd)}
+          Price:{" "}
+          {token.price_usd !== null && token.price_usd !== undefined
+            ? formatCompactCurrency(token.price_usd)
+            : "N/A"}
         </div>
 
         <div>
@@ -104,7 +113,10 @@ export function TokenDetailTradePanel({ token }: { token: Token }) {
         </div>
 
         <p className="text-b-5 text-gray">
-          Price USD: {formatCompactCurrency(token.priceUsd)}
+          Price USD:{" "}
+          {token.price_usd !== null && token.price_usd !== undefined
+            ? formatCompactCurrency(token.price_usd)
+            : "N/A"}
         </p>
 
         <TabsContent value="buy">

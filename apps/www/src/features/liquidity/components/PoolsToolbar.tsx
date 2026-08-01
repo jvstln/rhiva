@@ -1,13 +1,19 @@
 "use client";
 
-import { debounce } from "lodash";
-import { Filter, Rocket } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { debounce } from "lodash";
 import React, { useState } from "react";
-import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Filter, Rocket } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+
+import { capitalize } from "@/lib/utils";
+import { PoolColumns } from "../liquidity.schema";
 import { SolanaIcon } from "@/components/ui/icons";
+import { Separator } from "@/components/ui/separator";
+import { useLiquidityStore } from "../liquidity.store";
+import { PoolFiltersDialog } from "./PoolFiltersDialog";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import {
   InputGroup,
   InputGroupAddon,
@@ -20,11 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { capitalize } from "@/lib/utils";
-import { PoolColumns } from "../liquidity.schema";
-import { useLiquidityStore } from "../liquidity.store";
-import { PoolFiltersDialog } from "./PoolFiltersDialog";
 
 const TIMEFRAMES = ["1m", "5m", "30m", "1h", "2h", "4h", "12h", "24h"];
 

@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,8 +10,9 @@ import {
   type TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import React from "react";
+
+import { cn } from "@/lib/utils";
+import { ScrollArea, ScrollBar } from "../scroll-area";
 import {
   Table,
   TableBody,
@@ -18,8 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
-import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "../scroll-area";
 
 type TableClassNames = Partial<
   Record<
@@ -263,7 +264,10 @@ export function DataTable<TData>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.map((row) => (
-            <TableRow key={row.id} className={cn(classNames.tr)}>
+            <TableRow
+              key={row.id}
+              className={cn(classNames.tr)}
+            >
               {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}

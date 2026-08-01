@@ -1,19 +1,20 @@
+import { TokenSOL } from "@web3icons/react";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+import { BadgeDollarSign, Check, ChefHat, Copy, Crown } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import type { TokenInfoProps } from "./TokenInfo";
+import { useCopyToClipboard } from "@/hooks/use-clipboard";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import {
   InfoBadge,
   InfoBadgeTooltipGrid,
   InfoBadgeTooltipHeader,
   InfoBadgeTooltipRow,
 } from "@/components/ui/info-badge";
-import type { Token } from "../../market.token.type";
-import { TokenSOL } from "@web3icons/react";
-import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
-import { BadgeDollarSign, Check, ChefHat, Copy, Crown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { TokenInfoProps } from "./TokenInfo";
-import { useCopyToClipboard } from "@/hooks/use-clipboard";
 
 export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
-  const devHoldPercent = token.dev.tokenBalance / token.totalSupply || 0;
+  const devHoldPercent = token.holders?.dev_holder_pct;
   const hasDevSoldAll = devHoldPercent === 0;
 
   return (
@@ -27,7 +28,9 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
       tooltip={
         <div>
           <InfoBadgeTooltipHeader>
-            {hasDevSoldAll ? (
+            {devHoldPercent === undefined || devHoldPercent === null ? (
+              "Dev Holds N/A"
+            ) : hasDevSoldAll ? (
               "Dev Sell All"
             ) : (
               <>
@@ -39,58 +42,61 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
             )}
           </InfoBadgeTooltipHeader>
           <InfoBadgeTooltipGrid>
-            {token.dev.address && (
+            {token.creator ? (
               <InfoBadgeTooltipRow
                 label="Dev wallet"
                 value={
                   <div className="flex items-center gap-0.5">
-                    {`${token.dev.address.slice(0, 4)}...${token.dev.address.slice(-4)}`}
+                    {`${token.creator.slice(0, 4)}...${token.creator.slice(-4)}`}
                     <TokenSOL className="size-3.5" />
                   </div>
                 }
+              />
+            ) : (
+              <InfoBadgeTooltipRow
+                label="Dev wallet"
+                value="N/A"
               />
             )}
 
             <InfoBadgeTooltipRow
               label="Bought"
-              value={
-                <div className="flex items-center gap-1">
-                  <span className="text-up">{`${formatCompactCurrency(token.dev.buys)}`}</span>
-                  /
-                  <span className="text-up">{`${formatCompactCurrency(token.dev.buyTransactions)}`}</span>
-                </div>
-              }
+              value="N/A"
             />
 
             <InfoBadgeTooltipRow
               label="Sold"
-              value={
-                <div className="flex items-center gap-1">
-                  <span className="text-down">{`${formatCompactCurrency(token.dev.sells)}`}</span>
-                  /
-                  <span className="text-down">{`${formatCompactCurrency(token.dev.sellTransactions)}`}</span>
-                </div>
-              }
+              value="N/A"
             />
             <InfoBadgeTooltipRow
               label="Balance"
-              value={formatCompactCurrency(
-                token.dev.tokenBalance * token.priceUsd,
-              )}
+              value={
+                token.holders?.dev_balance !== undefined &&
+                token.holders?.dev_balance !== null
+                  ? formatCompactCurrency(
+                      token.holders.dev_balance * token.price_usd,
+                    )
+                  : "N/A"
+              }
             />
-            {token.dev.fundedByAddress && (
+            {token.creator ? (
               <InfoBadgeTooltipRow
                 label="Funding"
-                value={`${token.dev.fundedByAddress.slice(0, 4)}...${token.dev.fundedByAddress.slice(-4)}`}
+                value={`${token.creator.slice(0, 4)}...${token.creator.slice(-4)}`}
+              />
+            ) : (
+              <InfoBadgeTooltipRow
+                label="Funding"
+                value="N/A"
               />
             )}
             <InfoBadgeTooltipRow
               label="Transfer In"
-              value={`${formatCompactCurrency(0.1)} SOL`}
+              value="N/A"
             />
             <InfoBadgeTooltipRow
               label="Time"
-              value={new Date().toISOString()}
+              value="N/A"
             />
           </InfoBadgeTooltipGrid>
         </div>
@@ -98,12 +104,16 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <ChefHat />
-      {hasDevSoldAll ? "DS" : `${formatCompactNumber(devHoldPercent)}%`}
+      {devHoldPercent === undefined || devHoldPercent === null
+        ? "N/A"
+        : hasDevSoldAll
+          ? "DS"
+          : `${formatCompactNumber(devHoldPercent)}%`}
     </InfoBadge>
   );
 };
 
-export const DevMigratedAndLaunch = ({ token }: { token: Token }) => {
+export const DevMigratedAndLaunch = ({ token }: { token: TokenDetail }) => {
   return (
     <InfoBadge
       className="[--accent:var(--color-warn)]"
@@ -111,36 +121,25 @@ export const DevMigratedAndLaunch = ({ token }: { token: Token }) => {
         <InfoBadgeTooltipGrid>
           <InfoBadgeTooltipRow
             label="Dev Migrated"
-            value={token.dev.migrated}
+            value="N/A"
           />
           <InfoBadgeTooltipRow
             label="Dev Launched"
-            value={token.dev.launched}
+            value="N/A"
           />
           <InfoBadgeTooltipRow
             label="Migrated"
-            value={`${formatCompactNumber(token.dev.migrated / token.dev.launched || 0)}%`}
+            value="N/A"
           />
         </InfoBadgeTooltipGrid>
       }
     >
       <Crown />
-      {token.dev.migrated}/{token.dev.launched}
+      N/A
     </InfoBadge>
   );
 };
 
-export const CashbackNotice = ({ token }: { token: Token }) => {
-  if (token.fees.totalCashbackSol <= 0) return null;
-
-  return (
-    <InfoBadge
-      className="[--accent:var(--color-warn)]"
-      tooltip={
-        "Cashback coins return the creator fee to traders instead of the coin creator"
-      }
-    >
-      <BadgeDollarSign />
-    </InfoBadge>
-  );
+export const CashbackNotice = ({ token }: { token: TokenDetail }) => {
+  return null;
 };

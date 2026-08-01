@@ -1,14 +1,14 @@
 "use client";
 
-import { PoolDetailChartPanel } from "@/components/liquidity-detail/PoolDetailChartPanel";
-import { PoolDetailSidebar } from "@/components/liquidity-detail/PoolDetailSidebar";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { MeteoraTradeRail } from "@/features/liquidity/components/MeteoraTradeRail";
-import { OrcaTradeRail } from "@/features/liquidity/components/OrcaTradeRail";
-import { RaydiumTradeRail } from "@/features/liquidity/components/RaydiumTradeRail";
-import { BackButton } from "@/components/layout/BackButton";
 import { useLiquidityPool } from "../liquidity.hook";
+import { BackButton } from "@/components/layout/BackButton";
 import { QueryState } from "@/components/layout/QueryState";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { OrcaTradeRail } from "@/features/liquidity/components/OrcaTradeRail";
+import { PoolDetailSidebar } from "@/components/liquidity-detail/PoolDetailSidebar";
+import { MeteoraTradeRail } from "@/features/liquidity/components/MeteoraTradeRail";
+import { RaydiumTradeRail } from "@/features/liquidity/components/RaydiumTradeRail";
+import { PoolDetailChartPanel } from "@/components/liquidity-detail/PoolDetailChartPanel";
 
 export default function LiquidityPoolPage({ id }: { id: string }) {
   const pool = useLiquidityPool(id);

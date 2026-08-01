@@ -1,10 +1,10 @@
 import { ChevronUp } from "lucide-react";
 
-import { CandlestickChart } from "@/components/token-detail/CandlestickChart";
+import { PositionsPanel } from "./PositionsPanel";
+import { CANDLES } from "@/components/ui/data/token-detail-data";
 import { ChartToolbar } from "@/components/token-detail/ChartToolbar";
 import { ChartToolRail } from "@/components/token-detail/ChartToolRail";
-import { CANDLES } from "@/components/ui/data/token-detail-data";
-import { PositionsPanel } from "./PositionsPanel";
+import { CandlestickChart } from "@/components/token-detail/CandlestickChart";
 
 export function PoolDetailChartPanel() {
   return (

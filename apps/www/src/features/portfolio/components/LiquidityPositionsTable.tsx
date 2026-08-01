@@ -1,17 +1,18 @@
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
 import { CircleDollarSign, RefreshCcwIcon, Share, X } from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { capitalize } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SolanaIcon } from "@/components/ui/icons";
+import { PnlExportDialog } from "./PnlExportDialog";
+import { LP_POSITIONS } from "@/components/ui/data/portfolio-data";
+import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { LP_POSITIONS } from "@/components/ui/data/portfolio-data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { POOL_DEXES } from "@/features/liquidity/liquidity.schema";
-import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
-import { capitalize } from "@/lib/utils";
-import { PnlExportDialog } from "./PnlExportDialog";
-import { useRouter } from "next/navigation";
 
 const columnHelper = createColumnHelper<(typeof LP_POSITIONS)[0]>();
 
@@ -94,7 +95,7 @@ const columns = [
           <div className="flex items-center gap-1.5">
             <p className="text-b-5 text-gray">{row.original.timeAgo}</p>
             {(() => {
-              const Icon = POOL_DEXES[row.index % POOL_DEXES.length].icon;
+              const Icon = POOL_DEXES["meteora-dlmm"].icon;
               return <Icon className="size-3" />;
             })()}
           </div>
@@ -152,8 +153,8 @@ export const LiquidityPositionsTable = () => {
       <div className="flex items-center gap-6 px-1">
         <ToggleGroup defaultValue={["all"]}>
           <ToggleGroupItem value="all">All pools</ToggleGroupItem>
-          {POOL_DEXES.map((pool) => (
-            <ToggleGroupItem key={pool.id} value={pool.id}>
+          {Object.entries(POOL_DEXES).map(([key, pool]) => (
+            <ToggleGroupItem key={key} value={key}>
               <pool.icon />
             </ToggleGroupItem>
           ))}

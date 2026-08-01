@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
+import { useState } from "react";
+import { Check, Copy } from "lucide-react";
+
 import { Button } from "./index";
 
 export function CopyButton({

@@ -1,15 +1,10 @@
 "use client";
 
 import type * as React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Field, FieldLabel } from "@/components/ui/field";
+
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Select,
@@ -18,7 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type PoolFiltersDialogProps = Dialog.Props & {
   children?: React.ReactElement;

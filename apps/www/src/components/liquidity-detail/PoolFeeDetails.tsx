@@ -7,7 +7,8 @@ export function PoolFeeDetails({ pool }: { pool: LiquidityPool }) {
   const volume24h = pool.volume ?? 0;
   const activeTvl = pool.activeTvl ?? 0;
 
-  const fees24hValue = pool.feesUsd ?? pool.fees ?? volume24h * (totalFeePct / 100);
+  const fees24hValue =
+    pool.feesUsd ?? pool.fees ?? volume24h * (totalFeePct / 100);
   const fees24hTvlPct = activeTvl > 0 ? (fees24hValue / activeTvl) * 100 : 0;
 
   const feesChange = formatSignedPercent(pool.feesChange);

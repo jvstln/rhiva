@@ -1,13 +1,18 @@
 "use client";
 
-import { Flame, Globe, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { mockPumpLiveStreams } from "@/components/ui/data/pump-live-data";
-import { arrayWithId, cn, formatCompactCurrency } from "@/lib/utils";
-
 /* ------------------------------------------------------------------ */
 /* Types                                                                */
 /* ------------------------------------------------------------------ */
+
+import { Pill } from "lucide-react";
+import { Flame, Globe, Zap } from "lucide-react";
+import { Clock, MessageCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { InfoBadge } from "@/components/ui/info-badge";
+import { arrayWithId, cn, formatCompactCurrency } from "@/lib/utils";
+import { mockPumpLiveStreams } from "@/components/ui/data/pump-live-data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface PumpLiveStream {
   id: string;
@@ -72,8 +77,6 @@ function StreamThumbnail({ stream }: { stream: PumpLiveStream }) {
 /* Channel row (avatar, name, market cap)                              */
 /* ------------------------------------------------------------------ */
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 function ChannelRow({ stream }: { stream: PumpLiveStream }) {
   return (
     <div className="mt-3 flex items-center justify-between gap-2">
@@ -117,8 +120,6 @@ function DescriptionRow({ stream }: { stream: PumpLiveStream }) {
 /* Stats row                                                            */
 /* ------------------------------------------------------------------ */
 
-import { Clock, MessageCircle } from "lucide-react";
-
 function StatsRow({ stream }: { stream: PumpLiveStream }) {
   return (
     <div className="mt-2.5 flex items-center gap-3 text-b-4 text-gray">
@@ -143,9 +144,6 @@ function StatsRow({ stream }: { stream: PumpLiveStream }) {
 /* ------------------------------------------------------------------ */
 /* Actions row (status icons + buy button)                              */
 /* ------------------------------------------------------------------ */
-
-import { Pill } from "lucide-react";
-import { InfoBadge } from "@/components/ui/info-badge";
 
 function StreamActionsRow({ stream }: { stream: PumpLiveStream }) {
   return (

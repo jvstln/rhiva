@@ -11,12 +11,13 @@ const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
 const TOKEN_INFO_KEYS = ["15m", "5m", "1h", "24h"] as const;
 
 export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
-  const baseSymbol = pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
+  const baseSymbol =
+    pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
   const quoteSymbol = pool.tokenB.symbol || "SOL";
 
-  const [tokenTab, setTokenTab] = useState<typeof baseSymbol | typeof quoteSymbol>(
-    baseSymbol,
-  );
+  const [tokenTab, setTokenTab] = useState<
+    typeof baseSymbol | typeof quoteSymbol
+  >(baseSymbol);
 
   const baseUsd = pool.tvlDistribution?.base_usd ?? 0;
   const quoteUsd = pool.tvlDistribution?.quote_usd ?? 0;
@@ -38,8 +39,11 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
     return {
       label: k,
       value: w ? formatCompactCurrency(w.volume_usd) : "N/A",
-      sub: w ? `${w.price_change_pct >= 0 ? "+" : ""}${w.price_change_pct.toFixed(2)}%` : undefined,
-      subTone: w && w.price_change_pct < 0 ? ("down" as const) : ("up" as const),
+      sub: w
+        ? `${w.price_change_pct >= 0 ? "+" : ""}${w.price_change_pct.toFixed(2)}%`
+        : undefined,
+      subTone:
+        w && w.price_change_pct < 0 ? ("down" as const) : ("up" as const),
     };
   });
 
@@ -58,8 +62,16 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
             >
               <defs>
                 <linearGradient id="volFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.5} />
-                  <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
+                  <stop
+                    offset="0%"
+                    stopColor="var(--primary)"
+                    stopOpacity={0.5}
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor="var(--primary)"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
               <XAxis
@@ -134,8 +146,8 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-2">
-          {tokenInfoCols.map((col, i) => (
-            <div key={i}>
+          {tokenInfoCols.map((col) => (
+            <div key={col.value}>
               <p className="text-b-5 text-gray">{col.label}</p>
               <p className="font-medium text-b-4 text-white">{col.value}</p>
               {col.sub && (

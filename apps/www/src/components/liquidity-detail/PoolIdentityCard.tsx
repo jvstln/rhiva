@@ -7,12 +7,14 @@ const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
 
 export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
   const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
-  const baseSymbol = pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
+  const baseSymbol =
+    pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
   const quoteSymbol = pool.tokenB.symbol || "SOL";
   const pair = `${baseSymbol}/${quoteSymbol}`;
 
   const totalFeePct = pool.totalFeePct ?? 0;
-  const feeLabel = totalFeePct > 0 ? `${totalFeePct}%` : `${pool.binStep ?? 0}bps`;
+  const feeLabel =
+    totalFeePct > 0 ? `${totalFeePct}%` : `${pool.binStep ?? 0}bps`;
 
   const baseUsd = pool.tvlDistribution?.base_usd ?? 0;
   const quoteUsd = pool.tvlDistribution?.quote_usd ?? 0;
@@ -71,8 +73,8 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
             <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-gray shadow ring-1 ring-border">
               Current price
               <br />
-              {pool.price ? pool.price.toExponential(4) : "N/A"}{" "}
-              {baseSymbol}/{quoteSymbol}
+              {pool.price ? pool.price.toExponential(4) : "N/A"} {baseSymbol}/
+              {quoteSymbol}
             </span>
             <span className="mt-1 h-full w-px flex-1 bg-white/60" />
           </div>

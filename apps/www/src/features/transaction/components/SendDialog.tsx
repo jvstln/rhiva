@@ -1,7 +1,17 @@
 "use client";
 
 import * as React from "react";
+import { toast } from "sonner";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { WalletWithMetadata } from "@privy-io/react-auth";
+
+import { useUserApi } from "@/hooks";
+import { TokenSelect } from "./TokenSelect";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Send, type SendInput, type SendOutput } from "../transaction.schema";
 import {
   Dialog,
   DialogContent,
@@ -10,15 +20,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useUserApi } from "@/hooks";
-import type { WalletWithMetadata } from "@privy-io/react-auth";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Send, type SendInput, type SendOutput } from "../transaction.schema";
-import { toast } from "sonner";
-import { TokenSelect } from "./TokenSelect";
 
 export function SendDialog({
   activeWallet,
@@ -83,7 +84,10 @@ export function SendDialog({
             <Field>
               <div className="relative flex justify-between">
                 <div className="flex flex-col">
-                  <AmountInput {...field} value={String(field.value)} />
+                  <AmountInput
+                    {...field}
+                    value={String(field.value)}
+                  />
                   <span className="text-muted-foreground">$0.00</span>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -137,7 +141,10 @@ export function SendDialog({
           render={({ field, fieldState }) => (
             <Field>
               <FieldLabel>Recipient</FieldLabel>
-              <Input {...field} placeholder="Paste address" />
+              <Input
+                {...field}
+                placeholder="Paste address"
+              />
               <FieldError errors={[fieldState.error]} />
             </Field>
           )}

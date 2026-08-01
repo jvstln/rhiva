@@ -1,11 +1,12 @@
+import { Check, Copy } from "lucide-react";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
 import type { IconType } from "@/components/ui/icons";
 import { InfoBadge } from "@/components/ui/info-badge";
-import type { Token } from "../../market.token.type";
-import { Check, Copy } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/use-clipboard";
 
 export type TokenInfoProps = InfoBadge.Props & {
-  token: Token;
+  token: TokenDetail;
   children?: (props: {
     value: string | number;
     icon?: IconType;

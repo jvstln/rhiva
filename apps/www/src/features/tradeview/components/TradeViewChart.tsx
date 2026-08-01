@@ -1,6 +1,8 @@
 "use client";
-import { type ResolutionString, widget } from "@/public/tradeview";
+
 import { useEffect, useRef } from "react";
+
+import { type ResolutionString, widget } from "@/public/tradeview";
 import { type CreateDataFeedArgs, createDatafeed } from "../datafeed-trpc";
 
 type TradeViewChartProps = {

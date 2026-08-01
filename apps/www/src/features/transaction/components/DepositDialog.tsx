@@ -1,7 +1,12 @@
 "use client";
 
 import type * as React from "react";
+import { QRCode } from "react-qr-code";
+import { AlertTriangleIcon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { useCopyToClipboard } from "@/hooks/use-clipboard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -10,10 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { QRCode } from "react-qr-code";
-import { useCopyToClipboard } from "@/hooks/use-clipboard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangleIcon } from "lucide-react";
 
 export function DepositDialog({
   address,

@@ -1,10 +1,11 @@
 import { ArrowDownUp, Ban, Filter, LayoutList, Settings } from "lucide-react";
-import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
+
 import { Button } from "@/components/ui/button";
 import { BlacklistDialog } from "./BlacklistDialog";
-import { RadarCustomizeDialog } from "./RadarCustomizeDialog";
 import { RadarFilterDialog } from "./RadarFilterDialog";
+import { RadarCustomizeDialog } from "./RadarCustomizeDialog";
 import { RadarQuickSellDialog } from "./RadarQuickSellDialog";
+import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 
 export const RadarToolbar = () => {
   return (

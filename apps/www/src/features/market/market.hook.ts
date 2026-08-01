@@ -1,23 +1,25 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  getRadarTokens,
-  getSurgeTokens,
-  getTokens,
-  getTokenCandles,
-  getTrendingTokens,
-  getTokenTrades,
-} from "./market.api";
+import type { CandlesQuery } from "@rhivadotfun/dataapi";
+
+import { SurgeFilters } from "./market.schema";
+import { useMarketStore } from "./market.store";
 import type {
   RadarFilters,
   SurgeFiltersInput,
-  TokenCandleFilters,
   TrendingFilters,
 } from "./market.type";
-import { SurgeFilters } from "./market.schema";
-import { useMarketStore } from "./market.store";
-import { mapToken } from "./market.util";
+import {
+  getTokens,
+  getRadarTokens,
+  getTokenTrades,
+  getSurgeTokens,
+  getTokenCandles,
+  getTrendingTokens,
+} from "./market.api";
+
+export type TokenCandleFilters = CandlesQuery & { mint: string };
 
 export function useToken(mint: string) {
   return useQuery({
@@ -33,12 +35,6 @@ export function useTrendingTokens(filters: TrendingFilters) {
   return useQuery({
     queryKey: ["market", "trending"],
     queryFn: () => getTrendingTokens(filters),
-    select: (currentData) => ({
-      ...currentData,
-      tokens: currentData.tokens.map((token) =>
-        mapToken(token.original, filters),
-      ),
-    }),
   });
 }
 
@@ -65,7 +61,16 @@ export function useSurgeTokens(filters: SurgeFiltersInput) {
 
   return useQuery({
     queryKey: ["market", "surge", params],
-    queryFn: () => getSurgeTokens(params),
+    queryFn: () =>
+      getSurgeTokens({
+        direction: params.direction ?? null,
+        min_surge_pct: params.min_surge_pct ?? null,
+        sort: params.sort ?? null,
+        order: params.order ?? null,
+        include_incomplete: null,
+        limit: null,
+        offset: null,
+      }),
   });
 }
 

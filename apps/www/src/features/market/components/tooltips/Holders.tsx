@@ -1,10 +1,4 @@
-import {
-  InfoBadge,
-  InfoBadgeTooltipGrid,
-  InfoBadgeTooltipRow,
-} from "@/components/ui/info-badge";
-import type { Token } from "../../market.token.type";
-import { cn, formatCompactNumber } from "@/lib/utils";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
 import {
   Layers,
   LocateFixed,
@@ -13,29 +7,37 @@ import {
   Users,
   UserStar,
 } from "lucide-react";
-import { FishIcon, MouseLabIcon } from "@/components/ui/icons";
+
 import type { TokenInfoProps } from "./TokenInfo";
+import { cn, formatCompactNumber } from "@/lib/utils";
+import { FishIcon, MouseLabIcon } from "@/components/ui/icons";
+import {
+  InfoBadge,
+  InfoBadgeTooltipGrid,
+  InfoBadgeTooltipRow,
+} from "@/components/ui/info-badge";
 
 export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
-  const holdersPercent = token.holders.top10;
-  const value = `${formatCompactNumber(holdersPercent)}%`;
+  const holdersPercent = token.holders?.top10_holder_pct;
+  const value =
+    holdersPercent !== null && holdersPercent !== undefined
+      ? `${formatCompactNumber(holdersPercent)}%`
+      : "N/A";
 
   return (
     <InfoBadge
       variant={"badge"}
       className={cn(
-        holdersPercent > 5
+        holdersPercent !== null &&
+          holdersPercent !== undefined &&
+          holdersPercent > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
       tooltip={
         <InfoBadgeTooltipRow
           label="Top 10 Holders"
-          value={
-            <span className="text-accent">
-              {`${formatCompactNumber(holdersPercent)}%`}
-            </span>
-          }
+          value={<span className="text-accent">{value}</span>}
         />
       }
       {...props}
@@ -53,25 +55,28 @@ export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
 };
 
 export const TotalHolders = ({ token, ...props }: TokenInfoProps) => {
+  const total = token.holders?.holder_count;
   return (
     <InfoBadge
       tooltip={"Total holders"}
       {...props}
     >
       <Users />
-      {formatCompactNumber(token.holders.total)}
+      {total !== null && total !== undefined
+        ? formatCompactNumber(total)
+        : "N/A"}
     </InfoBadge>
   );
 };
 
 export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
-  const holdersPercent = token.holders.insiders;
+  const insiderCount = token.insiders?.insider_count;
 
   return (
     <InfoBadge
       variant={"badge"}
       className={cn(
-        holdersPercent > 5
+        insiderCount !== null && insiderCount !== undefined && insiderCount > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -80,7 +85,9 @@ export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
           label="Insiders Hold"
           value={
             <span className="text-accent">
-              {`${formatCompactNumber(holdersPercent)}%`}
+              {insiderCount !== null && insiderCount !== undefined
+                ? `${formatCompactNumber(insiderCount)}`
+                : "N/A"}
             </span>
           }
         />
@@ -88,77 +95,59 @@ export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <MouseLabIcon />
-      {`${formatCompactNumber(holdersPercent)}%`}
+      {insiderCount !== null && insiderCount !== undefined
+        ? `${formatCompactNumber(insiderCount)}`
+        : "N/A"}
     </InfoBadge>
   );
 };
 
 export const FreshHold = ({ token, ...props }: TokenInfoProps) => {
-  const holdersPercent = token.holders.fresh;
-
   return (
     <InfoBadge
       variant={"badge"}
-      className={cn(
-        holdersPercent > 5
-          ? "[--accent:var(--color-down)]"
-          : "[--accent:var(--color-up)]",
-      )}
+      className="[--accent:var(--color-up)]"
       tooltip={
         <InfoBadgeTooltipRow
           label="Fresh Hold"
-          value={
-            <span className="text-accent">
-              {`${formatCompactNumber(holdersPercent)}%`}
-            </span>
-          }
+          value={<span className="text-accent">N/A</span>}
         />
       }
       {...props}
     >
       <Sprout />
-      {`${formatCompactNumber(holdersPercent)}%`}
+      N/A
     </InfoBadge>
   );
 };
 
 export const PhishingsHold = ({ token, ...props }: TokenInfoProps) => {
-  const holdersPercent = token.holders.phishings;
-
   return (
     <InfoBadge
       variant={"badge"}
-      className={cn(
-        holdersPercent > 5
-          ? "[--accent:var(--color-down)]"
-          : "[--accent:var(--color-up)]",
-      )}
+      className="[--accent:var(--color-up)]"
       tooltip={
         <InfoBadgeTooltipRow
           label="Phishings Hold"
-          value={
-            <span className="text-accent">
-              {`${formatCompactNumber(holdersPercent)}%`}
-            </span>
-          }
+          value={<span className="text-accent">N/A</span>}
         />
       }
       {...props}
     >
       <FishIcon />
-      {`${formatCompactNumber(holdersPercent)}%`}
+      N/A
     </InfoBadge>
   );
 };
 
 export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
-  const holdersPercent = token.holders.snipers;
+  const sniperCount = token.snipers?.sniper_count;
 
   return (
     <InfoBadge
       variant={"badge"}
       className={cn(
-        holdersPercent > 5
+        sniperCount !== null && sniperCount !== undefined && sniperCount > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -167,7 +156,9 @@ export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
           label="Snipers Hold"
           value={
             <span className="text-accent">
-              {`${formatCompactNumber(holdersPercent)}%`}
+              {sniperCount !== null && sniperCount !== undefined
+                ? `${formatCompactNumber(sniperCount)}`
+                : "N/A"}
             </span>
           }
         />
@@ -175,17 +166,24 @@ export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <LocateFixed />
-      {`${formatCompactNumber(holdersPercent)}%`}
+      {sniperCount !== null && sniperCount !== undefined
+        ? `${formatCompactNumber(sniperCount)}`
+        : "N/A"}
     </InfoBadge>
   );
 };
 
 export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
+  const bundledWalletCount = token.bundlers?.bundled_wallet_count;
+  const earlySol = token.bundlers?.total_early_sol;
+
   return (
     <InfoBadge
       variant={"badge"}
       className={cn(
-        token.holders.bundlers > 5
+        bundledWalletCount !== null &&
+          bundledWalletCount !== undefined &&
+          Number(bundledWalletCount) > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -194,51 +192,64 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
           <InfoBadgeTooltipGrid>
             <InfoBadgeTooltipRow
               label="Bundlers Hold"
-              value={`${formatCompactNumber(token.holders.bundlers)}%`}
+              value={
+                bundledWalletCount !== null && bundledWalletCount !== undefined
+                  ? `${formatCompactNumber(Number(bundledWalletCount))}`
+                  : "N/A"
+              }
             />
 
             <InfoBadgeTooltipRow
               label="ATH Hold"
-              value={`${formatCompactNumber(token.holders.bundlers)}%`}
+              value="N/A"
             />
 
             <InfoBadgeTooltipRow
               label="Total bundlers"
-              value={`${formatCompactNumber(token.holders.totalBundlers)}%`}
+              value={
+                bundledWalletCount !== null && bundledWalletCount !== undefined
+                  ? `${formatCompactNumber(Number(bundledWalletCount))}`
+                  : "N/A"
+              }
             />
 
-            {
-              <InfoBadgeTooltipRow
-                label="Bundled total"
-                value={`${formatCompactNumber(token.holders.bundledTotal)} ${token.symbol ?? ""}`}
-              />
-            }
+            <InfoBadgeTooltipRow
+              label="Bundled total"
+              value={
+                earlySol !== null && earlySol !== undefined
+                  ? `${formatCompactNumber(earlySol)} SOL`
+                  : "N/A"
+              }
+            />
 
-            {token.holders.bundledToken !== undefined ? (
-              <InfoBadgeTooltipRow
-                label="Bundled token"
-                value={`${formatCompactNumber(token.holders.bundledToken)}%`}
-              />
-            ) : null}
+            <InfoBadgeTooltipRow
+              label="Bundled token"
+              value="N/A"
+            />
           </InfoBadgeTooltipGrid>
         </div>
       }
       {...props}
     >
       <Layers />
-      {`${formatCompactNumber(token.holders.totalBundlers)}%`}
+      {bundledWalletCount !== null && bundledWalletCount !== undefined
+        ? `${formatCompactNumber(Number(bundledWalletCount))}`
+        : "N/A"}
     </InfoBadge>
   );
 };
 
-export const KolHold = ({ token, ...props }: { token: Token }) => {
+export const KolHold = ({ token, ...props }: { token: TokenDetail }) => {
+  const completionPct = token.bonding?.completion_pct;
   return (
     <InfoBadge
       tooltip="KOL Hold"
       {...props}
     >
       <Trophy />
-      {(token.bonding?.bondingPct ?? 0).toFixed(0)}
+      {completionPct !== null && completionPct !== undefined
+        ? completionPct.toFixed(0)
+        : "N/A"}
     </InfoBadge>
   );
 };

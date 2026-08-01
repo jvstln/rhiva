@@ -1,17 +1,19 @@
 "use client";
-import { Calendar } from "lucide-react";
+
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { Calendar } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+
+import { capitalize, cn } from "@/lib/utils";
+import { PortfolioTab } from "../portfolio.schema";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
-import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
-import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
+import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
-import { capitalize, cn } from "@/lib/utils";
-import { PortfolioTab } from "../portfolio.schema";
+import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
 
 const PortfolioPage = () => {
   const searchParams = useSearchParams();

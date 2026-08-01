@@ -1,7 +1,7 @@
 import { useGSAP } from "@gsap/react";
-import gsap, { Draggable, DrawSVGPlugin, Flip, ScrollTrigger } from "gsap/all";
-import { InertiaPlugin } from "gsap/all";
 import SplitText from "gsap/SplitText";
+import { InertiaPlugin } from "gsap/all";
+import gsap, { Draggable, DrawSVGPlugin, Flip, ScrollTrigger } from "gsap/all";
 
 gsap.registerPlugin(
   Flip,

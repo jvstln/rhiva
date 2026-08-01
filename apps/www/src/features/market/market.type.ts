@@ -1,9 +1,11 @@
 import type {
   Preset,
+  Timeframe,
   RadarColumns,
   SurgeFiltersInput,
-  Timeframe,
 } from "./market.schema";
+
+export type { SurgeFiltersInput };
 
 type Sort = "asc" | "desc" | null;
 
@@ -58,11 +60,8 @@ export type RadarFilters = Record<
 >;
 
 export type TokenDetailFilters = Partial<{
+  preset: Preset;
   timeframe: Timeframe;
   quickBuy: number | null;
   quickSell: number | null;
-  preset: Preset;
 }>;
-
-export type * from "./market.token.type";
-export type * from "./market.schema";

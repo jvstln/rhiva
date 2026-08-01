@@ -1,4 +1,5 @@
 "use client";
+
 import { createContext, useEffect, useMemo } from "react";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
 import {
@@ -51,7 +52,7 @@ const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
         .map((embeddedWallet) =>
           addSigners({
             address: embeddedWallet.address,
-            signers: [{ signerId: env.PRIVY_SIGNER_ID }],
+            signers: [{ signerId: env.privySignerId }],
           }),
         );
     }
@@ -72,7 +73,7 @@ const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
 export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
   return (
     <PrivyProviderPrimitive
-      appId={env.PRIVY_APP_ID}
+      appId={env.privyAppId}
       config={{
         loginMethods: ["email", "google", "twitter", "apple", "wallet"],
         appearance: {

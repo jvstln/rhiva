@@ -1,8 +1,10 @@
 "use client";
-import { TokenDetailPage } from "@/features/market/components/TokenDetailPage";
+
 import { useParams } from "next/navigation";
+
 import { useToken } from "@/features/market/market.hook";
 import { QueryState } from "@/components/layout/QueryState";
+import { TokenDetailPage } from "@/features/market/components/TokenDetailPage";
 
 export default function TokenDetailRoute({ params }: PageProps<"/token/[id]">) {
   // const { id } = await params;

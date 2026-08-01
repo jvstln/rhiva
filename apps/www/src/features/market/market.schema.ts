@@ -1,5 +1,6 @@
-import { NumberFilter } from "@/schemas";
 import z from "zod";
+
+import { NumberFilter } from "@/schemas";
 
 export const MarketView = z
   .enum(["watchlist", "trending", "radar", "surge", "pumpLive"])

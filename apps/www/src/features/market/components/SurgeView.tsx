@@ -1,46 +1,50 @@
 "use client";
+
 import { Zap } from "lucide-react";
-import { QueryState } from "@/components/layout/QueryState";
+import { useRouter } from "next/navigation";
+import { formatDistanceToNowStrict } from "date-fns";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
 import { Button } from "@/components/ui/button";
-import {
-  InfoBadge,
-  InfoBadgeTooltipGrid,
-  InfoBadgeTooltipRow,
-} from "@/components/ui/info-badge";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import type { Token } from "@/features/market/market.type";
-import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
-import { formatSignedPercent } from "@/lib/finance.util";
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
+import { Separator } from "@/components/ui/separator";
+import { formatSignedPercent } from "@/lib/finance.util";
+import { QueryState } from "@/components/layout/QueryState";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { BotActivity, DexPaid, TotalFees } from "./tooltips/DexInfo";
+import { DevHoldOrDevSell, DevMigratedAndLaunch } from "./tooltips/DevInfo";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
+import {
+  TokenConnection,
+  TokenLatestPost,
+  TokenSocialSearch,
+} from "./tooltips/Socials";
+import {
+  InfoBadge,
+  InfoBadgeTooltipRow,
+  InfoBadgeTooltipGrid,
+} from "@/components/ui/info-badge";
 import {
   TokenAvatar,
   TokenDescription,
   TokenNameAndSymbol,
   TokenSymbolCopy,
 } from "./tooltips/TokenAvatar";
-import { useRouter } from "next/navigation";
-import { formatDistanceToNowStrict } from "date-fns";
 import {
-  TokenConnection,
-  TokenLatestPost,
-  TokenSocialSearch,
-} from "./tooltips/Socials";
-import { DevHoldOrDevSell, DevMigratedAndLaunch } from "./tooltips/DevInfo";
-import { BotActivity, DexPaid, TotalFees } from "./tooltips/DexInfo";
-import {
+  KolHold,
+  FreshHold,
   TopHolders,
   InsidersHold,
   BundlersHold,
   PhishingsHold,
-  FreshHold,
   SnipersHold,
   TotalHolders,
-  KolHold,
 } from "./tooltips/Holders";
 
-const SURGE_METRICS: Array<(props: { token: Token }) => React.JSX.Element> = [
+const SURGE_METRICS: Array<
+  (props: { token: TokenDetail }) => React.JSX.Element
+> = [
   TopHolders,
   DevHoldOrDevSell,
   InsidersHold,
@@ -52,11 +56,24 @@ const SURGE_METRICS: Array<(props: { token: Token }) => React.JSX.Element> = [
 ];
 
 interface TokenRowProps {
-  token: Token;
+  token: TokenDetail;
 }
 
 function TokenRow({ token }: TokenRowProps) {
   const router = useRouter();
+  const timeframe =
+    useMarketStore((state) => state.surgeFilters.timeframe) || "24h";
+
+  const window = token.timeframes?.windows?.[timeframe];
+  const priceChangePct =
+    window?.price_change_pct ?? token.price_change_percent ?? 0;
+  const volumeUsd = window?.volume_usd ?? 0;
+  const buys = window?.buys !== undefined ? Number(window.buys) : 0;
+  const sells = window?.sells ?? 0;
+  const totalTransaction = buys + sells;
+  const updatedAt = token.live?.updated_at
+    ? new Date(Number(token.live.updated_at))
+    : new Date();
 
   return (
     <article
@@ -75,10 +92,12 @@ function TokenRow({ token }: TokenRowProps) {
 
           <div className="flex items-center gap-1.5 text-b-4 text-gray">
             <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-              {formatDistanceToNowStrict(token.updatedAt).replace(
-                /^.*?(\d+)\s*(\w).*$/,
-                "$1$2",
-              )}
+              {token.live?.updated_at
+                ? formatDistanceToNowStrict(updatedAt).replace(
+                    /^.*?(\d+)\s*(\w).*$/,
+                    "$1$2",
+                  )
+                : "N/A"}
             </InfoBadge>
             <Separator
               orientation="vertical"
@@ -122,12 +141,12 @@ function TokenRow({ token }: TokenRowProps) {
             <span className="text-gray">
               ATH{" "}
               <span className="font-medium text-white">
-                {formatCompactCurrency(token.athUsd)}
+                {formatCompactCurrency(token.all_time_high_market_cap_usd)}
               </span>
             </span>
 
             <span className="text-up">
-              {formatSignedPercent(token.priceChangePct, 1)}
+              {formatSignedPercent(token.price_change_percent, 1)}
             </span>
           </div>
 
@@ -138,7 +157,7 @@ function TokenRow({ token }: TokenRowProps) {
           <span className="whitespace-nowrap text-muted-foreground text-sm">
             MC{" "}
             <span className="w-16 font-medium text-info text-lg">
-              {formatCompactCurrency(token.marketCapUsd)}
+              {formatCompactCurrency(token.market_cap_usd)}
             </span>
           </span>
 
@@ -149,16 +168,16 @@ function TokenRow({ token }: TokenRowProps) {
             }}
           />
           <span className="text-right font-semibold text-2xl text-white">
-            {formatCompactCurrency(token.liquidityUsd)}
+            {formatCompactCurrency(token.liquidity_usd)}
           </span>
           <span
             className={cn(
               "ml-auto text-right text-base",
-              token.priceChangePct > 0 ? "text-up" : "text-down",
+              priceChangePct > 0 ? "text-up" : "text-down",
             )}
           >
-            {token.priceChangePct > 0 ? "+" : ""}
-            {token.priceChangePct.toFixed(2)}%
+            {priceChangePct > 0 ? "+" : ""}
+            {priceChangePct.toFixed(2)}%
           </span>
         </div>
       </div>
@@ -172,10 +191,12 @@ function TokenRow({ token }: TokenRowProps) {
       <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
         <div className="flex items-center gap-3">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-            {formatDistanceToNowStrict(token.updatedAt).replace(
-              /^.*?(\d+)\s*(\w).*$/,
-              "$1$2",
-            )}
+            {token.live?.updated_at
+              ? formatDistanceToNowStrict(updatedAt).replace(
+                  /^.*?(\d+)\s*(\w).*$/,
+                  "$1$2",
+                )
+              : "N/A"}
           </InfoBadge>
           <SurgeBuyButton />
         </div>
@@ -191,29 +212,27 @@ function TokenRow({ token }: TokenRowProps) {
             tooltip={
               <InfoBadgeTooltipGrid>
                 <InfoBadgeTooltipRow
-                  label={`${token.timeframe} TXs`}
-                  value={`${formatCompactNumber(token.totalTransaction)}`}
+                  label={`${sells + buys} TXs`}
+                  value={`${formatCompactNumber(totalTransaction)}`}
                 />
                 <InfoBadgeTooltipRow
-                  label={`${token.timeframe} Buys`}
+                  label={`${timeframe} Buys`}
                   value={
-                    <span className="text-up">
-                      {formatCompactNumber(token.buys)}
-                    </span>
+                    <span className="text-up">{formatCompactNumber(buys)}</span>
                   }
                 />
                 <InfoBadgeTooltipRow
-                  label={`${token.timeframe} Sells`}
+                  label={`${timeframe} Sells`}
                   value={
                     <span className="text-down">
-                      {formatCompactNumber(token.sells)}
+                      {formatCompactNumber(sells)}
                     </span>
                   }
                 />
               </InfoBadgeTooltipGrid>
             }
           >
-            TX {formatCompactNumber(token.totalTransaction)}
+            TX {formatCompactNumber(totalTransaction)}
           </InfoBadge>
         </div>
 
@@ -222,13 +241,13 @@ function TokenRow({ token }: TokenRowProps) {
           orientation="horizontal"
           style={
             {
-              "--buy-percent": `${(token.buys / token.totalTransaction) * 100}%`,
+              "--buy-percent": `${totalTransaction > 0 ? (buys / totalTransaction) * 100 : 0}%`,
             } as React.CSSProperties
           }
         />
 
         <div className="w-full text-right text-b-5 text-gray">
-          V {formatCompactCurrency(token.volumeUsd)}
+          V {formatCompactCurrency(volumeUsd)}
         </div>
       </div>
     </article>
@@ -245,10 +264,10 @@ export function SurgeTable() {
         query={query}
         getIsLoading={(q) => q.isPending}
       >
-        {query.data?.tokens?.map((token) => (
+        {query.data?.map((token) => (
           <TokenRow
             key={token.mint}
-            token={token}
+            token={token as unknown as TokenDetail}
           />
         ))}
       </QueryState>

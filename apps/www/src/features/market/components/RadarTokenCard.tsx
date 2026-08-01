@@ -1,26 +1,41 @@
+import { useRouter } from "next/navigation";
+import { NetworkSolana } from "@web3icons/react";
+import { formatDistanceToNowStrict } from "date-fns";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
+import { DexPaid } from "./tooltips/DexInfo";
 import { Button } from "@/components/ui/button";
-import {
-  InfoBadge,
-  InfoBadgeTooltipGrid,
-  InfoBadgeTooltipRow,
-} from "@/components/ui/info-badge";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import type { Token } from "@/features/market/market.type";
-import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
-import type { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
+import type { RadarColumns } from "../market.schema";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   TokenAvatar,
   TokenDescription,
   TokenNameAndSymbol,
 } from "./tooltips/TokenAvatar";
-import { useRouter } from "next/navigation";
 import {
   CashbackNotice,
   DevHoldOrDevSell,
   DevMigratedAndLaunch,
 } from "./tooltips/DevInfo";
-import { DexPaid } from "./tooltips/DexInfo";
+import {
+  InfoBadge,
+  InfoBadgeTooltipGrid,
+  InfoBadgeTooltipRow,
+} from "@/components/ui/info-badge";
+import {
+  TokenLatestPost,
+  TokenConnection,
+  TokenWebsite,
+  TokenViewCount,
+  TokenSocialSearch,
+} from "./tooltips/Socials";
 import {
   TopHolders,
   InsidersHold,
@@ -30,35 +45,30 @@ import {
   TotalHolders,
   FreshHold,
 } from "./tooltips/Holders";
-import { formatDistanceToNowStrict } from "date-fns";
-import {
-  TokenLatestPost,
-  TokenConnection,
-  TokenWebsite,
-  TokenViewCount,
-  TokenSocialSearch,
-} from "./tooltips/Socials";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { NetworkSolana } from "@web3icons/react";
 
-const TransactionInfo = ({ token }: { token: Token }) => {
+const TransactionInfo = ({ token }: { token: TokenDetail }) => {
+  const window24h =
+    token.timeframes?.windows?.["24h"] ??
+    token.timeframes?.windows?.["1h"] ??
+    Object.values(token.timeframes?.windows ?? {})[0];
+  const volumeUsd = window24h?.volume_usd ?? 0;
+  const buys = window24h?.buys !== undefined ? Number(window24h.buys) : 0;
+  const sells = window24h?.sells ?? 0;
+  const totalTransaction = buys + sells;
+
   return (
     <div className="flex flex-col">
       <div className="flex gap-2">
         <InfoBadge>
           V
           <span className="text-foreground">
-            {formatCompactCurrency(token.volumeUsd)}
+            {formatCompactCurrency(volumeUsd)}
           </span>
         </InfoBadge>
         <InfoBadge>
           MC
           <span className="text-foreground">
-            {formatCompactCurrency(token.marketCapUsd)}
+            {formatCompactCurrency(token.market_cap_usd)}
           </span>
         </InfoBadge>
       </div>
@@ -68,21 +78,27 @@ const TransactionInfo = ({ token }: { token: Token }) => {
           tooltip={
             <InfoBadgeTooltipRow
               label="Prio & Tip & Trading Fees"
-              value={`${token.fees.totalFeeSol} SOL`}
+              value={
+                token.global_fees_paid !== null
+                  ? `${token.global_fees_paid} SOL`
+                  : "N/A"
+              }
             />
           }
         >
           F
           <NetworkSolana className="size-4" />
           <span className="[--accent:var(--color-foreground)]">
-            {formatCompactNumber(token.fees.totalFeeSol)}
+            {token.global_fees_paid !== null
+              ? formatCompactNumber(token.global_fees_paid)
+              : "N/A"}
           </span>
         </InfoBadge>
 
         <InfoBadge tooltip="Net buy">
           N
           <span className="[--accent:var(--color-up)]">
-            {formatCompactNumber(token.netBuyUsd)}
+            {formatCompactNumber(token.net_buy_usd)}
           </span>
         </InfoBadge>
 
@@ -91,21 +107,19 @@ const TransactionInfo = ({ token }: { token: Token }) => {
             <InfoBadgeTooltipGrid>
               <InfoBadgeTooltipRow
                 label={`TXs`}
-                value={`${formatCompactNumber(token.totalTransaction)}`}
+                value={`${formatCompactNumber(totalTransaction)}`}
               />
               <InfoBadgeTooltipRow
                 label={`Buys`}
                 value={
-                  <span className="text-up">
-                    {formatCompactNumber(token.buys)}
-                  </span>
+                  <span className="text-up">{formatCompactNumber(buys)}</span>
                 }
               />
               <InfoBadgeTooltipRow
                 label={`Sells`}
                 value={
                   <span className="text-down">
-                    {formatCompactNumber(token.sells)}
+                    {formatCompactNumber(sells)}
                   </span>
                 }
               />
@@ -114,12 +128,12 @@ const TransactionInfo = ({ token }: { token: Token }) => {
         >
           TX
           <span className="flex items-center gap-0.5 [--accent:var(--color-down)]">
-            {formatCompactNumber(token.totalTransaction)}
+            {formatCompactNumber(totalTransaction)}
             <div
               className="relative h-0.75 w-7 overflow-hidden rounded-full bg-down before:absolute before:inset-y-0 before:left-0 before:w-(--buy-percent) before:rounded-s-full before:bg-up before:transition"
               style={
                 {
-                  "--buy-percent": `${(token.buys / token.totalTransaction) * 100}%`,
+                  "--buy-percent": `${totalTransaction > 0 ? (buys / totalTransaction) * 100 : 0}%`,
                 } as React.CSSProperties
               }
             />
@@ -130,7 +144,9 @@ const TransactionInfo = ({ token }: { token: Token }) => {
   );
 };
 
-const RADAR_METRICS: Array<(props: { token: Token }) => React.JSX.Element> = [
+const RADAR_METRICS: Array<
+  (props: { token: TokenDetail }) => React.JSX.Element
+> = [
   TopHolders,
   DevHoldOrDevSell,
   InsidersHold,
@@ -142,7 +158,7 @@ const RADAR_METRICS: Array<(props: { token: Token }) => React.JSX.Element> = [
 ];
 
 interface TokenCardProps {
-  token: Token;
+  token: TokenDetail;
   column: RadarColumns;
 }
 export function RadarTokenCard({ token, column }: TokenCardProps) {
@@ -174,18 +190,19 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
               <div className="flex flex-col">
                 <TokenNameAndSymbol token={token} />
                 <div className="flex items-center gap-1">
-                  {token.socials.twitterHandle && (
+                  {token.social?.twitter_handle && (
                     <InfoBadge className="[--accent:var(--color-info)]">
-                      @{token.socials.twitterHandle}
+                      @{token.social.twitter_handle}
                     </InfoBadge>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-1">
                   <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-                    {formatDistanceToNowStrict(token.updatedAt).replace(
-                      /^.*?(\d+)\s*(\w).*$/,
-                      "$1$2",
-                    )}
+                    {token.live?.updated_at
+                      ? formatDistanceToNowStrict(
+                          new Date(Number(token.live.updated_at)),
+                        ).replace(/^.*?(\d+)\s*(\w).*$/, "$1$2")
+                      : "N/A"}
                   </InfoBadge>
                   <CashbackNotice token={token} />
                   <TokenDescription token={token} />
@@ -224,7 +241,9 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent>Bonding: {token.bonding.bondingPct}%</TooltipContent>
+      <TooltipContent>
+        Bonding: {token.bonding?.completion_pct ?? 0}%
+      </TooltipContent>
     </Tooltip>
   );
 }

@@ -1,22 +1,24 @@
 "use client";
+
+import { useState } from "react";
 import { debounce } from "lodash";
 import { Activity, Coins, Fuel, PercentIcon, Shield } from "lucide-react";
-import { useState } from "react";
+
+import { cn } from "@/lib/utils";
+import { Preset } from "../market.schema";
 import { SolanaIcon } from "@/components/ui/icons";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-} from "@/components/ui/input-group";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { Preset } from "../market.schema";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 
 export const BondingCurveToggle = ({
   value,

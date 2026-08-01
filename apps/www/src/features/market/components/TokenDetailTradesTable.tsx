@@ -1,13 +1,14 @@
-import { DataTable, useDataTable } from "@/components/ui/table/data-table";
-import { useTokenTrades } from "../market.hook";
+import type { TradeRow } from "@rhivadotfun/dataapi";
 import { createColumnHelper } from "@tanstack/react-table";
-import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
-import type { TokenTrade } from "../market.token.type";
-import { QueryState } from "@/components/layout/QueryState";
+
+import { useTokenTrades } from "../market.hook";
 import { CopyButton } from "@/components/ui/button";
 import { InfoBadge } from "@/components/ui/info-badge";
+import { QueryState } from "@/components/layout/QueryState";
+import { DataTable, useDataTable } from "@/components/ui/table/data-table";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 
-const columnHelper = createColumnHelper<TokenTrade>();
+const columnHelper = createColumnHelper<TradeRow>();
 
 const columns = [
   columnHelper.accessor("block_time", {
@@ -31,11 +32,18 @@ const columns = [
   }),
   columnHelper.accessor("token_amount", {
     header: "Token Amount",
-    cell: ({ getValue }) => (
-      <InfoBadge variant="none" tooltip={getValue().toLocaleString()}>
-        {formatCompactNumber(getValue())}
-      </InfoBadge>
-    ),
+    cell: ({ getValue }) => {
+      const val = getValue();
+      const numVal = Number(val);
+      return (
+        <InfoBadge
+          variant="none"
+          tooltip={numVal.toLocaleString()}
+        >
+          {formatCompactNumber(numVal)}
+        </InfoBadge>
+      );
+    },
   }),
   columnHelper.accessor("price_usd", {
     header: "Price (USD)",
@@ -65,7 +73,10 @@ export const TokenDetailTradesTable = ({
 
   return (
     <QueryState query={trades}>
-      <DataTable table={table} variant="compact" />
+      <DataTable
+        table={table}
+        variant="compact"
+      />
     </QueryState>
   );
 };

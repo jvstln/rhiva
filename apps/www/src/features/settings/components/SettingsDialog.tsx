@@ -1,5 +1,9 @@
 "use client";
 
+/* ------------------------------------------------------------------ */
+/* Shared types                                                         */
+/* ------------------------------------------------------------------ */
+
 import { Info } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -7,9 +11,10 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSettingsStore } from "../settings.store";
+import type { PriorityLevel } from "../settings.type";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +22,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-/* ------------------------------------------------------------------ */
-/* Shared types                                                         */
-/* ------------------------------------------------------------------ */
 
 type SettingsTabId =
   | "transaction"
@@ -203,9 +204,10 @@ function TokenGlyph({ className }: { className?: string }) {
 /* ------------------------------------------------------------------ */
 
 function TransactionTab() {
-  const { broadcastMode, priorityLevel, rebalancingType } = useSettingsStore(
-    (state) => state.transaction,
-  );
+  const transaction = useSettingsStore((state) => state.transaction);
+  const { broadcastMode, rebalancingType } = transaction;
+  const priorityLevel =
+    "priorityLevel" in transaction ? transaction.priorityLevel : undefined;
   const setTransactionSettings = useSettingsStore(
     (state) => state.setTransactionSettings,
   );
@@ -235,8 +237,10 @@ function TransactionTab() {
       <div>
         <p className="mb-3 text-muted-foreground text-sm">Priority Level</p>
         <SegmentedControl
-          value={priorityLevel}
-          onChange={(val) => setTransactionSettings({ priorityLevel: val })}
+          value={priorityLevel ?? "ultra"}
+          onChange={(val) =>
+            setTransactionSettings({ priorityLevel: val as PriorityLevel })
+          }
           options={[
             { value: "fast", label: "Fast" },
             { value: "turbo", label: "Turbo" },

@@ -1,56 +1,78 @@
-import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
-import type { Token } from "../../market.token.type";
-import { cn, formatCompactNumber } from "@/lib/utils";
-import { EagleIcon } from "@/components/ui/icons";
 import { Bot, HandCoins } from "lucide-react";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
+import { EagleIcon } from "@/components/ui/icons";
 import type { TokenInfoProps } from "./TokenInfo";
+import { cn, formatCompactNumber } from "@/lib/utils";
+import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
 
 export const DexPaid = ({ token, ...props }: TokenInfoProps) => {
+  const isPaid = token.dex_paid ?? false;
   return (
     <InfoBadge
       variant={"badge"}
       className={cn(
-        token.dexPaid > 0
-          ? "[--accent:var(--color-up)]"
-          : "[--accent:var(--color-down)]",
+        isPaid ? "[--accent:var(--color-up)]" : "[--accent:var(--color-down)]",
       )}
-      tooltip={<InfoBadgeTooltipRow label="Dex Paid" />}
+      tooltip={
+        <InfoBadgeTooltipRow
+          label="Dex Paid"
+          value={isPaid ? "Paid" : "Unpaid"}
+        />
+      }
       {...props}
     >
       <EagleIcon />
-      {token.dexPaid > 0
-        ? `${formatCompactNumber(token.dexPaid)}% CTO`
-        : "Unpaid"}
+      {isPaid ? "Paid" : "Unpaid"}
     </InfoBadge>
   );
 };
 
 export const BotActivity = ({ token, ...props }: TokenInfoProps) => {
+  const activity = token.bot_activity;
   return (
     <InfoBadge
       variant={"badge"}
-      tooltip={<InfoBadgeTooltipRow label="Bot activity" />}
+      tooltip={
+        <InfoBadgeTooltipRow
+          label="Bot activity"
+          value={
+            activity !== null && activity !== undefined
+              ? formatCompactNumber(activity)
+              : "N/A"
+          }
+        />
+      }
       {...props}
     >
       <Bot />
-      {`${formatCompactNumber(token.bot_activity)}`}
+      {activity !== null && activity !== undefined
+        ? formatCompactNumber(activity)
+        : "N/A"}
     </InfoBadge>
   );
 };
 
-export const TotalFees = ({ token }: { token: Token }) => {
+export const TotalFees = ({ token }: { token: TokenDetail }) => {
+  const feesPaid = token.global_fees_paid;
   return (
     <InfoBadge
       className="[--accent:var(--color-warn)]"
       tooltip={
         <InfoBadgeTooltipRow
           label="Prio & Tip & Trading Fees"
-          value={`${token.global_fees_paid ?? 0} SOL`}
+          value={
+            feesPaid !== null && feesPaid !== undefined
+              ? `${feesPaid} SOL`
+              : "N/A"
+          }
         />
       }
     >
       <HandCoins />
-      {formatCompactNumber(token.global_fees_paid ?? 0)}
+      {feesPaid !== null && feesPaid !== undefined
+        ? formatCompactNumber(feesPaid)
+        : "N/A"}
     </InfoBadge>
   );
 };

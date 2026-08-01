@@ -1,8 +1,9 @@
 import { ArrowDown, ArrowUp, Settings } from "lucide-react";
-import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
+
 import { Button } from "@/components/ui/button";
 import { useMarketStore } from "../market.store";
 import { BondingCurveToggle } from "./ToolbarItems";
+import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 
 export const PumpLiveToolbar = () => {
   const filters = useMarketStore((state) => state.pumpLiveSettings.sort);

@@ -24,17 +24,30 @@ export interface TradingPresetConfig {
   sell: TradingConfig;
 }
 
-export interface NotificationSetting {
+export interface NotificationSettings {
   id: string;
   label: string;
   enabled: boolean;
 }
-
-export interface TransactionSettings {
-  broadcastMode: BroadcastMode;
-  priorityLevel: PriorityLevel;
+type BaseTransactionSettings = {
   rebalancingType: RebalancingType;
-}
+};
+
+export type TransactionSettings = BaseTransactionSettings &
+  (
+    | (
+        | {
+            broadcastMode: "jito-only";
+            maxFee?: number;
+            priorityLevel: PriorityLevel;
+          }
+        | { broadcastMode: "jito-only"; exactFee: number }
+      )
+    | {
+        priorityLevel: PriorityLevel;
+        broadcastMode: Exclude<BroadcastMode, "jito-only">;
+      }
+  );
 
 export interface DlmmSettings {
   liquiditySlippage: number;
@@ -45,10 +58,24 @@ export interface ZapInSettings {
   amount: number;
   swapSlippage?: number;
   swapPriceImpact?: number;
-  liquiditySlippage?: number;
-  side: "base" | "quote" | "custom";
-  rangeFromCurrentPrice?: [number, number];
+  liquiditySlippage: number;
   curveType: keyof typeof Strategy;
+  side: "base" | "quote" | "custom";
+  rangeFromCurrentPrice: [number, number];
+  priceChangesFromCurrentPrice: [number, number];
+  inputToken: {
+    mint: string;
+    decimals: number;
+  };
+}
+
+export interface ZapOutSettings {
+  swapSlippage?: number;
+  liquiditySlippage: number;
+  outputToken: {
+    mint: string;
+    tokenProgram: string;
+  };
 }
 
 export interface TradingSettings {
@@ -61,11 +88,13 @@ export interface SettingsState {
   transaction: TransactionSettings;
   dlmm: DlmmSettings;
   zapIn: ZapInSettings;
+  zapOut: ZapOutSettings;
   trading: TradingSettings;
-  notifications: NotificationSetting[];
+  notifications: NotificationSettings[];
   setTransactionSettings: (settings: Partial<TransactionSettings>) => void;
   setDlmmSettings: (settings: Partial<DlmmSettings>) => void;
   setZapInSettings: (settings: Partial<ZapInSettings>) => void;
+  setZapOutSettings: (settings: Partial<ZapOutSettings>) => void;
   setTradingSettings: (
     settings: Partial<Omit<TradingSettings, "presets">>,
   ) => void;

@@ -1,12 +1,14 @@
 "use client";
-import { TradeViewChart } from "@/features/tradeview/components/TradeViewChart";
-import type { CreateDataFeedArgs } from "@/features/tradeview/datafeed-trpc";
-import type { SearchResultItem } from "@/features/tradeview/tradeview.type";
-import type { Bar, ResolutionString } from "@/public/tradeview";
+
 import { useCallback, useMemo } from "react";
+import type { TokenDetail, Candle } from "@rhivadotfun/dataapi";
+
 import { getTokenCandles } from "@/features/market/market.api";
-import type { Token, TokenCandle } from "@/features/market/market.token.type";
+import type { Bar, ResolutionString } from "@/public/tradeview";
 import type { Timeframe } from "@/features/market/market.schema";
+import type { SearchResultItem } from "@/features/tradeview/tradeview.type";
+import type { CreateDataFeedArgs } from "@/features/tradeview/datafeed-trpc";
+import { TradeViewChart } from "@/features/tradeview/components/TradeViewChart";
 
 const candleToBar = ({
   t_ms,
@@ -15,7 +17,7 @@ const candleToBar = ({
   low,
   close,
   volume_usd,
-}: TokenCandle): Bar => ({
+}: Candle): Bar => ({
   time: t_ms, // already in milliseconds — TradingView expects ms
   open,
   high,
@@ -35,7 +37,7 @@ const SUPPORTED_RESOLUTIONS: ResolutionString[] = [
   "1D",
 ] as ResolutionString[];
 
-type TokenChartProps = { token: Token };
+type TokenChartProps = { token: TokenDetail };
 
 export const TokenChart = ({ token }: TokenChartProps) => {
   // Keyed by mint so resolveSymbol cache-hits immediately without a search round-trip
@@ -47,14 +49,14 @@ export const TokenChart = ({ token }: TokenChartProps) => {
           address: token.mint,
           name: token.name ?? token.mint,
           symbol: token.symbol ?? "???",
-          image_url: token.image ?? "",
+          image_url: token.logo_uri ?? "",
           // decimals is currently not available from the token API — defaulted to 9 (SOL standard)
           decimals: token.decimals ?? 9,
         },
         // No dex/pool context at the token level; treated as a bare token (no quote_token)
       },
     }),
-    [token.mint, token.name, token.symbol, token.image, token.decimals],
+    [token.mint, token.name, token.symbol, token.logo_uri, token.decimals],
   );
 
   // getBars fetches candles directly (not via hook) because it's called inside

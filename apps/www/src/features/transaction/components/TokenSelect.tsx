@@ -1,3 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
+import { useConnection } from "@solana/wallet-adapter-react";
+
+import { useAuth } from "@/hooks";
+import { wallet } from "@/queries";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -6,13 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Spinner } from "@/components/ui/spinner";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useConnection } from "@solana/wallet-adapter-react";
-import { wallet } from "@/queries";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks";
 
 type TokenSelectProps<Value> = Select.Props<Value>;
 

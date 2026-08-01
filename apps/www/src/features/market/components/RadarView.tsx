@@ -1,12 +1,13 @@
 "use client";
-import { QueryState } from "@/components/layout/QueryState";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 import { capitalize } from "@/lib/utils";
 import { useRadarTokens } from "../market.hook";
 import { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
-import { RadarColumnToolbar } from "./RadarColumnToolbar";
 import { RadarTokenCard } from "./RadarTokenCard";
+import { RadarColumnToolbar } from "./RadarColumnToolbar";
+import { QueryState } from "@/components/layout/QueryState";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export const RadarView = () => {
   const radarFilters = useMarketStore((state) => state.radarFilters);
@@ -51,7 +52,7 @@ export const RadarView = () => {
                 query={query}
                 getIsLoading={(q) => q.isPending}
               >
-                {query.data?.tokens.map((token) => (
+                {query.data?.map((token) => (
                   <RadarTokenCard
                     key={token.mint}
                     token={token}

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
 
 const MODES = ["Spot", "Curve", "Bid-Ask"] as const;
 const RATIO_PRESETS = ["50:50", "75:25", "40:60"] as const;

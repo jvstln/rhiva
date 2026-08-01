@@ -1,5 +1,17 @@
 import { ArrowDownUp, PercentIcon, Undo2Icon, XIcon } from "lucide-react";
+
+import { capitalize } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { RadarColumns } from "../market.schema";
+import { useMarketStore } from "@/features/market/market.store";
+import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import {
   Dialog,
   DialogClose,
@@ -9,17 +21,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-} from "@/components/ui/input-group";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useMarketStore } from "@/features/market/market.store";
-import { capitalize } from "@/lib/utils";
-import { RadarColumns } from "../market.schema";
 
 export function RadarQuickSellDialog({
   children,

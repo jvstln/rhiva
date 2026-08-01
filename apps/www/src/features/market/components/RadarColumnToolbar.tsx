@@ -1,11 +1,12 @@
 import { Filter } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { SearchInput } from "@/components/ui/search-input";
-import type { RadarColumns } from "../market.schema";
 import { useMarketStore } from "../market.store";
+import type { RadarColumns } from "../market.schema";
 import { RadarFilterDialog } from "./RadarFilterDialog";
+import { SearchInput } from "@/components/ui/search-input";
 import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface ColumnToolbarProps {
   column: RadarColumns;

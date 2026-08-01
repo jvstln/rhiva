@@ -2,6 +2,7 @@ import { merge } from "lodash";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { devtools, persist } from "zustand/middleware";
+import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 import type {
   DlmmSettings,
@@ -10,10 +11,11 @@ import type {
   ZapInSettings,
   TradingPresetConfig,
   TransactionSettings,
+  ZapOutSettings,
 } from "./settings.type";
 
 const defaultTradingConfig: TradingConfig = {
-  slippage: 20,
+  slippage: 0.2,
 };
 
 const defaultPresetConfig: TradingPresetConfig = {
@@ -35,6 +37,21 @@ const defaultZapInSettings: ZapInSettings = {
   amount: 0.1,
   curveType: "Spot",
   side: "custom",
+  liquiditySlippage: 0.2,
+  rangeFromCurrentPrice: [34, 35],
+  priceChangesFromCurrentPrice: [0.1, 0.1],
+  inputToken: {
+    decimals: 9,
+    mint: NATIVE_MINT.toBase58(),
+  },
+};
+
+const defaultZapOutSettings: ZapOutSettings = {
+  liquiditySlippage: 0.2,
+  outputToken: {
+    mint: NATIVE_MINT.toBase58(),
+    tokenProgram: TOKEN_PROGRAM_ID.toBase58(),
+  },
 };
 
 const defaultNotifications = [
@@ -47,9 +64,10 @@ export const useSettingsStore = create<SettingsState>()(
   devtools(
     persist(
       immer((set) => ({
-        transaction: { ...defaultTransactionSettings },
+        zapOut: { ...defaultZapOutSettings },
         dlmm: { ...defaultDlmmSettings },
         zapIn: { ...defaultZapInSettings },
+        transaction: { ...defaultTransactionSettings },
         trading: {
           activePreset: "preset-1",
           activeBuySellMode: "buy",
@@ -70,6 +88,12 @@ export const useSettingsStore = create<SettingsState>()(
         setDlmmSettings: (settings) => {
           set((state) => {
             merge(state.dlmm, settings);
+          });
+        },
+
+        setZapOutSettings: (settings) => {
+          set((state) => {
+            merge(state.zapOut, settings);
           });
         },
 

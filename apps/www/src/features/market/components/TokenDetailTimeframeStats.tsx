@@ -1,12 +1,12 @@
-import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
-import type { Token } from "../market.token.type";
-import type { TokenDetailFilters } from "../market.type";
-import { mapToken } from "../market.util";
-import { Separator } from "@/components/ui/separator";
+import type { TokenDetail } from "@rhivadotfun/dataapi";
+
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import type { TokenDetailFilters } from "../market.type";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
 
 type TokenDetailTimeframeStatsProps = {
-  token: Token;
+  token: TokenDetail;
   filters: TokenDetailFilters;
   onFilterChange: (filters: Partial<TokenDetailFilters>) => void;
 };
@@ -16,36 +16,46 @@ export const TokenDetailTimeframeStats = ({
   filters,
   onFilterChange,
 }: TokenDetailTimeframeStatsProps) => {
+  const availableTimeframes = token.timeframes?.windows
+    ? Object.keys(token.timeframes.windows)
+    : [];
+
+  const activeTimeframe = filters.timeframe || "24h";
+  const activeWindow = token.timeframes?.windows?.[activeTimeframe];
+
+  const volumeUsd = activeWindow?.volume_usd ?? 0;
+  const buys = activeWindow?.buys !== undefined ? Number(activeWindow.buys) : 0;
+  const sells = activeWindow?.sells ?? 0;
+  const netBuyUsd = token.net_buy_usd;
+
   return (
     <div className="space-y-3 p-4">
       <div className="grid grid-cols-4 gap-2">
-        {token.timeframes.map((timeframe) => {
-          const tokenWithTimeframeInfo = mapToken(token.original, {
-            timeframe,
-          });
+        {availableTimeframes.map((timeframe) => {
+          const window = token.timeframes?.windows?.[timeframe];
+          const priceChangePct = window?.price_change_pct ?? 0;
 
           return (
             <Button
               key={timeframe}
-              onClick={() => onFilterChange({ timeframe })}
+              onClick={() => onFilterChange({ timeframe: timeframe as any })}
               variant={filters.timeframe === timeframe ? "outline" : "ghost"}
               data-active={filters.timeframe === timeframe || undefined}
               className={cn("h-auto flex-col rounded-md py-2")}
-              tooltip={`${tokenWithTimeframeInfo.priceChangePct}%`}
+              tooltip={`${priceChangePct}%`}
             >
               <span className="">{timeframe}</span>
               <p
                 className={cn(
                   "text-xs",
-                  tokenWithTimeframeInfo.priceChangePct > 0
+                  priceChangePct > 0
                     ? "text-up"
-                    : tokenWithTimeframeInfo.priceChangePct < 0
+                    : priceChangePct < 0
                       ? "text-down"
                       : "text-muted-foreground",
                 )}
               >
-                {/* {formatSignedPercent(tokenWithTimeframeInfo.priceChangePct)} */}
-                {formatCompactNumber(tokenWithTimeframeInfo.priceChangePct)}%
+                {formatCompactNumber(priceChangePct)}%
               </p>
             </Button>
           );
@@ -56,19 +66,15 @@ export const TokenDetailTimeframeStats = ({
 
       <div className="grid grid-cols-4 gap-2 text-center">
         {[
-          { label: "Vol", value: formatCompactCurrency(token.volumeUsd) },
+          { label: "Vol", value: formatCompactCurrency(volumeUsd) },
           {
             label: "Buys",
-            value: (
-              <span className="text-up">{formatCompactNumber(token.buys)}</span>
-            ),
+            value: <span className="text-up">{formatCompactNumber(buys)}</span>,
           },
           {
             label: "Sells",
             value: (
-              <span className="text-down">
-                {formatCompactNumber(token.sells)}
-              </span>
+              <span className="text-down">{formatCompactNumber(sells)}</span>
             ),
           },
           {
@@ -76,11 +82,11 @@ export const TokenDetailTimeframeStats = ({
             value: (
               <span
                 className={cn(
-                  token.netBuyUsd > 0 && "text-up",
-                  token.netBuyUsd < 0 && "text-down",
+                  netBuyUsd > 0 && "text-up",
+                  netBuyUsd < 0 && "text-down",
                 )}
               >
-                {formatCompactCurrency(token.netBuyUsd)}
+                {formatCompactCurrency(netBuyUsd)}
               </span>
             ),
           },

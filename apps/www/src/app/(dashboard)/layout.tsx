@@ -1,6 +1,7 @@
 import type React from "react";
-import { AssistantBubble } from "@/components/layout/AssistantBubble";
+
 import { Navbar } from "@/components/layout/Navbar";
+import { AssistantBubble } from "@/components/layout/AssistantBubble";
 
 export default function DashboardLayout({
   children,

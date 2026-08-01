@@ -1,8 +1,9 @@
 "use client";
 
+import { createContext, useContext } from "react";
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import { cva, type VariantProps } from "class-variance-authority";
-import { createContext, useContext } from "react";
+
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./button";
 

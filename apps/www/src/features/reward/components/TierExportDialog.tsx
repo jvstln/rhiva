@@ -1,10 +1,15 @@
 "use client";
-import { toBlob, toPng } from "html-to-image";
-import { Download, Globe, Share } from "lucide-react";
+
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { toBlob, toPng } from "html-to-image";
+import { useEffect, useRef, useState } from "react";
+import { Download, Globe, Share } from "lucide-react";
+
+import { share } from "@/lib/utils";
+import { downloadLink } from "@/lib/file.util";
 import { Button } from "@/components/ui/button";
+import type { RewardTier } from "@/components/ui/data/reward-data";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { RewardTier } from "@/components/ui/data/reward-data";
-import { downloadLink } from "@/lib/file.util";
-import { share } from "@/lib/utils";
 
 type TierShareDialogProps = Dialog.Props & {
   tier: RewardTier;
