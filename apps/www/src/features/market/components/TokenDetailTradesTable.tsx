@@ -32,7 +32,10 @@ const columns = [
   columnHelper.accessor("token_amount", {
     header: "Token Amount",
     cell: ({ getValue }) => (
-      <InfoBadge variant="none" tooltip={getValue().toLocaleString()}>
+      <InfoBadge
+        variant="none"
+        tooltip={getValue().toLocaleString()}
+      >
         {formatCompactNumber(getValue())}
       </InfoBadge>
     ),
@@ -65,7 +68,10 @@ export const TokenDetailTradesTable = ({
 
   return (
     <QueryState query={trades}>
-      <DataTable table={table} variant="compact" />
+      <DataTable
+        table={table}
+        variant="compact"
+      />
     </QueryState>
   );
 };

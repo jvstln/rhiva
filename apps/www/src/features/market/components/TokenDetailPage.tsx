@@ -74,7 +74,10 @@ export const TokenDetailPage = ({
             )}
           </div>
         </div>
-        <ScrollBar orientation="vertical" showIndicator />
+        <ScrollBar
+          orientation="vertical"
+          showIndicator
+        />
       </ScrollArea>
 
       {/* Right rail */}

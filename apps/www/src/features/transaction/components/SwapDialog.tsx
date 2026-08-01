@@ -101,7 +101,10 @@ export function SwapDialog({
                 }}
               >
                 {[25, 50, 75, 100].map((value) => (
-                  <ToggleGroupItem value={String(value)} key={value}>
+                  <ToggleGroupItem
+                    value={String(value)}
+                    key={value}
+                  >
                     {value}%
                   </ToggleGroupItem>
                 ))}

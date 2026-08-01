@@ -72,7 +72,10 @@ export function PortfolioHero() {
           </SelectTrigger>
           <SelectContent>
             {currencies.map((curr) => (
-              <SelectItem key={curr.value} value={curr}>
+              <SelectItem
+                key={curr.value}
+                value={curr}
+              >
                 {curr.label} ({curr.value})
               </SelectItem>
             ))}
@@ -96,7 +99,12 @@ export function PortfolioHero() {
               <TokenDialog>
                 <TooltipTrigger
                   payload={"View tokens"}
-                  render={<Button className="grow" variant="outline" />}
+                  render={
+                    <Button
+                      className="grow"
+                      variant="outline"
+                    />
+                  }
                 >
                   Token
                 </TooltipTrigger>
@@ -105,7 +113,12 @@ export function PortfolioHero() {
               <SwapDialog>
                 <TooltipTrigger
                   payload={"Swap"}
-                  render={<Button variant="outline" size="icon" />}
+                  render={
+                    <Button
+                      variant="outline"
+                      size="icon"
+                    />
+                  }
                 >
                   <ArrowDownUp />
                 </TooltipTrigger>
@@ -115,7 +128,12 @@ export function PortfolioHero() {
                 <SendDialog activeWallet={auth.activeWallet}>
                   <TooltipTrigger
                     payload={"Send"}
-                    render={<Button variant="outline" size="icon" />}
+                    render={
+                      <Button
+                        variant="outline"
+                        size="icon"
+                      />
+                    }
                   >
                     <ArrowUp />
                   </TooltipTrigger>
@@ -123,7 +141,13 @@ export function PortfolioHero() {
               ) : (
                 <TooltipTrigger
                   payload={"Send"}
-                  render={<Button variant="outline" size="icon" disabled />}
+                  render={
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled
+                    />
+                  }
                 >
                   <ArrowUp />
                 </TooltipTrigger>
@@ -132,7 +156,12 @@ export function PortfolioHero() {
               <DepositDialog address={"Wallet address"}>
                 <TooltipTrigger
                   payload={"Receive"}
-                  render={<Button variant="outline" size="icon" />}
+                  render={
+                    <Button
+                      variant="outline"
+                      size="icon"
+                    />
+                  }
                 >
                   <ArrowDown />
                 </TooltipTrigger>

@@ -101,7 +101,10 @@ export function AddToWatchlistButton({ mint }: { mint: string }) {
 
 function PairInfoCell({ token }: { token: Token }) {
   return (
-    <div data-token-id={token.mint} className="flex items-center gap-3">
+    <div
+      data-token-id={token.mint}
+      className="flex items-center gap-3"
+    >
       <AddToWatchlistButton mint={token.mint} />
       <TokenAvatar token={token} />
 
@@ -188,7 +191,10 @@ function ActionButtons() {
   return (
     <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
-        <Button variant="sell" size="sm">
+        <Button
+          variant="sell"
+          size="sm"
+        >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
           </span>

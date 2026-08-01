@@ -99,7 +99,10 @@ export function WithdrawDialog({
               <FieldLabel className="font-medium text-muted-foreground text-xs">
                 Select Token to Withdraw (Full Balance):
               </FieldLabel>
-              <TokenSelect value={field.value} onValueChange={field.onChange} />
+              <TokenSelect
+                value={field.value}
+                onValueChange={field.onChange}
+              />
               <FieldError errors={[fieldState.error]} />
             </Field>
           )}
@@ -114,7 +117,10 @@ export function WithdrawDialog({
                 <FieldLabel className="font-medium text-sm">
                   Destination Address
                 </FieldLabel>
-                <Input placeholder="Enter Solana Address" {...field} />
+                <Input
+                  placeholder="Enter Solana Address"
+                  {...field}
+                />
                 <FieldError errors={[fieldState.error]} />
               </Field>
 

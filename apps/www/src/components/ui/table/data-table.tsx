@@ -263,7 +263,10 @@ export function DataTable<TData>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.map((row) => (
-            <TableRow key={row.id} className={cn(classNames.tr)}>
+            <TableRow
+              key={row.id}
+              className={cn(classNames.tr)}
+            >
               {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}

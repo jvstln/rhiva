@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { NATIVE_MINT } from "@solana/spl-token";
 import type UserAPI from "@rhivadotfun/userapi";
+import { useMutation } from "@tanstack/react-query";
 
 import { toBps } from "@/lib/math.util";
 import { useUserApi } from "./use-user-api";
 import { useSettingsStore } from "@/features/settings/settings.store";
-import { useMutation } from "@tanstack/react-query";
 
 type BaseSwapParams = {
   amount: number;

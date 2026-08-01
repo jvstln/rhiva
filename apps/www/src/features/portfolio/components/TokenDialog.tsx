@@ -28,7 +28,10 @@ export function TokenDialog({
   children,
 }: React.ComponentProps<typeof Dialog> & { children: React.ReactElement }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       {children && <DialogTrigger render={children} />}
       <DialogContent className="p-0 sm:max-w-2xl">
         <DialogHeader className="sr-only">

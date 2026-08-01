@@ -56,18 +56,31 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center gap-6 border-border border-b bg-background/95 pr-4 backdrop-blur sm:px-6">
       <div className="flex items-center sm:contents">
-        <Button variant="ghost" className="sm:hidden">
+        <Button
+          variant="ghost"
+          className="sm:hidden"
+        >
           <MenuIcon />
         </Button>
-        <Link href="/" className="flex h-full shrink-0 items-center">
-          <Image src={logo} alt="Logo" className="h-8 w-auto sm:h-2/3" />
+        <Link
+          href="/"
+          className="flex h-full shrink-0 items-center"
+        >
+          <Image
+            src={logo}
+            alt="Logo"
+            className="h-8 w-auto sm:h-2/3"
+          />
         </Link>
       </div>
 
       <NavigationMenu>
         <NavigationMenuList className="max-sm:hidden">
           {NAV_LINKS.map((link) => (
-            <NavigationMenuItem key={link.label} value={link.label}>
+            <NavigationMenuItem
+              key={link.label}
+              value={link.label}
+            >
               <NavigationMenuLink
                 render={<Link href={link.url} />}
                 data-active={pathname.startsWith(link.url) ? true : undefined}
@@ -97,13 +110,22 @@ export function Navbar() {
                   </NavigationMenuLink>
                 </li>
                 <li className="flex gap-2">
-                  <NavigationMenuLink href="https://t.co" target="_blank">
+                  <NavigationMenuLink
+                    href="https://t.co"
+                    target="_blank"
+                  >
                     <TelegramIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink href="" target="_blank">
+                  <NavigationMenuLink
+                    href=""
+                    target="_blank"
+                  >
                     <DiscordIcon />
                   </NavigationMenuLink>
-                  <NavigationMenuLink href="" target="_blank">
+                  <NavigationMenuLink
+                    href=""
+                    target="_blank"
+                  >
                     <XIcon />
                   </NavigationMenuLink>
                 </li>
@@ -116,12 +138,18 @@ export function Navbar() {
       <div className="ml-auto flex items-center gap-3">
         <SearchInput />
         <NotificationPopover>
-          <Button variant={"ghost"} size="icon">
+          <Button
+            variant={"ghost"}
+            size="icon"
+          >
             <Bell />
           </Button>
         </NotificationPopover>
         <SettingsDialog>
-          <Button variant={"ghost"} size="icon">
+          <Button
+            variant={"ghost"}
+            size="icon"
+          >
             <Settings />
           </Button>
         </SettingsDialog>
@@ -136,11 +164,17 @@ export function Navbar() {
         </Link>
         {ready ? (
           auth.authenticated ? (
-            <UserMenuPopover user={user!} activeWallet={auth.activeWallet}>
-              <Button variant="outline" data-active>
+            <UserMenuPopover
+              user={user!}
+              activeWallet={auth.activeWallet}
+            >
+              <Button
+                variant="outline"
+                data-active
+              >
                 <Wallet />
                 <span className="max-sm:hidden">
-                  {" "}
+                  &nbsp;
                   {truncateString(auth.activeWallet.address)}
                 </span>
               </Button>
