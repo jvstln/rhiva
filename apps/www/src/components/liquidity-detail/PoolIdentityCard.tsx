@@ -1,41 +1,50 @@
-import {
-  LIQUIDITY_BINS,
-  POOL_DETAIL,
-} from "@/components/ui/data/liquidity-detail-data";
+import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
+import { LIQUIDITY_BINS } from "@/components/ui/data/liquidity-detail-data";
+import { formatCompactCurrency } from "@/lib/finance.util";
 import { cn } from "@/lib/utils";
 
-export function PoolIdentityCard() {
-  const { tokenA, tokenB, binStep, fee } = POOL_DETAIL;
+const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
+
+export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
   const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
+  const baseSymbol = pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
+  const quoteSymbol = pool.tokenB.symbol || "SOL";
+  const pair = `${baseSymbol}/${quoteSymbol}`;
+
+  const totalFeePct = pool.totalFeePct ?? 0;
+  const feeLabel = totalFeePct > 0 ? `${totalFeePct}%` : `${pool.binStep ?? 0}bps`;
+
+  const baseUsd = pool.tvlDistribution?.base_usd ?? 0;
+  const quoteUsd = pool.tvlDistribution?.quote_usd ?? 0;
 
   return (
     <div className="space-y-4 border-border/70 border-b p-4">
       <div className="flex items-center gap-3">
         <div className="relative flex size-9 shrink-0 items-center">
           <span className="z-10 flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-b-6 text-white ring-2 ring-card">
-            S
+            {baseSymbol[0]}
           </span>
           <span className="-ml-2.5 flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 font-bold text-b-6 text-white ring-2 ring-card">
-            U
+            {quoteSymbol[0]}
           </span>
         </div>
         <div>
-          <p className="font-bold text-b-1 text-white">{POOL_DETAIL.pair}</p>
+          <p className="font-bold text-b-1 text-white">{pair}</p>
           <p className="text-b-5 text-gray">
-            Bin Step: {binStep} Fee: {fee}
+            Bin Step: {pool.binStep ?? "—"} Fee: {feeLabel}
           </p>
         </div>
       </div>
 
       <TokenBalanceRow
-        symbol={tokenA.symbol}
-        balance={tokenA.balance}
-        meta={tokenA.meta}
+        symbol={baseSymbol}
+        balance={formatCompactCurrency(baseUsd)}
+        meta={shortId(pool.tokenA.mint)}
       />
       <TokenBalanceRow
-        symbol={tokenB.symbol}
-        balance={tokenB.balance}
-        meta={tokenB.meta}
+        symbol={quoteSymbol}
+        balance={formatCompactCurrency(quoteUsd)}
+        meta={shortId(pool.tokenB.mint)}
       />
 
       <div>
@@ -43,14 +52,8 @@ export function PoolIdentityCard() {
           <span className="font-medium text-white">Liquidity Distribution</span>
         </div>
         <div className="mb-2 flex items-center gap-3 text-b-5 text-gray">
-          <LegendDot
-            className="bg-violet-500"
-            label="USDC"
-          />
-          <LegendDot
-            className="bg-primary"
-            label="SOL"
-          />
+          <LegendDot className="bg-violet-500" label={baseSymbol} />
+          <LegendDot className="bg-primary" label={quoteSymbol} />
         </div>
 
         <div className="relative flex h-24 items-end gap-[2px]">
@@ -68,14 +71,15 @@ export function PoolIdentityCard() {
             <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-gray shadow ring-1 ring-border">
               Current price
               <br />
-              0.0000223 SOL/USDC
+              {pool.price ? pool.price.toExponential(4) : "N/A"}{" "}
+              {baseSymbol}/{quoteSymbol}
             </span>
             <span className="mt-1 h-full w-px flex-1 bg-white/60" />
           </div>
         </div>
         <div className="mt-1 flex justify-between text-b-5 text-gray">
-          <span>0,0198</span>
-          <span>0,0447</span>
+          <span>{pool.tvlDistribution?.base_pct?.toFixed(2) ?? "—"}%</span>
+          <span>{pool.tvlDistribution?.quote_pct?.toFixed(2) ?? "—"}%</span>
         </div>
       </div>
     </div>

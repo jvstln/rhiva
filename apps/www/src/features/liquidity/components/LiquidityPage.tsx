@@ -6,7 +6,7 @@ import {
 } from "@/components/layout/DashboardUi";
 import { Separator } from "@/components/ui/separator";
 import { LIQUIDITY_SUMMARY } from "@/components/ui/data/liquidity-data";
-import { PoolsTable } from "@/features/liquidity/components/PoolsTable";
+import { PoolsTable } from "@/features/liquidity/components/LiquidityPoolsTable";
 import { PoolsToolbar } from "./PoolsToolbar";
 
 const LiquidityPage = () => {
@@ -25,15 +25,9 @@ const LiquidityPage = () => {
             value={LIQUIDITY_SUMMARY.tvl}
           />
           <Separator orientation="vertical" />
-          <SummaryStat
-            label="24H Volume"
-            value={LIQUIDITY_SUMMARY.volume24h}
-          />
+          <SummaryStat label="24H Volume" value={LIQUIDITY_SUMMARY.volume24h} />
           <Separator orientation="vertical" />
-          <SummaryStat
-            label="24H Fees"
-            value={LIQUIDITY_SUMMARY.fees24h}
-          />
+          <SummaryStat label="24H Fees" value={LIQUIDITY_SUMMARY.fees24h} />
         </div>
       </div>
 

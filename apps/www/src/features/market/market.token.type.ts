@@ -87,7 +87,7 @@ export type RawInsiders = {
 };
 
 export type RawToken = {
-  mint: string;
+  mint?: string;
   name?: string;
   symbol?: string;
   logo_uri?: string;

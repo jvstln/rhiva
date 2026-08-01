@@ -5,22 +5,33 @@ import { getTokens } from "../market/market.api";
 import { mapLiquidityPool } from "./liquidity.util";
 
 export const getLiquidityPools = async (params: LiquidityPoolFilters) => {
-  const response = await api.get<RawLiquidityPool[]>("/pools", { params });
+  const response = await api.get<RawLiquidityPool[]>("/pools", {
+    params: { ...params, limit: 3 },
+  });
 
-  const pools = await Promise.all(
-    response.data.map(async (pool) => {
-      const [token_a, token_b] = await Promise.allSettled([
-        getTokens([pool.token_mint_a]),
-        getTokens([pool.token_mint_b]),
-      ]);
+  const mints = Array.from(
+    new Set(
+      response.data.flatMap((pool) => [pool.token_mint_a, pool.token_mint_b]),
+    ),
+  ).filter((mint): mint is string => !!mint);
 
-      return {
-        ...mapLiquidityPool(pool),
-        token_a: token_a.status === "fulfilled" ? token_a.value[0] : null,
-        token_b: token_b.status === "fulfilled" ? token_b.value[0] : null,
-      };
-    }),
-  );
+  const [settledTokens] = await Promise.allSettled([getTokens(mints)]);
+  const tokens =
+    settledTokens.status === "fulfilled" ? settledTokens.value : [];
 
-  return { pools };
+  const resolvedPools = response.data.map((pool) => {
+    return mapLiquidityPool({
+      ...pool,
+      token_a: tokens.find((t) => t.mint === pool.token_mint_a),
+      token_b: tokens.find((t) => t.mint === pool.token_mint_b),
+    });
+  });
+
+  return { pools: resolvedPools };
+};
+
+export const getLiquidityPool = async (address: string) => {
+  const response = await api.get<RawLiquidityPool>(`/pools/${address}`);
+
+  return mapLiquidityPool(response.data);
 };

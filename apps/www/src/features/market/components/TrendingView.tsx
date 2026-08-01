@@ -42,7 +42,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 // import { ChartContainer } from "@/components/ui/chart";
 // import { Area, AreaChart } from "recharts";
 
-export function AddToWatchlistButton({ mint }: { mint: string }) {
+export function AddTokenToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
   const watchlist = useMarketStore((state) => state.watchlist.items);
 
@@ -102,7 +102,7 @@ export function AddToWatchlistButton({ mint }: { mint: string }) {
 function PairInfoCell({ token }: { token: Token }) {
   return (
     <div data-token-id={token.mint} className="flex items-center gap-3">
-      <AddToWatchlistButton mint={token.mint} />
+      <AddTokenToWatchlistButton mint={token.mint} />
       <TokenAvatar token={token} />
 
       <div className="flex w-50 flex-col gap-1">

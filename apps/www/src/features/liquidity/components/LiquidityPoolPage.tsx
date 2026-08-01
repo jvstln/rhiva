@@ -18,7 +18,9 @@ export default function LiquidityPoolPage({ id }: { id: string }) {
       <BackButton />
       <main className="flex min-h-0 flex-1">
         <ScrollArea>
-          <PoolDetailSidebar />
+          <QueryState query={pool}>
+            {(query) => <PoolDetailSidebar pool={query.data} />}
+          </QueryState>
           <ScrollBar showScrollBar />
         </ScrollArea>
 
@@ -27,7 +29,7 @@ export default function LiquidityPoolPage({ id }: { id: string }) {
           <ScrollBar showScrollBar />
         </ScrollArea>
 
-        <ScrollArea className={"w-full max-w-[370px] border-l px-2 pr-4"}>
+        <ScrollArea className={"w-full max-w-92.5 border-l px-2 pr-4"}>
           <QueryState query={pool}>
             {(_query) => (
               <>

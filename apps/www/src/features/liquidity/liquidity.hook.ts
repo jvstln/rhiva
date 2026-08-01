@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { getLiquidityPools } from "./liquidity.api";
+import { useQuery } from "@tanstack/react-query";
+import { getLiquidityPools, getLiquidityPool } from "./liquidity.api";
 import type { LiquidityPoolFilters } from "./liquidity.schema";
 
 export function useLiquidityPools(params: LiquidityPoolFilters = {}) {
@@ -12,12 +12,9 @@ export function useLiquidityPools(params: LiquidityPoolFilters = {}) {
 }
 
 export function useLiquidityPool(id: string) {
-  const pools = useLiquidityPools();
-
-  return {
-    ...pools,
-    data: pools.data?.pools.find((pool) => pool.pool_address === id),
-  } as unknown as UseQueryResult<
-    NonNullable<typeof pools.data>["pools"][number]
-  >;
+  return useQuery({
+    queryKey: ["liquidity", "pool", id],
+    queryFn: () => getLiquidityPool(id),
+    enabled: !!id,
+  });
 }

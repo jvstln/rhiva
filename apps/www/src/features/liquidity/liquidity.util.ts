@@ -1,87 +1,87 @@
-import type { PoolRow } from "@/components/ui/data/liquidity-data";
 import type { RawLiquidityPool } from "./liquidity.type";
-import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
+import type { PoolDex } from "./liquidity.schema";
+import { mapToken } from "../market/market.util";
+const toNumber = (value?: number | string | null) => {
+  if (value === null || value === undefined) return null;
 
-const formatPercent = (value?: number | null): string => {
-  if (value === undefined || value === null || Number.isNaN(Number(value))) {
-    return "N/A";
-  }
-  return `${Number(value).toFixed(2)}%`;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 };
 
-const shortId = (value?: string) => (value ? value.slice(0, 6) : "----");
+export const mapLiquidityPool = (pool: RawLiquidityPool) => {
+  const dex: PoolDex = pool.dex?.includes("orca")
+    ? "orca"
+    : pool.dex?.includes("raydium")
+      ? "raydium-clmm"
+      : "meteora-dlmm";
 
-export const mapLiquidityPool = (
-  pool: RawLiquidityPool,
-): RawLiquidityPool & PoolRow => {
-  const tvlNum = Number(pool.liquidity) || 0;
-  const activeTvlNum = Number(pool.active_tvl_usd ?? 0);
-  const volume24h = pool.volume_24h_usd ?? 0;
-  const totalFeePct = Number(
-    pool.total_fee_pct ?? pool.base_fee_pct ?? pool.dynamic_fee_pct ?? 0,
+  // NOTE: was `toNumber(pool.liquidity)` — that field comes back "" for DLMM
+  // pools in the sample payload while `tvl_usd` is populated, so prefer it.
+  const tvlNum = toNumber(pool.tvl_usd) ?? toNumber(pool.liquidity) ?? 0;
+  const activeTvlNum = toNumber(pool.active_tvl_usd) ?? 0;
+  const volume24h = toNumber(pool.volume_24h_usd) ?? 0;
+  const totalFeePct = toNumber(
+    pool.total_fee_pct ?? pool.base_fee_pct ?? pool.dynamic_fee_pct,
   );
-  const feesValue = volume24h * (totalFeePct / 100);
+  const feesValue = totalFeePct != null ? volume24h * (totalFeePct / 100) : 0;
 
-  const feeLabel =
-    totalFeePct > 0
-      ? formatPercent(totalFeePct)
-      : pool.bin_step !== undefined
-        ? `${pool.bin_step}%`
-        : "N/A";
-
-  const feesRatio =
-    activeTvlNum > 0 ? formatPercent((feesValue / activeTvlNum) * 100) : "N/A";
-  const volumeRatio =
-    activeTvlNum > 0 ? formatPercent((volume24h / activeTvlNum) * 100) : "N/A";
+  const feesRatio = activeTvlNum > 0 ? (feesValue / activeTvlNum) * 100 : 0;
+  const volumeRatio = activeTvlNum > 0 ? (volume24h / activeTvlNum) * 100 : 0;
 
   return {
-    ...pool,
-    pair: `${shortId(pool.token_mint_a)}/${shortId(pool.token_mint_b)}`,
+    address: String(pool.pool_address),
+    dex,
+    tokenA: mapToken(pool.token_a?.original ?? { mint: pool.token_mint_a }),
+    tokenB: mapToken(pool.token_b?.original ?? { mint: pool.token_mint_b }),
     tickSpacing: pool.tick_spacing ?? 0,
-    fee: feeLabel,
-    age: String(pool.last_update_ms),
-    marketCap:
-      pool.market_cap_usd !== undefined && pool.market_cap_usd !== null
-        ? formatCompactCurrency(pool.market_cap_usd)
-        : "N/A",
-    marketCapChange:
-      pool.market_cap_change_pct !== undefined &&
-      pool.market_cap_change_pct !== null
-        ? formatSignedPercent(pool.market_cap_change_pct)
-        : "N/A",
-    tvl: tvlNum > 0 ? formatCompactCurrency(tvlNum) : "N/A",
-    tvlChange:
-      pool.tvl_change_pct !== undefined && pool.tvl_change_pct !== null
-        ? formatSignedPercent(pool.tvl_change_pct)
-        : "N/A",
-    activeTvl: activeTvlNum > 0 ? formatCompactCurrency(activeTvlNum) : "N/A",
-    activeTvlChange:
-      pool.active_tvl_change_pct !== undefined &&
-      pool.active_tvl_change_pct !== null
-        ? formatSignedPercent(pool.active_tvl_change_pct)
-        : "N/A",
-    fees: feesValue > 0 ? formatCompactCurrency(feesValue) : "N/A",
-    feesChange:
-      pool.fees_ratio_change_pct !== undefined &&
-      pool.fees_ratio_change_pct !== null
-        ? formatSignedPercent(pool.fees_ratio_change_pct)
-        : "N/A",
+    binStep: pool.bin_step ?? 0,
+    age: new Date(pool.last_update_ms ?? Date.now()),
+
+    marketCap: toNumber(pool.market_cap_usd),
+    marketCapChange: toNumber(pool.market_cap_change_pct),
+    tvl: tvlNum,
+    tvlChange: toNumber(pool.tvl_change_pct),
+    activeTvl: activeTvlNum,
+    activeTvlChange: toNumber(pool.active_tvl_change_pct),
+    fees: feesValue,
+    feesChange: toNumber(pool.fees_ratio_change_pct),
     feesRatio,
-    feesRatioChange:
-      pool.fees_ratio_change_pct !== undefined &&
-      pool.fees_ratio_change_pct !== null
-        ? formatSignedPercent(pool.fees_ratio_change_pct)
-        : "N/A",
-    volume: volume24h > 0 ? formatCompactCurrency(volume24h) : "N/A",
-    volumeChange:
-      pool.volume_change_pct !== undefined && pool.volume_change_pct !== null
-        ? formatSignedPercent(pool.volume_change_pct)
-        : "N/A",
+    feesRatioChange: toNumber(pool.fees_ratio_change_pct),
+    volume: volume24h,
+    volumeChange: toNumber(pool.volume_change_pct),
     volumeRatio,
-    volumeRatioChange:
-      pool.volume_ratio_change_pct !== undefined &&
-      pool.volume_ratio_change_pct !== null
-        ? formatSignedPercent(pool.volume_ratio_change_pct)
-        : "N/A",
+    volumeRatioChange: toNumber(pool.volume_ratio_change_pct),
+
+    // --- price (LiquidityDetailPage) ---
+    baseSymbol: pool.base_symbol ?? null,
+    price: toNumber(pool.price_usd),
+    priceChange1h: toNumber(pool.price_change_1h_pct),
+    priceChange24h: toNumber(pool.price_change_24h_pct),
+
+    // --- pool stats strip ---
+    swaps: pool.swaps_24h ?? 0,
+    traders: pool.traders_24h ?? 0,
+    totalLps: pool.total_lps ?? 0,
+    netDeposit: toNumber(pool.net_deposit_usd),
+    holders: pool.holders_count ?? 0,
+    avgVolume: toNumber(pool.avg_volume_usd) ?? 0,
+    minVolatility: toNumber(pool.min_volatility_pct) ?? 0,
+    top10Holders: toNumber(pool.top10_holder_pct) ?? 0,
+    devBalance: toNumber(pool.dev_balance_pct) ?? 0,
+
+    // --- fee breakdown (detail page sidebar) ---
+    totalFeePct: toNumber(pool.total_fee_pct),
+    baseFeePct: pool.base_fee_pct ?? null,
+    dynamicFeePct: pool.dynamic_fee_pct ?? null,
+    protocolFeePct: pool.protocol_fee_pct ?? null,
+    maxFeePct: pool.max_fee_pct ?? null,
+    feeCollectionToken: pool.fee_collection_token ?? null,
+    feesUsd: toNumber(pool.fees_usd),
+
+    // --- tvl distribution (detail page sidebar) ---
+    tvlDistribution: pool.tvl_distribution ?? null,
+
+    // --- token stats (detail page sidebar) ---
+    tokenStats: pool.token_stats ?? null,
   };
 };

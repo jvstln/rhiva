@@ -26,7 +26,7 @@ import {
 import React from "react";
 import { TopHolders, TotalHolders } from "./tooltips/Holders";
 import { NetworkSolana } from "@web3icons/react";
-import { AddToWatchlistButton } from "./TrendingView";
+import { AddTokenToWatchlistButton } from "./TrendingView";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type TokenDetailHeaderProps = { token: Token };
@@ -76,7 +76,7 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
     <ScrollArea className={"w-full min-w-0"}>
       <div className="flex w-max items-center gap-3 border-border/70 border-b px-4 pt-1 pb-3">
         <div className="flex items-center gap-1">
-          <AddToWatchlistButton mint={token.mint} />
+          <AddTokenToWatchlistButton mint={token.mint} />
           <TokenAvatar token={token} />
         </div>
 
@@ -125,11 +125,7 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
           </React.Fragment>
         ))}
       </div>
-      <ScrollBar
-        orientation="horizontal"
-        showIndicator
-        showScrollBar={false}
-      />
+      <ScrollBar orientation="horizontal" showIndicator showScrollBar={false} />
     </ScrollArea>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ChevronLeft,
   CircleDollarSign,
   Coins,
   Component,
@@ -10,20 +9,24 @@ import {
   Wallet,
   XSquare,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { CoinIcon, MeteoraIcon, SolanaIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import { CoinIcon } from "@/components/ui/icons";
 import { LIQUIDITY_BINS } from "@/components/ui/data/liquidity-detail-data";
 import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog";
+import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import { cn } from "@/lib/utils";
 import { useLiquidityPool } from "../liquidity.hook";
 import { QueryState } from "@/components/layout/QueryState";
+import { BackButton } from "@/components/layout/BackButton";
+import {
+  LiquidityAddressCopy,
+  LiquidityAvatar,
+} from "./tooltips/LiquidityAvatar";
+import { NetworkSolana } from "@web3icons/react";
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
-  const router = useRouter();
   const pool = useLiquidityPool(id);
 
   return (
@@ -31,40 +34,50 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
       {(query) => {
         const p = query.data;
         const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
-        const currentPriceNum = p.sqrt_price ? Number(p.sqrt_price) ** 2 : 0;
+
+        const baseSymbol = p.tokenA.symbol || p.baseSymbol || "Token A";
+        const quoteSymbol = p.tokenB.symbol || "SOL";
+        const pair = `${baseSymbol}/${quoteSymbol}`;
+
+        const totalFeePct = p.totalFeePct ?? 0;
+        const feeLabel =
+          totalFeePct > 0 ? `${totalFeePct}%` : `${p.binStep}bps`;
+
         const currentPriceStr =
-          currentPriceNum > 0 ? currentPriceNum.toExponential(4) : "N/A";
+          p.price != null && p.price > 0 ? p.price.toExponential(4) : "N/A";
+
+        const volume24h = p.volume ?? 0;
+        const feesValue =
+          p.feesUsd ?? p.fees ?? volume24h * (totalFeePct / 100);
+        const activeTvl = p.activeTvl ?? 0;
+        const feesRatioPct = activeTvl > 0 ? (feesValue / activeTvl) * 100 : 0;
+
+        const tvlFormatted = formatCompactCurrency(p.tvl);
+        const activeTvlFormatted = formatCompactCurrency(activeTvl);
+        const feesFormatted = formatCompactCurrency(feesValue);
+        const feesRatioFormatted = `${feesRatioPct.toFixed(2)}%`;
+
+        const priceChange24h = formatSignedPercent(p.priceChange24h);
+        const priceChange1h = formatSignedPercent(p.priceChange1h);
 
         return (
           <DashboardSlot>
-            {/* HEADER */}
             <div className="mb-6 space-y-4">
-              <Button
-                onClick={() => router.back()}
-                className={cn(buttonVariants({ variant: "ghost" }))}
-                variant={"ghost"}
-              >
-                <ChevronLeft />
-                Back
-              </Button>
+              <BackButton />
 
               <div className="flex items-center gap-4">
-                <Avatar>
-                  <AvatarImage src="" />
-                  <AvatarFallback>
-                    <SolanaIcon />
-                  </AvatarFallback>
-                </Avatar>
+                <LiquidityAvatar liquidity={p} />
+
                 <h1 className="flex items-center gap-2 font-bold text-xl">
-                  {p.pair}
-                  <MeteoraIcon className="size-4" />
+                  {pair}
+                  <LiquidityAddressCopy liquidity={p} />
                 </h1>
                 <div className="ml-2 flex items-center gap-3 border-border/70 border-l pl-4 text-gray text-sm">
                   <p>
-                    Bin Step: <span className="text-white">{p.bin_step}</span>
+                    Bin Step: <span className="text-white">{p.binStep}</span>
                   </p>
                   <p>
-                    Fee: <span className="text-white">{p.fee}</span>
+                    Fee: <span className="text-white">{feeLabel}</span>
                   </p>
                 </div>
               </div>
@@ -83,7 +96,7 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                       Current Price:{" "}
                       <span className="text-white">{currentPriceStr}</span>
                       <br />
-                      {p.pair.replace("/", " per ")}
+                      {baseSymbol}
                     </div>
                   </div>
 
@@ -112,14 +125,14 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   </h3>
                   <div className="flex items-center justify-between gap-2 rounded-lg border bg-background/50 p-4">
                     <TokenBalanceRow
-                      symbol={p.token_b?.symbol ?? "Token A"}
-                      balance={p.tvl}
-                      usdValue={p.activeTvl}
+                      symbol={quoteSymbol}
+                      balance={tvlFormatted}
+                      usdValue={tvlFormatted}
                     />
                     <TokenBalanceRow
-                      symbol={p.token_a?.symbol ?? "Token B"}
-                      balance={p.volume}
-                      usdValue={p.volume}
+                      symbol={baseSymbol}
+                      balance={activeTvlFormatted}
+                      usdValue={activeTvlFormatted}
                     />
                   </div>
                 </div>
@@ -131,14 +144,14 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   </h3>
                   <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border bg-background/50 p-4">
                     <TokenBalanceRow
-                      symbol={p.token_b?.symbol ?? "Token A"}
-                      balance={p.fees}
-                      usdValue={p.feesChange}
+                      symbol={quoteSymbol}
+                      balance={feesFormatted}
+                      usdValue={feesFormatted}
                     />
                     <TokenBalanceRow
-                      symbol={p.token_a?.symbol ?? "Token B"}
-                      balance={p.feesRatio}
-                      usdValue={p.feesRatioChange}
+                      symbol={baseSymbol}
+                      balance={feesRatioFormatted}
+                      usdValue={feesRatioFormatted}
                     />
                   </div>
                   <div className="flex gap-3">
@@ -159,17 +172,17 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   <StatCard
                     label="Current pool price"
                     value={currentPriceStr}
-                    meta={`${p.pair.replace("/", "/")} ⇄`}
+                    meta={`${pair.replace("/", "/")} ⇄`}
                     icon={<CircleDollarSign className="size-4" />}
                   />
                   <StatCard
                     label="Total Liquidity"
-                    value={p.tvl}
+                    value={tvlFormatted}
                     icon={<Wallet className="size-4" />}
                   />
                   <StatCard
-                    label="Fees Earned (Claimed)"
-                    value={p.fees}
+                    label="Fees Earned (24h)"
+                    value={feesFormatted}
                     icon={<Coins className="size-4" />}
                   />
                 </div>
@@ -179,27 +192,25 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   <div className="mb-6">
                     <p className="font-medium text-sm">{currentPriceStr} ⇋</p>
                     <p className="mt-1 text-gray text-xs">
-                      {p.pair.replace("/", " per ")}
+                      {pair.replace("/", " per ")}
                     </p>
                   </div>
 
                   <div className="space-y-0 text-sm">
                     <DetailRow
-                      label="PnL"
-                      value={`${p.marketCapChange} (${p.marketCapChange})`}
-                      valueClass="text-up"
+                      label="24h Price Change"
+                      value={`${priceChange24h} (${priceChange1h} 1h)`}
+                      valueClass={
+                        p.priceChange24h != null && p.priceChange24h >= 0
+                          ? "text-up"
+                          : "text-down"
+                      }
                     />
-                    <DetailRow
-                      label="Unclaimed Fees"
-                      value={p.fees}
-                    />
-                    <DetailRow
-                      label="Total Liquidity"
-                      value={p.tvl}
-                    />
+                    <DetailRow label="Unclaimed Fees" value={feesFormatted} />
+                    <DetailRow label="Total Liquidity" value={tvlFormatted} />
                     <DetailRow
                       label="24h Fee / TVL"
-                      value={p.feesRatio}
+                      value={feesRatioFormatted}
                     />
                     <div className="flex items-center justify-between border-border/30 border-b py-3">
                       <span className="text-gray">Range</span>
@@ -210,8 +221,8 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                     </div>
                     <DetailRow
                       label="Position Status"
-                      value={p.activeTvl ? "Active" : "Inactive"}
-                      valueClass={p.activeTvl ? "text-up" : "text-down"}
+                      value={activeTvl > 0 ? "Active" : "Inactive"}
+                      valueClass={activeTvl > 0 ? "text-up" : "text-down"}
                       noBorder
                     />
                   </div>
@@ -249,7 +260,7 @@ function TokenBalanceRow({
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         {symbol === "SOL" ? (
-          <SolanaIcon className="size-5" />
+          <NetworkSolana className="size-5" />
         ) : (
           <CoinIcon className="size-5" />
         )}

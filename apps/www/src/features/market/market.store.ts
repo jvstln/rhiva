@@ -1,117 +1,114 @@
 import { merge } from "lodash";
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import type { MarketState } from "./market.type";
 
 export const useMarketStore = create<MarketState>()(
-  devtools(
-    persist(
-      immer(
-        (set, get): MarketState => ({
-          radarFilters: {
-            fresh: {
-              search: "",
-              bondingCurve: "p1",
-              quickBuy: 0,
-              quickSell: 0,
-            },
-            heatingUp: {
-              search: "",
-              bondingCurve: "p1",
-              quickBuy: 0,
-              quickSell: 0,
-            },
-            graduated: {
-              search: "",
-              bondingCurve: "p1",
-              quickBuy: 0,
-              quickSell: 0,
-            },
-          },
-          setRadarFilters(columns) {
-            set((state) => {
-              merge(state.radarFilters, columns);
-            });
-          },
-
-          // ------------------------------------------------------------------------
-          trendingFilters: {
-            timeframe: "1h",
-            quickSell: 0,
+  persist(
+    immer(
+      (set, get): MarketState => ({
+        radarFilters: {
+          fresh: {
+            search: "",
+            bondingCurve: "p1",
             quickBuy: 0,
-            preset: "p1",
+            quickSell: 0,
           },
-          setTrendingFilters(filters) {
+          heatingUp: {
+            search: "",
+            bondingCurve: "p1",
+            quickBuy: 0,
+            quickSell: 0,
+          },
+          graduated: {
+            search: "",
+            bondingCurve: "p1",
+            quickBuy: 0,
+            quickSell: 0,
+          },
+        },
+        setRadarFilters(columns) {
+          set((state) => {
+            merge(state.radarFilters, columns);
+          });
+        },
+
+        // ------------------------------------------------------------------------
+        trendingFilters: {
+          timeframe: "1h",
+          quickSell: 0,
+          quickBuy: 0,
+          preset: "p1",
+        },
+        setTrendingFilters(filters) {
+          set((state) => {
+            merge(state.trendingFilters, filters);
+          });
+        },
+        // ------------------------------------------------------------------------
+
+        pumpLiveSettings: {
+          sort: {
+            marketCap: null,
+            time: null,
+          },
+          setSort(columns) {
             set((state) => {
-              merge(state.trendingFilters, filters);
+              merge(
+                state.pumpLiveSettings.sort,
+                typeof columns === "function"
+                  ? columns(state.pumpLiveSettings.sort)
+                  : columns,
+              );
             });
           },
-          // ------------------------------------------------------------------------
+        },
 
-          pumpLiveSettings: {
-            sort: {
-              marketCap: null,
-              time: null,
-            },
-            setSort(columns) {
-              set((state) => {
-                merge(
-                  state.pumpLiveSettings.sort,
-                  typeof columns === "function"
-                    ? columns(state.pumpLiveSettings.sort)
-                    : columns,
-                );
-              });
-            },
-          },
+        // ------------------------------------------------------------------------
+        surgeFilters: {
+          timeframe: "1h",
+          quickBuy: null,
+          preset: "p1",
+        },
+        setSurgeFilters(filters) {
+          set((state) => {
+            merge(state.surgeFilters, filters);
+          });
+        },
+        // ------------------------------------------------------------------------
 
-          // ------------------------------------------------------------------------
-          surgeFilters: {
-            timeframe: "1h",
-            quickBuy: null,
-            preset: "p1",
-          },
-          setSurgeFilters(filters) {
+        watchlist: {
+          items: [],
+          add(mint) {
+            if (get().watchlist.items.includes(mint)) return;
             set((state) => {
-              merge(state.surgeFilters, filters);
+              state.watchlist.items.push(mint);
             });
           },
-          // ------------------------------------------------------------------------
+          remove(mint) {
+            if (!get().watchlist.items.includes(mint)) return;
 
-          watchlist: {
-            items: [],
-            add(mint) {
-              if (get().watchlist.items.includes(mint)) return;
-              set((state) => {
-                state.watchlist.items.push(mint);
-              });
-            },
-            remove(mint) {
-              if (!get().watchlist.items.includes(mint)) return;
-
-              set((state) => {
-                state.watchlist.items = state.watchlist.items.filter(
-                  (m) => m !== mint,
-                );
-              });
-            },
-            toggle(mint) {
-              if (get().watchlist.items.includes(mint)) {
-                get().watchlist.remove(mint);
-              } else {
-                get().watchlist.add(mint);
-              }
-            },
+            set((state) => {
+              state.watchlist.items = state.watchlist.items.filter(
+                (m) => m !== mint,
+              );
+            });
           },
-        }),
-      ),
-      {
-        name: "rhiva.market",
-        merge: (persistedState, currentState) =>
-          merge(currentState, persistedState),
-      },
+          toggle(mint) {
+            if (get().watchlist.items.includes(mint)) {
+              get().watchlist.remove(mint);
+            } else {
+              get().watchlist.add(mint);
+            }
+          },
+        },
+      }),
     ),
-    { name: "rhiva-market" },
+    {
+      name: "rhiva.market",
+      merge: (persistedState, currentState) =>
+        merge(currentState, persistedState),
+    },
   ),
 );

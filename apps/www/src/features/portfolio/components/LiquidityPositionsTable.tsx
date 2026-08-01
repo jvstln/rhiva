@@ -7,7 +7,7 @@ import { SolanaIcon } from "@/components/ui/icons";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { LP_POSITIONS } from "@/components/ui/data/portfolio-data";
-import { POOLS } from "@/features/liquidity/liquidity.schema";
+import { POOL_DEXES } from "@/features/liquidity/liquidity.schema";
 import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
 import { capitalize } from "@/lib/utils";
 import { PnlExportDialog } from "./PnlExportDialog";
@@ -51,11 +51,7 @@ const ActionCell = () => {
         </>
       ) : (
         <PnlExportDialog>
-          <Button
-            tooltip="Share"
-            variant="ghost"
-            size="icon-sm"
-          >
+          <Button tooltip="Share" variant="ghost" size="icon-sm">
             <Share className="text-gray" />
           </Button>
         </PnlExportDialog>
@@ -98,7 +94,7 @@ const columns = [
           <div className="flex items-center gap-1.5">
             <p className="text-b-5 text-gray">{row.original.timeAgo}</p>
             {(() => {
-              const Icon = POOLS[row.index % POOLS.length].icon;
+              const Icon = POOL_DEXES[row.index % POOL_DEXES.length].icon;
               return <Icon className="size-3" />;
             })()}
           </div>
@@ -156,11 +152,8 @@ export const LiquidityPositionsTable = () => {
       <div className="flex items-center gap-6 px-1">
         <ToggleGroup defaultValue={["all"]}>
           <ToggleGroupItem value="all">All pools</ToggleGroupItem>
-          {POOLS.map((pool) => (
-            <ToggleGroupItem
-              key={pool.id}
-              value={pool.id}
-            >
+          {POOL_DEXES.map((pool) => (
+            <ToggleGroupItem key={pool.id} value={pool.id}>
               <pool.icon />
             </ToggleGroupItem>
           ))}
