@@ -17,8 +17,17 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { downloadLink, selectFile } from "@/lib/file.util";
 import { LpCard, PnlSummaryCard, TokenCard } from "./PnlCards";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import type { LpPosition } from "@/components/ui/data/portfolio-data";
-import { PNL_PROFIT_IMAGES, PortfolioTab } from "../portfolio.schema";
+import {
+  formatCompactCurrency,
+  formatSignedPercent,
+  formatSignedUsd,
+} from "@/lib/finance.util";
+import type { LpPosition, TokenPosition } from "@rhivadotfun/dataapi";
+import {
+  PNL_LOSS_IMAGES,
+  PNL_PROFIT_IMAGES,
+  PortfolioTab,
+} from "../portfolio.schema";
 import {
   Dialog,
   DialogContent,
@@ -32,12 +41,23 @@ import {
 interface PnlExportDialogProps extends Dialog.Props {
   children?: React.ReactElement;
   position?: LpPosition;
+  token?: TokenPosition;
   type?: "summary";
+  timeframe?: string;
+  summary?: {
+    value: number;
+    realized: number;
+    unrealized: number;
+  };
 }
 
 const PnlExportDialog = ({
   children,
   type,
+  position,
+  token,
+  timeframe,
+  summary,
   ...props
 }: PnlExportDialogProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -50,11 +70,29 @@ const PnlExportDialog = ({
     searchParams.get("view"),
   );
 
-  const allImages = PNL_PROFIT_IMAGES;
+  const lpPnlUsd = position
+    ? (position.current_value_usd ?? 0) - position.net_amount
+    : 0;
+  const lpPnlPct =
+    position && position.net_amount > 0
+      ? (lpPnlUsd / position.net_amount) * 100
+      : null;
+  const tokenPnlUsd = token
+    ? token.realized_pnl_usd + (token.unrealized_pnl_usd ?? 0)
+    : 0;
+  const tokenInvestedUsd = token ? token.bought * token.avg_buy_price_usd : 0;
+  const tokenPnlPct =
+    tokenInvestedUsd > 0 ? (tokenPnlUsd / tokenInvestedUsd) * 100 : null;
+  const isLoss = lpPnlUsd < 0 || tokenPnlUsd < 0;
+  const allImages = isLoss ? PNL_LOSS_IMAGES : PNL_PROFIT_IMAGES;
 
   const [selectedBg, setSelectedBg] = useState(allImages[0]);
   const [customImages, setCustomImages] = useState<string[]>([]);
   const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setSelectedBg(isLoss ? PNL_LOSS_IMAGES[0] : PNL_PROFIT_IMAGES[0]);
+  }, [isLoss]);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -149,34 +187,35 @@ const PnlExportDialog = ({
           {/* LP Card Preview */}
           <div className="h-full min-h-0 grow">
             {type === "summary" ? (
+              // TODO: biggest win and win rate are not exposed by the token portfolio API yet
               <PnlSummaryCard
                 ref={cardRef}
                 image={selectedBg}
-                value="+0.00%"
-                realized="+0.00%"
-                unrealized="+0.00%"
-                biggestWin="0"
-                winRate="0%"
-                timeframe="7 Days"
+                value={summary ? formatSignedUsd(summary.value) : "-"}
+                realized={summary ? formatSignedUsd(summary.realized) : "-"}
+                unrealized={summary ? formatSignedUsd(summary.unrealized) : "-"}
+                biggestWin="-"
+                winRate="-"
+                timeframe={timeframe ?? "30d"}
               />
             ) : activeView === "liquidityPosition" ? (
               <LpCard
                 ref={cardRef}
                 image={selectedBg}
-                pnl={"+16.60%"}
-                tvl={"$1.62"}
-                value={"$0.49"}
-                poolName="ANSEM-SOL"
-                timeAgo="-494,707,087:59:55"
+                pnl={formatSignedPercent(lpPnlPct)}
+                tvl={formatCompactCurrency(position?.current_value_usd ?? 0)}
+                value={formatSignedUsd(lpPnlUsd)}
+                poolName={position?.symbol ?? "LP Position"}
+                timeAgo="—"
               />
             ) : (
               <TokenCard
                 ref={cardRef}
                 image={selectedBg}
-                pnl={"+16.60%"}
-                invested="0.1 SOL"
-                value={"$0.49"}
-                tokenName="Trump"
+                pnl={formatSignedPercent(tokenPnlPct)}
+                invested={formatCompactCurrency(tokenInvestedUsd)}
+                value={formatSignedUsd(tokenPnlUsd)}
+                tokenName={token?.symbol ?? token?.mint ?? "Token"}
               />
             )}
           </div>

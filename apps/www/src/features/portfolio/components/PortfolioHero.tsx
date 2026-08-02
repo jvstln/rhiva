@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDown, ArrowDownUp, ArrowUp, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowDownUp,
+  ArrowUp,
+  Eye,
+  EyeOff,
+  RefreshCw,
+} from "lucide-react";
 
 import { useAuth } from "@/hooks";
 import { TokenDialog } from "./TokenDialog";
@@ -9,7 +16,6 @@ import { cn, currencies } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SwapDialog } from "../../transaction/components/SwapDialog";
 import { SendDialog } from "../../transaction/components/SendDialog";
-import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
 import { DepositDialog } from "../../transaction/components/DepositDialog";
 import {
   Tooltip,
@@ -24,7 +30,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function PortfolioHero() {
+type PortfolioHeroProps = {
+  totalValue?: string;
+  isError?: boolean;
+  isRetrying?: boolean;
+  onRetry?: () => void;
+};
+
+export function PortfolioHero({
+  totalValue,
+  isError,
+  isRetrying,
+  onRetry,
+}: PortfolioHeroProps) {
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
   const [balanceHidden, setBalanceHidden] = useState(false);
   const auth = useAuth();
@@ -55,7 +73,7 @@ export function PortfolioHero() {
       <div className="mt-2 flex items-center gap-2">
         <span className="font-bold text-h2 text-white">
           {selectedCurrency.symbol.length === 1 ? selectedCurrency.symbol : ""}
-          {balanceHidden ? "••••" : PORTFOLIO_SUMMARY.totalValue}
+          {balanceHidden ? "••••" : totalValue}
           {selectedCurrency.symbol.length > 1
             ? ` ${selectedCurrency.symbol}`
             : ""}
@@ -85,14 +103,16 @@ export function PortfolioHero() {
         </Select>
       </div>
 
-      <p className="mt-1 text-b-3 text-gray">
-        Today's PnL{" "}
-        {selectedCurrency.symbol.length === 1 ? selectedCurrency.symbol : ""}
-        {PORTFOLIO_SUMMARY.todaysPnl}
-        {selectedCurrency.symbol.length > 1
-          ? ` ${selectedCurrency.symbol}`
-          : ""}
-      </p>
+      {isError ? (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-2 flex items-center gap-1.5 font-medium text-b-3 text-destructive hover:underline"
+        >
+          <RefreshCw className={cn("size-3.5", isRetrying && "animate-spin")} />
+          {isRetrying ? "Retrying…" : "Failed to load balance — retry"}
+        </button>
+      ) : null}
 
       <div className="mt-6 flex min-w-xs items-center justify-center gap-3">
         <Tooltip>

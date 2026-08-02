@@ -155,7 +155,7 @@ export function LpCard(props: LpCardProps) {
           </div>
           <div>
             <PnlLabel>PNL</PnlLabel>
-            <PnlValue>{props.tvl}</PnlValue>
+            <PnlValue>{props.value}</PnlValue>
           </div>
         </div>
       </div>

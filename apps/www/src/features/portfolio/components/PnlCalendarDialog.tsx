@@ -19,10 +19,8 @@ import { Separator } from "@/components/ui/separator";
 import type { PortfolioTab } from "../portfolio.schema";
 import { Timeframe } from "@/features/market/market.schema";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import {
-  PNL_CALENDAR_DAYS,
-  PNL_CALENDAR_METRICS,
-} from "@/components/ui/data/portfolio-data";
+import type { LpCalendarDay } from "@rhivadotfun/dataapi";
+import { PNL_CALENDAR_METRICS } from "@/components/ui/data/portfolio-data";
 import {
   Select,
   SelectContent,
@@ -43,12 +41,19 @@ import {
 export function PnlCalendarDialog({
   children,
   liquidityType = "liquidityPosition",
+  calendar,
+  summary,
 }: {
   liquidityType?: PortfolioTab;
+  calendar?: LpCalendarDay[];
+  summary?: { value: number; realized: number; unrealized: number };
   children?: React.ReactElement;
 }) {
-  // Use July 2025 by default as per the mock design
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 6, 1));
+  // Open on the current month so real calendar events are visible
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [timeframe, setTimeframe] = useState<string>(
+    Timeframe.options.at(-1) ?? "30d",
+  );
 
   const handlePreviousMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -60,6 +65,9 @@ export function PnlCalendarDialog({
 
   const daysInGrid = eachDayOfInterval({ start: startDate, end: endDate });
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const calendarByDate = new Map(
+    calendar?.map((day) => [day.date, day.event_count]) ?? [],
+  );
 
   return (
     <Dialog>
@@ -138,7 +146,11 @@ export function PnlCalendarDialog({
 
           {/* Calendar Grid area */}
           <div className="flex h-full flex-1 flex-col bg-surface-2/10 p-6">
-            <SharePnl />
+            <SharePnl
+              timeframe={timeframe}
+              onTimeframeChange={setTimeframe}
+              summary={summary}
+            />
 
             <div className="mb-8 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -188,11 +200,8 @@ export function PnlCalendarDialog({
                 <div className="grid grid-cols-7 gap-1">
                   {daysInGrid.map((date) => {
                     const dateKey = format(date, "yyyy-MM-dd");
-                    const dayData = PNL_CALENDAR_DAYS[dateKey];
+                    const dayData = calendarByDate.get(dateKey);
                     const isCurrentMonth = isSameMonth(date, currentDate);
-                    // Styling active days
-                    const isProfit = dayData && dayData.pnl >= 0;
-                    const isLoss = dayData && dayData.pnl < 0;
                     return (
                       <div
                         key={dateKey}
@@ -201,8 +210,7 @@ export function PnlCalendarDialog({
                           !isCurrentMonth
                             ? "pointer-events-none opacity-0"
                             : "bg-surface-1/40",
-                          isProfit && "border-l-emerald-500 bg-emerald-500/5",
-                          isLoss && "border-l-red-500 bg-red-500/5",
+                          dayData !== undefined && "border-l-white/20",
                         )}
                       >
                         <span
@@ -213,28 +221,12 @@ export function PnlCalendarDialog({
                         >
                           {format(date, "d")}
                         </span>
-                        {dayData ? (
+                        {dayData !== undefined ? (
                           <div className="flex flex-col items-center justify-center pt-2">
-                            <span
-                              className={cn(
-                                "font-bold text-sm",
-                                isProfit ? "text-emerald-500" : "text-red-500",
-                              )}
-                            >
-                              {isProfit ? "+" : ""}
-                              {dayData.pnl < 0
-                                ? `-$${Math.abs(dayData.pnl).toFixed(2)}`
-                                : `$${dayData.pnl.toFixed(2)}`}
+                            <span className="font-bold text-sm text-white">
+                              {dayData}
                             </span>
-                            <span
-                              className={cn(
-                                "mt-0.5 text-[10px]",
-                                isProfit
-                                  ? "text-emerald-500/80"
-                                  : "text-red-500/80",
-                              )}
-                            >
-                              {dayData.positions}{" "}
+                            <span className="mt-0.5 text-[10px] text-gray">
                               {liquidityType === "tradingPosition"
                                 ? "Trades"
                                 : "Positions"}
@@ -243,7 +235,7 @@ export function PnlCalendarDialog({
                         ) : (
                           <div className="flex flex-1 items-center justify-center">
                             <span className="font-medium font-mono text-gray/40 text-sm">
-                              $0
+                              -
                             </span>
                           </div>
                         )}
@@ -264,10 +256,24 @@ export function PnlCalendarDialog({
   );
 }
 
-const SharePnl = () => {
+const SharePnl = ({
+  timeframe,
+  onTimeframeChange,
+  summary,
+}: {
+  timeframe: string;
+  onTimeframeChange: (timeframe: string) => void;
+  summary?: { value: number; realized: number; unrealized: number };
+}) => {
   return (
     <div className="mb-4 flex justify-end gap-4 pr-4">
-      <Select defaultValue={Timeframe.options.at(-1)}>
+      <Select
+        value={timeframe}
+        onValueChange={(value) => {
+          if (!value) return;
+          onTimeframeChange(value);
+        }}
+      >
         <SelectTrigger
           size="sm"
           className={"w-fit"}
@@ -289,7 +295,11 @@ const SharePnl = () => {
         </SelectContent>
       </Select>
 
-      <PnlExportDialog type="summary">
+      <PnlExportDialog
+        type="summary"
+        timeframe={timeframe}
+        summary={summary}
+      >
         <Button
           variant="outline"
           size="sm"

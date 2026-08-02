@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export function formatCompactCurrency(value?: number | string | null): string {
-  if (value === null || value === undefined) return "N/A";
+  if (value === null || value === undefined) return "-";
   const abs = Math.abs(Number(value));
   if (abs >= 1_000_000_000)
     return `$${(Number(value) / 1_000_000_000).toFixed(2)}b`;
@@ -23,9 +23,15 @@ export function formatCompactCurrency(value?: number | string | null): string {
   return `$${Number(value).toFixed(2)}`;
 }
 
+/** "+$23.45", "-$4.10" — signed USD for PnL displays */
+export function formatSignedUsd(value?: number | null): string {
+  if (value === null || value === undefined) return "-";
+  return `${value < 0 ? "-" : "+"}${formatCompactCurrency(Math.abs(value))}`;
+}
+
 /** "+23.45%", "-4.10%" */
 export function formatSignedPercent(value?: number | null, digits = 2): string {
-  if (value === null || value === undefined) return "N/A";
+  if (value === null || value === undefined) return "-";
 
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(digits)}%`;
@@ -33,7 +39,7 @@ export function formatSignedPercent(value?: number | null, digits = 2): string {
 
 /** "511", "1.2k" — used for TXNS counts */
 export function formatCompactNumber(value?: number | null): string {
-  if (value === null || value === undefined) return "N/A";
+  if (value === null || value === undefined) return "-";
 
   return new Intl.NumberFormat("en-US", { notation: "compact" }).format(value);
 }

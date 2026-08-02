@@ -9,11 +9,13 @@ import { capitalize, cn } from "@/lib/utils";
 import { PortfolioTab } from "../portfolio.schema";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { PORTFOLIO_SUMMARY } from "@/components/ui/data/portfolio-data";
+import { formatCompactCurrency, formatSignedUsd } from "@/lib/finance.util";
 import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
 import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
+import { useLiquidityPositions, useTokenPortfolio } from "../portfolio.hook";
+import { useAuth } from "@/hooks";
 
 const PortfolioPage = () => {
   const searchParams = useSearchParams();
@@ -21,9 +23,58 @@ const PortfolioPage = () => {
     searchParams.get("view"),
   );
 
+  const auth = useAuth();
+  const walletAddress = auth.authenticated ? auth.activeWallet.address : "";
+  const positions = useLiquidityPositions(walletAddress);
+  const tokenPortfolio = useTokenPortfolio(walletAddress);
+
+  const summaryStats =
+    activeView === "tradingPosition"
+      ? [
+          {
+            label: "TOTAL VALUE",
+            value: formatCompactCurrency(
+              tokenPortfolio.data?.total_wallet_worth_usd,
+            ),
+          },
+          {
+            label: "UNREALIZED PNL",
+            value: formatSignedUsd(tokenPortfolio.data?.total_pnl_usd),
+          },
+          {
+            label: "TRADEABLE BALANCE",
+            value: formatCompactCurrency(
+              tokenPortfolio.data?.total_invested_usd,
+            ),
+          },
+        ]
+      : [
+          {
+            label: "TOTAL VALUE",
+            value: formatCompactCurrency(positions.data?.total_value_usd),
+          },
+        ];
+
+  const pnlSummary = tokenPortfolio.data
+    ? {
+        value: tokenPortfolio.data.total_pnl_usd,
+        realized: tokenPortfolio.data.realized_pnl_usd,
+        unrealized:
+          tokenPortfolio.data.total_pnl_usd -
+          tokenPortfolio.data.realized_pnl_usd,
+      }
+    : undefined;
+
   return (
     <DashboardSlot className="mx-auto xl:container">
-      <PortfolioHero />
+      <PortfolioHero
+        totalValue={formatCompactCurrency(
+          tokenPortfolio.data?.total_wallet_worth_usd,
+        )}
+        isError={tokenPortfolio.isError}
+        isRetrying={tokenPortfolio.isRefetching}
+        onRetry={() => tokenPortfolio.refetch()}
+      />
 
       <div className="space-y-3">
         <div className="flex gap-3">
@@ -41,52 +92,24 @@ const PortfolioPage = () => {
 
         <div className="flex items-center justify-between rounded-xl border border-border/70 bg-card px-6 py-5">
           <div className="flex flex-wrap gap-10">
-            {[
-              {
-                label: "TOTAL VALUE",
-                value: PORTFOLIO_SUMMARY.totalValue,
-                change: PORTFOLIO_SUMMARY.totalValueChange,
-                show: true,
-              },
-              {
-                label: "UNREALIZED PNL",
-                value: PORTFOLIO_SUMMARY.unrealizedPnl,
-                show: activeView === "tradingPosition",
-              },
-              {
-                label: "TRADEABLE BALANCE",
-                value: PORTFOLIO_SUMMARY.tradeableBalance,
-                show: activeView === "tradingPosition",
-              },
-            ].map(
-              (stat) =>
-                stat.show && (
-                  <div key={stat.label}>
-                    <p className="font-medium text-b-4 text-gray tracking-wide">
-                      {stat.label}
-                    </p>
-                    <p className="mt-1 flex items-baseline gap-2">
-                      <span className="font-bold text-h6 text-white">
-                        {stat.value}
-                      </span>
-                      {stat.change && (
-                        <span
-                          className={cn(
-                            "font-medium text-b-3",
-                            stat.change.startsWith("-")
-                              ? "text-down"
-                              : "text-up",
-                          )}
-                        >
-                          {stat.change}
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                ),
-            )}
+            {summaryStats.map((stat) => (
+              <div key={stat.label}>
+                <p className="font-medium text-b-4 text-gray tracking-wide">
+                  {stat.label}
+                </p>
+                <p className="mt-1 flex items-baseline gap-2">
+                  <span className="font-bold text-h6 text-white">
+                    {stat.value}
+                  </span>
+                </p>
+              </div>
+            ))}
           </div>
-          <PnlCalendarDialog liquidityType={activeView}>
+          <PnlCalendarDialog
+            liquidityType={activeView}
+            calendar={positions.data?.calendar}
+            summary={pnlSummary}
+          >
             <Button className="min-w-24">
               <Calendar />
               PnL
@@ -95,8 +118,14 @@ const PortfolioPage = () => {
         </div>
       </div>
 
-      {activeView === "tradingPosition" && <TradingPositionsTable />}
-      {activeView === "liquidityPosition" && <LiquidityPositionsTable />}
+      {activeView === "tradingPosition" && (
+        <TradingPositionsTable positions={tokenPortfolio.data?.tokens ?? []} />
+      )}
+      {activeView === "liquidityPosition" && (
+        <LiquidityPositionsTable
+          positions={positions.data?.lp_positions || []}
+        />
+      )}
     </DashboardSlot>
   );
 };

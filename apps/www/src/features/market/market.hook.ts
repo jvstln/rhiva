@@ -31,6 +31,14 @@ export function useToken(mint: string) {
   });
 }
 
+export function useTokens(mints: string[]) {
+  return useQuery({
+    queryKey: ["tokens", mints.sort().join(",")],
+    queryFn: () => getTokens(mints),
+    enabled: mints.length > 0,
+  });
+}
+
 export function useTrendingTokens(filters: TrendingFilters) {
   return useQuery({
     queryKey: ["market", "trending"],

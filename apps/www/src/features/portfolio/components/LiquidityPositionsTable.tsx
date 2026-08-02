@@ -5,21 +5,50 @@ import { CircleDollarSign, RefreshCcwIcon, Share, X } from "lucide-react";
 
 import { capitalize } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { SolanaIcon } from "@/components/ui/icons";
 import { PnlExportDialog } from "./PnlExportDialog";
-import { LP_POSITIONS } from "@/components/ui/data/portfolio-data";
 import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { POOL_DEXES } from "@/features/liquidity/liquidity.schema";
+import { usePoolDetail } from "@/features/liquidity/liquidity.hook";
+import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
+import type { LpPosition, TokenDetail } from "@rhivadotfun/dataapi";
+import { useTokens } from "@/features/market/market.hook";
+import { useMemo } from "react";
 
-const columnHelper = createColumnHelper<(typeof LP_POSITIONS)[0]>();
+type LpPositionWithToken = LpPosition & {
+  token: { isPending: boolean; data?: TokenDetail };
+  pnlUsd: string;
+  pnlPct: string;
+  totalDeposit: string;
+  totalWithdraw: string;
+};
+
+const columnHelper = createColumnHelper<LpPositionWithToken>();
 
 const filters = ["openedPosition", "history"];
 
-const ActionCell = () => {
+const positionSymbol = (row: LpPositionWithToken) =>
+  row.symbol ?? row.token.data?.symbol;
+
+const FeeTvlCell = ({ poolAddress }: { poolAddress: string }) => {
+  const { data: pool } = usePoolDetail(poolAddress);
+  const ratio = pool?.fees_ratio;
+
+  return (
+    <p className="font-medium text-white">
+      {ratio == null ? "-" : `${(ratio * 100).toFixed(2)}%`}
+    </p>
+  );
+};
+
+const ActionCell = ({ position }: { position: LpPositionWithToken }) => {
   const activeFilter = usePortfolioStore((state) => state.liquidityFilter);
+  const handleStopPropagation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   return (
     <div className="flex items-center justify-end gap-1">
@@ -30,6 +59,7 @@ const ActionCell = () => {
             variant="soft"
             size="icon-sm"
             className="[--accent:var(--color-emerald-500)]"
+            onClick={handleStopPropagation}
           >
             <CircleDollarSign />
           </Button>
@@ -38,6 +68,7 @@ const ActionCell = () => {
             variant="soft"
             size="icon-sm"
             className="[--accent:var(--color-blue-500)]"
+            onClick={handleStopPropagation}
           >
             <RefreshCcwIcon />
           </Button>
@@ -46,14 +77,20 @@ const ActionCell = () => {
             variant="soft"
             size="icon-sm"
             className="[--accent:var(--color-red-500)]"
+            onClick={handleStopPropagation}
           >
             <X />
           </Button>
         </>
       ) : (
-        <PnlExportDialog>
-          <Button tooltip="Share" variant="ghost" size="icon-sm">
-            <Share className="text-gray" />
+        <PnlExportDialog position={position}>
+          <Button
+            tooltip="Share"
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleStopPropagation}
+          >
+            <Share className="text-muted-foreground" />
           </Button>
         </PnlExportDialog>
       )}
@@ -67,37 +104,33 @@ const columns = [
     cell: ({ row }) => (
       <div
         className="group flex items-center gap-3 transition-opacity hover:opacity-80"
-        data-pool-id={row.original.pool}
+        data-pool-id={row.original.pool_address}
       >
         <Link
-          href="/token/123"
+          href={`/token/${row.original.mint}`}
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
           <Avatar>
-            <AvatarImage />
-            <AvatarFallback>
-              <SolanaIcon className="size-4" />
-            </AvatarFallback>
+            <AvatarImage src={row.original.token.data?.logo_uri ?? ""} />
+            <AvatarFallback>{positionSymbol(row.original)}</AvatarFallback>
           </Avatar>
         </Link>
         <div>
           <Link
-            href="/token/123"
+            href={`/token/${row.original.mint}`}
             onClick={(e) => {
               e.stopPropagation();
             }}
             className="font-bold text-b-2"
           >
-            {row.original.pool}
+            {positionSymbol(row.original)}
           </Link>
           <div className="flex items-center gap-1.5">
-            <p className="text-b-5 text-gray">{row.original.timeAgo}</p>
-            {(() => {
-              const Icon = POOL_DEXES["meteora-dlmm"].icon;
-              return <Icon className="size-3" />;
-            })()}
+            <p className="text-b-5 text-muted-foreground">
+              {row.original.is_open ? "Open" : "Closed"}
+            </p>
           </div>
         </div>
       </div>
@@ -127,24 +160,48 @@ const columns = [
   columnHelper.display({
     id: "feeTvl",
     header: "24h Fee / TVL",
-    cell: () => <p className="font-medium text-white">0.53%</p>,
+    cell: ({ row }) => <FeeTvlCell poolAddress={row.original.pool_address} />,
   }),
   columnHelper.display({
     id: "action",
     header: "",
-    cell: () => <ActionCell />,
+    cell: ({ row }) => <ActionCell position={row.original} />,
   }),
 ];
 
-export const LiquidityPositionsTable = () => {
-  const activeFilter = usePortfolioStore((state) => state.liquidityFilter);
-  const setActiveFilter = usePortfolioStore(
-    (state) => state.setLiquidityFilter,
-  );
+export const LiquidityPositionsTable = ({
+  positions,
+}: {
+  positions: LpPosition[];
+}) => {
+  const filter = usePortfolioStore((state) => state.liquidityFilter);
+  const setFilter = usePortfolioStore((state) => state.setLiquidityFilter);
+
+  const tokens = useTokens(positions.map((position) => position.mint));
   const router = useRouter();
 
+  const data = useMemo(() => {
+    return positions.map((position) => {
+      const pnlUsd = (position.current_value_usd ?? 0) - position.net_amount;
+
+      return {
+        ...position,
+        token: {
+          isPending: tokens.isPending,
+          data: tokens.data?.find((token) => token.mint === position.mint),
+        },
+        totalDeposit: formatCompactCurrency(position.deposited),
+        totalWithdraw: formatCompactCurrency(position.withdrawn),
+        pnlUsd: formatCompactCurrency(pnlUsd),
+        pnlPct: formatSignedPercent(
+          position.net_amount > 0 ? (pnlUsd / position.net_amount) * 100 : null,
+        ),
+      };
+    });
+  }, [positions, tokens.data, tokens.isPending]);
+
   const table = useDataTable({
-    data: LP_POSITIONS,
+    data,
     columns,
   });
 
@@ -154,20 +211,23 @@ export const LiquidityPositionsTable = () => {
         <ToggleGroup defaultValue={["all"]}>
           <ToggleGroupItem value="all">All pools</ToggleGroupItem>
           {Object.entries(POOL_DEXES).map(([key, pool]) => (
-            <ToggleGroupItem key={key} value={key}>
+            <ToggleGroupItem
+              key={key}
+              value={key}
+            >
               <pool.icon />
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
 
         <div className="flex items-center gap-1">
-          {filters.map((filter) => (
+          {filters.map((f) => (
             <Button
               key={filter}
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => setFilter(filter)}
               variant="ghost"
               size="sm"
-              data-active={activeFilter === filter ? true : undefined}
+              data-active={f === filter ? true : undefined}
             >
               {capitalize(filter)}
             </Button>
