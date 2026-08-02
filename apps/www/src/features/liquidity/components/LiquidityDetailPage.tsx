@@ -19,10 +19,15 @@ import { QueryState } from "@/components/layout/QueryState";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CoinIcon, MeteoraIcon, SolanaIcon } from "@/components/ui/icons";
-import { LIQUIDITY_BINS } from "@/components/ui/data/liquidity-detail-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog";
+
+const LIQUIDITY_BINS = Array.from({ length: 48 }, (_, i) => ({
+  bin: i,
+  isSol: i < 22,
+  height: 20 + Math.round(Math.abs(Math.sin(i / 3)) * 70),
+}));
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -55,25 +60,20 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
         const feeLabel =
           totalFeePct > 0 ? `${totalFeePct.toFixed(2)}%` : `${p.bin_step}%`;
 
-        const activeTvlNum = (p as any).active_tvl_usd ?? p.tvl_usd ?? 0;
+        const activeTvlNum = p.active_tvl_usd ?? p.tvl_usd ?? 0;
         const volume24h = p.volume_24h_usd ?? 0;
-        const feesValue =
-          (p as any).fees_usd ?? volume24h * (totalFeePct / 100);
+        const feesValue = p.fees_usd ?? volume24h * (totalFeePct / 100);
 
         const tvlStr = formatCompactCurrency(p.tvl_usd);
         const activeTvlStr = formatCompactCurrency(activeTvlNum);
         const volumeStr = formatCompactCurrency(volume24h);
         const feesStr = formatCompactCurrency(feesValue);
-        const feesChangeStr = formatSignedPercent(
-          (p as any).fees_change_pct ?? null,
-        );
+        const feesChangeStr = formatSignedPercent(p.fees_change_pct);
         const feesRatioStr =
           activeTvlNum > 0
             ? `${((feesValue / activeTvlNum) * 100).toFixed(2)}%`
             : "N/A";
-        const feesRatioChangeStr = formatSignedPercent(
-          (p as any).fees_ratio_change_pct ?? null,
-        );
+        const feesRatioChangeStr = formatSignedPercent(p.fees_ratio_change_pct);
         const marketCapChangeStr = formatSignedPercent(p.price_change_24h_pct);
 
         return (
@@ -316,7 +316,7 @@ function StatCard({
   icon?: ReactNode;
 }) {
   return (
-    <div className="flex min-h-[100px] flex-col justify-between rounded-xl border border-border/70 bg-card/30 p-4">
+    <div className="flex min-h-25 flex-col justify-between rounded-xl border border-border/70 bg-card/30 p-4">
       <span className="text-gray text-xs">{label}</span>
       <div className="mt-2 flex items-end justify-between">
         {icon ? (

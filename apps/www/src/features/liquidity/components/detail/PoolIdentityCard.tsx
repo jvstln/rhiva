@@ -8,16 +8,16 @@ const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
 export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
   const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
   const baseSymbol =
-    pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
-  const quoteSymbol = pool.tokenB.symbol || "SOL";
+    pool.token_a?.symbol || pool.base_symbol || shortId(pool.token_a?.mint);
+  const quoteSymbol = pool.token_b?.symbol || "SOL";
   const pair = `${baseSymbol}/${quoteSymbol}`;
 
-  const totalFeePct = pool.totalFeePct ?? 0;
+  const totalFeePct = Number(pool.total_fee_pct ?? 0);
   const feeLabel =
-    totalFeePct > 0 ? `${totalFeePct}%` : `${pool.binStep ?? 0}bps`;
+    totalFeePct > 0 ? `${totalFeePct}%` : `${pool.bin_step ?? 0}bps`;
 
-  const baseUsd = pool.tvlDistribution?.base_usd ?? 0;
-  const quoteUsd = pool.tvlDistribution?.quote_usd ?? 0;
+  const baseUsd = pool.tvl_distribution?.base_usd ?? 0;
+  const quoteUsd = pool.tvl_distribution?.quote_usd ?? 0;
 
   return (
     <div className="space-y-4 border-border/70 border-b p-4">
@@ -33,7 +33,7 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
         <div>
           <p className="font-bold text-b-1 text-white">{pair}</p>
           <p className="text-b-5 text-gray">
-            Bin Step: {pool.binStep ?? "—"} Fee: {feeLabel}
+            Bin Step: {pool.bin_step ?? "—"} Fee: {feeLabel}
           </p>
         </div>
       </div>
@@ -41,12 +41,12 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
       <TokenBalanceRow
         symbol={baseSymbol}
         balance={formatCompactCurrency(baseUsd)}
-        meta={shortId(pool.tokenA.mint)}
+        meta={shortId(pool.token_a?.mint)}
       />
       <TokenBalanceRow
         symbol={quoteSymbol}
         balance={formatCompactCurrency(quoteUsd)}
-        meta={shortId(pool.tokenB.mint)}
+        meta={shortId(pool.token_b?.mint)}
       />
 
       <div>
@@ -54,8 +54,14 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
           <span className="font-medium text-white">Liquidity Distribution</span>
         </div>
         <div className="mb-2 flex items-center gap-3 text-b-5 text-gray">
-          <LegendDot className="bg-violet-500" label={baseSymbol} />
-          <LegendDot className="bg-primary" label={quoteSymbol} />
+          <LegendDot
+            className="bg-violet-500"
+            label={baseSymbol}
+          />
+          <LegendDot
+            className="bg-primary"
+            label={quoteSymbol}
+          />
         </div>
 
         <div className="relative flex h-24 items-end gap-[2px]">
@@ -73,15 +79,15 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
             <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-gray shadow ring-1 ring-border">
               Current price
               <br />
-              {pool.price ? pool.price.toExponential(4) : "N/A"} {baseSymbol}/
-              {quoteSymbol}
+              {pool.price_usd ? pool.price_usd.toExponential(4) : "N/A"}{" "}
+              {baseSymbol}/{quoteSymbol}
             </span>
             <span className="mt-1 h-full w-px flex-1 bg-white/60" />
           </div>
         </div>
         <div className="mt-1 flex justify-between text-b-5 text-gray">
-          <span>{pool.tvlDistribution?.base_pct?.toFixed(2) ?? "—"}%</span>
-          <span>{pool.tvlDistribution?.quote_pct?.toFixed(2) ?? "—"}%</span>
+          <span>{pool.tvl_distribution?.base_pct?.toFixed(2) ?? "—"}%</span>
+          <span>{pool.tvl_distribution?.quote_pct?.toFixed(2) ?? "—"}%</span>
         </div>
       </div>
     </div>

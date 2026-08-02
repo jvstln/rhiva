@@ -2,12 +2,14 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getLiquidityPools, getLiquidityPool } from "./liquidity.api";
-import type { LiquidityPoolFilters } from "./liquidity.schema";
+import { LiquidityPoolFilters } from "./liquidity.schema";
 
-export function useLiquidityPools(params: LiquidityPoolFilters = {}) {
+export function useLiquidityPools(filters: LiquidityPoolFilters = {}) {
+  const { data: dependentFilters } = LiquidityPoolFilters.safeParse(filters);
+
   return useQuery({
-    queryKey: ["liquidity", "pools", params],
-    queryFn: () => getLiquidityPools(params),
+    queryKey: ["liquidity", "pools", dependentFilters],
+    queryFn: () => getLiquidityPools(filters),
   });
 }
 

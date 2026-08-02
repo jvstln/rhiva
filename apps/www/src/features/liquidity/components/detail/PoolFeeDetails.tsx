@@ -3,36 +3,26 @@ import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import { cn } from "@/lib/utils";
 
 export function PoolFeeDetails({ pool }: { pool: LiquidityPool }) {
-  const totalFeePct = pool.totalFeePct ?? 0;
-  const volume24h = pool.volume ?? 0;
-  const activeTvl = pool.activeTvl ?? 0;
+  const totalFeePct = Number(pool.total_fee_pct ?? 0);
+  const volume24h = pool.volume_24h_usd ?? 0;
+  const activeTvl = pool.active_tvl_usd ?? 0;
 
-  const fees24hValue =
-    pool.feesUsd ?? pool.fees ?? volume24h * (totalFeePct / 100);
+  const fees24hValue = pool.fees_usd ?? volume24h * (totalFeePct / 100);
   const fees24hTvlPct = activeTvl > 0 ? (fees24hValue / activeTvl) * 100 : 0;
 
-  const feesChange = formatSignedPercent(pool.feesChange);
-  const feesRatioChange = formatSignedPercent(pool.feesRatioChange);
+  const feesChange = formatSignedPercent(pool.fees_change_pct);
+  const feesRatioChange = formatSignedPercent(pool.fees_ratio_change_pct);
 
   const feeSchedule = [
-    { label: "Bin Step", value: String(pool.binStep ?? "—") },
-    { label: "Base Fee", value: pool.baseFeePct ? `${pool.baseFeePct}%` : "—" },
-    {
-      label: "Dynamic Fee",
-      value: pool.dynamicFeePct ? `${pool.dynamicFeePct}%` : "—",
-    },
-    {
-      label: "Total Trading Fee",
-      value: pool.totalFeePct ? `${pool.totalFeePct}%` : "—",
-    },
+    { label: "Bin Step", value: String(pool.bin_step ?? "—") },
+    { label: "Base Fee", value: `${pool.base_fee_pct}%` },
+    { label: "Dynamic Fee", value: `${pool.dynamic_fee_pct}%` },
+    { label: "Total Trading Fee", value: `${pool.total_fee_pct}%` },
     {
       label: "Max Fee",
-      value: pool.maxFeePct ? `${pool.maxFeePct}%` : "—",
+      value: pool.max_fee_pct ? `${pool.max_fee_pct}%` : "—",
     },
-    {
-      label: "Protocol Fee",
-      value: pool.protocolFeePct ? `${pool.protocolFeePct}%` : "—",
-    },
+    { label: "Protocol Fee", value: `${pool.protocol_fee_pct}%` },
   ];
 
   return (
@@ -62,7 +52,7 @@ export function PoolFeeDetails({ pool }: { pool: LiquidityPool }) {
         ))}
         <div className="flex items-center justify-between py-0.5 text-b-4">
           <span className="text-gray">{"Fee Collection Token"}</span>
-          <span>{pool.feeCollectionToken ?? "Base + Quote"}</span>
+          <span>{pool.fee_collection_token ?? "Base + Quote"}</span>
         </div>
       </div>
     </div>

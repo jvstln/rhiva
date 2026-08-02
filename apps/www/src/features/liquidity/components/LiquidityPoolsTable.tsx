@@ -20,7 +20,7 @@ import {
 } from "@/lib/utils";
 import { POOL_DEXES, type PoolDex } from "../liquidity.schema";
 import { useLiquidityStore } from "../liquidity.store";
-import type { LiquidityPool } from "../liquidity.type";
+import type { PoolWithTokens } from "../liquidity.type";
 import { useRouter } from "next/navigation";
 import { QueryState } from "@/components/layout/QueryState";
 import {
@@ -28,6 +28,7 @@ import {
   LiquidityAvatar,
 } from "./tooltips/LiquidityAvatar";
 import Link from "next/link";
+import { formatDistanceToNowStrict } from "date-fns";
 
 function ValueChangeCell({
   value,
@@ -70,12 +71,12 @@ function ValueChangeCell({
 export function AddLiquidityToWatchlistButton({
   address,
 }: {
-  address: string;
+  address?: string;
 }) {
   const toggleWatchlist = useLiquidityStore((state) => state.watchlist.toggle);
   const watchlist = useLiquidityStore((state) => state.watchlist.items);
 
-  const isInWatchlist = watchlist.includes(address);
+  const isInWatchlist = watchlist.includes(address ?? "");
 
   return (
     <Button
@@ -87,6 +88,7 @@ export function AddLiquidityToWatchlistButton({
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
+        if (!address) return;
         toggleWatchlist(address);
       }}
     >
@@ -147,7 +149,10 @@ function DexSelector() {
     >
       <ToggleGroupItem value="all">All pools</ToggleGroupItem>
       {Object.entries(POOL_DEXES).map(([key, pool]) => (
-        <ToggleGroupItem key={key} value={key}>
+        <ToggleGroupItem
+          key={key}
+          value={key}
+        >
           <pool.icon />
         </ToggleGroupItem>
       ))}
@@ -155,19 +160,23 @@ function DexSelector() {
   );
 }
 
-const columnHelper = createColumnHelper<LiquidityPool>();
+const columnHelper = createColumnHelper<PoolWithTokens>();
 
-const columns: ColumnDef<LiquidityPool>[] = [
+const columns: ColumnDef<PoolWithTokens>[] = [
   columnHelper.display({
     id: "dexSelector",
     header: () => <DexSelector />,
     cell: ({ row }) => {
+      const { token_a, token_b, token_mint_a, token_mint_b } = row.original;
+      const symbolA = token_a?.symbol ?? token_mint_a.slice(0, 6);
+      const symbolB = token_b?.symbol ?? token_mint_b.slice(0, 6);
+
       return (
         <div
           className="flex items-center gap-2"
-          data-pool-id={row.original.address}
+          data-pool-id={row.original.pool_address}
         >
-          <AddLiquidityToWatchlistButton address={row.original.address} />
+          <AddLiquidityToWatchlistButton address={row.original.pool_address} />
 
           <div className="flex items-center gap-3">
             <LiquidityAvatar liquidity={row.original} />
@@ -175,26 +184,29 @@ const columns: ColumnDef<LiquidityPool>[] = [
             <div>
               <p className="flex gap-1 font-semibold text-b-2 text-white">
                 <Link
-                  href={`/token/${row.original.tokenA.mint}`}
+                  href={`/token/${token_mint_a}`}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {row.original.tokenA.symbol}
+                  {symbolA}
                 </Link>{" "}
                 /{" "}
                 <Link
-                  href={`/token/${row.original.tokenB.mint}`}
+                  href={`/token/${token_mint_b}`}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {row.original.tokenB.symbol}
+                  {symbolB}
                 </Link>
                 <LiquidityAddressCopy liquidity={row.original} />
               </p>
               <p className="text-muted-foreground text-xs">
-                Tick Spacing: {row.original.tickSpacing} Fee:{" "}
-                {row.original.fees}
+                Tick Spacing: {row.original.tick_spacing} Fee:{" "}
+                {row.original.total_fee_pct}%
               </p>
               <p className="text-muted-foreground text-xs">
-                {row.original.age.toLocaleDateString()}
+                {formatDistanceToNowStrict(row.original.age_seconds).replace(
+                  /^.*?(\d+)\s*(\w).*$/,
+                  "$1$2",
+                )}
               </p>
             </div>
           </div>
@@ -205,12 +217,12 @@ const columns: ColumnDef<LiquidityPool>[] = [
   }),
   {
     id: "marketCap",
-    accessorKey: "marketCap",
+    accessorKey: "market_cap_usd",
     header: "Market Cap",
     cell: ({ row }) => (
       <ValueChangeCell
-        value={row.original.marketCap}
-        change={row.original.marketCapChange}
+        value={row.original.market_cap_usd}
+        change={row.original.token_a?.market_cap_change_24h_pct}
         valueKind="currency"
       />
     ),
@@ -218,84 +230,78 @@ const columns: ColumnDef<LiquidityPool>[] = [
   },
   {
     id: "tvl",
-    accessorKey: "tvl",
+    accessorKey: "tvl_usd",
     header: "TVL",
     cell: ({ row }) => (
       <ValueChangeCell
-        value={row.original.tvl}
-        change={row.original.tvlChange}
+        value={row.original.tvl_usd}
+        change={null}
         valueKind="currency"
       />
     ),
     size: 100,
   },
-  {
+  columnHelper.display({
     id: "activeTvl",
-    accessorKey: "activeTvl",
     header: "Active TVL",
-    cell: ({ row }) => (
+    cell: () => (
       <ValueChangeCell
-        value={row.original.activeTvl}
-        change={row.original.activeTvlChange}
+        value={null}
+        change={null}
         valueKind="currency"
       />
     ),
     size: 100,
-  },
-  {
+  }),
+  columnHelper.display({
     id: "fees",
-    accessorKey: "fees",
     header: "Fees",
-    cell: ({ row }) => (
+    cell: () => (
       <ValueChangeCell
-        value={row.original.fees}
-        change={row.original.feesChange}
+        value={null}
+        change={null}
         valueKind="currency"
       />
     ),
-
     size: 100,
-  },
-  {
+  }),
+  columnHelper.display({
     id: "feesRatio",
-    accessorKey: "feesRatio",
     header: "Fees/Active TVL",
-    cell: ({ row }) => (
+    cell: () => (
       <ValueChangeCell
-        value={row.original.feesRatio}
-        change={row.original.feesRatioChange}
+        value={null}
+        change={null}
         valueKind="percent"
       />
     ),
-
     size: 100,
-  },
+  }),
   {
-    accessorKey: "volume",
+    id: "volume",
+    accessorKey: "volume_24h_usd",
     header: "Vol",
     cell: ({ row }) => (
       <ValueChangeCell
-        value={row.original.volume}
-        change={row.original.volumeChange}
+        value={row.original.volume_24h_usd}
+        change={row.original.volume_change_pct}
         valueKind="currency"
       />
     ),
-
     size: 100,
   },
-  {
-    accessorKey: "volumeRatio",
+  columnHelper.display({
+    id: "volumeRatio",
     header: "Vol/Active TVL",
-    cell: ({ row }) => (
+    cell: () => (
       <ValueChangeCell
-        value={row.original.volumeRatio}
-        change={row.original.volumeRatioChange}
+        value={null}
+        change={null}
         valueKind="percent"
       />
     ),
-
     size: 100,
-  },
+  }),
   columnHelper.display({
     id: "more",
     cell({ row }) {
@@ -304,56 +310,64 @@ const columns: ColumnDef<LiquidityPool>[] = [
         <Popover>
           <PopoverTrigger
             openOnHover
-            render={<Button size="sm" variant="outline" />}
+            render={
+              <Button
+                size="sm"
+                variant="outline"
+              />
+            }
           >
             More
           </PopoverTrigger>
-          <PopoverContent align="end" className="p-0">
+          <PopoverContent
+            align="end"
+            className="p-0"
+          >
             <div className="flex flex-col py-1">
               {[
                 {
                   label: "Swap",
-                  value: formatCompactCurrency(pool.swaps),
+                  value: formatCompactCurrency(pool.swaps_24h),
                   className: "text-emerald-400",
                 },
                 {
                   label: "Traders",
-                  value: pool.traders,
+                  value: formatCompactNumber(Number(pool.traders_24h)),
                   className: "text-emerald-400",
                 },
                 {
                   label: "Total LPs",
-                  value: pool.totalLps,
+                  value: formatCompactNumber(pool.total_lps),
                   className: "text-emerald-400",
                 },
                 {
                   label: "Net deposit",
-                  value: formatCompactCurrency(pool.netDeposit),
+                  value: formatCompactCurrency(null),
                   className: "text-white",
                 },
                 {
                   label: "Holders",
-                  value: formatCompactNumber(pool.holders),
+                  value: formatCompactNumber(pool.holders_count),
                   className: "text-emerald-400",
                 },
                 {
                   label: "Avg Vol/",
-                  value: formatCompactCurrency(pool.avgVolume),
+                  value: formatCompactCurrency(pool.avg_volume_usd),
                   className: "text-white",
                 },
                 {
                   label: "Min Volatility",
-                  value: formatSignedPercent(pool.minVolatility),
+                  value: formatSignedPercent(null),
                   className: "text-white",
                 },
                 {
                   label: "Top 10 Holders",
-                  value: formatSignedPercent(pool.top10Holders),
+                  value: formatSignedPercent(pool.top10_holder_pct),
                   className: "text-orange-500",
                 },
                 {
                   label: "Dev Balance",
-                  value: formatSignedPercent(pool.devBalance),
+                  value: formatSignedPercent(pool.dev_balance_pct),
                   className: "text-cyan-400",
                 },
               ].map((stat) => (
@@ -392,10 +406,11 @@ const columns: ColumnDef<LiquidityPool>[] = [
 
 export function PoolsTable() {
   const router = useRouter();
-  const pools = useLiquidityPools();
+  const filters = useLiquidityStore((s) => s.liquidityFilters);
+  const pools = useLiquidityPools(filters);
 
   const table = useDataTable({
-    data: pools.data?.pools ?? [],
+    data: pools.data ?? [],
     columns,
   });
 

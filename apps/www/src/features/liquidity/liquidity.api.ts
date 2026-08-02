@@ -42,6 +42,14 @@ export const getLiquidityPools = async (
 };
 
 export const getLiquidityPool = async (address: string) => {
-  const response = await dataapi.pools.getPoolDetail(address);
-  return response;
+  const pool = await dataapi.pools.getPoolDetail(address);
+  if (!pool) throw new Error("Pool not found");
+
+  const tokens = await getTokens([pool.token_mint_a, pool.token_mint_b]);
+
+  return {
+    ...pool,
+    token_a: tokens.find((token) => token.mint === pool.token_mint_a),
+    token_b: tokens.find((token) => token.mint === pool.token_mint_b),
+  };
 };

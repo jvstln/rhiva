@@ -1,5 +1,5 @@
-import { PoolTradeForm } from "../../../components/liquidity-detail/PoolTradeForm";
-import { PriceRangeSelector } from "../../../components/liquidity-detail/PriceRangeSelector";
+import { PoolTradeForm } from "./detail/PoolTradeForm";
+import { PriceRangeSelector } from "./detail/PriceRangeSelector";
 
 export function MeteoraTradeRail() {
   return (

@@ -7,9 +7,9 @@ import type {
 import { dataapi } from "@/lib/dataapi";
 import type { RadarFilters, TrendingFilters } from "./market.type";
 
-export const getTokens = async (mints: string[]) => {
+export const getTokens = async (mints: Array<string | undefined>) => {
   const response = await dataapi.tokens.getTokensBatch({
-    mints: mints.join(","),
+    mints: mints.filter(Boolean).join(","),
   });
   return response;
 };

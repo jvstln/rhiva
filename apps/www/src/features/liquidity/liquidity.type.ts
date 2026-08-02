@@ -1,10 +1,10 @@
 import type { PoolRow as SDKPoolRow, TokenDetail } from "@rhivadotfun/dataapi";
+import type { getLiquidityPool } from "./liquidity.api";
+import type { LiquidityPoolFilters } from "./liquidity.schema";
 
 export type LiquidityState = {
-  liquidityFilters: {
+  liquidityFilters: LiquidityPoolFilters & {
     zapIn: number | null;
-    // dex: PoolDex | null;
-    dex: SDKPoolRow["dex"] | null;
   };
   setLiquidityFilters: (
     filters: Partial<LiquidityState["liquidityFilters"]>,
@@ -23,4 +23,4 @@ export type PoolWithTokens = SDKPoolRow & {
   token_b: TokenDetail | undefined;
 };
 
-export type LiquidityPool = PoolWithTokens;
+export type LiquidityPool = Awaited<ReturnType<typeof getLiquidityPool>>;

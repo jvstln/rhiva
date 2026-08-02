@@ -6,27 +6,27 @@ import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import { formatCompactCurrency } from "@/lib/finance.util";
 import { cn } from "@/lib/utils";
 
-const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
-
 const TOKEN_INFO_KEYS = ["15m", "5m", "1h", "24h"] as const;
 
 export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
   const baseSymbol =
-    pool.tokenA.symbol || pool.baseSymbol || shortId(pool.tokenA.mint);
-  const quoteSymbol = pool.tokenB.symbol || "SOL";
+    pool.token_a?.symbol ||
+    pool.base_symbol ||
+    `${pool.token_a?.mint.slice(0, 6)}...`;
+  const quoteSymbol = pool.token_b?.symbol || "SOL";
 
   const [tokenTab, setTokenTab] = useState<
     typeof baseSymbol | typeof quoteSymbol
   >(baseSymbol);
 
-  const baseUsd = pool.tvlDistribution?.base_usd ?? 0;
-  const quoteUsd = pool.tvlDistribution?.quote_usd ?? 0;
-  const basePct = pool.tvlDistribution?.base_pct ?? 0;
-  const quotePct = pool.tvlDistribution?.quote_pct ?? 0;
+  const baseUsd = pool.tvl_distribution?.base_usd ?? 0;
+  const quoteUsd = pool.tvl_distribution?.quote_usd ?? 0;
+  const basePct = pool.tvl_distribution?.base_pct ?? 0;
+  const quotePct = pool.tvl_distribution?.quote_pct ?? 0;
   const totalPct = basePct + quotePct || 1;
 
   // Build volume series from token_stats windows
-  const windows = pool.tokenStats?.windows;
+  const windows = pool.token_stats?.windows;
   const volumeSeries = windows
     ? (["5m", "15m", "30m", "1h", "6h", "12h", "24h"] as const)
         .filter((k) => k in windows)
@@ -52,16 +52,25 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
       <div>
         <p className="font-medium text-b-3 text-white">Volume</p>
         <p className="mt-1 font-bold text-h6 text-white">
-          {formatCompactCurrency(pool.volume)}
+          {formatCompactCurrency(pool.volume_24h_usd)}
         </p>
         <div className="mt-2 h-24 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+          >
             <AreaChart
               data={volumeSeries}
               margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
             >
               <defs>
-                <linearGradient id="volFill" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id="volFill"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop
                     offset="0%"
                     stopColor="var(--primary)"

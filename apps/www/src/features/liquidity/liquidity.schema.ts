@@ -11,15 +11,15 @@ export const PoolColumns = z.enum([
 
 export const POOL_DEXES = {
   "meteora-dlmm": { icon: MeteoraIcon },
-  orca: { icon: OrcaIcon },
   "raydium-clmm": { icon: RaydiumIcon },
+  "orca-whirlpool": { icon: OrcaIcon },
 } as const;
 
 export type PoolDex = keyof typeof POOL_DEXES;
 
 export const LiquidityPoolFilters = z
   .object({
-    dex: z.enum(Object.keys(POOL_DEXES) as PoolDex[]),
+    dex: z.enum(Object.keys(POOL_DEXES) as PoolDex[]).nullish(),
     sort: z.enum(["bin_step"]),
   })
   .partial();

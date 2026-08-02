@@ -1,3 +1,3 @@
-import type { LiquidityPool } from "../../liquidity.type";
+import type { PoolWithTokens } from "../../liquidity.type";
 
-export type LiquidityInfoProps = { liquidity: LiquidityPool };
+export type LiquidityInfoProps = { liquidity: PoolWithTokens };

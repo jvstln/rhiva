@@ -24,14 +24,12 @@ type QueryStateProps<
   query: TQuery;
   children?:
     | React.ReactNode
-    | ((
-        query: Extract<TQuery, { data: NonNullable<TData> }>,
-      ) => React.ReactNode);
+    | ((query: TQuery & { data: NonNullable<TData> }) => React.ReactNode);
 
   getIsLoading?: (query: TQuery) => boolean | React.ReactNode;
   getIsError?: (query: TQuery) => boolean | string | undefined;
   getIsEmpty?: (
-    query: Extract<TQuery, { data: NonNullable<TData> }>,
+    query: TQuery & { data: NonNullable<TData> },
   ) => boolean | string | EmptyStateProps;
 };
 
@@ -82,10 +80,7 @@ const ErrorState = ({
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button
-            onClick={() => query?.refetch?.()}
-            variant="outline"
-          >
+          <Button onClick={() => query?.refetch?.()} variant="outline">
             Try Again
           </Button>
         </EmptyContent>
@@ -126,7 +121,7 @@ function hasData<
   TQuery extends Partial<UseQueryResult<TData>> = Partial<
     UseQueryResult<TData>
   >,
->(query: TQuery): query is Extract<TQuery, { data: NonNullable<TData> }> {
+>(query: TQuery): query is TQuery & { data: NonNullable<TData> } {
   return query.data !== undefined && query.data !== null;
 }
 
