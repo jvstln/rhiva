@@ -6,27 +6,48 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { LiquidityPool } from "../../liquidity.type";
+import { usePoolTokenBalances } from "../../liquidity.hook";
+import {
+  formatBalance,
+  formatPrice,
+  getActiveBinIndex,
+  getLiquidityBars,
+  getPoolPriceInQuote,
+  getPoolTokens,
+  getPriceLabels,
+  getTokenBalance,
+} from "../../liquidity.util";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const MODES = ["Spot", "Curve", "Bid-Ask"] as const;
 const RATIO_PRESETS = ["50:50", "75:25", "40:60"] as const;
-const BINS = Array.from({ length: 42 }, (_, i) => i);
+const BARS_COUNT = 42;
 
-const getBinHeight = (bin: number, mode: string) => {
-  const mid = 20.5;
-  if (mode === "Spot") return 100;
-  if (mode === "Curve") {
-    return Math.max(5, 100 * Math.exp(-((bin - mid) ** 2) / 80));
-  }
-  if (mode === "Bid-Ask") {
-    return Math.min(100, 30 + Math.abs(bin - mid) * 3.5);
-  }
-  return 50;
-};
-
-export function PoolTradeForm() {
+export function PoolTradeForm({ pool }: { pool: LiquidityPool }) {
   const [mode, setMode] = useState<(typeof MODES)[number]>("Spot");
-  const [token, setToken] = useState<"SOL" | "USDC">("SOL");
+  const [token, setToken] = useState<"base" | "quote">("base");
   const [ratio, setRatio] = useState(50);
+
+  const { base, quote } = getPoolTokens(pool);
+  const priceInQuote = getPoolPriceInQuote(pool);
+  const bars = getLiquidityBars(pool, BARS_COUNT);
+  const activeIndex = getActiveBinIndex(bars, pool.active_id);
+  const activeBinId = bars[activeIndex]?.bin_id ?? 0;
+  const priceLabels = getPriceLabels(bars, 7);
+  const centerPct =
+    bars.length > 1 ? (activeIndex / (bars.length - 1)) * 100 : 50;
+
+  const { data: balances } = usePoolTokenBalances(pool);
+  const activeToken = token === "base" ? base : quote;
+  const balance = getTokenBalance(balances, activeToken.mint);
 
   return (
     <div className="space-y-5 p-4">
@@ -50,39 +71,35 @@ export function PoolTradeForm() {
       </Tabs>
 
       <div>
-        <p className="mb-2 text-b-3 text-gray">Trade amount</p>
-        <div className="relative">
-          <Input
-            defaultValue="0.0"
-            className="h-12 border-border/70 pr-16 text-b-1"
-          />
-          <span className="absolute top-1/2 right-3 -translate-y-1/2 font-medium text-b-3 text-gray">
-            SOL
-          </span>
-        </div>
-        <div className="mt-2 flex items-center justify-between text-b-4">
-          <span className="text-gray">Balance: 0 SOL</span>
-          <span className="flex gap-3 text-gray">
-            <button
-              type="button"
-              className="hover:text-white"
+        <Field>
+          <FieldLabel>Trade amount</FieldLabel>
+          <InputGroup>
+            <InputGroupInput defaultValue="0.0" />
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>{activeToken.symbol}</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
+
+          <div className="flex items-center justify-between gap-2">
+            <FieldDescription>
+              Balance: {formatBalance(balance)} {activeToken.symbol}
+            </FieldDescription>
+
+            <ToggleGroup
+              size={"sm"}
+              onValueChange={([value]) => value}
             >
-              25%
-            </button>
-            <button
-              type="button"
-              className="hover:text-white"
-            >
-              50%
-            </button>
-            <button
-              type="button"
-              className="font-medium text-primary"
-            >
-              Max
-            </button>
-          </span>
-        </div>
+              {[25, 50, 100].map((pct) => (
+                <ToggleGroupItem
+                  key={pct}
+                  value={String(pct)}
+                >
+                  {pct}%
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
+        </Field>
       </div>
 
       <div>
@@ -94,20 +111,24 @@ export function PoolTradeForm() {
           step={1}
         />
         <div className="mt-1 flex justify-between text-b-4 text-gray">
-          <span>{ratio}% SOL</span>
-          <span>{100 - ratio}% USDC</span>
+          <span>
+            {ratio}% {base.symbol}
+          </span>
+          <span>
+            {100 - ratio}% {quote.symbol}
+          </span>
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
           <TokenToggle
-            label="SOL"
-            active={token === "SOL"}
-            onClick={() => setToken("SOL")}
+            label={base.symbol}
+            active={token === "base"}
+            onClick={() => setToken("base")}
           />
           <TokenToggle
-            label="USDC"
-            active={token === "USDC"}
-            onClick={() => setToken("USDC")}
+            label={quote.symbol}
+            active={token === "quote"}
+            onClick={() => setToken("quote")}
           />
         </div>
 
@@ -125,7 +146,7 @@ export function PoolTradeForm() {
             type="button"
             className="rounded-md border border-border/70 py-1.5 font-medium text-b-4 text-gray"
           >
-            Custom ration
+            Custom ratio
           </button>
         </div>
       </div>
@@ -134,25 +155,38 @@ export function PoolTradeForm() {
         <p className="text-center text-b-3 text-gray">
           Current Price:{" "}
           <span className="font-medium text-white">
-            0.05329 {mode === "Spot" ? "SOL per USDC" : ""}
+            {formatPrice(priceInQuote)} {quote.symbol} per {base.symbol}
           </span>
         </p>
 
         <div className="relative mt-4">
           <div className="flex h-16 items-end gap-[1px]">
-            {BINS.map((bin) => (
-              <span
-                key={bin}
-                className={cn(
-                  "flex-1",
-                  bin <= 20 ? "bg-violet-600" : "bg-primary",
-                )}
-                style={{ height: `${getBinHeight(bin, mode)}%` }}
-              />
-            ))}
+            {bars.length > 0 ? (
+              // TODO: The Spot/Curve/Bid-Ask deposit strategy shape isn't
+              // returned by the API — bars render the pool's real liquidity
+              // distribution instead of the user's projected deposit curve.
+              bars.map((bar) => (
+                <span
+                  key={bar.bin_id}
+                  className={cn(
+                    "flex-1",
+                    bar.bin_id <= activeBinId ? "bg-violet-600" : "bg-primary",
+                  )}
+                  style={{ height: `${Math.max(4, bar.height * 100)}%` }}
+                />
+              ))
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-b-4 text-gray">
+                {/* TODO: Liquidity distribution isn't available for this pool. */}
+                No liquidity data
+              </span>
+            )}
           </div>
-          {/* Center line */}
-          <div className="absolute top-[-10px] bottom-0 left-1/2 w-0.5 -translate-x-1/2 bg-white" />
+          {/* Center line at current price */}
+          <div
+            className="absolute top-[-10px] bottom-0 w-0.5 -translate-x-1/2 bg-white"
+            style={{ left: `${centerPct}%` }}
+          />
 
           {/* Bottom solid bar */}
           <div className="h-1 w-full bg-primary" />
@@ -162,15 +196,13 @@ export function PoolTradeForm() {
           <div className="absolute right-0 bottom-[-4px] h-3 w-0.5 bg-white" />
         </div>
 
-        <div className="mt-1 flex justify-between text-b-6 text-gray">
-          <span>0.05216</span>
-          <span>0.05216</span>
-          <span>0.05216</span>
-          <span>0.05216</span>
-          <span>0.05216</span>
-          <span>0.05216</span>
-          <span>0.05216</span>
-        </div>
+        {priceLabels.length > 0 && (
+          <div className="mt-1 flex justify-between text-b-6 text-gray">
+            {priceLabels.map((price) => (
+              <span key={price}>{formatPrice(price, 4)}</span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -3,15 +3,38 @@
 import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { arrayWithId, capitalize, cn } from "@/lib/utils";
+import { capitalize } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { LiquidityPool } from "../liquidity.type";
+import { usePoolTokenBalances } from "../liquidity.hook";
+import {
+  formatPrice,
+  getLiquidityBars,
+  getPoolPriceInQuote,
+  getPoolTokens,
+  getTokenBalance,
+} from "../liquidity.util";
+import {
+  LiquidityDepthChart,
+  OpenPositionButton,
+  PriceTickerLabels,
+  SummaryFees,
+  TradeAmountField,
+  YieldDepositCard,
+} from "./detail/trade-rail-shared";
 
 const TABS = ["spot"] as const;
 type Tab = (typeof TABS)[number];
 
-export function RaydiumTradeRail() {
+const PRICE_PRESETS = ["± 1%", "± 5%", "± 10%", "Custom"] as const;
+
+const parsePreset = (label: string): number | null => {
+  if (label === "Custom") return null;
+  return Number(label.replace(/[^0-9.]/g, "")) / 100;
+};
+
+export function RaydiumTradeRail({ pool }: { pool: LiquidityPool }) {
   const [tab, setTab] = useState<Tab>("spot");
 
   return (
@@ -34,206 +57,155 @@ export function RaydiumTradeRail() {
       </TabsList>
 
       <TabsContent value="spot">
-        <div className="fade-in animate-in space-y-6 p-4 duration-300">
-          <div className="text-center text-b-5 text-white">
-            Current Price: 0.05329 SOL per USDC
-          </div>
-
-          <div className="relative mt-2 flex h-24 w-full items-end gap-[1px]">
-            {arrayWithId(60).map(({ id }, i) => (
-              <div
-                key={id}
-                className={cn(
-                  "flex-1",
-                  i >= 20 && i <= 40 ? "bg-primary" : "bg-white/20",
-                )}
-                style={{ height: `${Math.max(10, Math.random() * 100)}%` }}
-              />
-            ))}
-            {/* Bottom Bar */}
-            <div className="absolute right-0 bottom-[-4px] left-0 flex h-1">
-              <div
-                className="flex-1 bg-white/20"
-                style={{ flexGrow: 20 }}
-              />
-              <div
-                className="flex-1 bg-primary"
-                style={{ flexGrow: 21 }}
-              />
-              <div
-                className="flex-1 bg-white/20"
-                style={{ flexGrow: 19 }}
-              />
-            </div>
-            {/* Handles */}
-            <div className="absolute top-0 bottom-[-16px] left-[33%] z-10 w-0.5 bg-white" />
-            <div className="absolute top-0 bottom-[-16px] left-[68%] z-10 w-0.5 bg-white" />
-            <div className="absolute bottom-[-16px] left-[33%] h-4 w-1.5 -translate-x-1/2 rounded-sm bg-white" />
-            <div className="absolute bottom-[-16px] left-[68%] h-4 w-1.5 -translate-x-1/2 rounded-sm bg-white" />
-          </div>
-
-          <div className="mt-4 flex justify-between text-[10px] text-white">
-            <span>0.05216</span>
-            <span>0.05216</span>
-            <span>0.05216</span>
-            <span>0.05216</span>
-            <span>0.05216</span>
-            <span>0.05216</span>
-            <span>0.05216</span>
-          </div>
-
-          <div className="mt-6 space-y-3">
-            <span className="text-b-4 text-gray">Price Range</span>
-            <ToggleGroup
-              variant="outline"
-              defaultValue={["± 10%"]}
-              className={"w-full *:flex-1"}
-            >
-              {["± 1%", "± 5%", "± 10%", "Custom"].map((p) => (
-                <ToggleGroupItem
-                  key={p}
-                  value={p}
-                >
-                  {p}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <span className="text-b-4 text-gray">Min Price</span>
-              <div className="flex overflow-hidden rounded-xl border border-border/40 bg-secondary/30">
-                <input
-                  type="text"
-                  defaultValue="109.493575"
-                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none"
-                />
-                <div className="flex items-center whitespace-nowrap border-border/40 border-l bg-white/5 px-4 text-gray text-sm">
-                  -0.3%
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <span className="text-b-4 text-gray">Max Price</span>
-              <div className="flex overflow-hidden rounded-xl border border-border/40 bg-secondary/30">
-                <input
-                  type="text"
-                  defaultValue="109.493575"
-                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none"
-                />
-                <div className="flex items-center whitespace-nowrap border-border/40 border-l bg-white/5 px-4 text-gray text-sm">
-                  +0.3%
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <YieldDepositCard />
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-b-4 text-gray">Deposit Amount</span>
-              <button
-                type="button"
-                className="rounded border border-border/70 p-1.5 text-gray transition-colors hover:text-white"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="relative flex min-h-[100px] flex-col justify-center rounded-xl border border-border/70 bg-secondary/30 p-4">
-              <div className="flex items-center justify-between">
-                <input
-                  type="text"
-                  defaultValue="0"
-                  className="w-full bg-transparent font-semibold text-2xl text-white outline-none"
-                />
-                <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-tr from-purple-500 to-cyan-500 font-bold text-[10px] text-white shadow-sm">
-                    S
-                  </div>
-                  <span className="font-semibold text-sm text-white">SOL</span>
-                </div>
-              </div>
-              <div className="mt-1 text-b-4 text-gray">$0.00</div>
-            </div>
-          </div>
-
-          <SummaryFees />
-
-          <div className="sticky bottom-4 bg-background py-2">
-            <Button className="w-full">Open Position</Button>
-          </div>
-        </div>
+        <RaydiumSpotTab pool={pool} />
       </TabsContent>
     </Tabs>
   );
 }
 
-function InfoRow({
-  label,
-  value,
-  isTag = false,
-}: {
-  label: string;
-  value: string;
-  isTag?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between text-b-4">
-      <div className="flex items-center gap-2 text-gray">
-        {label}
-        {isTag && (
-          <span className="rounded bg-primary/10 bg-white/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-            24H
-          </span>
-        )}
-      </div>
-      <span className="text-white">{value}</span>
-    </div>
-  );
-}
+function RaydiumSpotTab({ pool }: { pool: LiquidityPool }) {
+  const { base, quote } = getPoolTokens(pool);
+  const price = getPoolPriceInQuote(pool);
+  const bars = getLiquidityBars(pool, 60);
+  const { data: balances } = usePoolTokenBalances(pool);
 
-function YieldDepositCard() {
-  return (
-    <div className="space-y-3 rounded-xl border border-border/70 bg-transparent p-4">
-      <InfoRow
-        label="Estimated Yield"
-        value="0.028%"
-        isTag
-      />
-      <InfoRow
-        label="Deposit"
-        value="50.0% SOL / 50.0% USDC"
-      />
-    </div>
-  );
-}
+  const basePct = pool.tvl_distribution?.base_pct ?? 50;
+  const quotePct = pool.tvl_distribution?.quote_pct ?? 50;
 
-function SummaryFees() {
+  const [preset, setPreset] = useState<string>("± 10%");
+  const [minText, setMinText] = useState("");
+  const [maxText, setMaxText] = useState("");
+
+  const spread = parsePreset(preset);
+  const current = price ?? 0;
+  const minPrice =
+    spread != null ? current * (1 - spread) : parseFloat(minText) || current;
+  const maxPrice =
+    spread != null ? current * (1 + spread) : parseFloat(maxText) || current;
+
+  const applyPreset = (next: string) => {
+    setPreset(next);
+    if (next === "Custom") return;
+    const spread = parsePreset(next)!;
+    setMinText((current * (1 - spread)).toFixed(4));
+    setMaxText((current * (1 + spread)).toFixed(4));
+  };
+
+  const onMinChange = (value: string) => {
+    setPreset("Custom");
+    setMinText(value);
+  };
+
+  const onMaxChange = (value: string) => {
+    setPreset("Custom");
+    setMaxText(value);
+  };
+
+  const minOffset =
+    current > 0 && minPrice > 0
+      ? `-${(((current - minPrice) / current) * 100).toFixed(1)}%`
+      : "—";
+  const maxOffset =
+    current > 0 && maxPrice > 0
+      ? `+${(((maxPrice - current) / current) * 100).toFixed(1)}%`
+      : "—";
+
   return (
-    <div className="space-y-3 pt-2">
-      <InfoRow
-        label="Estimated Yield"
-        value="-"
-        isTag
+    <div className="fade-in animate-in space-y-6 p-4 duration-300">
+      <div className="text-center text-b-5 text-white">
+        Current Price: {formatPrice(price)} {quote.symbol} per {base.symbol}
+      </div>
+
+      <LiquidityDepthChart
+        bars={bars}
+        activeId={pool.active_id}
       />
-      <div className="my-4 h-[1px] w-full bg-border/40" />
-      <div className="flex items-center justify-between text-b-4 text-gray">
-        <span className="underline decoration-dashed underline-offset-4">
-          Non-Refundable Fees
-        </span>
-        <span className="text-white text-xs">{"<"}0.01SOL</span>
+
+      <PriceTickerLabels bars={bars} />
+
+      <div className="mt-6 space-y-3">
+        <span className="text-b-4 text-gray">Price Range</span>
+        <ToggleGroup
+          variant="outline"
+          value={[preset]}
+          onValueChange={([value]) => value && applyPreset(value)}
+          className={"w-full *:flex-1"}
+        >
+          {PRICE_PRESETS.map((p) => (
+            <ToggleGroupItem
+              key={p}
+              value={p}
+            >
+              {p}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
       </div>
-      <div className="flex items-center justify-between text-b-4 text-gray">
-        <span className="underline decoration-dashed underline-offset-4">
-          Refundable Fees
-        </span>
-        <span className="text-white text-xs">0.01SOL</span>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <span className="text-b-4 text-gray">Min Price</span>
+          <div className="flex overflow-hidden rounded-xl border border-border/40 bg-secondary/30">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={preset === "Custom" ? minText : formatPrice(minPrice, 4)}
+              onChange={(e) => onMinChange(e.target.value)}
+              className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none"
+            />
+            <div className="flex items-center whitespace-nowrap border-border/40 border-l bg-white/5 px-4 text-gray text-sm">
+              {minOffset}
+            </div>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <span className="text-b-4 text-gray">Max Price</span>
+          <div className="flex overflow-hidden rounded-xl border border-border/40 bg-secondary/30">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={preset === "Custom" ? maxText : formatPrice(maxPrice, 4)}
+              onChange={(e) => onMaxChange(e.target.value)}
+              className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none"
+            />
+            <div className="flex items-center whitespace-nowrap border-border/40 border-l bg-white/5 px-4 text-gray text-sm">
+              {maxOffset}
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div className="pt-2">
+        <YieldDepositCard
+          baseSymbol={base.symbol}
+          quoteSymbol={quote.symbol}
+          basePct={basePct}
+          quotePct={quotePct}
+        />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-b-4 text-gray">Deposit Amount</span>
+          <button
+            type="button"
+            className="rounded border border-border/70 p-1.5 text-gray transition-colors hover:text-white"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+          </button>
+        </div>
+
+        <TradeAmountField
+          symbol={base.symbol}
+          balance={getTokenBalance(balances, base.mint)}
+          priceUsd={base.priceUsd}
+          decimals={base.decimals}
+        />
+      </div>
+
+      <SummaryFees pool={pool} />
+
+      <OpenPositionButton />
     </div>
   );
 }

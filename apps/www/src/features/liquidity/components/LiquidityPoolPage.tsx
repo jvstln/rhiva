@@ -5,10 +5,11 @@ import { BackButton } from "@/components/layout/BackButton";
 import { QueryState } from "@/components/layout/QueryState";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { OrcaTradeRail } from "@/features/liquidity/components/OrcaTradeRail";
+import { PositionsPanel } from "@/features/liquidity/components/detail/PositionsPanel";
 import { PoolDetailSidebar } from "@/features/liquidity/components/detail/PoolDetailSidebar";
 import { MeteoraTradeRail } from "@/features/liquidity/components/MeteoraTradeRail";
 import { RaydiumTradeRail } from "@/features/liquidity/components/RaydiumTradeRail";
-import { PoolDetailChartPanel } from "@/features/liquidity/components/detail/PoolDetailChartPanel";
+import { PoolChart } from "@/features/tradeview/components/PoolChart";
 
 export default function LiquidityPoolPage({ id }: { id: string }) {
   const pool = useLiquidityPool(id);
@@ -25,14 +26,23 @@ export default function LiquidityPoolPage({ id }: { id: string }) {
             </ScrollArea>
 
             <ScrollArea className={"grow"}>
-              <PoolDetailChartPanel />
+              <div className="h-[60vh]">
+                <PoolChart pool={query.data} />
+              </div>
+              <PositionsPanel pool={query.data} />
               <ScrollBar showScrollBar />
             </ScrollArea>
 
             <ScrollArea className={"w-full max-w-92.5 border-l px-2 pr-4"}>
-              {query.data.dex === "meteora-dlmm" && <MeteoraTradeRail />}
-              {query.data.dex === "orca-whirlpool" && <OrcaTradeRail />}
-              {query.data.dex === "raydium-clmm" && <RaydiumTradeRail />}
+              {query.data.dex === "meteora-dlmm" && (
+                <MeteoraTradeRail pool={query.data} />
+              )}
+              {query.data.dex === "orca-whirlpool" && (
+                <OrcaTradeRail pool={query.data} />
+              )}
+              {query.data.dex === "raydium-clmm" && (
+                <RaydiumTradeRail pool={query.data} />
+              )}
               <ScrollBar showScrollBar />
             </ScrollArea>
           </main>

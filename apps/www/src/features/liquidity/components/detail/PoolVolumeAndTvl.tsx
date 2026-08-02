@@ -12,12 +12,10 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
   const baseSymbol =
     pool.token_a?.symbol ||
     pool.base_symbol ||
-    `${pool.token_a?.mint.slice(0, 6)}...`;
+    `${pool.token_a?.mint.slice(0, 6) ?? "Base"}...`;
   const quoteSymbol = pool.token_b?.symbol || "SOL";
 
-  const [tokenTab, setTokenTab] = useState<
-    typeof baseSymbol | typeof quoteSymbol
-  >(baseSymbol);
+  const [tokenTab, setTokenTab] = useState<string>(baseSymbol);
 
   const baseUsd = pool.tvl_distribution?.base_usd ?? 0;
   const quoteUsd = pool.tvl_distribution?.quote_usd ?? 0;
@@ -25,17 +23,26 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
   const quotePct = pool.tvl_distribution?.quote_pct ?? 0;
   const totalPct = basePct + quotePct || 1;
 
-  // Build volume series from token_stats windows
-  const windows = pool.token_stats?.windows;
-  const volumeSeries = windows
+  // TODO: Historical volume chart series is built from token_stats windows
+  // because a dedicated pool volume time-series endpoint is not available.
+  const poolWindows = pool.token_stats?.windows;
+  const volumeSeries = poolWindows
     ? (["5m", "15m", "30m", "1h", "6h", "12h", "24h"] as const)
-        .filter((k) => k in windows)
-        .map((k) => ({ day: k, volume: windows[k]?.volume_usd ?? 0 }))
+        .filter((k) => k in poolWindows)
+        .map((k) => ({ day: k, volume: poolWindows[k]?.volume_usd ?? 0 }))
     : [];
 
-  // Token info columns from token_stats windows
+  // Get active token's timeframe stats based on token tab selection
+  const activeStats =
+    tokenTab === baseSymbol
+      ? (pool.token_a?.timeframes ?? pool.token_stats)
+      : pool.token_b?.timeframes;
+
+  const activeWindows = activeStats?.windows;
+
+  // Token info columns for the selected token
   const tokenInfoCols = TOKEN_INFO_KEYS.map((k) => {
-    const w = windows?.[k as keyof typeof windows];
+    const w = activeWindows?.[k as keyof typeof activeWindows];
     return {
       label: k,
       value: w ? formatCompactCurrency(w.volume_usd) : "N/A",
@@ -55,51 +62,58 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
           {formatCompactCurrency(pool.volume_24h_usd)}
         </p>
         <div className="mt-2 h-24 w-full">
-          <ResponsiveContainer
-            width="100%"
-            height="100%"
-          >
-            <AreaChart
-              data={volumeSeries}
-              margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
+          {volumeSeries.length > 0 ? (
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
             >
-              <defs>
-                <linearGradient
-                  id="volFill"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop
-                    offset="0%"
-                    stopColor="var(--primary)"
-                    stopOpacity={0.5}
-                  />
-                  <stop
-                    offset="100%"
-                    stopColor="var(--primary)"
-                    stopOpacity={0}
-                  />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="day"
-                tick={{ fill: "var(--gray)", fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-                interval={1}
-              />
-              <Area
-                type="monotone"
-                dataKey="volume"
-                stroke="var(--primary)"
-                strokeWidth={2}
-                fill="url(#volFill)"
-                isAnimationActive={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+              <AreaChart
+                data={volumeSeries}
+                margin={{ top: 4, right: 0, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="volFill"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="var(--primary)"
+                      stopOpacity={0.5}
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="var(--primary)"
+                      stopOpacity={0}
+                    />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="day"
+                  tick={{ fill: "var(--gray)", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={1}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="volume"
+                  stroke="var(--primary)"
+                  strokeWidth={2}
+                  fill="url(#volFill)"
+                  isAnimationActive={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            // TODO: Time-series volume windows are unavailable for this pool.
+            <div className="flex h-full items-center justify-center text-b-5 text-gray">
+              No volume chart data
+            </div>
+          )}
         </div>
       </div>
 
@@ -107,19 +121,19 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
         <p className="font-medium text-b-3 text-white">TVL Distribution</p>
         <p className="mt-2 flex items-center gap-4 text-b-5 text-gray">
           <span className="flex items-center gap-1">
-            <span className="size-2 rounded-full bg-primary" /> {baseSymbol}
+            <span className="size-2 rounded-full bg-violet-500" /> {baseSymbol}
           </span>
           <span className="flex items-center gap-1">
-            <span className="size-2 rounded-full bg-violet-500" /> {quoteSymbol}
+            <span className="size-2 rounded-full bg-primary" /> {quoteSymbol}
           </span>
         </p>
         <div className="mt-2 flex h-2.5 overflow-hidden rounded-full bg-secondary">
           <span
-            className="h-full bg-primary"
+            className="h-full bg-violet-500"
             style={{ width: `${(basePct / totalPct) * 100}%` }}
           />
           <span
-            className="h-full bg-violet-500"
+            className="h-full bg-primary"
             style={{ width: `${(quotePct / totalPct) * 100}%` }}
           />
         </div>
@@ -139,7 +153,7 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
         <div className="mb-2 flex items-center justify-between">
           <p className="font-medium text-b-3 text-white">Token Info</p>
           <div className="flex rounded-md bg-secondary p-0.5">
-            {([baseSymbol, quoteSymbol] as const).map((t) => (
+            {[baseSymbol, quoteSymbol].map((t) => (
               <button
                 type="button"
                 key={t}
@@ -156,7 +170,7 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
         </div>
         <div className="grid grid-cols-4 gap-2">
           {tokenInfoCols.map((col) => (
-            <div key={col.value}>
+            <div key={col.label}>
               <p className="text-b-5 text-gray">{col.label}</p>
               <p className="font-medium text-b-4 text-white">{col.value}</p>
               {col.sub && (

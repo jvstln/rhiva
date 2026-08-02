@@ -4,14 +4,31 @@ import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { arrayWithId, capitalize, cn } from "@/lib/utils";
+import { capitalize } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import type { LiquidityPool } from "../liquidity.type";
+import { usePoolTokenBalances } from "../liquidity.hook";
+import {
+  formatPrice,
+  getLiquidityBars,
+  getPoolPriceInQuote,
+  getPoolTokens,
+  getTokenBalance,
+} from "../liquidity.util";
+import {
+  LiquidityDepthChart,
+  OpenPositionButton,
+  PriceTickerLabels,
+  SummaryFees,
+  TradeAmountField,
+  YieldDepositCard,
+} from "./detail/trade-rail-shared";
 
 const TABS = ["full", "custom"] as const;
 type Tab = (typeof TABS)[number];
 
-export function OrcaTradeRail() {
+export function OrcaTradeRail({ pool }: { pool: LiquidityPool }) {
   const [tab, setTab] = useState<Tab>("full");
 
   return (
@@ -33,98 +50,29 @@ export function OrcaTradeRail() {
         ))}
       </TabsList>
 
-      {tab === "full" ? <OrcaFullTab /> : <OrcaCustomTab />}
+      {tab === "full" ? (
+        <OrcaFullTab pool={pool} />
+      ) : (
+        <OrcaCustomTab pool={pool} />
+      )}
     </Tabs>
   );
 }
 
-function InfoRow({
-  label,
-  value,
-  isTag = false,
-}: {
-  label: string;
-  value: string;
-  isTag?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between text-b-4">
-      <div className="flex items-center gap-2 text-gray">
-        {label}
-        {isTag && (
-          <span className="rounded bg-white/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-            24H
-          </span>
-        )}
-      </div>
-      <span className="text-white">{value}</span>
-    </div>
-  );
-}
+function OrcaFullTab({ pool }: { pool: LiquidityPool }) {
+  const { base, quote } = getPoolTokens(pool);
+  const basePct = pool.tvl_distribution?.base_pct ?? 50;
+  const quotePct = pool.tvl_distribution?.quote_pct ?? 50;
+  const { data: balances } = usePoolTokenBalances(pool);
 
-function YieldDepositCard({
-  currencies = ["SOL", "USDC"],
-}: {
-  currencies?: Array<"SOL" | "USDC">;
-}) {
-  const solPercent =
-    currencies.length > 1
-      ? "50.0%"
-      : currencies.includes("SOL")
-        ? "100.0%"
-        : "0.0%";
-
-  const usdcPercent =
-    currencies.length > 1
-      ? "50.0%"
-      : currencies.includes("USDC")
-        ? "100.0%"
-        : "0.0%";
-
-  return (
-    <div className="space-y-3 rounded-xl border border-border/70 p-4">
-      <InfoRow
-        label="Estimated Yield"
-        value="0.028%"
-        isTag
-      />
-      <InfoRow
-        label="Deposit"
-        value={`${solPercent} SOL / ${usdcPercent} USDC`}
-      />
-    </div>
-  );
-}
-
-function SummaryFees() {
-  return (
-    <div className="space-y-3 pt-2">
-      <InfoRow
-        label="Estimated Yield"
-        value="-"
-        isTag
-      />
-      <div className="my-4 h-px w-full bg-border/40" />
-      <div className="flex items-center justify-between text-b-4 text-gray">
-        <span className="underline decoration-dashed underline-offset-4">
-          Non-Refundable Fees
-        </span>
-        <span className="text-white text-xs">{"<"}0.01SOL</span>
-      </div>
-      <div className="flex items-center justify-between text-b-4 text-gray">
-        <span className="underline decoration-dashed underline-offset-4">
-          Refundable Fees
-        </span>
-        <span className="text-white text-xs">0.01SOL</span>
-      </div>
-    </div>
-  );
-}
-
-function OrcaFullTab() {
   return (
     <div className="fade-in animate-in space-y-6 duration-300">
-      <YieldDepositCard />
+      <YieldDepositCard
+        baseSymbol={base.symbol}
+        quoteSymbol={quote.symbol}
+        basePct={basePct}
+        quotePct={quotePct}
+      />
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -137,87 +85,59 @@ function OrcaFullTab() {
           </Button>
         </div>
 
-        <div className="relative flex min-h-[100px] flex-col justify-center rounded-xl border border-border/70 bg-secondary/30 p-4">
-          <div className="flex items-center justify-between">
-            <input
-              type="text"
-              defaultValue="0"
-              className="w-full bg-transparent font-semibold text-2xl text-white outline-none"
-            />
-            <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-tr from-purple-500 to-cyan-500 font-bold text-[10px] text-white shadow-sm">
-                S
-              </div>
-              <span className="font-semibold text-sm text-white">SOL</span>
-            </div>
-          </div>
-          <div className="mt-1 text-b-4 text-gray">$0.00</div>
-        </div>
+        <TradeAmountField
+          symbol={base.symbol}
+          balance={getTokenBalance(balances, base.mint)}
+          priceUsd={base.priceUsd}
+          decimals={base.decimals}
+        />
       </div>
 
-      <SummaryFees />
+      <SummaryFees pool={pool} />
 
-      <div className="sticky bottom-4 bg-background py-2">
-        <Button className="w-full">Open Position</Button>
-      </div>
+      <OpenPositionButton />
     </div>
   );
 }
 
-function OrcaCustomTab() {
+function OrcaCustomTab({ pool }: { pool: LiquidityPool }) {
   const [tradeType, setTradeType] = useState<"full" | "single">("full");
-  const [selectedCurrency, setSelectedCurrency] = useState<"SOL" | "USDC">(
-    "SOL",
+  const [selectedCurrency, setSelectedCurrency] = useState<"base" | "quote">(
+    "base",
   );
+
+  const { base, quote } = getPoolTokens(pool);
+  const priceInQuote = getPoolPriceInQuote(pool);
+  const bars = getLiquidityBars(pool, 60);
+  const { data: balances } = usePoolTokenBalances(pool);
+
+  const activeToken = selectedCurrency === "base" ? base : quote;
+  const activePct =
+    tradeType === "full"
+      ? (pool.tvl_distribution?.base_pct ?? 50)
+      : selectedCurrency === "base"
+        ? 100
+        : 0;
+  const quotePct =
+    tradeType === "full"
+      ? (pool.tvl_distribution?.quote_pct ?? 50)
+      : selectedCurrency === "base"
+        ? 0
+        : 100;
 
   return (
     <div className="fade-in animate-in space-y-6 duration-300">
       <div className="text-center text-b-5 text-white">
-        Current Price: 0.05329 SOL per USDC
+        Current Price: {formatPrice(priceInQuote)} {quote.symbol} per{" "}
+        {base.symbol}
       </div>
 
-      <div className="relative mt-2 flex h-24 w-full items-end gap-[1px]">
-        {arrayWithId(60).map(({ id }, i) => (
-          <div
-            key={id}
-            className={cn(
-              "flex-1",
-              i >= 20 && i <= 40 ? "bg-primary" : "bg-white/20",
-            )}
-            style={{ height: `${Math.max(10, Math.random() * 100)}%` }}
-          />
-        ))}
-        {/* Bottom Bar */}
-        <div className="absolute right-0 bottom-[-4px] left-0 flex h-1">
-          <div
-            className="flex-1 bg-white/20"
-            style={{ flexGrow: 20 }}
-          />
-          <div
-            className="flex-1 bg-primary"
-            style={{ flexGrow: 21 }}
-          />
-          <div
-            className="flex-1 bg-white/20"
-            style={{ flexGrow: 19 }}
-          />
-        </div>
-        {/* Handles */}
-        <div className="absolute top-0 bottom-[-16px] left-[33%] z-10 w-0.5 bg-white" />
-        <div className="absolute top-0 bottom-[-16px] left-[68%] z-10 w-0.5 bg-white" />
-        <div className="absolute bottom-[-16px] left-[33%] h-4 w-1.5 -translate-x-1/2 rounded-sm bg-white" />
-        <div className="absolute bottom-[-16px] left-[68%] h-4 w-1.5 -translate-x-1/2 rounded-sm bg-white" />
-      </div>
+      <LiquidityDepthChart
+        bars={bars}
+        activeId={pool.active_id}
+      />
 
-      <div className="mt-4 flex justify-between text-[10px] text-white">
-        <span>0.05216</span>
-        <span>0.05216</span>
-        <span>0.05216</span>
-        <span>0.05216</span>
-        <span>0.05216</span>
-        <span>0.05216</span>
-        <span>0.05216</span>
-      </div>
+      <PriceTickerLabels bars={bars} />
 
       <div className="mt-6 space-y-3">
         <div className="flex items-center justify-between">
@@ -233,75 +153,49 @@ function OrcaCustomTab() {
           </ToggleGroup>
         </div>
 
-        <div className="relative flex flex-col justify-center rounded-xl border border-border/70 bg-secondary/30 p-4">
-          <div className="flex items-center justify-between">
-            <input
-              type="text"
-              defaultValue="0.0"
-              className="w-full bg-transparent font-semibold text-white text-xl outline-none"
-            />
-            <span className="font-semibold text-gray text-sm">SOL</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-gray text-xs">Balance: 0 SOL</span>
-          <div className="flex items-center gap-3 text-gray text-xs">
-            <ToggleGroup
-              size="sm"
-              defaultValue={["max"]}
-              spacing={0}
-            >
-              <ToggleGroupItem value="25">25%</ToggleGroupItem>
-              <ToggleGroupItem value="50">50%</ToggleGroupItem>
-              <ToggleGroupItem value="max">Max</ToggleGroupItem>
-            </ToggleGroup>
-            <Button
-              size={"icon-sm"}
-              variant={"ghost"}
-            >
-              <SlidersHorizontal />
-            </Button>
-          </div>
-        </div>
+        <TradeAmountField
+          symbol={activeToken.symbol}
+          balance={getTokenBalance(balances, activeToken.mint)}
+          priceUsd={activeToken.priceUsd}
+          decimals={activeToken.decimals}
+        />
 
         <div className="flex gap-3 pt-2 *:flex-1">
           <Button
             variant={
-              selectedCurrency.includes("SOL") || tradeType === "full"
+              selectedCurrency === "base" || tradeType === "full"
                 ? "default"
                 : "outline"
             }
-            onClick={() => setSelectedCurrency("SOL")}
+            onClick={() => setSelectedCurrency("base")}
           >
-            SOL
+            {base.symbol}
           </Button>
           <Button
             variant={
-              selectedCurrency.includes("USDC") || tradeType === "full"
+              selectedCurrency === "quote" || tradeType === "full"
                 ? "default"
                 : "outline"
             }
-            onClick={() => setSelectedCurrency("USDC")}
+            onClick={() => setSelectedCurrency("quote")}
           >
-            USDC
+            {quote.symbol}
           </Button>
         </div>
       </div>
 
       <div className="pt-2">
         <YieldDepositCard
-          currencies={
-            tradeType === "full" ? ["SOL", "USDC"] : [selectedCurrency]
-          }
+          baseSymbol={base.symbol}
+          quoteSymbol={quote.symbol}
+          basePct={activePct}
+          quotePct={quotePct}
         />
       </div>
 
-      <SummaryFees />
+      <SummaryFees pool={pool} />
 
-      <div className="sticky bottom-4 bg-background py-2">
-        <Button className="w-full">Open Position</Button>
-      </div>
+      <OpenPositionButton />
     </div>
   );
 }

@@ -13,21 +13,21 @@ import {
   XSquare,
 } from "lucide-react";
 
-import { cn, getInitials } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useLiquidityPool } from "../liquidity.hook";
 import { QueryState } from "@/components/layout/QueryState";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CoinIcon, MeteoraIcon, SolanaIcon } from "@/components/ui/icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog";
-
-const LIQUIDITY_BINS = Array.from({ length: 48 }, (_, i) => ({
-  bin: i,
-  isSol: i < 22,
-  height: 20 + Math.round(Math.abs(Math.sin(i / 3)) * 70),
-}));
+import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/LiquidityAvatar";
+import {
+  formatPrice,
+  getActiveBinIndex,
+  getLiquidityBars,
+  getPoolPriceInQuote,
+} from "@/features/liquidity/liquidity.util";
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -37,22 +37,17 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
     <QueryState query={pool}>
       {(query) => {
         const p = query.data;
-        const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
-        const currentPriceNum = p.sqrt_price ? Number(p.sqrt_price) ** 2 : 0;
+        const bars = getLiquidityBars(p, 48);
+        const activeIndex = getActiveBinIndex(bars, p.active_id);
+        const currentPriceNum = getPoolPriceInQuote(p);
         const currentPriceStr =
-          currentPriceNum > 0 ? currentPriceNum.toExponential(4) : "N/A";
+          currentPriceNum && currentPriceNum > 0
+            ? formatPrice(currentPriceNum)
+            : "N/A";
 
         const symbolA = p.token_a?.symbol ?? p.token_mint_a.slice(0, 6);
         const symbolB = p.token_b?.symbol ?? p.token_mint_b.slice(0, 6);
         const pair = `${symbolA}/${symbolB}`;
-
-        const baseToken =
-          p.token_mint_a === p.base_mint ? p.token_a : p.token_b;
-        const logoUri =
-          baseToken?.logo_uri ??
-          p.token_a?.logo_uri ??
-          p.token_b?.logo_uri ??
-          "";
 
         const totalFeePct = Number(
           p.total_fee_pct ?? p.base_fee_pct ?? p.dynamic_fee_pct ?? 0,
@@ -90,10 +85,7 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
               </Button>
 
               <div className="flex items-center gap-4">
-                <Avatar>
-                  <AvatarImage src={logoUri} />
-                  <AvatarFallback>{getInitials(pair)}</AvatarFallback>
-                </Avatar>
+                <LiquidityAvatar liquidity={p} />
                 <h1 className="flex items-center gap-2 font-bold text-xl">
                   {pair}
                   <MeteoraIcon className="size-4" />
@@ -127,17 +119,37 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   </div>
 
                   <div className="relative flex h-32 items-end gap-px">
-                    {LIQUIDITY_BINS.map((bin) => (
-                      <span
-                        key={bin.bin}
-                        className={cn(
-                          "flex-1",
-                          bin.isSol ? "bg-primary" : "bg-violet-600",
-                        )}
-                        style={{ height: `${(bin.height / maxHeight) * 100}%` }}
-                      />
-                    ))}
-                    <div className="pointer-events-none absolute inset-y-0 left-[68%] flex flex-col items-center">
+                    {bars.length > 0 ? (
+                      bars.map((bar) => (
+                        <span
+                          key={bar.bin_id}
+                          className={cn(
+                            "flex-1",
+                            bar.bin_id <= p.active_id
+                              ? "bg-violet-600"
+                              : "bg-primary",
+                          )}
+                          style={{
+                            height: `${Math.max(2, bar.height * 100)}%`,
+                          }}
+                        />
+                      ))
+                    ) : (
+                      // TODO: Liquidity distribution isn't available for this pool.
+                      <span className="flex h-full w-full items-center justify-center text-b-6 text-gray">
+                        No liquidity data
+                      </span>
+                    )}
+                    <div
+                      className="pointer-events-none absolute inset-y-0 flex flex-col items-center"
+                      style={{
+                        left: `${
+                          bars.length > 1
+                            ? (activeIndex / (bars.length - 1)) * 100
+                            : 68
+                        }%`,
+                      }}
+                    >
                       <span className="h-full w-px flex-1 bg-white" />
                     </div>
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-white" />
@@ -145,6 +157,9 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                 </div>
 
                 {/* Current Balance */}
+                {/* TODO: This legacy page only receives the pool id — it has no
+                    wallet/position context. Values below are pool-level
+                    (tvl/volume) placeholders, not the connected wallet's balance. */}
                 <div className="space-y-4 rounded-xl border border-border/70 bg-card/30 p-5">
                   <h3 className="font-medium text-gray text-sm">
                     Current Balance
@@ -164,6 +179,8 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                 </div>
 
                 {/* Your Unclaimed Swap Fee */}
+                {/* TODO: Same as above — unclaimed swap fee is wallet-specific;
+                    here pool-level fee stats stand in as placeholders. */}
                 <div className="space-y-4 rounded-xl border border-border/70 bg-card/30 p-5">
                   <h3 className="font-medium text-gray text-sm">
                     Your Unclaimed Swap Fee
@@ -214,6 +231,9 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                 </div>
 
                 {/* Position Details Panel */}
+                {/* TODO: This panel markets itself as a user position (PnL,
+                    Unclaimed Fees, Position Status) but renders pool-level stats
+                    because no wallet/position is passed to this legacy page. */}
                 <div className="relative overflow-hidden rounded-xl border border-border/70 bg-card/30 p-5">
                   <div className="mb-6">
                     <p className="font-medium text-sm">{currentPriceStr} ⇋</p>

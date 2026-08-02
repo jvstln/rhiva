@@ -43,7 +43,9 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
   const [balanceHidden, setBalanceHidden] = useState(false);
   const auth = useAuth();
 
-  const totalValue = formatCompactCurrency(query.data?.total_wallet_worth_usd);
+  const totalValue = formatCompactCurrency(
+    query.data?.total_wallet_worth_usd,
+  ).slice(1);
   const isLoading = query.isPending && query.fetchStatus !== "paused";
 
   return (

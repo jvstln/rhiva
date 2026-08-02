@@ -1,12 +1,24 @@
+import type { TokenDetail } from "@rhivadotfun/dataapi";
 import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
-import { LIQUIDITY_BINS } from "@/components/ui/data/liquidity-detail-data";
+import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/LiquidityAvatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCompactCurrency } from "@/lib/finance.util";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
+import {
+  formatPrice,
+  getActiveBinIndex,
+  getLiquidityBars,
+  getPoolPriceInQuote,
+} from "@/features/liquidity/liquidity.util";
 
 const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
 
 export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
-  const maxHeight = Math.max(...LIQUIDITY_BINS.map((b) => b.height));
+  const bars = getLiquidityBars(pool, 48);
+  const activeIndex = getActiveBinIndex(bars, pool.active_id);
+  const activeBinId = bars[activeIndex]?.bin_id ?? 0;
+  const priceInQuote = getPoolPriceInQuote(pool);
+
   const baseSymbol =
     pool.token_a?.symbol || pool.base_symbol || shortId(pool.token_a?.mint);
   const quoteSymbol = pool.token_b?.symbol || "SOL";
@@ -22,14 +34,7 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
   return (
     <div className="space-y-4 border-border/70 border-b p-4">
       <div className="flex items-center gap-3">
-        <div className="relative flex size-9 shrink-0 items-center">
-          <span className="z-10 flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-b-6 text-white ring-2 ring-card">
-            {baseSymbol[0]}
-          </span>
-          <span className="-ml-2.5 flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 font-bold text-b-6 text-white ring-2 ring-card">
-            {quoteSymbol[0]}
-          </span>
-        </div>
+        <LiquidityAvatar liquidity={pool} />
         <div>
           <p className="font-bold text-b-1 text-white">{pair}</p>
           <p className="text-b-5 text-gray">
@@ -39,14 +44,16 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
       </div>
 
       <TokenBalanceRow
+        token={pool.token_a}
         symbol={baseSymbol}
         balance={formatCompactCurrency(baseUsd)}
-        meta={shortId(pool.token_a?.mint)}
+        meta={pool.token_a?.name ?? shortId(pool.token_a?.mint)}
       />
       <TokenBalanceRow
+        token={pool.token_b}
         symbol={quoteSymbol}
         balance={formatCompactCurrency(quoteUsd)}
-        meta={shortId(pool.token_b?.mint)}
+        meta={pool.token_b?.name ?? shortId(pool.token_b?.mint)}
       />
 
       <div>
@@ -65,22 +72,35 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
         </div>
 
         <div className="relative flex h-24 items-end gap-[2px]">
-          {LIQUIDITY_BINS.map((bin) => (
-            <span
-              key={bin.bin}
-              className={cn(
-                "flex-1 rounded-t-sm",
-                bin.isSol ? "bg-primary" : "bg-violet-500",
-              )}
-              style={{ height: `${(bin.height / maxHeight) * 100}%` }}
-            />
-          ))}
-          <div className="pointer-events-none absolute inset-y-0 left-[46%] flex flex-col items-center">
+          {bars.length > 0 ? (
+            bars.map((bar) => (
+              <span
+                key={bar.bin_id}
+                className={cn(
+                  "flex-1 rounded-t-sm",
+                  bar.bin_id <= activeBinId ? "bg-violet-500" : "bg-primary",
+                )}
+                style={{ height: `${Math.max(2, bar.height * 100)}%` }}
+              />
+            ))
+          ) : (
+            // TODO: Liquidity distribution isn't available for this pool.
+            <span className="flex h-full w-full items-center justify-center text-b-6 text-gray">
+              No liquidity data
+            </span>
+          )}
+          <div
+            className="pointer-events-none absolute inset-y-0 flex flex-col items-center"
+            style={{
+              left: `${
+                bars.length > 1 ? (activeIndex / (bars.length - 1)) * 100 : 50
+              }%`,
+            }}
+          >
             <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-gray shadow ring-1 ring-border">
               Current price
               <br />
-              {pool.price_usd ? pool.price_usd.toExponential(4) : "N/A"}{" "}
-              {baseSymbol}/{quoteSymbol}
+              {formatPrice(priceInQuote)} {quoteSymbol}/{baseSymbol}
             </span>
             <span className="mt-1 h-full w-px flex-1 bg-white/60" />
           </div>
@@ -95,10 +115,12 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
 }
 
 function TokenBalanceRow({
+  token,
   symbol,
   balance,
   meta,
 }: {
+  token?: TokenDetail;
   symbol: string;
   balance: string;
   meta: string;
@@ -106,9 +128,10 @@ function TokenBalanceRow({
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-b-6 text-white">
-          {symbol[0]}
-        </span>
+        <Avatar className="size-7">
+          <AvatarImage src={token?.logo_uri ?? undefined} />
+          <AvatarFallback>{getInitials(symbol)}</AvatarFallback>
+        </Avatar>
         <div>
           <p className="font-semibold text-b-3 text-white">{symbol}</p>
           <p className="text-b-5 text-gray">{meta}</p>

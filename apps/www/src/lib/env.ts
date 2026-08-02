@@ -8,7 +8,7 @@ const envSchema = z.object({
   env: z.string().default("development"),
   appOrigin: z.url().default("https://alpha.rhiva.fun"),
   userApiUrl: z.string().default("https://api.rhiva.fun"),
-  dataApiUrl: z.string().default("https://datapi.rhiva.fun"),
+  dataApiUrl: z.string().default("https://dataapi.rhiva.fun"),
 });
 
 export const env = envSchema.parse({

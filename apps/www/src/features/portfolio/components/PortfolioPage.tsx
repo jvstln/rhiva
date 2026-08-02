@@ -14,11 +14,11 @@ import { formatCompactCurrency, formatSignedUsd } from "@/lib/finance.util";
 import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { PortfolioErrorBanner } from "./PortfolioErrorBanner";
-import { PortfolioQueryState } from "./PortfolioQueryState";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
 import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
 import { useLiquidityPositions, useTokenPortfolio } from "../portfolio.hook";
 import { useAuth } from "@/hooks";
+import { QueryState } from "@/components/layout/QueryState";
 
 const PortfolioPage = () => {
   const searchParams = useSearchParams();
@@ -138,28 +138,26 @@ const PortfolioPage = () => {
       </div>
 
       {activeView === "tradingPosition" && (
-        <PortfolioQueryState
+        <QueryState
           query={tokenPortfolio}
-          pausedEmpty="Connect your wallet to view your trading positions."
-          getIsEmpty={(data) =>
-            data.tokens.length === 0 && "No trading positions yet"
+          getIsEmpty={(q) =>
+            q.data.tokens.length === 0 && "No trading positions yet"
           }
         >
           {(query) => <TradingPositionsTable positions={query.data.tokens} />}
-        </PortfolioQueryState>
+        </QueryState>
       )}
       {activeView === "liquidityPosition" && (
-        <PortfolioQueryState
+        <QueryState
           query={positions}
-          pausedEmpty="Connect your wallet to view your liquidity positions."
-          getIsEmpty={(data) =>
-            data.lp_positions.length === 0 && "No liquidity positions yet"
+          getIsEmpty={(q) =>
+            q.data.lp_positions.length === 0 && "No liquidity positions yet"
           }
         >
           {(query) => (
             <LiquidityPositionsTable positions={query.data.lp_positions} />
           )}
-        </PortfolioQueryState>
+        </QueryState>
       )}
     </DashboardSlot>
   );
