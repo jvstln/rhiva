@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
+import { Fragment } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { capitalize, cn } from "@/lib/utils";
@@ -27,23 +27,23 @@ export function MarketToolbar() {
         className="flex items-center gap-0.5 py-2"
         aria-label="Market sections"
       >
-        {MarketView.unwrap().options.map((tab, i) => (
-          <React.Fragment key={tab}>
+        {MarketView.unwrap().options.map((tab, index) => (
+          <Fragment key={tab}>
             <Link
               href={`?view=${tab}`}
+              data-active={view === tab}
               className={buttonVariants({ variant: "ghost" })}
               aria-current={view === tab ? "page" : undefined}
-              data-active={view === tab ? true : undefined}
             >
               {capitalize(tab)}
             </Link>
-            {i === 0 && (
+            {index === 0 && (
               <span
                 className="h-4 w-px bg-white/30"
                 aria-hidden="true"
               />
             )}
-          </React.Fragment>
+          </Fragment>
         ))}
       </nav>
 

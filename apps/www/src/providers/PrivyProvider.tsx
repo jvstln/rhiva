@@ -57,7 +57,7 @@ const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
         );
     }
   }, [user, addSigners]);
-  console.log(activeWallet, user?.linkedAccounts);
+
   return (
     <AuthContext.Provider
       value={{
