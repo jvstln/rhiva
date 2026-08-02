@@ -1,8 +1,14 @@
 "use client";
 
+import type { UseQueryResult } from "@tanstack/react-query";
+import type { TokenPortfolioResponse } from "@rhivadotfun/dataapi";
+
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PortfolioErrorBanner } from "./PortfolioErrorBanner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SolanaIcon } from "../../../components/ui/icons";
+import { formatCompactCurrency } from "@/lib/finance.util";
 import { SwapDialog } from "../../transaction/components/SwapDialog";
 import {
   Dialog,
@@ -12,21 +18,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-const assets = Array.from({ length: 10 }).map((_, i) => ({
-  id: i,
-  name: "Solana",
-  symbol: "SOL",
-  price: "$187.39",
-  change: "-4.49%",
-  balance: "$25.31",
-  amount: "0.14 SOL",
-}));
+const formatTokenAmount = (amount: number) => {
+  if (amount >= 1000)
+    return amount.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return amount.toLocaleString("en-US", { maximumFractionDigits: 4 });
+};
 
 export function TokenDialog({
+  query,
   open,
   onOpenChange,
   children,
-}: React.ComponentProps<typeof Dialog> & { children: React.ReactElement }) {
+}: React.ComponentProps<typeof Dialog> & {
+  query: UseQueryResult<TokenPortfolioResponse, Error>;
+  children: React.ReactElement;
+}) {
+  const isLoading = query.isPending && query.fetchStatus !== "paused";
+  const tokens = query.data?.tokens;
+
   return (
     <Dialog
       open={open}
@@ -38,9 +47,14 @@ export function TokenDialog({
           <DialogTitle>Portfolio</DialogTitle>
         </DialogHeader>
 
-        <div className="p-5">
+        <div className="space-y-4 p-5">
+          <PortfolioErrorBanner
+            query={query}
+            message="Failed to load your tokens."
+          />
+
           {/* Portfolio Summary */}
-          <div className="mb-4 rounded-xl border border-border/70 bg-card p-5">
+          <div className="rounded-xl border border-border/70 bg-card p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-semibold text-b-4 text-gray uppercase tracking-wider">
@@ -48,11 +62,16 @@ export function TokenDialog({
                 </p>
 
                 <div className="mt-1 flex items-baseline gap-2">
-                  <h2 className="font-bold text-h4 text-white">$25.32</h2>
+                  <h2 className="font-bold text-h4 text-white">
+                    {isLoading ? (
+                      <Spinner className="size-5" />
+                    ) : (
+                      formatCompactCurrency(query.data?.total_wallet_worth_usd)
+                    )}
+                  </h2>
 
-                  <span className="font-semibold text-b-3 text-down">
-                    -4.49%
-                  </span>
+                  {/* TODO: portfolio API exposes no 24h change per wallet */}
+                  <span className="font-semibold text-b-3 text-gray">-</span>
                 </div>
               </div>
 
@@ -69,54 +88,71 @@ export function TokenDialog({
             {/* Header */}
             <div className="grid grid-cols-[2fr_1fr_1fr] border-border/70 border-b bg-muted/20 px-5 py-3 font-semibold text-b-4 text-gray uppercase tracking-wider">
               <div>TOKEN NAME</div>
-              <div>PRICE/24H CHANGE</div>
+              <div>PRICE</div>
               <div className="text-right">BALANCE</div>
             </div>
 
-            <ScrollArea className="h-[400px]">
-              {assets.map((asset) => (
-                <div
-                  key={asset.id}
-                  className="grid grid-cols-[2fr_1fr_1fr] items-center border-border/40 border-b px-5 py-3.5 transition-colors last:border-none hover:bg-white/2"
-                >
-                  {/* Token */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border/40 bg-[#141414]">
-                      <SolanaIcon className="size-4" />
+            {isLoading ? (
+              <div className="flex h-[400px] items-center justify-center">
+                <Spinner className="size-8" />
+              </div>
+            ) : query.isError ? null : tokens && tokens.length > 0 ? (
+              <ScrollArea className="h-[400px]">
+                {tokens.map((token) => (
+                  <div
+                    key={token.mint}
+                    className="grid grid-cols-[2fr_1fr_1fr] items-center border-border/40 border-b px-5 py-3.5 transition-colors last:border-none hover:bg-white/2"
+                  >
+                    {/* Token */}
+                    <div className="flex items-center gap-3">
+                      <Avatar className="size-8">
+                        <AvatarFallback>
+                          {(token.symbol ?? token.mint).slice(0, 1)}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div>
+                        <p className="font-semibold text-b-3 text-white leading-tight">
+                          {token.symbol ?? token.mint}
+                        </p>
+                        {/* TODO: portfolio API exposes no per-token 24h change */}
+                      </div>
                     </div>
 
+                    {/* Price */}
                     <div>
                       <p className="font-semibold text-b-3 text-white leading-tight">
-                        {asset.name}
+                        {formatCompactCurrency(token.current_price_usd)}
+                      </p>
+                      <p className="mt-0.5 font-semibold text-b-5 text-gray leading-tight">
+                        -
+                      </p>
+                    </div>
+
+                    {/* Balance */}
+                    <div className="text-right">
+                      <p className="font-semibold text-b-3 text-white leading-tight">
+                        {token.current_price_usd == null
+                          ? "-"
+                          : formatCompactCurrency(
+                              token.remaining * token.current_price_usd,
+                            )}
                       </p>
                       <p className="mt-0.5 text-b-5 text-gray leading-tight">
-                        {asset.symbol}
+                        {formatTokenAmount(token.remaining)}{" "}
+                        {token.symbol ?? token.mint}
                       </p>
                     </div>
                   </div>
-
-                  {/* Price */}
-                  <div>
-                    <p className="font-semibold text-b-3 text-white leading-tight">
-                      {asset.price}
-                    </p>
-                    <p className="mt-0.5 font-semibold text-b-5 text-down leading-tight">
-                      {asset.change}
-                    </p>
-                  </div>
-
-                  {/* Balance */}
-                  <div className="text-right">
-                    <p className="font-semibold text-b-3 text-white leading-tight">
-                      {asset.balance}
-                    </p>
-                    <p className="mt-0.5 text-b-5 text-gray leading-tight">
-                      {asset.amount}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </ScrollArea>
+                ))}
+              </ScrollArea>
+            ) : (
+              <div className="flex h-[400px] items-center justify-center">
+                <p className="text-b-4 text-muted-foreground">
+                  No tokens in your portfolio.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

@@ -5,6 +5,7 @@ import { CircleDollarSign, RefreshCcwIcon, Share, X } from "lucide-react";
 
 import { capitalize } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { PnlExportDialog } from "./PnlExportDialog";
 import { usePortfolioStore } from "@/features/portfolio/portfolio.store";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
@@ -33,12 +34,18 @@ const positionSymbol = (row: LpPositionWithToken) =>
   row.symbol ?? row.token.data?.symbol;
 
 const FeeTvlCell = ({ poolAddress }: { poolAddress: string }) => {
-  const { data: pool } = usePoolDetail(poolAddress);
+  const { data: pool, isPending } = usePoolDetail(poolAddress);
   const ratio = pool?.fees_ratio;
 
   return (
     <p className="font-medium text-white">
-      {ratio == null ? "-" : `${(ratio * 100).toFixed(2)}%`}
+      {isPending ? (
+        <Spinner className="size-3.5" />
+      ) : ratio == null ? (
+        "-"
+      ) : (
+        `${(ratio * 100).toFixed(2)}%`
+      )}
     </p>
   );
 };

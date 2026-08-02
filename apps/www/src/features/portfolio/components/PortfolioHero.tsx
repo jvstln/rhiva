@@ -9,11 +9,15 @@ import {
   EyeOff,
   RefreshCw,
 } from "lucide-react";
+import type { UseQueryResult } from "@tanstack/react-query";
+import type { TokenPortfolioResponse } from "@rhivadotfun/dataapi";
 
 import { useAuth } from "@/hooks";
 import { TokenDialog } from "./TokenDialog";
 import { cn, currencies } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { formatCompactCurrency } from "@/lib/finance.util";
 import { SwapDialog } from "../../transaction/components/SwapDialog";
 import { SendDialog } from "../../transaction/components/SendDialog";
 import { DepositDialog } from "../../transaction/components/DepositDialog";
@@ -31,21 +35,16 @@ import {
 } from "@/components/ui/select";
 
 type PortfolioHeroProps = {
-  totalValue?: string;
-  isError?: boolean;
-  isRetrying?: boolean;
-  onRetry?: () => void;
+  query: UseQueryResult<TokenPortfolioResponse, Error>;
 };
 
-export function PortfolioHero({
-  totalValue,
-  isError,
-  isRetrying,
-  onRetry,
-}: PortfolioHeroProps) {
+export function PortfolioHero({ query }: PortfolioHeroProps) {
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
   const [balanceHidden, setBalanceHidden] = useState(false);
   const auth = useAuth();
+
+  const totalValue = formatCompactCurrency(query.data?.total_wallet_worth_usd);
+  const isLoading = query.isPending && query.fetchStatus !== "paused";
 
   return (
     <div
@@ -71,9 +70,15 @@ export function PortfolioHero({
       </p>
 
       <div className="mt-2 flex items-center gap-2">
-        <span className="font-bold text-h2 text-white">
+        <span className="flex items-center gap-1 font-bold text-h2 text-white">
           {selectedCurrency.symbol.length === 1 ? selectedCurrency.symbol : ""}
-          {balanceHidden ? "••••" : totalValue}
+          {balanceHidden ? (
+            "••••"
+          ) : isLoading ? (
+            <Spinner className="size-8" />
+          ) : (
+            totalValue
+          )}
           {selectedCurrency.symbol.length > 1
             ? ` ${selectedCurrency.symbol}`
             : ""}
@@ -103,22 +108,25 @@ export function PortfolioHero({
         </Select>
       </div>
 
-      {isError ? (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="mt-2 flex items-center gap-1.5 font-medium text-b-3 text-destructive hover:underline"
+      {query.isError ? (
+        <Button
+          variant={"ghost"}
+          onClick={() => query.refetch()}
+          size="sm"
+          className="[--accent:var(--color-destructive)]"
         >
-          <RefreshCw className={cn("size-3.5", isRetrying && "animate-spin")} />
-          {isRetrying ? "Retrying…" : "Failed to load balance — retry"}
-        </button>
+          <RefreshCw
+            className={cn("size-3.5", query.isRefetching && "animate-spin")}
+          />
+          {query.isRefetching ? "Retrying…" : "Failed to load balance — retry"}
+        </Button>
       ) : null}
 
       <div className="mt-6 flex min-w-xs items-center justify-center gap-3">
         <Tooltip>
           {({ payload }: { payload?: string }) => (
             <>
-              <TokenDialog>
+              <TokenDialog query={query}>
                 <TooltipTrigger
                   payload={"View tokens"}
                   render={

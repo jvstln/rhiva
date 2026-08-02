@@ -83,7 +83,12 @@ const PnlExportDialog = ({
   const tokenInvestedUsd = token ? token.bought * token.avg_buy_price_usd : 0;
   const tokenPnlPct =
     tokenInvestedUsd > 0 ? (tokenPnlUsd / tokenInvestedUsd) * 100 : null;
-  const isLoss = lpPnlUsd < 0 || tokenPnlUsd < 0;
+  const isLoss =
+    type === "summary"
+      ? (summary?.value ?? 0) < 0
+      : activeView === "liquidityPosition"
+        ? lpPnlUsd < 0
+        : tokenPnlUsd < 0;
   const allImages = isLoss ? PNL_LOSS_IMAGES : PNL_PROFIT_IMAGES;
 
   const [selectedBg, setSelectedBg] = useState(allImages[0]);

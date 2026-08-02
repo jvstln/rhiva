@@ -8,10 +8,13 @@ import { useSearchParams } from "next/navigation";
 import { capitalize, cn } from "@/lib/utils";
 import { PortfolioTab } from "../portfolio.schema";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
+import { Spinner } from "@/components/ui/spinner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { formatCompactCurrency, formatSignedUsd } from "@/lib/finance.util";
 import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
+import { PortfolioErrorBanner } from "./PortfolioErrorBanner";
+import { PortfolioQueryState } from "./PortfolioQueryState";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
 import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
 import { useLiquidityPositions, useTokenPortfolio } from "../portfolio.hook";
@@ -65,16 +68,14 @@ const PortfolioPage = () => {
       }
     : undefined;
 
+  const statsQuery =
+    activeView === "tradingPosition" ? tokenPortfolio : positions;
+  const isStatsLoading =
+    statsQuery.isPending && statsQuery.fetchStatus !== "paused";
+
   return (
     <DashboardSlot className="mx-auto xl:container">
-      <PortfolioHero
-        totalValue={formatCompactCurrency(
-          tokenPortfolio.data?.total_wallet_worth_usd,
-        )}
-        isError={tokenPortfolio.isError}
-        isRetrying={tokenPortfolio.isRefetching}
-        onRetry={() => tokenPortfolio.refetch()}
-      />
+      <PortfolioHero query={tokenPortfolio} />
 
       <div className="space-y-3">
         <div className="flex gap-3">
@@ -90,6 +91,19 @@ const PortfolioPage = () => {
           ))}
         </div>
 
+        {activeView === "tradingPosition" && (
+          <PortfolioErrorBanner
+            query={tokenPortfolio}
+            message="Failed to load your trading positions."
+          />
+        )}
+        {activeView === "liquidityPosition" && (
+          <PortfolioErrorBanner
+            query={positions}
+            message="Failed to load your liquidity positions."
+          />
+        )}
+
         <div className="flex items-center justify-between rounded-xl border border-border/70 bg-card px-6 py-5">
           <div className="flex flex-wrap gap-10">
             {summaryStats.map((stat) => (
@@ -99,7 +113,11 @@ const PortfolioPage = () => {
                 </p>
                 <p className="mt-1 flex items-baseline gap-2">
                   <span className="font-bold text-h6 text-white">
-                    {stat.value}
+                    {isStatsLoading ? (
+                      <Spinner className="size-5" />
+                    ) : (
+                      stat.value
+                    )}
                   </span>
                 </p>
               </div>
@@ -107,7 +125,8 @@ const PortfolioPage = () => {
           </div>
           <PnlCalendarDialog
             liquidityType={activeView}
-            calendar={positions.data?.calendar}
+            tokenPortfolioQuery={tokenPortfolio}
+            positionsQuery={positions}
             summary={pnlSummary}
           >
             <Button className="min-w-24">
@@ -119,12 +138,28 @@ const PortfolioPage = () => {
       </div>
 
       {activeView === "tradingPosition" && (
-        <TradingPositionsTable positions={tokenPortfolio.data?.tokens ?? []} />
+        <PortfolioQueryState
+          query={tokenPortfolio}
+          pausedEmpty="Connect your wallet to view your trading positions."
+          getIsEmpty={(data) =>
+            data.tokens.length === 0 && "No trading positions yet"
+          }
+        >
+          {(query) => <TradingPositionsTable positions={query.data.tokens} />}
+        </PortfolioQueryState>
       )}
       {activeView === "liquidityPosition" && (
-        <LiquidityPositionsTable
-          positions={positions.data?.lp_positions || []}
-        />
+        <PortfolioQueryState
+          query={positions}
+          pausedEmpty="Connect your wallet to view your liquidity positions."
+          getIsEmpty={(data) =>
+            data.lp_positions.length === 0 && "No liquidity positions yet"
+          }
+        >
+          {(query) => (
+            <LiquidityPositionsTable positions={query.data.lp_positions} />
+          )}
+        </PortfolioQueryState>
       )}
     </DashboardSlot>
   );
