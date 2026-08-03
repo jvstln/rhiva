@@ -107,7 +107,10 @@ function PairInfoCell({ token }: { token: TokenDetail }) {
     ? new Date(Number(token.live.updated_at))
     : new Date();
   return (
-    <div data-token-id={token.mint} className="flex items-center gap-3">
+    <div
+      data-token-id={token.mint}
+      className="flex items-center gap-3"
+    >
       <AddTokenToWatchlistButton mint={token.mint} />
       <TokenAvatar token={token} />
 
@@ -198,7 +201,10 @@ function ActionButtons() {
   return (
     <div className="flex items-center justify-start gap-2">
       {quickSell !== null && (
-        <Button variant="sell" size="sm">
+        <Button
+          variant="sell"
+          size="sm"
+        >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
           </span>

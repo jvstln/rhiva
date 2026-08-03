@@ -56,11 +56,20 @@ const LiquidityPage = () => {
           </DashboardDescription>
         </div>
         <div className="flex gap-5">
-          <SummaryStat label="Total Value Locked" value={stats.tvl} />
+          <SummaryStat
+            label="Total Value Locked"
+            value={stats.tvl}
+          />
           <Separator orientation="vertical" />
-          <SummaryStat label="24H Volume" value={stats.volume24h} />
+          <SummaryStat
+            label="24H Volume"
+            value={stats.volume24h}
+          />
           <Separator orientation="vertical" />
-          <SummaryStat label="24H Fees" value={stats.fees24h} />
+          <SummaryStat
+            label="24H Fees"
+            value={stats.fees24h}
+          />
         </div>
       </div>
 

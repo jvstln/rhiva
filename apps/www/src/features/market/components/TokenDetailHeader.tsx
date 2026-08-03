@@ -150,7 +150,11 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
           </React.Fragment>
         ))}
       </div>
-      <ScrollBar orientation="horizontal" showIndicator showScrollBar={false} />
+      <ScrollBar
+        orientation="horizontal"
+        showIndicator
+        showScrollBar={false}
+      />
     </ScrollArea>
   );
 }

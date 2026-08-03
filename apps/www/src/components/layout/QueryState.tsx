@@ -80,7 +80,10 @@ const ErrorState = ({
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button onClick={() => query?.refetch?.()} variant="outline">
+          <Button
+            onClick={() => query?.refetch?.()}
+            variant="outline"
+          >
             Try Again
           </Button>
         </EmptyContent>

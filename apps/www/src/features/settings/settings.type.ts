@@ -1,10 +1,13 @@
 import z from "zod";
 import { feeConfig } from "@rhivadotfun/api";
+import type { PoolDex } from "@/features/liquidity/liquidity.schema";
 import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
 
 export type RebalancingType = "swap" | "swapless";
 export type PriorityLevel = "fast" | "turbo" | "ultra";
 export type BroadcastMode = "priority-fee" | "jito-only" | "mixed";
+export type BinRangeMode = "custom" | "quote" | "base";
+export type SlippageMode = "0.1" | "0.5" | "1" | "custom" | "dynamic";
 
 export type BuySellMode = "buy" | "sell";
 export type TradingPresetId = "preset-1" | "preset-2" | "preset-3";
@@ -49,24 +52,33 @@ export type TransactionSettings = BaseTransactionSettings &
       }
   );
 
-export interface DlmmSettings {
+export interface LpSettings {
   liquiditySlippage: number;
   swapSlippage?: number;
 }
 
-export interface ZapInSettings {
+export interface ZapInDexSettings {
   amount: number;
-  swapSlippage?: number;
-  swapPriceImpact?: number;
   liquiditySlippage: number;
-  curveType: keyof typeof Strategy;
-  side: "base" | "quote" | "custom";
+  liquiditySlippageMode: SlippageMode;
+  swapSlippage: number;
+  swapSlippageMode: SlippageMode;
+  binRangeMode: BinRangeMode;
   rangeFromCurrentPrice: [number, number];
   priceChangesFromCurrentPrice: [number, number];
   inputToken: {
     mint: string;
     decimals: number;
   };
+}
+
+export interface ZapInState {
+  dex: PoolDex;
+  curveType: keyof typeof Strategy;
+  settings: Record<PoolDex, ZapInDexSettings>;
+  setDex: (dex: PoolDex) => void;
+  setCurveType: (curveType: keyof typeof Strategy) => void;
+  setSettings: (settings: Partial<ZapInDexSettings>) => void;
 }
 
 export interface ZapOutSettings {
@@ -86,14 +98,13 @@ export interface TradingSettings {
 
 export interface SettingsState {
   transaction: TransactionSettings;
-  dlmm: DlmmSettings;
-  zapIn: ZapInSettings;
+  lp: LpSettings;
+  zapIn: ZapInState;
   zapOut: ZapOutSettings;
   trading: TradingSettings;
   notifications: NotificationSettings[];
   setTransactionSettings: (settings: Partial<TransactionSettings>) => void;
-  setDlmmSettings: (settings: Partial<DlmmSettings>) => void;
-  setZapInSettings: (settings: Partial<ZapInSettings>) => void;
+  setLpSettings: (settings: Partial<LpSettings>) => void;
   setZapOutSettings: (settings: Partial<ZapOutSettings>) => void;
   setTradingSettings: (
     settings: Partial<Omit<TradingSettings, "presets">>,

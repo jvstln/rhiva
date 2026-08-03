@@ -1,14 +1,19 @@
 import { merge } from "lodash";
+import type { WritableDraft } from "immer";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { devtools, persist } from "zustand/middleware";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
+import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
+import type { PoolDex } from "@/features/liquidity/liquidity.schema";
+
 import type {
-  DlmmSettings,
+  LpSettings,
   SettingsState,
   TradingConfig,
-  ZapInSettings,
+  ZapInDexSettings,
+  ZapInState,
   TradingPresetConfig,
   TransactionSettings,
   ZapOutSettings,
@@ -29,15 +34,17 @@ const defaultTransactionSettings: TransactionSettings = {
   rebalancingType: "swap",
 };
 
-const defaultDlmmSettings: DlmmSettings = {
+const defaultLpSettings: LpSettings = {
   liquiditySlippage: 2,
 };
 
-const defaultZapInSettings: ZapInSettings = {
+const defaultZapInDexSettings: ZapInDexSettings = {
   amount: 0.1,
-  curveType: "Spot",
-  side: "custom",
   liquiditySlippage: 0.2,
+  liquiditySlippageMode: "custom",
+  swapSlippage: 0.5,
+  swapSlippageMode: "custom",
+  binRangeMode: "custom",
   rangeFromCurrentPrice: [34, 35],
   priceChangesFromCurrentPrice: [0.1, 0.1],
   inputToken: {
@@ -45,6 +52,43 @@ const defaultZapInSettings: ZapInSettings = {
     mint: NATIVE_MINT.toBase58(),
   },
 };
+
+const defaultZapInState: Omit<
+  ZapInState,
+  "setDex" | "setCurveType" | "setSettings"
+> = {
+  dex: "meteora-dlmm",
+  curveType: "Spot",
+  settings: {
+    "meteora-dlmm": { ...defaultZapInDexSettings },
+    "orca-whirlpool": { ...defaultZapInDexSettings },
+    "raydium-clmm": { ...defaultZapInDexSettings },
+  },
+};
+
+const createDefaultZapInState = (
+  set: (fn: (state: WritableDraft<SettingsState>) => void) => void,
+): ZapInState => ({
+  ...defaultZapInState,
+  setDex(dex: PoolDex) {
+    set((state) => {
+      state.zapIn.dex = dex;
+    });
+  },
+  setCurveType(curveType: keyof typeof Strategy) {
+    set((state) => {
+      state.zapIn.curveType = curveType;
+    });
+  },
+  setSettings(settings: Partial<ZapInDexSettings>) {
+    set((state) => {
+      if (!state.zapIn.settings[state.zapIn.dex]) {
+        state.zapIn.dex = "meteora-dlmm";
+      }
+      merge(state.zapIn.settings[state.zapIn.dex], settings);
+    });
+  },
+});
 
 const defaultZapOutSettings: ZapOutSettings = {
   liquiditySlippage: 0.2,
@@ -63,88 +107,86 @@ const defaultNotifications = [
 export const useSettingsStore = create<SettingsState>()(
   devtools(
     persist(
-      immer((set) => ({
-        zapOut: { ...defaultZapOutSettings },
-        dlmm: { ...defaultDlmmSettings },
-        zapIn: { ...defaultZapInSettings },
-        transaction: { ...defaultTransactionSettings },
-        trading: {
-          activePreset: "preset-1",
-          activeBuySellMode: "buy",
-          presets: {
-            "preset-1": { ...defaultPresetConfig },
-            "preset-2": { ...defaultPresetConfig },
-            "preset-3": { ...defaultPresetConfig },
+      immer(
+        (set): SettingsState => ({
+          zapOut: { ...defaultZapOutSettings },
+          lp: { ...defaultLpSettings },
+          zapIn: createDefaultZapInState(set),
+          transaction: { ...defaultTransactionSettings },
+          trading: {
+            activePreset: "preset-1",
+            activeBuySellMode: "buy",
+            presets: {
+              "preset-1": { ...defaultPresetConfig },
+              "preset-2": { ...defaultPresetConfig },
+              "preset-3": { ...defaultPresetConfig },
+            },
           },
-        },
-        notifications: [...defaultNotifications],
+          notifications: [...defaultNotifications],
 
-        setTransactionSettings: (settings) => {
-          set((state) => {
-            merge(state.transaction, settings);
-          });
-        },
+          setTransactionSettings: (settings) => {
+            set((state) => {
+              merge(state.transaction, settings);
+            });
+          },
 
-        setDlmmSettings: (settings) => {
-          set((state) => {
-            merge(state.dlmm, settings);
-          });
-        },
+          setLpSettings: (settings) => {
+            set((state) => {
+              merge(state.lp, settings);
+            });
+          },
 
-        setZapOutSettings: (settings) => {
-          set((state) => {
-            merge(state.zapOut, settings);
-          });
-        },
+          setZapOutSettings: (settings) => {
+            set((state) => {
+              merge(state.zapOut, settings);
+            });
+          },
 
-        setZapInSettings: (settings) => {
-          set((state) => {
-            merge(state.zapIn, settings);
-          });
-        },
+          setTradingSettings: (settings) => {
+            set((state) => {
+              merge(state.trading, settings);
+            });
+          },
 
-        setTradingSettings: (settings) => {
-          set((state) => {
-            merge(state.trading, settings);
-          });
-        },
+          updateTradingConfig: (presetId, mode, config) => {
+            set((state) => {
+              if (!state.trading.presets[presetId]) {
+                state.trading.presets[presetId] = { ...defaultPresetConfig };
+              }
+              merge(state.trading.presets[presetId][mode], config);
+            });
+          },
 
-        updateTradingConfig: (presetId, mode, config) => {
-          set((state) => {
-            if (!state.trading.presets[presetId]) {
-              state.trading.presets[presetId] = { ...defaultPresetConfig };
-            }
-            merge(state.trading.presets[presetId][mode], config);
-          });
-        },
+          toggleNotification: (id) => {
+            set((state) => {
+              const setting = state.notifications.find(
+                (item) => item.id === id,
+              );
+              if (setting) {
+                setting.enabled = !setting.enabled;
+              }
+            });
+          },
 
-        toggleNotification: (id) => {
-          set((state) => {
-            const setting = state.notifications.find((item) => item.id === id);
-            if (setting) {
-              setting.enabled = !setting.enabled;
-            }
-          });
-        },
-
-        resetAllSettings: () => {
-          set((state) => {
-            state.transaction = { ...defaultTransactionSettings };
-            state.dlmm = { ...defaultDlmmSettings };
-            state.zapIn = { ...defaultZapInSettings };
-            state.trading = {
-              activePreset: "preset-1",
-              activeBuySellMode: "buy",
-              presets: {
-                "preset-1": { ...defaultPresetConfig },
-                "preset-2": { ...defaultPresetConfig },
-                "preset-3": { ...defaultPresetConfig },
-              },
-            };
-            state.notifications = [...defaultNotifications];
-          });
-        },
-      })),
+          resetAllSettings: () => {
+            set((state) => {
+              state.transaction = { ...defaultTransactionSettings };
+              state.lp = { ...defaultLpSettings };
+              state.zapIn = createDefaultZapInState(set);
+              state.trading = {
+                activePreset: "preset-1",
+                activeBuySellMode: "buy",
+                presets: {
+                  "preset-1": { ...defaultPresetConfig },
+                  "preset-2": { ...defaultPresetConfig },
+                  "preset-3": { ...defaultPresetConfig },
+                },
+              };
+              state.notifications = [...defaultNotifications];
+            });
+          },
+        }),
+      ),
       {
         name: "rhiva.settings",
         merge: (persistedState, currentState) =>

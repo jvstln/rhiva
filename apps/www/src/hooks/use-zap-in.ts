@@ -6,19 +6,19 @@ import type { jitoConfigSchema } from "@rhivadotfun/api";
 import { useUserApi } from "./use-user-api";
 import { useSettingsStore } from "@/features/settings/settings.store";
 import { toJitoPriorityLevel } from "@/features/settings/settings.util";
+import type { PoolDex } from "@/features/liquidity/liquidity.schema";
 
 type ZapInParams = {
   pool: string;
   amount?: number;
-  dex: "meteora-dlmm" | "orca" | "raydium-clmm";
+  dex: PoolDex;
 };
 
 export const useZapIn = (params: ZapInParams) => {
   const userApi = useUserApi();
-  const [zapInSettings, transactionSettings] = useSettingsStore((store) => [
-    store.zapIn,
-    store.transaction,
-  ]);
+  const [zapIn, transactionSettings] = useSettingsStore(
+    (store) => [store.zapIn, store.transaction] as const,
+  );
 
   const jitoConfig: z.infer<typeof jitoConfigSchema> = useMemo(() => {
     if (transactionSettings.broadcastMode === "jito-only")
@@ -38,17 +38,16 @@ export const useZapIn = (params: ZapInParams) => {
   }, [transactionSettings]);
 
   return useCallback(() => {
-    const rawAmount = params.amount ? params.amount : zapInSettings.amount;
-    const [minDeltaId, maxDeltaId] = zapInSettings.rangeFromCurrentPrice;
+    const dexSettings = zapIn.settings[params.dex];
+    const rawAmount = params.amount ? params.amount : dexSettings.amount;
+    const [minDeltaId, maxDeltaId] = dexSettings.rangeFromCurrentPrice;
     const slippage = {
-      liquidity: zapInSettings.liquiditySlippage,
-      swap: zapInSettings.swapSlippage
-        ? zapInSettings.swapSlippage
-        : ("dynamic" as const),
+      liquidity: dexSettings.liquiditySlippage,
+      swap: dexSettings.swapSlippage,
     };
 
-    const inputMint = zapInSettings.inputToken.mint;
-    const inputDecimals = zapInSettings.inputToken.decimals;
+    const inputMint = dexSettings.inputToken.mint;
+    const inputDecimals = dexSettings.inputToken.decimals;
 
     const amount = rawAmount * Math.pow(10, inputDecimals);
 
@@ -68,12 +67,12 @@ export const useZapIn = (params: ZapInParams) => {
           liquidityRatio,
           pool: params.pool,
           action: "open-position",
-          strategy: Strategy[zapInSettings.curveType],
+          strategy: Strategy[zapIn.curveType],
         });
       }
-      case "orca": {
+      case "orca-whirlpool": {
         const [lowerPriceChange, upperPriceChange] =
-          zapInSettings.priceChangesFromCurrentPrice;
+          dexSettings.priceChangesFromCurrentPrice;
         const priceChange = lowerPriceChange + upperPriceChange;
         const xRatio = lowerPriceChange / priceChange;
         const yRatio = upperPriceChange / priceChange;
@@ -94,7 +93,7 @@ export const useZapIn = (params: ZapInParams) => {
           liquidityRatio,
           pool: params.pool,
           action: "open-position",
-          priceChanges: zapInSettings.priceChangesFromCurrentPrice,
+          priceChanges: dexSettings.priceChangesFromCurrentPrice,
         });
       }
       case "raydium-clmm":
@@ -106,8 +105,8 @@ export const useZapIn = (params: ZapInParams) => {
           jitoConfig,
           pool: params.pool,
           action: "open-position",
-          priceChanges: zapInSettings.priceChangesFromCurrentPrice,
+          priceChanges: dexSettings.priceChangesFromCurrentPrice,
         });
     }
-  }, [params, userApi, zapInSettings, jitoConfig]);
+  }, [params, userApi, zapIn, jitoConfig]);
 };

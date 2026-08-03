@@ -4,7 +4,6 @@
 /* Shared types                                                         */
 /* ------------------------------------------------------------------ */
 
-import { Info } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -22,17 +21,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ZapInTab } from "./ZapInTab";
 
 type SettingsTabId =
   | "transaction"
-  | "dlmm"
+  | "lp"
   | "zap-in"
   | "trading-settings"
   | "others";
 
 const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
   { id: "transaction", label: "Transaction" },
-  { id: "dlmm", label: "DLMM" },
+  { id: "lp", label: "LP" },
   { id: "zap-in", label: "Zap In" },
   { id: "trading-settings", label: "Trading Settings" },
   { id: "others", label: "Others" },
@@ -188,17 +188,6 @@ function SectionDivider() {
   return <div className="border-border border-t" />;
 }
 
-/** Small stand-in for a token/quote-token glyph (three tinted bars). */
-function TokenGlyph({ className }: { className?: string }) {
-  return (
-    <span className={cn("flex items-end gap-0.5", className)}>
-      <span className="h-2.5 w-1 rounded-full bg-info" />
-      <span className="h-3.5 w-1 rounded-full bg-primary" />
-      <span className="h-2 w-1 rounded-full bg-casablanca" />
-    </span>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* Tab: Transaction                                                      */
 /* ------------------------------------------------------------------ */
@@ -298,7 +287,7 @@ function TransactionTab() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Tab: DLMM                                                            */
+/* Tab: Lp                                                            */
 /* ------------------------------------------------------------------ */
 
 function SlippagePresetField({
@@ -346,21 +335,21 @@ function SlippagePresetField({
   );
 }
 
-function DlmmTab() {
-  const dlmm = useSettingsStore((state) => state.dlmm);
-  const setDlmmSettings = useSettingsStore((state) => state.setDlmmSettings);
+function LpTab() {
+  const lp = useSettingsStore((state) => state.lp);
+  const setLpSettings = useSettingsStore((state) => state.setLpSettings);
 
   return (
     <div className="space-y-6">
       <SlippagePresetField
         label="Liquidity Spillage"
-        value={dlmm.liquiditySlippage}
-        onValueChange={(value) => setDlmmSettings({ liquiditySlippage: value })}
+        value={lp.liquiditySlippage}
+        onValueChange={(value) => setLpSettings({ liquiditySlippage: value })}
       />
       <SlippagePresetField
         label="Swap Slippage"
-        value={dlmm.swapSlippage}
-        onValueChange={(value) => setDlmmSettings({ swapSlippage: value })}
+        value={lp.swapSlippage}
+        onValueChange={(value) => setLpSettings({ swapSlippage: value })}
       />
     </div>
   );
@@ -369,79 +358,6 @@ function DlmmTab() {
 /* ------------------------------------------------------------------ */
 /* Tab: Zap In                                                          */
 /* ------------------------------------------------------------------ */
-
-function ZapInTab() {
-  const zapIn = useSettingsStore((state) => state.zapIn);
-  const setZapInSettings = useSettingsStore((state) => state.setZapInSettings);
-
-  return (
-    <div className="space-y-6">
-      <div className="rounded-xl bg-primary/10 p-4">
-        <div className="flex items-center gap-2 text-primary">
-          <Info className="size-4" />
-          <p className="font-semibold">What is Zap In?</p>
-        </div>
-        <p className="mt-2 text-muted-foreground text-sm">
-          Create a liquidity position instantly with one token and one
-          click—using your preferred settings.
-        </p>
-      </div>
-
-      <ValueInputRow
-        label="Amount"
-        placeholder="Zap in amount"
-        value={zapIn.amount}
-        onChange={(value) => setZapInSettings({ amount: parseFloat(value) })}
-        suffix={<TokenGlyph />}
-      />
-
-      <div>
-        <p className="mb-2 font-semibold text-foreground text-sm">Slippage</p>
-        <div className="space-y-3">
-          <ValueInputRow
-            placeholder="Liquidity Slippage"
-            value={zapIn.liquiditySlippage}
-            onChange={(value) =>
-              setZapInSettings({ liquiditySlippage: parseFloat(value) })
-            }
-          />
-          <ValueInputRow
-            placeholder="Swap Slippage"
-            value={zapIn.swapSlippage}
-            onChange={(value) =>
-              setZapInSettings({ swapSlippage: parseFloat(value) })
-            }
-          />
-        </div>
-      </div>
-
-      <ValueInputRow
-        label="Swap Price Impact"
-        placeholder="Max Price Impact"
-        value={zapIn.swapPriceImpact}
-        onChange={(value) =>
-          setZapInSettings({ swapPriceImpact: parseFloat(value) })
-        }
-      />
-
-      <SegmentedControl
-        tone="soft"
-        value={zapIn.curveType}
-        onChange={(value) => setZapInSettings({ curveType: value })}
-        options={[
-          { value: "Spot", label: "Spot" },
-          { value: "Curve", label: "Curve" },
-          { value: "BidAsk", label: "Bid Ask" },
-        ]}
-      />
-
-      <div className="flex items-center justify-end gap-2 rounded-lg border border-border px-4 py-3">
-        <span className="size-3 rounded-sm bg-primary" />
-        <span className="text-foreground text-sm">{zapIn.side}</span>
-      </div>
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /* Tab: Trading Settings                                                */
@@ -657,7 +573,7 @@ export function SettingsDialog({
           >
             <div>
               {activeTab === "transaction" && <TransactionTab />}
-              {activeTab === "dlmm" && <DlmmTab />}
+              {activeTab === "lp" && <LpTab />}
               {activeTab === "zap-in" && <ZapInTab />}
               {activeTab === "trading-settings" && <TradingSettingsTab />}
               {activeTab === "others" && <OthersTab />}
