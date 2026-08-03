@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
 
 import { capitalize } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -10,17 +9,16 @@ import type { LiquidityPool } from "../liquidity.type";
 import { usePoolTokenBalances } from "../liquidity.hook";
 import {
   formatPrice,
-  getLiquidityBars,
   getPoolPriceInQuote,
   getPoolTokens,
   getTokenBalance,
 } from "../liquidity.util";
 import {
+  CurrentPrice,
+  DepositAmount,
   LiquidityDepthChart,
   OpenPositionButton,
-  PriceTickerLabels,
   SummaryFees,
-  TradeAmountField,
   YieldDepositCard,
 } from "./detail/trade-rail-shared";
 
@@ -66,7 +64,6 @@ export function RaydiumTradeRail({ pool }: { pool: LiquidityPool }) {
 function RaydiumSpotTab({ pool }: { pool: LiquidityPool }) {
   const { base, quote } = getPoolTokens(pool);
   const price = getPoolPriceInQuote(pool);
-  const bars = getLiquidityBars(pool, 60);
   const { data: balances } = usePoolTokenBalances(pool);
 
   const basePct = pool.tvl_distribution?.base_pct ?? 50;
@@ -112,16 +109,13 @@ function RaydiumSpotTab({ pool }: { pool: LiquidityPool }) {
 
   return (
     <div className="fade-in animate-in space-y-6 p-4 duration-300">
-      <div className="text-center text-b-5 text-white">
-        Current Price: {formatPrice(price)} {quote.symbol} per {base.symbol}
-      </div>
-
-      <LiquidityDepthChart
-        bars={bars}
-        activeId={pool.active_id}
+      <CurrentPrice
+        price={price}
+        baseSymbol={base.symbol}
+        quoteSymbol={quote.symbol}
       />
 
-      <PriceTickerLabels bars={bars} />
+      <LiquidityDepthChart pool={pool} />
 
       <div className="mt-6 space-y-3">
         <span className="text-b-4 text-gray">Price Range</span>
@@ -184,24 +178,12 @@ function RaydiumSpotTab({ pool }: { pool: LiquidityPool }) {
         />
       </div>
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-b-4 text-gray">Deposit Amount</span>
-          <button
-            type="button"
-            className="rounded border border-border/70 p-1.5 text-gray transition-colors hover:text-white"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-          </button>
-        </div>
-
-        <TradeAmountField
-          symbol={base.symbol}
-          balance={getTokenBalance(balances, base.mint)}
-          priceUsd={base.priceUsd}
-          decimals={base.decimals}
-        />
-      </div>
+      <DepositAmount
+        symbol={base.symbol}
+        balance={getTokenBalance(balances, base.mint)}
+        priceUsd={base.priceUsd}
+        decimals={base.decimals}
+      />
 
       <SummaryFees pool={pool} />
 

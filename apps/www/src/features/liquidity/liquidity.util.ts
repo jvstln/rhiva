@@ -11,13 +11,6 @@ export type PoolToken = {
   decimals: number | null;
 };
 
-export type LiquidityBar = {
-  bin_id: number;
-  price: number;
-  value: number;
-  height: number;
-};
-
 const shortMint = (mint?: string) => (mint ? `${mint.slice(0, 6)}...` : "----");
 
 export function getPoolTokens(pool: LiquidityPool): {
@@ -65,69 +58,23 @@ export function getPoolPriceUsd(pool: LiquidityPool): number | null {
   return pool.price_usd || pool.token_a?.price_usd || null;
 }
 
-/**
- * Downsample the pool's bin liquidity into `count` normalized bars.
- * Each bar's value is the USD depth of the bin; heights are 0..1.
- */
-export function getLiquidityBars(
+/** Number of bins the pool's distribution spans within [minPrice, maxPrice]. */
+export function getBinsInRange(
   pool: LiquidityPool,
-  count = 60,
-): LiquidityBar[] {
-  const bins = pool.liquidity_distribution;
-  if (!bins?.length) return [];
-
-  const { base, quote } = getPoolTokens(pool);
-  const basePrice = base.priceUsd ?? 0;
-  const quotePrice = quote.priceUsd ?? 0;
-  const values = bins.map(
-    (bin) => bin.base_amount * basePrice + bin.quote_amount * quotePrice,
-  );
-  const max = Math.max(...values, 1);
-
-  const step = Math.max(1, Math.ceil(bins.length / count));
-  const bars: LiquidityBar[] = [];
-  for (let i = 0; i < bins.length; i += step) {
-    const group = bins.slice(i, i + step);
-    const mid = group[Math.floor(group.length / 2)]!;
-    const value =
-      group.reduce((sum, _bin, j) => sum + values[i + j]!, 0) / group.length;
-    bars.push({
-      bin_id: mid.bin_id,
-      price: mid.price,
-      value,
-      height: value / max,
-    });
-  }
-  return bars;
-}
-
-/** Index of the bar closest to the pool's active bin. */
-export function getActiveBinIndex(
-  bars: LiquidityBar[],
-  activeId?: number,
+  minPrice: number,
+  maxPrice: number,
 ): number {
-  if (!bars.length) return 0;
-  if (activeId === undefined) return Math.floor(bars.length / 2);
-
-  let best = 0;
-  let bestDiff = Infinity;
-  bars.forEach((bar, i) => {
-    const diff = Math.abs(bar.bin_id - activeId);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      best = i;
-    }
-  });
-  return best;
-}
-
-/** Evenly sample `count` price labels across the bars for axis ticks. */
-export function getPriceLabels(bars: LiquidityBar[], count = 7): number[] {
-  if (!bars.length) return [];
-  const step = bars.length > 1 ? bars.length / (count - 1) : 0;
-  return Array.from(
-    { length: count },
-    (_, i) => bars[Math.min(Math.round(i * step), bars.length - 1)]!.price,
+  if (minPrice <= 0 || maxPrice <= minPrice) return 1;
+  const distribution = pool.liquidity_distribution;
+  if (distribution?.length) {
+    return distribution.filter(
+      (bin) => bin.price >= minPrice && bin.price <= maxPrice,
+    ).length;
+  }
+  const binStepRatio = 1 + (pool.bin_step ?? 0) / 10_000;
+  return Math.max(
+    1,
+    Math.round(Math.log(maxPrice / minPrice) / Math.log(binStepRatio)),
   );
 }
 

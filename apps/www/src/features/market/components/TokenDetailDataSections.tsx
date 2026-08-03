@@ -1,43 +1,11 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import type { TokenDetail } from "@rhivadotfun/dataapi";
-import { CheckCircle2, ChevronDown, HelpCircle, Lock } from "lucide-react";
+import { CheckCircle2, HelpCircle, Lock } from "lucide-react";
 
 import { AddressCopy } from "./tooltips/TokenInfo";
 import { Separator } from "@/components/ui/separator";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-
-function Section({
-  title,
-  children,
-}: {
-  title: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <Collapsible className="px-4 py-3">
-      <CollapsibleTrigger className="mb-2 flex w-full items-center justify-between">
-        <h3 className="mr-auto font-semibold text-b-2 text-white">{title}</h3>
-        <ChevronDown className="size-4 transition-transform [[data-panel-open]_*]:rotate-180" />
-      </CollapsibleTrigger>
-
-      <CollapsibleContent>{children}</CollapsibleContent>
-    </Collapsible>
-  );
-}
-
-function Row({ label, value }: { label: ReactNode; value: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between py-0.5 text-b-4">
-      <span className="text-gray">{label}</span>
-      <span>{value}</span>
-    </div>
-  );
-}
+import { SideRailRow, SideRailSection } from "@/components/ui/side-rail";
 
 export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
   const creator = useMemo(
@@ -66,8 +34,8 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
 
   return (
     <div>
-      <Section title="Dynamic BC Pool Info">
-        <Row
+      <SideRailSection title="Dynamic BC Pool Info">
+        <SideRailRow
           label="Total liq"
           value={
             <div className="flex items-center gap-1">
@@ -96,22 +64,22 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
             {formatCompactCurrency(token.liquidity_usd)}
           </span>
         </div>
-      </Section>
+      </SideRailSection>
 
       <Separator />
 
-      <Section title="DEV Info">
+      <SideRailSection title="DEV Info">
         {creator && (
-          <Row
+          <SideRailRow
             label="DEV"
             value={<AddressCopy address={creator} />}
           />
         )}
-        <Row
+        <SideRailRow
           label="Dev Launched / Migrated"
           value={`N/A / N/A`}
         />
-        <Row
+        <SideRailRow
           label="Token Balance"
           value={
             token.holders?.dev_balance !== undefined &&
@@ -120,23 +88,23 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
               : "N/A"
           }
         />
-      </Section>
+      </SideRailSection>
 
       <Separator />
 
-      <Section title="Basic Data">
+      <SideRailSection title="Basic Data">
         {basicDataItems.map((item) => (
-          <Row
+          <SideRailRow
             key={item.label}
             label={item.label}
             value={item.value}
           />
         ))}
-      </Section>
+      </SideRailSection>
 
       <Separator />
 
-      <Section title="Token Audit">
+      <SideRailSection title="Token Audit">
         {[
           { label: "NoMint", ok: true },
           { label: "No Blacklist", ok: true },
@@ -155,7 +123,7 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
             warn: true,
           },
         ].map((item) => (
-          <Row
+          <SideRailRow
             key={item.label}
             label={item.label}
             value={
@@ -170,7 +138,7 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
             }
           />
         ))}
-      </Section>
+      </SideRailSection>
     </div>
   );
 }

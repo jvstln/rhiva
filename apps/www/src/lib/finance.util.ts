@@ -30,11 +30,14 @@ export function formatSignedUsd(value?: number | null): string {
 }
 
 /** "+23.45%", "-4.10%" */
-export function formatSignedPercent(value?: number | null, digits = 2): string {
+export function formatSignedPercent(
+  value?: string | number | null,
+  digits = 2,
+): string {
   if (value === null || value === undefined) return "-";
 
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(digits)}%`;
+  const sign = Number(value) > 0 ? "+" : "";
+  return `${sign}${Number(value).toFixed(digits)}%`;
 }
 
 /** "511", "1.2k" — used for TXNS counts */

@@ -1,8 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { useConnection } from "@solana/wallet-adapter-react";
-
-import { useAuth } from "@/hooks";
-import { wallet } from "@/queries";
+import { useWalletTokens } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -18,15 +14,7 @@ import {
 type TokenSelectProps<Value> = Select.Props<Value>;
 
 export function TokenSelect<Value>({ ...props }: TokenSelectProps<Value>) {
-  const { connection } = useConnection();
-  const auth = useAuth();
-
-  const balances = useQuery(
-    wallet.tokens.queryOptions({
-      connection,
-      address: auth.authenticated ? (auth.activeWallet?.address ?? "") : "",
-    }),
-  );
+  const balances = useWalletTokens();
 
   return (
     <Select {...props}>

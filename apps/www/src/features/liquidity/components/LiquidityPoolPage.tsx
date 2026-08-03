@@ -1,6 +1,5 @@
 "use client";
 
-import { useLiquidityPool } from "../liquidity.hook";
 import { BackButton } from "@/components/layout/BackButton";
 import { QueryState } from "@/components/layout/QueryState";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -10,44 +9,39 @@ import { PoolDetailSidebar } from "@/features/liquidity/components/detail/PoolDe
 import { MeteoraTradeRail } from "@/features/liquidity/components/MeteoraTradeRail";
 import { RaydiumTradeRail } from "@/features/liquidity/components/RaydiumTradeRail";
 import { PoolChart } from "@/features/tradeview/components/PoolChart";
+import { useLiquidityPool } from "../liquidity.hook";
 
 export default function LiquidityPoolPage({ id }: { id: string }) {
-  const pool = useLiquidityPool(id);
+  const poolQuery = useLiquidityPool(id);
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <BackButton />
-      <QueryState query={pool}>
-        {(query) => (
+    <QueryState query={poolQuery}>
+      {({ data: pool }) => (
+        <div className="flex h-full min-h-0 flex-col">
+          <BackButton />
           <main className="flex min-h-0 flex-1">
-            <ScrollArea>
-              <PoolDetailSidebar pool={query.data} />
+            <ScrollArea className={"w-1/4 min-w-72 shrink-0"}>
+              <PoolDetailSidebar pool={pool} />
               <ScrollBar showScrollBar />
             </ScrollArea>
 
             <ScrollArea className={"grow"}>
               <div className="h-[60vh]">
-                <PoolChart pool={query.data} />
+                <PoolChart pool={pool} />
               </div>
-              <PositionsPanel pool={query.data} />
+              <PositionsPanel pool={pool} />
               <ScrollBar showScrollBar />
             </ScrollArea>
 
             <ScrollArea className={"w-full max-w-92.5 border-l px-2 pr-4"}>
-              {query.data.dex === "meteora-dlmm" && (
-                <MeteoraTradeRail pool={query.data} />
-              )}
-              {query.data.dex === "orca-whirlpool" && (
-                <OrcaTradeRail pool={query.data} />
-              )}
-              {query.data.dex === "raydium-clmm" && (
-                <RaydiumTradeRail pool={query.data} />
-              )}
+              {pool.dex === "meteora-dlmm" && <MeteoraTradeRail pool={pool} />}
+              {pool.dex === "orca-whirlpool" && <OrcaTradeRail pool={pool} />}
+              {pool.dex === "raydium-clmm" && <RaydiumTradeRail pool={pool} />}
               <ScrollBar showScrollBar />
             </ScrollArea>
           </main>
-        )}
-      </QueryState>
-    </div>
+        </div>
+      )}
+    </QueryState>
   );
 }

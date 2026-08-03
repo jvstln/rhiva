@@ -12,11 +12,11 @@ import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { POOL_DEXES } from "@/features/liquidity/liquidity.schema";
-import { usePoolDetail } from "@/features/liquidity/liquidity.hook";
 import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
 import type { LpPosition, TokenDetail } from "@rhivadotfun/dataapi";
 import { useTokens } from "@/features/market/market.hook";
 import { useMemo } from "react";
+import { useLiquidityPool } from "@/features/liquidity/liquidity.hook";
 
 type LpPositionWithToken = LpPosition & {
   token: { isPending: boolean; data?: TokenDetail };
@@ -34,7 +34,7 @@ const positionSymbol = (row: LpPositionWithToken) =>
   row.symbol ?? row.token.data?.symbol;
 
 const FeeTvlCell = ({ poolAddress }: { poolAddress: string }) => {
-  const { data: pool, isPending } = usePoolDetail(poolAddress);
+  const { data: pool, isPending } = useLiquidityPool(poolAddress);
   const ratio = pool?.fees_ratio;
 
   return (

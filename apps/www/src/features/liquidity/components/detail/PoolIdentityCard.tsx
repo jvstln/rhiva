@@ -4,23 +4,14 @@ import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/Liquid
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCompactCurrency } from "@/lib/finance.util";
 import { cn, getInitials } from "@/lib/utils";
-import {
-  formatPrice,
-  getActiveBinIndex,
-  getLiquidityBars,
-  getPoolPriceInQuote,
-} from "@/features/liquidity/liquidity.util";
-
-const shortId = (v?: string) => (v ? v.slice(0, 6) : "----");
+import { BarGraph } from "../BarGraph";
 
 export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
-  const bars = getLiquidityBars(pool, 48);
-  const activeIndex = getActiveBinIndex(bars, pool.active_id);
-  const activeBinId = bars[activeIndex]?.bin_id ?? 0;
-  const priceInQuote = getPoolPriceInQuote(pool);
-
   const baseSymbol =
-    pool.token_a?.symbol || pool.base_symbol || shortId(pool.token_a?.mint);
+    pool.token_a?.symbol ||
+    pool.base_symbol ||
+    pool.token_a?.mint.slice(0, 6) ||
+    "---";
   const quoteSymbol = pool.token_b?.symbol || "SOL";
   const pair = `${baseSymbol}/${quoteSymbol}`;
 
@@ -47,13 +38,13 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
         token={pool.token_a}
         symbol={baseSymbol}
         balance={formatCompactCurrency(baseUsd)}
-        meta={pool.token_a?.name ?? shortId(pool.token_a?.mint)}
+        meta={pool.token_a?.name ?? pool.token_a?.mint.slice(0, 6) ?? "---"}
       />
       <TokenBalanceRow
         token={pool.token_b}
         symbol={quoteSymbol}
         balance={formatCompactCurrency(quoteUsd)}
-        meta={pool.token_b?.name ?? shortId(pool.token_b?.mint)}
+        meta={pool.token_b?.name ?? pool.token_b?.mint.slice(0, 6) ?? "---"}
       />
 
       <div>
@@ -71,40 +62,10 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
           />
         </div>
 
-        <div className="relative flex h-24 items-end gap-[2px]">
-          {bars.length > 0 ? (
-            bars.map((bar) => (
-              <span
-                key={bar.bin_id}
-                className={cn(
-                  "flex-1 rounded-t-sm",
-                  bar.bin_id <= activeBinId ? "bg-violet-500" : "bg-primary",
-                )}
-                style={{ height: `${Math.max(2, bar.height * 100)}%` }}
-              />
-            ))
-          ) : (
-            // TODO: Liquidity distribution isn't available for this pool.
-            <span className="flex h-full w-full items-center justify-center text-b-6 text-gray">
-              No liquidity data
-            </span>
-          )}
-          <div
-            className="pointer-events-none absolute inset-y-0 flex flex-col items-center"
-            style={{
-              left: `${
-                bars.length > 1 ? (activeIndex / (bars.length - 1)) * 100 : 50
-              }%`,
-            }}
-          >
-            <span className="rounded bg-card px-1.5 py-0.5 text-b-6 text-gray shadow ring-1 ring-border">
-              Current price
-              <br />
-              {formatPrice(priceInQuote)} {quoteSymbol}/{baseSymbol}
-            </span>
-            <span className="mt-1 h-full w-px flex-1 bg-white/60" />
-          </div>
-        </div>
+        <BarGraph
+          data={Array.from({ length: 100 }, () => ({ value: 1 }))}
+          markerIndex={50}
+        />
         <div className="mt-1 flex justify-between text-b-5 text-gray">
           <span>{pool.tvl_distribution?.base_pct?.toFixed(2) ?? "—"}%</span>
           <span>{pool.tvl_distribution?.quote_pct?.toFixed(2) ?? "—"}%</span>

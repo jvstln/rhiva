@@ -35,10 +35,10 @@ export const wallet = {
       return ["wallet", "tokens", params.address];
     },
     queryOptions({ connection, ...params }: GetWalletTokensParams) {
-      const address = new PublicKey(params.address);
       return queryOptions({
         queryKey: this.queryKey(params),
         async queryFn(): Promise<ParsedTokenAccount[]> {
+          const address = new PublicKey(params.address);
           const [nativeBalance, ...nestedTokenAccountsByOwner] =
             await Promise.all([
               connection.getBalance(address),

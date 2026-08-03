@@ -53,6 +53,3 @@ export const getLiquidityPool = async (address: string) => {
     token_b: tokens.find((token) => token.mint === pool.token_mint_b),
   };
 };
-
-export const getPoolDetail = (address: string) =>
-  dataapi.pools.getPoolDetail(address);

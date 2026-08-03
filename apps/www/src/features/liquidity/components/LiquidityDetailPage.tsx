@@ -24,10 +24,9 @@ import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog
 import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/LiquidityAvatar";
 import {
   formatPrice,
-  getActiveBinIndex,
-  getLiquidityBars,
   getPoolPriceInQuote,
 } from "@/features/liquidity/liquidity.util";
+import { BarGraph } from "./BarGraph";
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -37,8 +36,6 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
     <QueryState query={pool}>
       {(query) => {
         const p = query.data;
-        const bars = getLiquidityBars(p, 48);
-        const activeIndex = getActiveBinIndex(bars, p.active_id);
         const currentPriceNum = getPoolPriceInQuote(p);
         const currentPriceStr =
           currentPriceNum && currentPriceNum > 0
@@ -118,42 +115,10 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                     </div>
                   </div>
 
-                  <div className="relative flex h-32 items-end gap-px">
-                    {bars.length > 0 ? (
-                      bars.map((bar) => (
-                        <span
-                          key={bar.bin_id}
-                          className={cn(
-                            "flex-1",
-                            bar.bin_id <= p.active_id
-                              ? "bg-violet-600"
-                              : "bg-primary",
-                          )}
-                          style={{
-                            height: `${Math.max(2, bar.height * 100)}%`,
-                          }}
-                        />
-                      ))
-                    ) : (
-                      // TODO: Liquidity distribution isn't available for this pool.
-                      <span className="flex h-full w-full items-center justify-center text-b-6 text-gray">
-                        No liquidity data
-                      </span>
-                    )}
-                    <div
-                      className="pointer-events-none absolute inset-y-0 flex flex-col items-center"
-                      style={{
-                        left: `${
-                          bars.length > 1
-                            ? (activeIndex / (bars.length - 1)) * 100
-                            : 68
-                        }%`,
-                      }}
-                    >
-                      <span className="h-full w-px flex-1 bg-white" />
-                    </div>
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-white" />
-                  </div>
+                  <BarGraph
+                    data={Array.from({ length: 100 }, () => ({ value: 1 }))}
+                    markerIndex={50}
+                  />
                 </div>
 
                 {/* Current Balance */}

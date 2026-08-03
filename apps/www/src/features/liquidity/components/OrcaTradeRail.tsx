@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { capitalize } from "@/lib/utils";
@@ -10,16 +9,15 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { LiquidityPool } from "../liquidity.type";
 import { usePoolTokenBalances } from "../liquidity.hook";
 import {
-  formatPrice,
-  getLiquidityBars,
   getPoolPriceInQuote,
   getPoolTokens,
   getTokenBalance,
 } from "../liquidity.util";
 import {
+  CurrentPrice,
+  DepositAmount,
   LiquidityDepthChart,
   OpenPositionButton,
-  PriceTickerLabels,
   SummaryFees,
   TradeAmountField,
   YieldDepositCard,
@@ -74,24 +72,12 @@ function OrcaFullTab({ pool }: { pool: LiquidityPool }) {
         quotePct={quotePct}
       />
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-b-4 text-gray">Deposit Amount</span>
-          <Button
-            size={"icon-sm"}
-            variant={"ghost"}
-          >
-            <SlidersHorizontal />
-          </Button>
-        </div>
-
-        <TradeAmountField
-          symbol={base.symbol}
-          balance={getTokenBalance(balances, base.mint)}
-          priceUsd={base.priceUsd}
-          decimals={base.decimals}
-        />
-      </div>
+      <DepositAmount
+        symbol={base.symbol}
+        balance={getTokenBalance(balances, base.mint)}
+        priceUsd={base.priceUsd}
+        decimals={base.decimals}
+      />
 
       <SummaryFees pool={pool} />
 
@@ -108,7 +94,6 @@ function OrcaCustomTab({ pool }: { pool: LiquidityPool }) {
 
   const { base, quote } = getPoolTokens(pool);
   const priceInQuote = getPoolPriceInQuote(pool);
-  const bars = getLiquidityBars(pool, 60);
   const { data: balances } = usePoolTokenBalances(pool);
 
   const activeToken = selectedCurrency === "base" ? base : quote;
@@ -127,17 +112,13 @@ function OrcaCustomTab({ pool }: { pool: LiquidityPool }) {
 
   return (
     <div className="fade-in animate-in space-y-6 duration-300">
-      <div className="text-center text-b-5 text-white">
-        Current Price: {formatPrice(priceInQuote)} {quote.symbol} per{" "}
-        {base.symbol}
-      </div>
-
-      <LiquidityDepthChart
-        bars={bars}
-        activeId={pool.active_id}
+      <CurrentPrice
+        price={priceInQuote}
+        baseSymbol={base.symbol}
+        quoteSymbol={quote.symbol}
       />
 
-      <PriceTickerLabels bars={bars} />
+      <LiquidityDepthChart pool={pool} />
 
       <div className="mt-6 space-y-3">
         <div className="flex items-center justify-between">

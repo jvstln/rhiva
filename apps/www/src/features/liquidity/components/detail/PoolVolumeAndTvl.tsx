@@ -1,12 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, XAxis } from "recharts";
 import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import { formatCompactCurrency } from "@/lib/finance.util";
-import { cn } from "@/lib/utils";
-
-const TOKEN_INFO_KEYS = ["15m", "5m", "1h", "24h"] as const;
 
 export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
   const baseSymbol =
@@ -14,8 +10,6 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
     pool.base_symbol ||
     `${pool.token_a?.mint.slice(0, 6) ?? "Base"}...`;
   const quoteSymbol = pool.token_b?.symbol || "SOL";
-
-  const [tokenTab, setTokenTab] = useState<string>(baseSymbol);
 
   const baseUsd = pool.tvl_distribution?.base_usd ?? 0;
   const quoteUsd = pool.tvl_distribution?.quote_usd ?? 0;
@@ -31,28 +25,6 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
         .filter((k) => k in poolWindows)
         .map((k) => ({ day: k, volume: poolWindows[k]?.volume_usd ?? 0 }))
     : [];
-
-  // Get active token's timeframe stats based on token tab selection
-  const activeStats =
-    tokenTab === baseSymbol
-      ? (pool.token_a?.timeframes ?? pool.token_stats)
-      : pool.token_b?.timeframes;
-
-  const activeWindows = activeStats?.windows;
-
-  // Token info columns for the selected token
-  const tokenInfoCols = TOKEN_INFO_KEYS.map((k) => {
-    const w = activeWindows?.[k as keyof typeof activeWindows];
-    return {
-      label: k,
-      value: w ? formatCompactCurrency(w.volume_usd) : "N/A",
-      sub: w
-        ? `${w.price_change_pct >= 0 ? "+" : ""}${w.price_change_pct.toFixed(2)}%`
-        : undefined,
-      subTone:
-        w && w.price_change_pct < 0 ? ("down" as const) : ("up" as const),
-    };
-  });
 
   return (
     <div className="space-y-5 p-4">
@@ -146,45 +118,6 @@ export function PoolVolumeAndTvl({ pool }: { pool: LiquidityPool }) {
             {formatCompactCurrency(quoteUsd)}{" "}
             <span className="text-gray">{quotePct.toFixed(1)}%</span>
           </span>
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-2 flex items-center justify-between">
-          <p className="font-medium text-b-3 text-white">Token Info</p>
-          <div className="flex rounded-md bg-secondary p-0.5">
-            {[baseSymbol, quoteSymbol].map((t) => (
-              <button
-                type="button"
-                key={t}
-                onClick={() => setTokenTab(t)}
-                className={cn(
-                  "rounded-md px-2.5 py-1 font-medium text-b-5",
-                  tokenTab === t ? "bg-background text-white" : "text-gray",
-                )}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          {tokenInfoCols.map((col) => (
-            <div key={col.label}>
-              <p className="text-b-5 text-gray">{col.label}</p>
-              <p className="font-medium text-b-4 text-white">{col.value}</p>
-              {col.sub && (
-                <p
-                  className={cn(
-                    "text-b-5",
-                    col.subTone === "down" ? "text-down" : "text-up",
-                  )}
-                >
-                  {col.sub}
-                </p>
-              )}
-            </div>
-          ))}
         </div>
       </div>
     </div>

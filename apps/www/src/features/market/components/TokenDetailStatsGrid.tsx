@@ -122,7 +122,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
             key={item.label}
             className="flex flex-col items-start gap-1 p-4"
           >
-            <p className="text-gray text-xs">{item.label}</p>
+            <p className="whitespace-nowrap text-gray text-xs">{item.label}</p>
             {item.infoBadge}
           </div>
         );

@@ -429,3 +429,118 @@ export const LeafIcon = (props: IconProps) => (
     <path d="M13.211 1.925c-4.23.569-6.689 2.73-8.138 5.242-.983 1.704-1.508 3.585-1.778 5.272.185-.296.375-.572.572-.826.682-.877 1.49-1.542 2.49-1.764l.517-.114c2.36-.515 4.292-.937 5.605-2.96l-1.45-.652c-.56-.252-.593-.996-.127-1.326 1.223-.866 1.935-2.054 2.31-2.872m.762-1.387c.475-.038.968.41.788.98-.17.542-.82 2.338-2.406 3.776l1.301.586a.662.662 0 0 1 .316.907c-1.598 3.093-4.249 3.664-6.759 4.206l-.575.125c-.591.131-1.162.543-1.745 1.292-.583.75-1.131 1.783-1.688 3.048a.764.764 0 0 1-.847.444.756.756 0 0 1-.614-.766c.059-2.21.478-5.63 2.202-8.618C5.692 3.49 8.757.948 13.974.538" />
   </svg>
 );
+
+function PlatformIconPlaceholder({
+  name,
+  ...props
+}: IconProps & { name: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="1em"
+      height="1em"
+      fill="currentColor"
+      {...props}
+    >
+      <title>{name} icon</title>
+      <rect
+        x="2.5"
+        y="2.5"
+        width="19"
+        height="19"
+        rx="5.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <text
+        x="12"
+        y="16.8"
+        textAnchor="middle"
+        fontSize="11"
+        fontWeight="600"
+        fill="currentColor"
+      >
+        {name.charAt(0)}
+      </text>
+    </svg>
+  );
+}
+
+export const LpAgentIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="LP Agent"
+    {...props}
+  />
+);
+
+export const BananaGunIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Banana Gun"
+    {...props}
+  />
+);
+
+export const JupiterIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Jupiter"
+    {...props}
+  />
+);
+
+export const FluxbotIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Fluxbot"
+    {...props}
+  />
+);
+
+export const TrojanIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Trojan"
+    {...props}
+  />
+);
+
+export const BonkbotIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="BONKbot"
+    {...props}
+  />
+);
+
+export const MaestroIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Maestro"
+    {...props}
+  />
+);
+
+export const PhotonIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Photon"
+    {...props}
+  />
+);
+
+export const AxiomIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Axiom"
+    {...props}
+  />
+);
+
+export const BirdeyeIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="Birdeye"
+    {...props}
+  />
+);
+
+export const GeckoTerminalIcon = (props: IconProps) => (
+  <PlatformIconPlaceholder
+    name="GeckoTerminal"
+    {...props}
+  />
+);

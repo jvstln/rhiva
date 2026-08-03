@@ -2,8 +2,6 @@
 
 import { toast } from "sonner";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
-import { useConnection } from "@solana/wallet-adapter-react";
 import {
   usePrivy,
   type User,
@@ -19,7 +17,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { wallet } from "@/queries";
+import { useWalletTokens } from "@/hooks";
 import { Button, CopyButton } from "@/components/ui/button";
 import { SendDialog } from "@/features/transaction/components/SendDialog";
 import { DepositDialog } from "@/features/transaction/components/DepositDialog";
@@ -43,14 +41,8 @@ export function UserMenuPopover({
   ...props
 }: UserMenuPopoverProps) {
   const { logout } = usePrivy();
-  const { connection } = useConnection();
 
-  const balances = useQuery(
-    wallet.tokens.queryOptions({
-      connection,
-      address: activeWallet?.address ?? "",
-    }),
-  );
+  const balances = useWalletTokens({ address: activeWallet?.address ?? "" });
 
   return (
     <Popover {...props}>
