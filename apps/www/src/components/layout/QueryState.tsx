@@ -1,9 +1,11 @@
 import type React from "react";
 import { isValidElement } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { AlertTriangle, FolderOpenIcon } from "lucide-react";
+import { AlertTriangle, FolderOpenIcon, KeyRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks";
+import { gsap, useGSAP } from "@/lib/gsap.util";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import {
@@ -31,6 +33,8 @@ type QueryStateProps<
   getIsEmpty?: (
     query: TQuery & { data: NonNullable<TData> },
   ) => boolean | string | EmptyStateProps;
+  /** Whether to require authentication before rendering the wrapped content. @default false */
+  requireAuth?: boolean;
 };
 
 type EmptyStateProps = {
@@ -129,7 +133,45 @@ function hasData<
 }
 
 /**
+ * Displays a login prompt when the wrapped data requires authentication.
+ */
+const AuthRequiredState = () => {
+  useGSAP(() => {
+    gsap.to("[data-bounce]", {
+      keyframes: [{ y: -10 }, { y: 0, ease: "bounce.out" }],
+      repeat: -1,
+      repeatDelay: 1,
+      duration: 2.5,
+    });
+  });
+
+  return (
+    <div className="flex flex-col items-center justify-center py-12">
+      <Empty className="border-none bg-transparent">
+        <EmptyHeader>
+          <EmptyMedia className="relative">
+            <KeyRound
+              className="size-28 animate-pulse text-primary/80"
+              data-bounce
+            />
+            <div className="absolute inset-0 rounded-full bg-primary/5 blur-xl" />
+          </EmptyMedia>
+          <EmptyTitle>Connect your wallet to view this data</EmptyTitle>
+          <EmptyDescription>
+            This data requires a connected wallet.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button data-require-auth>Connect Wallet</Button>
+        </EmptyContent>
+      </Empty>
+    </div>
+  );
+};
+
+/**
  * A wrapper component that handles loading, error, and empty states for queries.
+ * - Renders `AuthRequiredState` if `requireAuth` is set and the user is not authenticated.
  * - Renders `LoadingState` if the query is pending or custom loading is active.
  * - Renders `ErrorState` if the query has failed or custom error is active.
  * - Renders an empty placeholder state if the custom empty check evaluates to true.
@@ -144,7 +186,14 @@ export function QueryState<
   getIsError,
   getIsEmpty,
   children,
+  requireAuth = false,
 }: QueryStateProps<TData, TQuery>) {
+  const auth = useAuth();
+
+  if (requireAuth && !auth.authenticated) {
+    return <AuthRequiredState />;
+  }
+
   const possibleLoadingMessage = getIsLoading?.(query);
   const possibleErrorMessage = getIsError?.(query);
   const possibleEmptyMessage = hasData<TData>(query)

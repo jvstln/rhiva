@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks";
+import { QueryState } from "@/components/layout/QueryState";
 import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import { useLiquidityPositions } from "@/features/portfolio/portfolio.hook";
 import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
@@ -50,40 +49,14 @@ export function PositionsPanel({ pool }: { pool: LiquidityPool }) {
         ))}
       </div>
 
-      {!auth.authenticated ? (
-        <div className="flex flex-col items-center justify-center gap-4 py-24">
-          <div className="flex size-14 items-center justify-center rounded-full bg-secondary text-gray">
-            <MapPin className="size-6" />
-          </div>
-          <div className="text-center">
-            <p className="font-semibold text-b-1 text-white">
-              No Wallet Connected
-            </p>
-            <p className="mt-1 text-b-3 text-gray">
-              Connect your wallet to view your open positions
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button data-require-auth>Connect Wallet</Button>
-            <Button variant="secondary">Learn about DLMM</Button>
-          </div>
-        </div>
-      ) : positions.isPending ? (
-        <div className="grid place-items-center py-24 text-b-3 text-gray">
-          Loading positions...
-        </div>
-      ) : visible.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-24">
-          <div className="flex size-14 items-center justify-center rounded-full bg-secondary text-gray">
-            <MapPin className="size-6" />
-          </div>
-          <div className="text-center">
-            <p className="font-semibold text-b-1 text-white">
-              No {isOpenTab ? "open" : "historical"} positions in this pool
-            </p>
-          </div>
-        </div>
-      ) : (
+      <QueryState
+        query={positions}
+        requireAuth
+        getIsEmpty={() =>
+          visible.length === 0 &&
+          `No ${isOpenTab ? "open" : "historical"} positions in this pool`
+        }
+      >
         <div className="space-y-2 p-4">
           {visible.map((position) => {
             const pnlUsd =
@@ -139,7 +112,7 @@ export function PositionsPanel({ pool }: { pool: LiquidityPool }) {
             );
           })}
         </div>
-      )}
+      </QueryState>
     </div>
   );
 }

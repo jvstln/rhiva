@@ -143,6 +143,7 @@ const PortfolioPage = () => {
       {activeView === "tradingPosition" && (
         <QueryState
           query={tokenPortfolio}
+          requireAuth
           getIsEmpty={(q) =>
             q.data.tokens.length === 0 && "No trading positions yet"
           }
@@ -153,6 +154,7 @@ const PortfolioPage = () => {
       {activeView === "liquidityPosition" && (
         <QueryState
           query={positions}
+          requireAuth
           getIsEmpty={(q) =>
             q.data.lp_positions.length === 0 && "No liquidity positions yet"
           }
