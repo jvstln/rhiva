@@ -135,6 +135,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
                     <Button
                       className="grow"
                       variant="outline"
+                      data-require-auth
                     />
                   }
                 >
@@ -149,6 +150,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
                     <Button
                       variant="outline"
                       size="icon"
+                      data-require-auth
                     />
                   }
                 >
@@ -156,7 +158,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
                 </TooltipTrigger>
               </SwapDialog>
 
-              {auth.authenticated ? (
+              {auth.authenticated && (
                 <SendDialog activeWallet={auth.activeWallet}>
                   <TooltipTrigger
                     payload={"Send"}
@@ -164,40 +166,31 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
                       <Button
                         variant="outline"
                         size="icon"
+                        data-require-auth
                       />
                     }
                   >
                     <ArrowUp />
                   </TooltipTrigger>
                 </SendDialog>
-              ) : (
-                <TooltipTrigger
-                  payload={"Send"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      disabled
-                    />
-                  }
-                >
-                  <ArrowUp />
-                </TooltipTrigger>
               )}
 
-              <DepositDialog address={"Wallet address"}>
-                <TooltipTrigger
-                  payload={"Receive"}
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                    />
-                  }
-                >
-                  <ArrowDown />
-                </TooltipTrigger>
-              </DepositDialog>
+              {auth.authenticated && (
+                <DepositDialog address={auth.activeWallet.address}>
+                  <TooltipTrigger
+                    payload={"Receive"}
+                    render={
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        data-require-auth
+                      />
+                    }
+                  >
+                    <ArrowDown />
+                  </TooltipTrigger>
+                </DepositDialog>
+              )}
 
               <TooltipContent>{payload}</TooltipContent>
             </>

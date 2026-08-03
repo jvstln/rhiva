@@ -130,6 +130,7 @@ const columns = [
             e.preventDefault();
             e.stopPropagation();
           }}
+          data-require-auth
         >
           <ArrowUpDown className="text-gray" />
         </Button>

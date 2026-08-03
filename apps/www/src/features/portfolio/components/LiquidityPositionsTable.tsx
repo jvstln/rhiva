@@ -67,6 +67,7 @@ const ActionCell = ({ position }: { position: LpPositionWithToken }) => {
             size="icon-sm"
             className="[--accent:var(--color-emerald-500)]"
             onClick={handleStopPropagation}
+            data-require-auth
           >
             <CircleDollarSign />
           </Button>
@@ -76,6 +77,7 @@ const ActionCell = ({ position }: { position: LpPositionWithToken }) => {
             size="icon-sm"
             className="[--accent:var(--color-blue-500)]"
             onClick={handleStopPropagation}
+            data-require-auth
           >
             <RefreshCcwIcon />
           </Button>
@@ -85,6 +87,7 @@ const ActionCell = ({ position }: { position: LpPositionWithToken }) => {
             size="icon-sm"
             className="[--accent:var(--color-red-500)]"
             onClick={handleStopPropagation}
+            data-require-auth
           >
             <X />
           </Button>

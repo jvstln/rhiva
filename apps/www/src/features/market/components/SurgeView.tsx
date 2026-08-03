@@ -283,6 +283,7 @@ const SurgeBuyButton = () => {
       <Button
         size="sm"
         variant={"soft"}
+        data-require-auth
       >
         <Zap
           className="size-3"

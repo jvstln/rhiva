@@ -269,6 +269,7 @@ export const ClaimRewardsDialog = ({
         color: "#1A1208",
         boxShadow: "0 10px 26px rgba(180,123,46,0.3)",
       }}
+      data-require-auth
     >
       <Sparkles />
       Open reward vault

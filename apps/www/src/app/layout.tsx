@@ -4,6 +4,7 @@ import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Providers from "@/providers";
+import { AuthProtection } from "@/components/layout/AuthProtection";
 
 const defaultFont = IBM_Plex_Sans({
   variable: "--geist",
@@ -26,7 +27,10 @@ export default function RootLayout({
       className={cn(`h-full antialiased`, defaultFont.className)}
     >
       <body className="flex min-h-full flex-col overflow-x-hidden">
-        <Providers>{children}</Providers>
+        <Providers>
+          <AuthProtection />
+          {children}
+        </Providers>
       </body>
     </html>
   );

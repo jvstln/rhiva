@@ -120,12 +120,18 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         </p>
 
         <TabsContent value="buy">
-          <Button className="w-full">Buy</Button>
+          <Button
+            className="w-full"
+            data-require-auth
+          >
+            Buy
+          </Button>
         </TabsContent>
         <TabsContent value="sell">
           <Button
             className="w-full"
             variant={"sell"}
+            data-require-auth
           >
             Sell
           </Button>

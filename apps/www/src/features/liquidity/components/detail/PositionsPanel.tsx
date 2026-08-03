@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useLogin } from "@privy-io/react-auth";
 import { MapPin } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -15,7 +14,6 @@ const TABS = ["Positions", "History"] as const;
 
 export function PositionsPanel({ pool }: { pool: LiquidityPool }) {
   const auth = useAuth();
-  const { login } = useLogin();
   const [tab, setTab] = useState<(typeof TABS)[number]>("Positions");
 
   const walletAddress = auth.authenticated
@@ -66,9 +64,7 @@ export function PositionsPanel({ pool }: { pool: LiquidityPool }) {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={() => login({ walletChainType: "solana-only" })}>
-              Connect Wallet
-            </Button>
+            <Button data-require-auth>Connect Wallet</Button>
             <Button variant="secondary">Learn about DLMM</Button>
           </div>
         </div>

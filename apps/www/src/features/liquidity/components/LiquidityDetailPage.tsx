@@ -163,10 +163,13 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                     />
                   </div>
                   <div className="flex gap-3">
-                    <Button variant="outline">
+                    <Button
+                      variant="outline"
+                      data-require-auth
+                    >
                       <Gift /> Claim Rewards
                     </Button>
-                    <Button>
+                    <Button data-require-auth>
                       <XSquare /> Close Position
                     </Button>
                   </div>
@@ -241,11 +244,14 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                   </div>
 
                   <div className="mt-8 flex gap-3">
-                    <Button variant="outline">
+                    <Button
+                      variant="outline"
+                      data-require-auth
+                    >
                       <Repeat /> Rebalance
                     </Button>
                     <PnlExportDialog>
-                      <Button>
+                      <Button data-require-auth>
                         <Component /> Generate PnL
                       </Button>
                     </PnlExportDialog>

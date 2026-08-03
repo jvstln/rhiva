@@ -172,6 +172,7 @@ function StreamActionsRow({ stream }: { stream: PumpLiveStream }) {
       <Button
         size="sm"
         className="h-7 gap-1.5 rounded-full bg-surface-2 px-3 text-up hover:bg-surface-3 hover:text-up"
+        data-require-auth
       >
         <Zap
           className="size-3 text-up"

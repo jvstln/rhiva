@@ -76,7 +76,10 @@ export function TokenDialog({
               </div>
 
               <SwapDialog>
-                <Button className="min-w-24 self-start px-6 sm:self-auto">
+                <Button
+                  className="min-w-24 self-start px-6 sm:self-auto"
+                  data-require-auth
+                >
                   Swap
                 </Button>
               </SwapDialog>

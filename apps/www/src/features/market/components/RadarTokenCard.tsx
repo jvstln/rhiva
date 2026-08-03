@@ -262,6 +262,7 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
         <Button
           variant="sell"
           size="sm"
+          data-require-auth
         >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
@@ -274,7 +275,10 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
         </Button>
       )}
       {quickBuy !== null && (
-        <Button size="sm">
+        <Button
+          size="sm"
+          data-require-auth
+        >
           <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
             Buy
           </span>

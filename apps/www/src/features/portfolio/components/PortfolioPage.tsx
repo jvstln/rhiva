@@ -129,7 +129,10 @@ const PortfolioPage = () => {
             positionsQuery={positions}
             summary={pnlSummary}
           >
-            <Button className="min-w-24">
+            <Button
+              className="min-w-24"
+              data-require-auth
+            >
               <Calendar />
               PnL
             </Button>
