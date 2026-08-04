@@ -36,7 +36,7 @@ import {
   getTokenBalance,
 } from "../liquidity.util";
 import { RaydiumTrade, type RaydiumTradeInput } from "../liquidity.schema";
-import { LiquidityDepthChart } from "./detail/trade-rail-shared";
+import { LiquidityDepthChart } from "./detail/LiquidityDepthChart";
 import { SideRailRow } from "@/components/ui/side-rail";
 
 const PRICE_PRESETS = ["± 1%", "± 5%", "± 10%", "Custom"] as const;

@@ -11,13 +11,30 @@ type TokenDetailTimeframeStatsProps = {
   onFilterChange: (filters: Partial<TokenDetailFilters>) => void;
 };
 
+const UNIT_TO_MINUTES: Record<string, number> = {
+  m: 1,
+  h: 60,
+  d: 1440,
+  w: 10080,
+};
+
+function timeframeToMinutes(timeframe: string): number {
+  const match = /^(\d+)([mhdw])?$/.exec(timeframe.trim());
+  if (!match) return 0;
+  const value = Number(match[1]);
+  const unit = (match[2] ?? "h").toLowerCase();
+  return value * (UNIT_TO_MINUTES[unit] ?? 60);
+}
+
 export const TokenDetailTimeframeStats = ({
   token,
   filters,
   onFilterChange,
 }: TokenDetailTimeframeStatsProps) => {
   const availableTimeframes = token.timeframes?.windows
-    ? Object.keys(token.timeframes.windows)
+    ? Object.keys(token.timeframes.windows).sort(
+        (a, b) => timeframeToMinutes(a) - timeframeToMinutes(b),
+      )
     : [];
 
   const activeTimeframe = filters.timeframe || "24h";
@@ -42,7 +59,6 @@ export const TokenDetailTimeframeStats = ({
               variant={filters.timeframe === timeframe ? "outline" : "ghost"}
               data-active={filters.timeframe === timeframe || undefined}
               className={cn("h-auto flex-col rounded-md py-2")}
-              tooltip={`${priceChangePct}%`}
             >
               <span className="">{timeframe}</span>
               <p

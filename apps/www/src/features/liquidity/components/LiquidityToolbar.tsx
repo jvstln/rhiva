@@ -11,7 +11,7 @@ import { PoolColumns } from "../liquidity.schema";
 import { SolanaIcon } from "@/components/ui/icons";
 import { Separator } from "@/components/ui/separator";
 import { useLiquidityStore } from "../liquidity.store";
-import { PoolFiltersDialog } from "./PoolFiltersDialog";
+import { PoolFiltersDialog } from "./LiquidityFiltersDialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import {
@@ -112,7 +112,7 @@ const ZapInInput = ({
   const [internalValue, setInternalValue] = useState(zapIn?.toString() || "");
 
   return (
-    <div className="flex w-36 rounded-full border *:rounded-none *:border-0 *:first:rounded-s-full *:last:rounded-e-full *:[button]:h-auto">
+    <div className="flex w-40 rounded-full border *:rounded-none *:border-0 *:first:rounded-s-full *:last:rounded-e-full *:[button]:h-auto">
       <Button
         size="sm"
         variant="soft"

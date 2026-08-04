@@ -7,6 +7,7 @@ import { InfoBadge } from "@/components/ui/info-badge";
 import { QueryState } from "@/components/layout/QueryState";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
+import { cn } from "@/lib";
 
 const columnHelper = createColumnHelper<TradeRow>();
 
@@ -24,7 +25,16 @@ const columns = [
   }),
   columnHelper.accessor("side", {
     header: "Type",
-    cell: ({ getValue }) => <span>{getValue()}</span>,
+    cell: ({ getValue }) => (
+      <span
+        className={cn(
+          "capitalize",
+          getValue() === "sell" ? "text-down" : "text-up",
+        )}
+      >
+        {getValue()}
+      </span>
+    ),
   }),
   columnHelper.accessor("sol_amount", {
     header: "SOL Amount",

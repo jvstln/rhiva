@@ -19,23 +19,19 @@ export const LiquidityAvatar = ({ liquidity }: LiquidityInfoProps) => {
   const { token_a, token_b } = liquidity;
 
   return (
-    <div className="relative flex w-21 *:data-[slot=avatar]:border">
-      <Avatar
-        variant="circle"
-        size={"lg"}
-      >
+    <div className="relative flex *:data-[slot=avatar]:border">
+      <Avatar variant="circle">
         <AvatarImage src={token_a?.logo_uri ?? undefined} />
         <AvatarFallback>{getInitials(token_a?.name ?? null)}</AvatarFallback>
       </Avatar>
 
       <Avatar
         variant="circle"
-        size={"lg"}
-        className={"relative top-0 -translate-x-2/3"}
+        className={"relative top-0 -translate-x-1/4"}
       >
         <AvatarImage src={token_b?.logo_uri ?? undefined} />
         <AvatarFallback>{getInitials(token_b?.name ?? null)}</AvatarFallback>
-        {dex && <dex.icon className="absolute right-0 bottom-0" />}
+        {dex && <dex.icon className="absolute -right-1 bottom-0" />}
       </Avatar>
     </div>
   );

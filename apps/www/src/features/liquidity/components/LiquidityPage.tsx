@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo } from "react";
 
-import { PoolsToolbar } from "./PoolsToolbar";
+import { PoolsToolbar } from "./LiquidityToolbar";
 import { Separator } from "@/components/ui/separator";
 import { useLiquidityPools } from "../liquidity.hook";
 import { formatCompactCurrency } from "@/lib/finance.util";

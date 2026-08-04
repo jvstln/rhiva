@@ -161,6 +161,7 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
       {changePercent !== undefined && changePercent !== null ? (
         <InfoBadge
           className={cn(
+            "text-xs",
             changePercent >= 0
               ? "[--accent:var(--color-up)]"
               : "[--accent:var(--color-down)]",
@@ -249,7 +250,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         id: "pairInfo",
         header: "Pair Info",
         cell: ({ row }) => <PairInfoCell token={row.original} />,
-        size: 500,
+        size: 400,
       },
       {
         id: "marketCap",
@@ -276,15 +277,10 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         id: "liquidity",
         header: "Liquidity",
         cell: ({ row }) => {
-          const liq = row.original.liquidity_usd;
           return (
-            <MetricCell
-              value={
-                liq !== null && liq !== undefined
-                  ? formatCompactCurrency(liq)
-                  : "N/A"
-              }
-            />
+            <span className="font-medium text-sm">
+              {formatCompactCurrency(row.original.liquidity_usd)}
+            </span>
           );
         },
       },
@@ -294,13 +290,9 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         cell: ({ row }) => {
           const vol = row.original.timeframes?.windows?.[timeframe]?.volume_usd;
           return (
-            <MetricCell
-              value={
-                vol !== null && vol !== undefined
-                  ? formatCompactCurrency(vol)
-                  : "N/A"
-              }
-            />
+            <span className="font-medium text-sm">
+              {formatCompactCurrency(vol)}
+            </span>
           );
         },
       },
@@ -352,7 +344,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
             </div>
           );
         },
-        size: 300,
+        size: 220,
       },
       {
         id: "action",

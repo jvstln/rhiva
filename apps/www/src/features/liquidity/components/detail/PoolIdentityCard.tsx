@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+import { ArrowLeftRight } from "lucide-react";
 import type { TokenDetail } from "@rhivadotfun/dataapi";
 import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/LiquidityAvatar";
@@ -5,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCompactCurrency } from "@/lib/finance.util";
 import { cn, getInitials } from "@/lib/utils";
 import { BarGraph } from "../BarGraph";
+import { formatPrice, getPoolPriceInQuote } from "../../liquidity.util";
 
 export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
   const baseSymbol =
@@ -33,6 +38,8 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
           </p>
         </div>
       </div>
+
+      <PoolPriceToggle pool={pool} />
 
       <TokenBalanceRow
         token={pool.token_a}
@@ -70,6 +77,56 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
           <span>{pool.tvl_distribution?.base_pct?.toFixed(2) ?? "—"}%</span>
           <span>{pool.tvl_distribution?.quote_pct?.toFixed(2) ?? "—"}%</span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function PoolPriceToggle({ pool }: { pool: LiquidityPool }) {
+  const [inverted, setInverted] = useState(false);
+  const priceInQuote = getPoolPriceInQuote(pool);
+
+  const baseSymbol =
+    pool.token_a?.symbol ||
+    pool.base_symbol ||
+    pool.token_a?.mint.slice(0, 6) ||
+    "---";
+  const quoteSymbol = pool.token_b?.symbol || "SOL";
+
+  const value =
+    priceInQuote != null && priceInQuote > 0
+      ? inverted
+        ? priceInQuote
+        : 1 / priceInQuote
+      : null;
+  const pair = inverted
+    ? `${quoteSymbol}/${baseSymbol}`
+    : `${baseSymbol}/${quoteSymbol}`;
+  const toggleTo = inverted
+    ? `${baseSymbol}/${quoteSymbol}`
+    : `${quoteSymbol}/${baseSymbol}`;
+
+  return (
+    <div className="space-y-3 border-border/70 border-y py-3">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-gray text-xs">Current Pool Price</span>
+        <button
+          type="button"
+          onClick={() => setInverted((value) => !value)}
+          title={`Toggle to ${toggleTo}`}
+          className="flex items-center gap-1.5 text-start font-semibold text-b-2 text-foreground transition-colors hover:text-foreground/80"
+        >
+          <span>
+            {value == null ? "—" : formatPrice(value, 10)} {pair}
+          </span>
+          <ArrowLeftRight className="size-3.5 text-gray" />
+        </button>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-gray text-xs">Total Value Locked</span>
+        <span className="font-semibold text-b-2 text-white">
+          {formatCompactCurrency(pool.tvl_usd)}
+        </span>
       </div>
     </div>
   );

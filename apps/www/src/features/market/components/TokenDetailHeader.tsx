@@ -138,17 +138,19 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
             : "N/A"}
         </InfoBadge>
 
-        {headerStats.map((stat, i) => (
-          <React.Fragment key={stat.label}>
-            {i !== 0 && <Separator orientation="vertical" />}
-            <div>
-              <p className="text-b-5 text-gray">{stat.label}</p>
-              <p className={cn("font-semibold text-b-2 text-foreground")}>
-                {stat.value}
-              </p>
-            </div>
-          </React.Fragment>
-        ))}
+        <div className="flex items-center gap-5">
+          {headerStats.map((stat, i) => (
+            <React.Fragment key={stat.label}>
+              {i !== 0 && <Separator orientation="vertical" />}
+              <div>
+                <p className="text-muted-foreground text-xs">{stat.label}</p>
+                <p className={cn("font-semibold text-foreground text-lg")}>
+                  {stat.value}
+                </p>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
       </div>
       <ScrollBar
         orientation="horizontal"

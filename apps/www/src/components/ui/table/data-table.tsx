@@ -50,7 +50,7 @@ const variants = {
   default: {
     table: cn("w-full border-collapse text-left"),
     th: cn(
-      "relative h-10 align-middle font-semibold text-muted-foreground text-xs uppercase tracking-wider",
+      "relative h-10 align-middle font-semibold text-muted-foreground text-xs capitalize tracking-wider",
       "border-border/40 border-b bg-transparent px-4 text-left",
     ),
     tr: cn(
@@ -61,7 +61,7 @@ const variants = {
   compact: {
     table: cn("w-full border-collapse text-left"),
     th: cn(
-      "relative h-8 align-middle font-semibold text-muted-foreground text-xs uppercase tracking-wider",
+      "relative h-8 align-middle font-semibold text-muted-foreground text-xs capitalize tracking-wider",
       "border-border/40 border-b bg-transparent px-2 text-left",
     ),
     tr: cn(

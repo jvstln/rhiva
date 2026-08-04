@@ -37,7 +37,7 @@ import {
   getTokenBalance,
 } from "../liquidity.util";
 import { OrcaTrade, type OrcaTradeInput } from "../liquidity.schema";
-import { LiquidityDepthChart } from "./detail/trade-rail-shared";
+import { LiquidityDepthChart } from "./detail/LiquidityDepthChart";
 import { SideRailRow } from "@/components/ui/side-rail";
 
 export function OrcaTradeRail({ pool }: { pool: LiquidityPool }) {
