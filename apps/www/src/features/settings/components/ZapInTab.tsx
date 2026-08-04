@@ -32,7 +32,7 @@ function toNumber(value: string) {
 
 export function ZapInTab() {
   const zapIn = useSettingsStore((state) => state.zapIn);
-  const { setDex, setCurveType, setSettings } = zapIn;
+  const setZapInSettings = useSettingsStore((state) => state.setZapInSettings);
 
   const dex = zapIn.settings[zapIn.dex] ? zapIn.dex : "meteora-dlmm";
   const settings = zapIn.settings[dex];
@@ -55,7 +55,17 @@ export function ZapInTab() {
             inputMode="decimal"
             placeholder="0.0"
             value={settings.amount}
-            onValueChange={(value) => setSettings({ amount: toNumber(value) })}
+            onValueChange={(value) =>
+              setZapInSettings({
+                settings: {
+                  ...zapIn.settings,
+                  [dex]: {
+                    ...zapIn.settings[dex],
+                    amount: toNumber(value),
+                  },
+                },
+              })
+            }
           />
           <InputGroupAddon align="inline-end">
             <SolanaIcon />
@@ -68,7 +78,7 @@ export function ZapInTab() {
 
       <Tabs
         value={dex}
-        onValueChange={(value) => setDex(value as PoolDex)}
+        onValueChange={(value) => setZapInSettings({ dex: value as PoolDex })}
       >
         <TabsList
           className="w-full"
@@ -94,9 +104,15 @@ export function ZapInTab() {
             value={[settings.liquiditySlippageMode]}
             onValueChange={([value]) => {
               if (!value) return;
-              setSettings({
-                liquiditySlippageMode: value as SlippageMode,
-                ...(Number(value) && { liquiditySlippage: Number(value) }),
+              setZapInSettings({
+                settings: {
+                  ...zapIn.settings,
+                  [dex]: {
+                    ...zapIn.settings[dex],
+                    liquiditySlippageMode: value as SlippageMode,
+                    ...(Number(value) && { liquiditySlippage: Number(value) }),
+                  },
+                },
               });
             }}
           >
@@ -129,7 +145,15 @@ export function ZapInTab() {
               inputMode="decimal"
               value={settings.liquiditySlippage}
               onValueChange={(value) =>
-                setSettings({ liquiditySlippage: toNumber(value) })
+                setZapInSettings({
+                  settings: {
+                    ...zapIn.settings,
+                    [dex]: {
+                      ...zapIn.settings[dex],
+                      liquiditySlippage: toNumber(value),
+                    },
+                  },
+                })
               }
             />
             <InputGroupAddon align="inline-end">
@@ -147,9 +171,15 @@ export function ZapInTab() {
             value={[settings.swapSlippageMode]}
             onValueChange={([value]) => {
               if (!value) return;
-              setSettings({
-                swapSlippageMode: value as SlippageMode,
-                ...(Number(value) && { swapSlippage: Number(value) }),
+              setZapInSettings({
+                settings: {
+                  ...zapIn.settings,
+                  [dex]: {
+                    ...zapIn.settings[dex],
+                    swapSlippageMode: value as SlippageMode,
+                    ...(Number(value) && { swapSlippage: Number(value) }),
+                  },
+                },
               });
             }}
           >
@@ -170,7 +200,15 @@ export function ZapInTab() {
             inputMode="decimal"
             value={settings.swapSlippage}
             onValueChange={(value) =>
-              setSettings({ swapSlippage: toNumber(value) })
+              setZapInSettings({
+                settings: {
+                  ...zapIn.settings,
+                  [dex]: {
+                    ...zapIn.settings[dex],
+                    swapSlippage: toNumber(value),
+                  },
+                },
+              })
             }
           />
           <InputGroupAddon align="inline-end">
@@ -189,7 +227,9 @@ export function ZapInTab() {
                 value={[zapIn.curveType]}
                 onValueChange={([value]) => {
                   if (!value) return;
-                  setCurveType(value as keyof typeof Strategy);
+                  setZapInSettings({
+                    curveType: value as keyof typeof Strategy,
+                  });
                 }}
               >
                 {(
@@ -238,7 +278,15 @@ export function ZapInTab() {
           className="flex flex-row gap-2"
           value={settings.binRangeMode}
           onValueChange={(value) =>
-            setSettings({ binRangeMode: value as BinRangeMode })
+            setZapInSettings({
+              settings: {
+                ...zapIn.settings,
+                [dex]: {
+                  ...zapIn.settings[dex],
+                  binRangeMode: value as BinRangeMode,
+                },
+              },
+            })
           }
         >
           {(
@@ -267,11 +315,17 @@ export function ZapInTab() {
               inputMode="numeric"
               value={settings.rangeFromCurrentPrice[0]}
               onValueChange={(value) =>
-                setSettings({
-                  rangeFromCurrentPrice: [
-                    toNumber(value),
-                    settings.rangeFromCurrentPrice[1],
-                  ],
+                setZapInSettings({
+                  settings: {
+                    ...zapIn.settings,
+                    [dex]: {
+                      ...zapIn.settings[dex],
+                      rangeFromCurrentPrice: [
+                        toNumber(value),
+                        settings.rangeFromCurrentPrice[1],
+                      ],
+                    },
+                  },
                 })
               }
             />
@@ -284,11 +338,17 @@ export function ZapInTab() {
               inputMode="numeric"
               value={settings.rangeFromCurrentPrice[1]}
               onValueChange={(value) =>
-                setSettings({
-                  rangeFromCurrentPrice: [
-                    settings.rangeFromCurrentPrice[0],
-                    toNumber(value),
-                  ],
+                setZapInSettings({
+                  settings: {
+                    ...zapIn.settings,
+                    [dex]: {
+                      ...zapIn.settings[dex],
+                      rangeFromCurrentPrice: [
+                        settings.rangeFromCurrentPrice[0],
+                        toNumber(value),
+                      ],
+                    },
+                  },
                 })
               }
             />

@@ -54,3 +54,45 @@ export const MeteoraTrade = z
 
 export type MeteoraTradeInput = z.input<typeof MeteoraTrade>;
 export type MeteoraTrade = z.infer<typeof MeteoraTrade>;
+
+export const OrcaTrade = z
+  .object({
+    tab: z.enum(["full", "custom"]),
+    tradeType: z.enum(["full-sided", "single-sided"]),
+    selectedCurrency: z.enum(["base", "quote"]),
+    amount: z.coerce.number<string>().gt(0),
+    minPrice: z.coerce.number<string>().positive(),
+    maxPrice: z.coerce.number<string>().positive(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.minPrice >= value.maxPrice) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["minPrice"],
+        message: "Min price must be below the max price",
+      });
+    }
+  });
+
+export type OrcaTradeInput = z.input<typeof OrcaTrade>;
+export type OrcaTrade = z.infer<typeof OrcaTrade>;
+
+export const RaydiumTrade = z
+  .object({
+    preset: z.string(),
+    minPrice: z.coerce.number<string>().positive(),
+    maxPrice: z.coerce.number<string>().positive(),
+    amount: z.coerce.number<string>().gt(0),
+  })
+  .superRefine((value, ctx) => {
+    if (value.minPrice >= value.maxPrice) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["minPrice"],
+        message: "Min price must be below the max price",
+      });
+    }
+  });
+
+export type RaydiumTradeInput = z.input<typeof RaydiumTrade>;
+export type RaydiumTrade = z.infer<typeof RaydiumTrade>;

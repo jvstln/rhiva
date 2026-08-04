@@ -41,7 +41,7 @@ export function useTokens(mints: string[]) {
 
 export function useTrendingTokens(filters: TrendingFilters) {
   return useQuery({
-    queryKey: ["market", "trending"],
+    queryKey: ["market", "trending", filters.timeframe],
     queryFn: () => getTrendingTokens(filters),
   });
 }

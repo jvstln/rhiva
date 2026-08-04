@@ -5,9 +5,6 @@ import { immer } from "zustand/middleware/immer";
 import { devtools, persist } from "zustand/middleware";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
-import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
-import type { PoolDex } from "@/features/liquidity/liquidity.schema";
-
 import type {
   LpSettings,
   SettingsState,
@@ -66,30 +63,6 @@ const defaultZapInState: Omit<
   },
 };
 
-const createDefaultZapInState = (
-  set: (fn: (state: WritableDraft<SettingsState>) => void) => void,
-): ZapInState => ({
-  ...defaultZapInState,
-  setDex(dex: PoolDex) {
-    set((state) => {
-      state.zapIn.dex = dex;
-    });
-  },
-  setCurveType(curveType: keyof typeof Strategy) {
-    set((state) => {
-      state.zapIn.curveType = curveType;
-    });
-  },
-  setSettings(settings: Partial<ZapInDexSettings>) {
-    set((state) => {
-      if (!state.zapIn.settings[state.zapIn.dex]) {
-        state.zapIn.dex = "meteora-dlmm";
-      }
-      merge(state.zapIn.settings[state.zapIn.dex], settings);
-    });
-  },
-});
-
 const defaultZapOutSettings: ZapOutSettings = {
   liquiditySlippage: 0.2,
   outputToken: {
@@ -111,7 +84,7 @@ export const useSettingsStore = create<SettingsState>()(
         (set): SettingsState => ({
           zapOut: { ...defaultZapOutSettings },
           lp: { ...defaultLpSettings },
-          zapIn: createDefaultZapInState(set),
+          zapIn: { ...defaultZapInState },
           transaction: { ...defaultTransactionSettings },
           trading: {
             activePreset: "preset-1",
@@ -133,6 +106,12 @@ export const useSettingsStore = create<SettingsState>()(
           setLpSettings: (settings) => {
             set((state) => {
               merge(state.lp, settings);
+            });
+          },
+
+          setZapInSettings: (settings) => {
+            set((state) => {
+              merge(state.zapIn, settings);
             });
           },
 
@@ -172,7 +151,8 @@ export const useSettingsStore = create<SettingsState>()(
             set((state) => {
               state.transaction = { ...defaultTransactionSettings };
               state.lp = { ...defaultLpSettings };
-              state.zapIn = createDefaultZapInState(set);
+              state.zapIn = { ...defaultZapInState };
+              state.zapOut = { ...defaultZapOutSettings };
               state.trading = {
                 activePreset: "preset-1",
                 activeBuySellMode: "buy",

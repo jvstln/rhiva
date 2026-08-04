@@ -78,6 +78,35 @@ export function getBinsInRange(
   );
 }
 
+/** Fractional price change below/above the current price for a given range. */
+export function getPriceChangesFromCurrentPrice(
+  price: number,
+  minPrice: number,
+  maxPrice: number,
+): [number, number] | null {
+  if (price <= 0 || minPrice <= 0 || maxPrice <= minPrice) return null;
+  return [(price - minPrice) / price, (maxPrice - price) / price] as [
+    number,
+    number,
+  ];
+}
+
+/** Bin delta ids below/above the active bin for a given price range. */
+export function getBinDeltasFromRange(
+  pool: LiquidityPool,
+  price: number,
+  minPrice: number,
+  maxPrice: number,
+): [number, number] | null {
+  if (price <= 0 || minPrice <= 0 || maxPrice <= minPrice) return null;
+  const binStepRatio = 1 + (pool.bin_step ?? 0) / 10_000;
+  if (binStepRatio <= 1) return null;
+  return [
+    Math.round(Math.log(price / minPrice) / Math.log(binStepRatio)),
+    Math.round(Math.log(maxPrice / price) / Math.log(binStepRatio)),
+  ] as [number, number];
+}
+
 export function formatPrice(value?: number | null, digits = 6): string {
   if (value === null || value === undefined || !Number.isFinite(value)) {
     return "—";

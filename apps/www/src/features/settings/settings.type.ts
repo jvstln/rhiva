@@ -76,9 +76,6 @@ export interface ZapInState {
   dex: PoolDex;
   curveType: keyof typeof Strategy;
   settings: Record<PoolDex, ZapInDexSettings>;
-  setDex: (dex: PoolDex) => void;
-  setCurveType: (curveType: keyof typeof Strategy) => void;
-  setSettings: (settings: Partial<ZapInDexSettings>) => void;
 }
 
 export interface ZapOutSettings {
@@ -105,6 +102,7 @@ export interface SettingsState {
   notifications: NotificationSettings[];
   setTransactionSettings: (settings: Partial<TransactionSettings>) => void;
   setLpSettings: (settings: Partial<LpSettings>) => void;
+  setZapInSettings: (settings: Partial<ZapInState>) => void;
   setZapOutSettings: (settings: Partial<ZapOutSettings>) => void;
   setTradingSettings: (
     settings: Partial<Omit<TradingSettings, "presets">>,

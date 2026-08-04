@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { capitalize } from "@/lib/utils";
+import { useZapIn } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { useSettingsStore } from "@/features/settings/settings.store";
+import type { ZapInDexSettings } from "@/features/settings/settings.type";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Field,
@@ -28,6 +32,8 @@ import { usePoolTokenBalances } from "../liquidity.hook";
 import {
   formatBalance,
   getBinsInRange,
+  getBinDeltasFromRange,
+  getPoolPriceInQuote,
   getPoolTokens,
   getTokenBalance,
 } from "../liquidity.util";
@@ -43,6 +49,55 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
 
   const token = activeToken === "base" ? base : quote;
   const balance = getTokenBalance(balances, token.mint);
+  const price = getPoolPriceInQuote(pool) ?? 0;
+
+  const dex = "meteora-dlmm" as const;
+  const zapInState = useSettingsStore((state) => state.zapIn);
+  const setZapInSettings = useSettingsStore((state) => state.setZapInSettings);
+  const zapIn = useZapIn({ pool: pool.pool_address, dex });
+
+  const handleSubmit = (values: MeteoraTrade) => {
+    const range = getBinDeltasFromRange(
+      pool,
+      price,
+      values.minPrice,
+      values.maxPrice,
+    );
+
+    const settings: Partial<ZapInDexSettings> = {
+      amount: values.amount,
+      inputToken: {
+        mint: token.mint ?? "",
+        decimals: token.decimals ?? 9,
+      },
+    };
+    if (range) settings.rangeFromCurrentPrice = range;
+
+    setZapInSettings({
+      dex,
+      curveType:
+        values.type === "spot"
+          ? "Spot"
+          : values.type === "curve"
+            ? "Curve"
+            : "BidAsk",
+      settings: {
+        ...zapInState.settings,
+        [dex]: { ...zapInState.settings[dex], ...settings },
+      },
+    });
+
+    zapIn.mutate(undefined, {
+      onSuccess(response) {
+        toast.success(
+          `Position opened! Bundle: ${response.bundleId.slice(0, 8)}...`,
+        );
+      },
+      onError(error) {
+        toast.error(error.message);
+      },
+    });
+  };
 
   const form = useForm<MeteoraTradeInput, unknown, MeteoraTrade>({
     resolver: zodResolver(MeteoraTrade),
@@ -231,7 +286,16 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
         <div className="flex items-center gap-2">
           <ToggleGroup size="xs">
             {[1, 5, 10].map((preset) => (
-              <ToggleGroupItem key={preset}>±{preset}%</ToggleGroupItem>
+              <ToggleGroupItem
+                key={preset}
+                onPressedChange={(pressed) => {
+                  if (!pressed) return;
+                  form.setValue("minPrice", String(price * (1 - preset / 100)));
+                  form.setValue("maxPrice", String(price * (1 + preset / 100)));
+                }}
+              >
+                ±{preset}%
+              </ToggleGroupItem>
             ))}
           </ToggleGroup>
 
@@ -245,7 +309,11 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
           <Field>
             <FieldLabel className="text-xs">Min price</FieldLabel>
             <InputGroup size="sm">
-              <InputGroupInput inputMode="decimal" />
+              <InputGroupInput
+                inputMode="decimal"
+                value={minPrice}
+                onValueChange={(v) => form.setValue("minPrice", v)}
+              />
               <InputGroupAddon align="inline-end">
                 <InputGroupText>{0.3}%</InputGroupText>
               </InputGroupAddon>
@@ -254,7 +322,11 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
           <Field>
             <FieldLabel className="text-xs">Max price</FieldLabel>
             <InputGroup size="sm">
-              <InputGroupInput inputMode="decimal" />
+              <InputGroupInput
+                inputMode="decimal"
+                value={maxPrice}
+                onValueChange={(v) => form.setValue("maxPrice", v)}
+              />
               <InputGroupAddon align="inline-end">
                 <InputGroupText>{0.3}%</InputGroupText>
               </InputGroupAddon>
@@ -274,7 +346,14 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
         </div>
 
         <div className="sticky bottom-4 bg-background py-2">
-          <Button className="w-full">Open Position</Button>
+          <Button
+            className="w-full"
+            data-require-auth
+            loading={zapIn.isPending}
+            onClick={form.handleSubmit(handleSubmit)}
+          >
+            Open Position
+          </Button>
         </div>
       </div>
     </aside>

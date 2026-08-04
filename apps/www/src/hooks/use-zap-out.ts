@@ -5,10 +5,11 @@ import type { jitoConfigSchema } from "@rhivadotfun/api";
 import { useUserApi } from "./use-user-api";
 import { useSettingsStore } from "@/features/settings/settings.store";
 import { toJitoPriorityLevel } from "@/features/settings/settings.util";
+import type { PoolDex } from "@/features/liquidity/liquidity.schema";
 
 type ZapInParams = {
   position: string;
-  dex: "meteora-dlmm" | "orca" | "raydium-clmm";
+  dex: PoolDex;
 };
 
 export const useZapOut = (params: ZapInParams) => {
@@ -57,7 +58,7 @@ export const useZapOut = (params: ZapInParams) => {
           position: params.position,
         });
       }
-      case "orca": {
+      case "orca-whirlpool": {
         return userApi.transaction.dex.orca.whirlpool.buildTransaction({
           slippage,
           outputMint,

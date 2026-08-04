@@ -1,5 +1,6 @@
 import type z from "zod";
 import { useCallback, useMemo } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Strategy } from "@rhivadotfun/zap/dex/meteora";
 import type { jitoConfigSchema } from "@rhivadotfun/api";
 
@@ -16,9 +17,7 @@ type ZapInParams = {
 
 export const useZapIn = (params: ZapInParams) => {
   const userApi = useUserApi();
-  const [zapIn, transactionSettings] = useSettingsStore(
-    (store) => [store.zapIn, store.transaction] as const,
-  );
+  const transactionSettings = useSettingsStore((store) => store.transaction);
 
   const jitoConfig: z.infer<typeof jitoConfigSchema> = useMemo(() => {
     if (transactionSettings.broadcastMode === "jito-only")
@@ -37,7 +36,8 @@ export const useZapIn = (params: ZapInParams) => {
     };
   }, [transactionSettings]);
 
-  return useCallback(() => {
+  const build = useCallback(() => {
+    const { zapIn } = useSettingsStore.getState();
     const dexSettings = zapIn.settings[params.dex];
     const rawAmount = params.amount ? params.amount : dexSettings.amount;
     const [minDeltaId, maxDeltaId] = dexSettings.rangeFromCurrentPrice;
@@ -108,5 +108,9 @@ export const useZapIn = (params: ZapInParams) => {
           priceChanges: dexSettings.priceChangesFromCurrentPrice,
         });
     }
-  }, [params, userApi, zapIn, jitoConfig]);
+  }, [params, userApi, jitoConfig]);
+
+  return useMutation({
+    mutationFn: build,
+  });
 };

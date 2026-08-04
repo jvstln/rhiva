@@ -415,7 +415,7 @@ export function PoolsTable() {
   });
 
   const pinnedColumnClassName = cn(
-    "bg-background data-[column-id=action]:sticky data-[column-id=action]:right-0 data-[column-id=action]:shadow-[inset_1px_0_var(--color-border)]",
+    "data-[column-id=action]:sticky data-[column-id=action]:right-0 data-[column-id=action]:bg-background data-[column-id=action]:shadow-[inset_1px_0_var(--color-border)] [tr:hover]:bg-background",
     "w-auto!",
   );
 
