@@ -7,11 +7,11 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePrivy, type WalletWithMetadata } from "@privy-io/react-auth";
 
-import { cn } from "@/lib/utils";
 import { useUserApi } from "@/hooks";
 import { TokenSelect } from "./TokenSelect";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn, truncateString } from "@/lib/utils";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import {
   Withdraw,
@@ -153,8 +153,7 @@ export function WithdrawDialog({
                           </span>
                         </div>
                         <span className="font-mono text-[10px] text-muted-foreground">
-                          {wallet.address.slice(0, 6)}...
-                          {wallet.address.slice(-4)}
+                          {truncateString(wallet.address)}
                         </span>
                       </button>
                     ))}
