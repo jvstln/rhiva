@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
+import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
 import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
 import { CopyButton } from "@/components/ui/button/copy-button";
@@ -33,7 +33,7 @@ import { REWARD_TIERS } from "@/features/reward/reward.schema";
 import { useRewardProfile } from "@/features/reward/reward.hook";
 import { QueryState } from "@/components/layout/QueryState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /* ------------------------------------------------------------------ */
 /* Current tier card                                                    */
@@ -170,7 +170,8 @@ function StatCard({
 
 function ReferralCard() {
   const rewardProfile = useRewardProfile();
-  const [safeWindow] = useState(() => window);
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(window.location.origin), []);
 
   return (
     <div
@@ -197,12 +198,12 @@ function ReferralCard() {
             <InputGroup>
               <InputGroupInput
                 readOnly
-                value={`${safeWindow.location.origin}?referralCode=${rewardProfile.data.refererCode}`}
+                value={`${origin}?referralCode=${rewardProfile.data.refererCode}`}
               />
               <InputGroupAddon align={"inline-end"}>
                 <CopyButton
                   size="icon-lg"
-                  copy={`${safeWindow.location.origin}?referralCode=${rewardProfile.data.refererCode}`}
+                  copy={`${origin}?referralCode=${rewardProfile.data.refererCode}`}
                 />
               </InputGroupAddon>
             </InputGroup>

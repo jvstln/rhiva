@@ -27,7 +27,7 @@ import {
   getPoolPriceInQuote,
 } from "@/features/liquidity/liquidity.util";
 import { BarGraph } from "./BarGraph";
-import { useZapOut } from "@/hooks";
+import { useZapOut } from "@/features/transaction/hooks/use-zap-out";
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
   const router = useRouter();

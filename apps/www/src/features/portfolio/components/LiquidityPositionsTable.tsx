@@ -17,7 +17,7 @@ import type { LpPosition, TokenDetail } from "@rhivadotfun/dataapi";
 import { useTokens } from "@/features/market/market.hook";
 import { useMemo } from "react";
 import { useLiquidityPool } from "@/features/liquidity/liquidity.hook";
-import { useZapOut } from "@/hooks";
+import { useZapOut } from "@/features/transaction/hooks/use-zap-out";
 
 type LpPositionWithToken = LpPosition & {
   token: { isPending: boolean; data?: TokenDetail };
