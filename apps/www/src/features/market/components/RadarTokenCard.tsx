@@ -45,6 +45,8 @@ import {
   TotalHolders,
   FreshHold,
 } from "./tooltips/Holders";
+import { toast } from "sonner";
+import { useSwap } from "@/features/transaction/hooks/use-swap";
 
 const TransactionInfo = ({ token }: { token: TokenDetail }) => {
   const window24h =
@@ -98,7 +100,7 @@ const TransactionInfo = ({ token }: { token: TokenDetail }) => {
         <InfoBadge tooltip="Net buy">
           N
           <span className="[--accent:var(--color-up)]">
-            {formatCompactNumber(token.net_buy_usd)}
+            {formatCompactCurrency(token.net_buy_usd)}
           </span>
         </InfoBadge>
 
@@ -235,26 +237,36 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
               <div className="flex shrink-0 gap-1.5">
-                <BuyAndSellActions column={column} />
+                <BuyAndSellActions
+                  column={column}
+                  token={token}
+                />
               </div>
             </div>
           </div>
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        Bonding: {token.bonding?.completion_pct ?? 0}%
+        Bonding: {formatCompactNumber(token.bonding?.completion_pct)}%
       </TooltipContent>
     </Tooltip>
   );
 }
 
-const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
+const BuyAndSellActions = ({
+  column,
+  token,
+}: {
+  column: RadarColumns;
+  token: TokenDetail;
+}) => {
   const quickBuy = useMarketStore(
     (state) => state.radarFilters[column].quickBuy,
   );
   const quickSell = useMarketStore(
     (state) => state.radarFilters[column].quickSell,
   );
+  const swap = useSwap();
 
   return (
     <div className="flex items-center justify-start gap-2">
@@ -263,6 +275,21 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
           variant="sell"
           size="sm"
           data-require-auth
+          loading={swap.isPending && swap.variables.action === "sell"}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (quickSell <= 0) {
+              return toast.error("Quick sell amount must be greater than zero");
+            }
+
+            swap.mutate({
+              action: "sell",
+              inputMint: token.mint,
+              inputDecimals: token.decimals,
+              amount: quickSell,
+            });
+          }}
         >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
             Sell
@@ -278,6 +305,20 @@ const BuyAndSellActions = ({ column }: { column: RadarColumns }) => {
         <Button
           size="sm"
           data-require-auth
+          loading={swap.isPending && swap.variables.action === "buy"}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (quickBuy <= 0) {
+              return toast.error("Quick buy amount must be greater than zero");
+            }
+
+            swap.mutate({
+              action: "buy",
+              outputMint: token.mint,
+              amount: quickBuy,
+            });
+          }}
         >
           <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
             Buy

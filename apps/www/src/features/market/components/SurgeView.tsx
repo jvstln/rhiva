@@ -41,6 +41,8 @@ import {
   SnipersHold,
   TotalHolders,
 } from "./tooltips/Holders";
+import { toast } from "sonner";
+import { useSwap } from "@/features/transaction/hooks/use-swap";
 
 const SURGE_METRICS: Array<
   (props: { token: TokenDetail }) => React.JSX.Element
@@ -146,7 +148,7 @@ function TokenRow({ token }: TokenRowProps) {
             </span>
 
             <span className="text-up">
-              {formatSignedPercent(token.price_change_percent, 1)}
+              {formatSignedPercent(token.price_change_percent)}
             </span>
           </div>
 
@@ -198,7 +200,7 @@ function TokenRow({ token }: TokenRowProps) {
                 )
               : "N/A"}
           </InfoBadge>
-          <SurgeBuyButton />
+          <SurgeBuyButton token={token} />
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-x-1 **:data-[slot=info-badge]:text-sm">
@@ -275,8 +277,9 @@ export function SurgeTable() {
   );
 }
 
-const SurgeBuyButton = () => {
+const SurgeBuyButton = ({ token }: { token: TokenDetail }) => {
   const quickBuy = useMarketStore((state) => state.surgeFilters.quickBuy) ?? 0;
+  const swap = useSwap();
 
   return (
     quickBuy !== null && (
@@ -284,6 +287,20 @@ const SurgeBuyButton = () => {
         size="sm"
         variant={"soft"}
         data-require-auth
+        loading={swap.isPending}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (quickBuy <= 0) {
+            return toast.error("Quick buy amount must be greater than zero");
+          }
+
+          swap.mutate({
+            action: "buy",
+            outputMint: token.mint,
+            amount: quickBuy,
+          });
+        }}
       >
         <Zap
           className="size-3"

@@ -20,7 +20,7 @@ import {
 } from "@/lib/utils";
 import { POOL_DEXES, type PoolDex } from "../liquidity.schema";
 import { useLiquidityStore } from "../liquidity.store";
-import type { PoolWithTokens } from "../liquidity.type";
+import type { LiquidityPool } from "../liquidity.type";
 import { useRouter } from "next/navigation";
 import { QueryState } from "@/components/layout/QueryState";
 import {
@@ -29,6 +29,7 @@ import {
 } from "./tooltips/LiquidityAvatar";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
+import { useZapIn } from "@/features/transaction/hooks/use-zap-in";
 
 function ValueChangeCell({
   value,
@@ -97,13 +98,25 @@ export function AddLiquidityToWatchlistButton({
   );
 }
 
-function ZapInButton() {
-  const zapIn = useLiquidityStore((state) => state.liquidityFilters.zapIn);
+function ZapInButton({ pool }: { pool: LiquidityPool }) {
+  const zapInAmount = useLiquidityStore(
+    (state) => state.liquidityFilters.zapIn,
+  );
+  const zapIn = useZapIn();
 
   return (
     <Button
       aria-label="Zap in"
+      data-require-auth
       variant={"secondary"}
+      loading={zapIn.isPending}
+      onClick={() => {
+        zapIn.mutate({
+          pool: pool.pool_address,
+          amount: Number(zapInAmount),
+          dex: pool.dex,
+        });
+      }}
       onMouseEnter={(e) => {
         gsap.context(() => {
           gsap.to("[data-slot='action-value']", {
@@ -124,12 +137,12 @@ function ZapInButton() {
       }}
     >
       <Rocket className="size-4 text-primary" />
-      {zapIn !== null && (
+      {zapInAmount !== null && (
         <span
           data-slot="action-value"
           className="w-0 scale-0 overflow-hidden transition-[width]"
         >
-          {zapIn} SOL
+          {zapInAmount} SOL
         </span>
       )}
     </Button>
@@ -160,9 +173,9 @@ function DexSelector() {
   );
 }
 
-const columnHelper = createColumnHelper<PoolWithTokens>();
+const columnHelper = createColumnHelper<LiquidityPool>();
 
-const columns: ColumnDef<PoolWithTokens>[] = [
+const columns: ColumnDef<LiquidityPool>[] = [
   columnHelper.display({
     id: "dexSelector",
     header: () => <DexSelector />,
@@ -395,9 +408,9 @@ const columns: ColumnDef<PoolWithTokens>[] = [
   {
     id: "action",
     header: "Zap In",
-    cell: () => (
+    cell: ({ row }) => (
       <div className="flex w-24 items-center justify-center gap-4">
-        <ZapInButton />
+        <ZapInButton pool={row.original} />
       </div>
     ),
     enableSorting: false,

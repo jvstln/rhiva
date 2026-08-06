@@ -17,6 +17,7 @@ import type { LpPosition, TokenDetail } from "@rhivadotfun/dataapi";
 import { useTokens } from "@/features/market/market.hook";
 import { useMemo } from "react";
 import { useLiquidityPool } from "@/features/liquidity/liquidity.hook";
+import { useZapOut } from "@/hooks";
 
 type LpPositionWithToken = LpPosition & {
   token: { isPending: boolean; data?: TokenDetail };
@@ -52,6 +53,7 @@ const FeeTvlCell = ({ poolAddress }: { poolAddress: string }) => {
 
 const ActionCell = ({ position }: { position: LpPositionWithToken }) => {
   const activeFilter = usePortfolioStore((state) => state.liquidityFilter);
+  const _zapOut = useZapOut();
   const handleStopPropagation = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -86,7 +88,17 @@ const ActionCell = ({ position }: { position: LpPositionWithToken }) => {
             variant="soft"
             size="icon-sm"
             className="[--accent:var(--color-red-500)]"
-            onClick={handleStopPropagation}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+
+              // zapOut.mutate({
+              //   //   TODO: add position param
+              //   //   TODO: add dex property to position
+              //   dex: "",
+              //   position: "",
+              // });
+            }}
             data-require-auth
           >
             <X />

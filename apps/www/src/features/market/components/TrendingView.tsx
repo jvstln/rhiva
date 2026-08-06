@@ -44,6 +44,8 @@ import {
   TokenViewCount,
   TokenWebsite,
 } from "./tooltips/Socials";
+import { useSwap } from "@/features/transaction/hooks/use-swap";
+import { toast } from "sonner";
 
 export function AddTokenToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
@@ -195,9 +197,11 @@ const METRICS: TokenMetric[] = [
 /* Sell / Buy action buttons                                            */
 /* ------------------------------------------------------------------ */
 
-function ActionButtons() {
+function ActionButtons({ token }: { token: TokenDetail }) {
   const quickBuy = useMarketStore((state) => state.trendingFilters.quickBuy);
   const quickSell = useMarketStore((state) => state.trendingFilters.quickSell);
+
+  const swap = useSwap();
 
   return (
     <div className="flex items-center justify-start gap-2">
@@ -205,6 +209,21 @@ function ActionButtons() {
         <Button
           variant="sell"
           size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (quickSell <= 0) {
+              return toast.error("Quick sell amount must be greater than zero");
+            }
+
+            swap.mutate({
+              action: "sell",
+              inputMint: token.mint,
+              inputDecimals: token.decimals,
+              amount: quickSell,
+            });
+          }}
+          loading={swap.isPending && swap.variables.action === "sell"}
           data-require-auth
         >
           <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
@@ -220,6 +239,20 @@ function ActionButtons() {
       {quickBuy !== null && (
         <Button
           size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (quickBuy <= 0) {
+              return toast.error("Quick buy amount must be greater than zero");
+            }
+
+            swap.mutate({
+              action: "buy",
+              outputMint: token.mint,
+              amount: quickBuy,
+            });
+          }}
+          loading={swap.isPending && swap.variables.action === "buy"}
           data-require-auth
         >
           <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
@@ -349,7 +382,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
       {
         id: "action",
         header: () => <span className="">Action</span>,
-        cell: () => <ActionButtons />,
+        cell: ({ row }) => <ActionButtons token={row.original} />,
         size: 130,
       },
     ];
@@ -383,7 +416,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         key={tokens[0]?.mint}
         table={table}
         classNames={{
-          table: "w-max table-fixed",
+          table: "w-full table-fixed",
           tr: "cursor-pointer",
           td: pinnedColumnClassName,
           th: pinnedColumnClassName,

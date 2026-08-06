@@ -27,10 +27,12 @@ import {
   getPoolPriceInQuote,
 } from "@/features/liquidity/liquidity.util";
 import { BarGraph } from "./BarGraph";
+import { useZapOut } from "@/hooks";
 
 export const LiquidityDetailPage = ({ id }: { id: string }) => {
   const router = useRouter();
   const pool = useLiquidityPool(id);
+  const zapOut = useZapOut();
 
   return (
     <QueryState query={pool}>
@@ -169,7 +171,17 @@ export const LiquidityDetailPage = ({ id }: { id: string }) => {
                     >
                       <Gift /> Claim Rewards
                     </Button>
-                    <Button data-require-auth>
+                    <Button
+                      data-require-auth
+                      loading={zapOut.isPending}
+                      onClick={() => {
+                        zapOut.mutate({
+                          dex: query.data.dex,
+                          //   TODO: add position param (commented out in source for now)
+                          position: "",
+                        });
+                      }}
+                    >
                       <XSquare /> Close Position
                     </Button>
                   </div>

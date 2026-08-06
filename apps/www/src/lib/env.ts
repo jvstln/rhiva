@@ -9,6 +9,7 @@ const envSchema = z.object({
   appOrigin: z.url().default("https://alpha.rhiva.fun"),
   userApiUrl: z.string().default("https://api.rhiva.fun"),
   dataApiUrl: z.string().default("https://dataapi.rhiva.fun"),
+  webSocketApiUrl: z.string().default("wss://dataapi.rhiva.fun/ws"),
 });
 
 export const env = envSchema.parse({
@@ -20,4 +21,5 @@ export const env = envSchema.parse({
   solanaRpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
   userApiUrl: process.env.NEXT_PUBLIC_URL_API_URL,
   dataApiUrl: process.env.NEXT_PUBLIC_DATA_API_URL,
+  webSocketApiUrl: process.env.NEXT_PUBLIC_WS_API_URL,
 });

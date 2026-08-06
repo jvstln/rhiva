@@ -2,12 +2,12 @@ import type { PoolsQuery } from "@rhivadotfun/dataapi";
 
 import { dataapi } from "@/lib/dataapi";
 import { getTokens } from "../market/market.api";
-import type { PoolWithTokens } from "./liquidity.type";
-import type { LiquidityPoolFilters } from "./liquidity.schema";
+import type { LiquidityPool } from "./liquidity.type";
+import type { LiquidityPoolFilters, PoolDex } from "./liquidity.schema";
 
 export const getLiquidityPools = async (
   params: LiquidityPoolFilters,
-): Promise<PoolWithTokens[]> => {
+): Promise<LiquidityPool[]> => {
   const queryParams: PoolsQuery = {
     dex: params.dex ?? null,
     query: null,
@@ -49,6 +49,8 @@ export const getLiquidityPool = async (address: string) => {
 
   return {
     ...pool,
+    // TODO: Type pool dex properly and without null value
+    dex: pool.dex as PoolDex,
     token_a: tokens.find((token) => token.mint === pool.token_mint_a),
     token_b: tokens.find((token) => token.mint === pool.token_mint_b),
   };

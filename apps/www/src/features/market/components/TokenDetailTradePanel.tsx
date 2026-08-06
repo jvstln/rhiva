@@ -15,12 +15,15 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "../../../components/ui/input-group";
+import { toast } from "sonner";
+import { useSwap } from "@/features/transaction/hooks/use-swap";
 
 const QUICK_AMOUNTS = ["0.01", "0.1", "0.5", "1"] as const;
 
 export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
   const [side, setSide] = useState<"buy" | "sell" | "lp">("buy");
   const [amount, setAmount] = useState("");
+  const swap = useSwap();
 
   return (
     <div className="space-y-3 p-4">
@@ -94,7 +97,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
               placeholder="Amount"
             />
             <InputGroupAddon align="inline-end">
-              <InputGroupText>SOL</InputGroupText>
+              <InputGroupText>{side === "buy" ? "SOL" : "%"}</InputGroupText>
             </InputGroupAddon>
           </InputGroup>
           <div className="grid grid-cols-4">
@@ -107,6 +110,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
                 className="rounded-none first:rounded-bl-md last:rounded-br-md"
               >
                 {amt}
+                {side === "sell" && "%"}
               </Button>
             ))}
           </div>
@@ -123,6 +127,22 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
           <Button
             className="w-full"
             data-require-auth
+            loading={swap.isPending && swap.variables.action === "buy"}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (Number(amount) <= 0) {
+                return toast.error(
+                  "Quick buy amount must be greater than zero",
+                );
+              }
+
+              swap.mutate({
+                action: "buy",
+                outputMint: token.mint,
+                amount: Number(amount),
+              });
+            }}
           >
             Buy
           </Button>
@@ -132,6 +152,30 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
             className="w-full"
             variant={"sell"}
             data-require-auth
+            loading={swap.isPending && swap.variables.action === "sell"}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (Number(amount) <= 0) {
+                return toast.error(
+                  "Quick sell amount must be greater than zero",
+                );
+              }
+
+              swap.mutate(
+                {
+                  action: "sell",
+                  inputMint: token.mint,
+                  inputDecimals: token.decimals,
+                  amount: Number(amount),
+                },
+                {
+                  onSettled() {
+                    console.log(swap.variables);
+                  },
+                },
+              );
+            }}
           >
             Sell
           </Button>

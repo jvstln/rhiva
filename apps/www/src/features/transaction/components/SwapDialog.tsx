@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
-import { useSwap } from "@/hooks";
+import { useSwap } from "@/features/transaction/hooks/use-swap";
 import { TokenSelect } from "./TokenSelect";
 import { Button } from "@/components/ui/button";
 import { InputGroupInput } from "@/components/ui/input-group";

@@ -6,10 +6,8 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { capitalize } from "@/lib/utils";
-import { useZapIn } from "@/hooks";
+import { useZapIn } from "@/features/transaction/hooks/use-zap-in";
 import { Button } from "@/components/ui/button";
-import { useSettingsStore } from "@/features/settings/settings.store";
-import type { ZapInDexSettings } from "@/features/settings/settings.type";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Field,
@@ -33,7 +31,6 @@ import {
   formatPrice,
   getPoolPriceInQuote,
   getPoolTokens,
-  getPriceChangesFromCurrentPrice,
   getTokenBalance,
 } from "../liquidity.util";
 import { OrcaTrade, type OrcaTradeInput } from "../liquidity.schema";
@@ -49,45 +46,26 @@ export function OrcaTradeRail({ pool }: { pool: LiquidityPool }) {
   const token = activeToken === "base" ? base : quote;
   const balance = getTokenBalance(balances, token.mint);
 
-  const dex = "orca-whirlpool" as const;
-  const zapInState = useSettingsStore((state) => state.zapIn);
-  const setZapInSettings = useSettingsStore((state) => state.setZapInSettings);
-  const zapIn = useZapIn({ pool: pool.pool_address, dex });
+  const zapIn = useZapIn();
 
   const handleSubmit = (values: OrcaTrade) => {
-    const changes = getPriceChangesFromCurrentPrice(
-      priceInQuote,
-      values.minPrice,
-      values.maxPrice,
+    zapIn.mutate(
+      {
+        pool: pool.pool_address,
+        dex: pool.dex || "orca-whirlpool",
+        amount: values.amount,
+      },
+      {
+        onSuccess(response) {
+          toast.success(
+            `Position opened! Bundle: ${response.bundleId.slice(0, 8)}...`,
+          );
+        },
+        onError(error) {
+          toast.error(error.message);
+        },
+      },
     );
-
-    const settings: Partial<ZapInDexSettings> = {
-      amount: values.amount,
-      inputToken: {
-        mint: token.mint ?? "",
-        decimals: token.decimals ?? 9,
-      },
-    };
-    if (changes) settings.priceChangesFromCurrentPrice = changes;
-
-    setZapInSettings({
-      dex,
-      settings: {
-        ...zapInState.settings,
-        [dex]: { ...zapInState.settings[dex], ...settings },
-      },
-    });
-
-    zapIn.mutate(undefined, {
-      onSuccess(response) {
-        toast.success(
-          `Position opened! Bundle: ${response.bundleId.slice(0, 8)}...`,
-        );
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
-    });
   };
 
   const form = useForm<OrcaTradeInput, unknown, OrcaTrade>({

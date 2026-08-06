@@ -6,10 +6,9 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { capitalize } from "@/lib/utils";
-import { useZapIn } from "@/hooks";
+import { useZapIn } from "@/features/transaction/hooks/use-zap-in";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useSettingsStore } from "@/features/settings/settings.store";
 import type { ZapInDexSettings } from "@/features/settings/settings.type";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -51,10 +50,7 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
   const balance = getTokenBalance(balances, token.mint);
   const price = getPoolPriceInQuote(pool) ?? 0;
 
-  const dex = "meteora-dlmm" as const;
-  const zapInState = useSettingsStore((state) => state.zapIn);
-  const setZapInSettings = useSettingsStore((state) => state.setZapInSettings);
-  const zapIn = useZapIn({ pool: pool.pool_address, dex });
+  const zapIn = useZapIn();
 
   const handleSubmit = (values: MeteoraTrade) => {
     const range = getBinDeltasFromRange(
@@ -73,30 +69,19 @@ export function MeteoraTradeRail({ pool }: { pool: LiquidityPool }) {
     };
     if (range) settings.rangeFromCurrentPrice = range;
 
-    setZapInSettings({
-      dex,
-      curveType:
-        values.type === "spot"
-          ? "Spot"
-          : values.type === "curve"
-            ? "Curve"
-            : "BidAsk",
-      settings: {
-        ...zapInState.settings,
-        [dex]: { ...zapInState.settings[dex], ...settings },
+    zapIn.mutate(
+      { dex: "meteora-dlmm", pool: pool.pool_address, amount: values.amount },
+      {
+        onSuccess(response) {
+          toast.success(
+            `Position opened! Bundle: ${response.bundleId.slice(0, 8)}...`,
+          );
+        },
+        onError(error) {
+          toast.error(error.message);
+        },
       },
-    });
-
-    zapIn.mutate(undefined, {
-      onSuccess(response) {
-        toast.success(
-          `Position opened! Bundle: ${response.bundleId.slice(0, 8)}...`,
-        );
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
-    });
+    );
   };
 
   const form = useForm<MeteoraTradeInput, unknown, MeteoraTrade>({

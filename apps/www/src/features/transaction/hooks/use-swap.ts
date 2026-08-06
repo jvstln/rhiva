@@ -4,8 +4,10 @@ import type UserAPI from "@rhivadotfun/userapi";
 import { useMutation } from "@tanstack/react-query";
 
 import { toBps } from "@/lib/math.util";
-import { useUserApi } from "./use-user-api";
+import { useUserApi } from "../../../hooks/use-user-api";
 import { useSettingsStore } from "@/features/settings/settings.store";
+import { toast } from "sonner";
+import { capitalize } from "@/lib";
 
 type BaseSwapParams = {
   amount: number;
@@ -78,6 +80,12 @@ export const useSwap = () => {
         feeConfig,
         ...quoteResponse,
       });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (_data, variables) => {
+      toast.success(`${capitalize(variables.action || "Swap")} successful`);
     },
   });
 };
