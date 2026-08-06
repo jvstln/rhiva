@@ -1,204 +1,120 @@
 "use client";
 
-import Image from "next/image";
-import type * as React from "react";
-import { useMemo, useState } from "react";
 import {
   Coins,
   Globe,
   LineChart,
   Repeat,
   Share2,
-  Sparkles,
   Star,
-  Trophy,
   Zap,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { cn, formatCompactNumber } from "@/lib/utils";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
 import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
 import { CopyButton } from "@/components/ui/button/copy-button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import {
-  mockRewardAccount,
-  REWARD_TIERS,
-  type RewardTier,
-} from "@/components/ui/data/reward-data";
-import {
   DashboardDescription,
   DashboardHeader,
   DashboardSlot,
 } from "@/components/layout/DashboardUi";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-export type RewardQuest = {
-  id: string;
-  label: string;
-  rewardXp: number;
-  progressPercent: number;
-  icon: "volume" | "transactions";
-};
-
-export const REWARD_QUESTS: RewardQuest[] = [
-  {
-    id: "volume",
-    label: "5 transactions per day = 150XP bonus",
-    rewardXp: 1_000,
-    progressPercent: 62,
-    icon: "volume",
-  },
-  {
-    id: "transactions",
-    label: "Transaction volume is $500 = 500XP",
-    rewardXp: 200,
-    progressPercent: 38,
-    icon: "transactions",
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* Tier progress helper                                                 */
-/* ------------------------------------------------------------------ */
-
-function getTierProgress(tiers: RewardTier[], currentXp: number) {
-  const currentIndex = [...tiers]
-    .reverse()
-    .findIndex((tier) => currentXp >= tier.minXp);
-  const resolvedIndex = tiers.length - 1 - currentIndex;
-
-  const currentTier = tiers[resolvedIndex];
-  const nextTier = tiers[resolvedIndex + 1];
-
-  const progressPercent = nextTier
-    ? Math.min(
-        100,
-        ((currentXp - currentTier.minXp) /
-          (nextTier.minXp - currentTier.minXp)) *
-          100,
-      )
-    : 100;
-
-  return { currentTier, nextTier, progressPercent };
-}
-
-/* ------------------------------------------------------------------ */
-/* Tier badge (dummy SVG-ish placeholder — swap for real art later)     */
-/* ------------------------------------------------------------------ */
-
-function TierBadge({
-  tier,
-  locked,
-  size = 100,
-}: {
-  tier: RewardTier;
-  locked: boolean;
-  size?: number;
-}) {
-  return (
-    <div
-      className="relative flex size-full items-center justify-center"
-      style={{ width: size, height: size }}
-    >
-      <Image
-        src={tier.image}
-        alt={tier.name}
-        fill
-        // sizes={`${size * 0.55}px`}
-        className={cn("object-contain", locked && "opacity-70 grayscale")}
-      />
-    </div>
-  );
-}
+  TierBadge,
+  TierRoadmap,
+} from "@/features/reward/components/TierRoadmap";
+import { REWARD_TIERS } from "@/features/reward/reward.schema";
+import { useRewardProfile } from "@/features/reward/reward.hook";
+import { QueryState } from "@/components/layout/QueryState";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 /* ------------------------------------------------------------------ */
 /* Current tier card                                                    */
 /* ------------------------------------------------------------------ */
 
 function CurrentTierCard() {
-  const { currentTier, nextTier, progressPercent } = useMemo(
-    () => getTierProgress(REWARD_TIERS, mockRewardAccount.currentXp),
-    [],
-  );
-
-  const xpToNext = nextTier
-    ? Math.max(0, nextTier.minXp - mockRewardAccount.currentXp)
-    : 0;
+  const rewardProfile = useRewardProfile();
 
   return (
-    <div
-      className="relative overflow-hidden rounded-lg bg-surface-1 p-6"
-      style={{
-        boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
+    <QueryState query={rewardProfile}>
+      {(rewardProfile) => {
+        const currentTier = REWARD_TIERS[rewardProfile.data.tier];
+        const nextTier = REWARD_TIERS[rewardProfile.data.tier + 1];
+
+        return (
+          <div
+            className="relative overflow-hidden rounded-lg bg-surface-1 p-6"
+            style={{
+              boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
+            }}
+          >
+            <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
+
+            <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+              <div className="flex shrink-0 flex-col items-center gap-1">
+                <TierBadge
+                  tier={currentTier}
+                  locked={false}
+                  size={110}
+                />
+                <span className="text-foreground/80 text-lg">1x</span>
+                <span className="text-muted-foreground/60 text-sm">
+                  10% Referral Rate
+                </span>
+              </div>
+
+              <div className="w-full flex-1 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-muted-foreground text-sm">
+                    Next Tier:{" "}
+                    <span className="font-semibold text-foreground">
+                      {nextTier?.name ?? "MAX"}
+                    </span>
+                  </p>
+
+                  <TierExportDialog tier={currentTier}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                    >
+                      <Share2 />
+                      Share
+                    </Button>
+                  </TierExportDialog>
+                </div>
+
+                <p className="font-medium text-foreground/90 text-xl">
+                  {formatCompactNumber(rewardProfile.data.xp)} of{" "}
+                  {formatCompactNumber(nextTier.minXp ?? currentTier.minXp)} XP
+                </p>
+
+                <div className="h-3.5 w-full overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
+                    style={{
+                      width: `${rewardProfile.data.xp / nextTier.minXp}%`,
+                    }}
+                  />
+                </div>
+
+                <p className="text-muted-foreground text-sm">
+                  {nextTier
+                    ? `You're almost there! Trade ${nextTier.minXp - rewardProfile.data.xp} SOL to reach ${nextTier.name}`
+                    : "You've reached the highest tier!"}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
       }}
-    >
-      <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
-
-      <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-        <div className="flex shrink-0 flex-col items-center gap-1">
-          <TierBadge
-            tier={currentTier}
-            locked={false}
-            size={110}
-          />
-          <span className="text-foreground/80 text-lg">1x</span>
-          <span className="text-muted-foreground/60 text-sm">
-            10% Referral Rate
-          </span>
-        </div>
-
-        <div className="w-full flex-1 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              Next Tier:{" "}
-              <span className="font-semibold text-foreground">
-                {nextTier?.name ?? "MAX"}
-              </span>
-            </p>
-
-            <TierExportDialog tier={currentTier}>
-              <Button
-                size="sm"
-                variant="outline"
-              >
-                <Share2 />
-                Share
-              </Button>
-            </TierExportDialog>
-          </div>
-
-          <p className="font-medium text-foreground/90 text-xl">
-            {formatCompactNumber(mockRewardAccount.currentXp)} of{" "}
-            {formatCompactNumber(nextTier?.minXp ?? currentTier.minXp)} XP
-          </p>
-
-          <div className="h-3.5 w-full overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-
-          <p className="text-muted-foreground text-sm">
-            {nextTier
-              ? `You're almost there! Trade ${xpToNext} SOL to reach ${nextTier.name}`
-              : "You've reached the highest tier!"}
-          </p>
-        </div>
-      </div>
-    </div>
+    </QueryState>
   );
 }
 
@@ -207,73 +123,38 @@ function CurrentTierCard() {
 /* ------------------------------------------------------------------ */
 
 function StatCard({
-  icon: Icon,
-  iconClassName,
-  iconBgClassName,
+  icon,
   label,
   value,
-  helper,
+  description,
+  className,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
-  iconClassName: string;
-  iconBgClassName: string;
+  icon: React.ReactNode;
   label: string;
   value: string;
-  helper: string;
+  description: string;
+  className: string;
 }) {
   return (
     <div
-      className="flex flex-col justify-between rounded-lg border p-4"
+      className={cn(
+        "flex flex-col justify-between rounded-lg border p-4",
+        className,
+      )}
       style={{
         boxShadow: `inset 1px -1px 0 rgba(255, 255, 255, 0.6)`,
       }}
     >
       <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            "flex size-6 items-center justify-center rounded-full",
-            iconBgClassName,
-          )}
-        >
-          <Icon className={cn("size-3.5", iconClassName)} />
+        <span className="flex size-8 items-center justify-center rounded-full bg-accent/10 p-1 text-accent">
+          {icon}
         </span>
         <div>
           <p className="text-muted-foreground text-sm">{label}</p>
           <p className="font-semibold text-foreground text-lg">{value}</p>
         </div>
       </div>
-      <p className="mt-4 text-muted-foreground text-sm">{helper}</p>
-    </div>
-  );
-}
-
-function StatsRow() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <StatCard
-        icon={Globe}
-        iconClassName="text-primary"
-        iconBgClassName="bg-primary/10"
-        label="Global Rank"
-        value={`#${formatCompactNumber(mockRewardAccount.globalRank)}`}
-        helper={`Total users: ${mockRewardAccount.totalUsers.toLocaleString()}`}
-      />
-      <StatCard
-        icon={Star}
-        iconClassName="text-casablanca"
-        iconBgClassName="bg-casablanca/10"
-        label="Total Stars"
-        value={String(mockRewardAccount.totalStars)}
-        helper="Keep Collecting!"
-      />
-      <StatCard
-        icon={Zap}
-        iconClassName="text-info"
-        iconBgClassName="bg-info/10"
-        label="Total XP"
-        value={mockRewardAccount.currentXp.toLocaleString()}
-        helper={`+${mockRewardAccount.xpPerDay} XP per day`}
-      />
+      <p className="mt-4 text-muted-foreground text-sm">{description}</p>
     </div>
   );
 }
@@ -282,187 +163,14 @@ function StatsRow() {
 /* Tier roadmap (inline, first 5 tiers) + dialog (all 10 tiers)         */
 /* ------------------------------------------------------------------ */
 
-function RoadmapStep({
-  tier,
-  unlocked,
-  index,
-}: {
-  tier: RewardTier;
-  unlocked: boolean;
-  isLast: boolean;
-  index: number;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-1 flex-col items-center gap-2",
-        index === 3 && "hidden sm:flex",
-        index === 4 && "hidden md:flex",
-      )}
-    >
-      <TierBadge
-        tier={tier}
-        locked={!unlocked}
-        size={100}
-      />
-      <div className="flex flex-col items-center gap-0.5">
-        <span
-          className={cn(
-            "font-medium text-lg",
-            unlocked ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {tier.name}
-        </span>
-        <span
-          className={cn(
-            "text-lg",
-            unlocked ? "text-foreground/80" : "text-muted-foreground/40",
-          )}
-        >
-          {tier.multiplier}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function TierRoadmapCard({ onViewAll }: { onViewAll: () => void }) {
-  const visibleTiers = REWARD_TIERS.slice(0, 5);
-
-  return (
-    <div className="space-y-7 rounded-lg border border-border p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-medium text-foreground text-lg">Tier Roadmap</p>
-          <p className="text-muted-foreground text-sm">
-            Progress through the ranks and unlock exclusive badges
-          </p>
-        </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={onViewAll}
-        >
-          View All Tiers
-        </Button>
-      </div>
-
-      <ScrollArea>
-        <div className="relative flex items-start">
-          {visibleTiers.map((tier, index) => {
-            const unlocked = mockRewardAccount.currentXp >= tier.minXp;
-            return (
-              <RoadmapStep
-                key={tier.id}
-                tier={tier}
-                unlocked={unlocked}
-                isLast={index === visibleTiers.length - 1}
-                index={index}
-              />
-            );
-          })}
-          {/* connecting line, sits behind the badges */}
-          <div className="absolute top-[50px] right-[10%] left-[10%] -z-10 h-px bg-white/10" />
-        </div>
-        <ScrollBar
-          orientation="horizontal"
-          showIndicator
-        />
-      </ScrollArea>
-
-      <div className="flex items-center gap-3 rounded-lg bg-primary/4 p-4">
-        <Trophy className="size-9 shrink-0 text-casablanca" />
-        <div>
-          <p className="font-semibold text-foreground/80 text-sm">
-            Climb the ranks, earn more XP, and unlock exclusive rewards!
-          </p>
-          <p className="text-muted-foreground/60 text-xs">
-            The more you engage, the higher you go.
-          </p>
-        </div>
-        <Sparkles className="ml-auto size-4 shrink-0 text-casablanca" />
-      </div>
-    </div>
-  );
-}
-
-function TierRoadmapDialog({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Tier Roadmap</DialogTitle>
-          <DialogDescription>
-            Progress through the ranks and unlock exclusive badges
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid grid-cols-5 gap-x-4 gap-y-8">
-          {REWARD_TIERS.map((tier) => {
-            const unlocked = mockRewardAccount.currentXp >= tier.minXp;
-            return (
-              <div
-                key={tier.id}
-                className="flex flex-col items-center gap-2"
-              >
-                <TierBadge
-                  tier={tier}
-                  locked={!unlocked}
-                  size={84}
-                />
-                <span
-                  className={cn(
-                    "font-medium text-sm",
-                    unlocked ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {tier.name}
-                </span>
-                <span
-                  className={cn(
-                    "text-sm",
-                    unlocked
-                      ? "text-foreground/80"
-                      : "text-muted-foreground/40",
-                  )}
-                >
-                  {tier.multiplier}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* Referral card                                                        */
+
 /* ------------------------------------------------------------------ */
 
 function ReferralCard() {
-  const [_copied, setCopied] = useState(false);
-
-  const _handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(mockRewardAccount.referralLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // clipboard access denied — no-op for this mock
-    }
-  };
+  const rewardProfile = useRewardProfile();
+  const [safeWindow] = useState(() => window);
 
   return (
     <div
@@ -485,21 +193,25 @@ function ReferralCard() {
           <p className="font-medium text-foreground text-sm">
             Your Referral Link
           </p>
-          <InputGroup>
-            <InputGroupInput
-              readOnly
-              value={mockRewardAccount.referralLink}
-            />
-            <InputGroupAddon align={"inline-end"}>
-              <CopyButton
-                size="icon-lg"
-                copy={mockRewardAccount.referralLink}
+          {rewardProfile.data ? (
+            <InputGroup>
+              <InputGroupInput
+                readOnly
+                value={`${safeWindow.location.origin}?referralCode=${rewardProfile.data.refererCode}`}
               />
-            </InputGroupAddon>
-          </InputGroup>
+              <InputGroupAddon align={"inline-end"}>
+                <CopyButton
+                  size="icon-lg"
+                  copy={`${safeWindow.location.origin}?referralCode=${rewardProfile.data.refererCode}`}
+                />
+              </InputGroupAddon>
+            </InputGroup>
+          ) : (
+            <Skeleton className="h-12 w-full" />
+          )}
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2 rounded-2xl border bg-foreground/3 p-4">
             <div className="flex items-center gap-1.5">
               <span className="flex size-6 items-center justify-center rounded-full bg-up/10">
@@ -508,7 +220,7 @@ function ReferralCard() {
             </div>
             <p className="text-muted-foreground">Total Invited</p>
             <p className="mt-auto font-medium text-2xl text-foreground">
-              {mockRewardAccount.totalInvited}
+              {formatCompactNumber(rewardProfile.data?.invites)}
             </p>
           </div>
 
@@ -520,7 +232,7 @@ function ReferralCard() {
             </div>
             <p className="text-muted-foreground">Total Earnings</p>
             <p className="mt-auto font-medium text-2xl text-foreground">
-              {mockRewardAccount.totalEarnings} SOL
+              {formatCompactNumber(rewardProfile.data?.earnedNative)} SOL
             </p>
           </div>
         </div>
@@ -531,6 +243,7 @@ function ReferralCard() {
 
 /* ------------------------------------------------------------------ */
 /* Quests card                                                          */
+
 /* ------------------------------------------------------------------ */
 
 function RadialProgress({
@@ -558,7 +271,7 @@ function RadialProgress({
       <svg
         width={size}
         height={size}
-        className="-rotate-90"
+        className="-rotate-90 transition-all"
         role="presentation"
       >
         <circle
@@ -622,31 +335,13 @@ function QuestRing({
   );
 }
 
-function QuestsCard() {
-  return (
-    <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">
-      <p className="font-medium text-foreground">Quests</p>
-      <div className="flex flex-1 items-center justify-center gap-16">
-        {REWARD_QUESTS.map((quest) => (
-          <QuestRing
-            key={quest.id}
-            label={quest.label}
-            rewardXp={quest.rewardXp}
-            progressPercent={quest.progressPercent}
-            icon={quest.icon}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* Page                                                                 */
+
 /* ------------------------------------------------------------------ */
 
 export function RewardsPage() {
-  const [tierDialogOpen, setTierDialogOpen] = useState(false);
+  const rewardProfile = useRewardProfile();
 
   return (
     <DashboardSlot>
@@ -657,34 +352,65 @@ export function RewardsPage() {
             Track your XP, level up, and climb the global ranks
           </DashboardDescription>
         </div>
-
         <ClaimRewardsDialog />
-        {/* <Button
-            tooltip={"Claim your reward for trading upto $2000"}
-            className="not-hover:animate-pulse"
-          >
-            Claim gift
-          </Button>
-        </ClaimRewardsDialog> */}
       </div>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-6">
           <CurrentTierCard />
-          <StatsRow />
-          <TierRoadmapCard onViewAll={() => setTierDialogOpen(true)} />
-        </div>
 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatCard
+              icon={<Globe />}
+              className="[--accent:var(--color-primary)]"
+              label="Global Rank"
+              value={`#${formatCompactNumber(rewardProfile.data?.rank)}`}
+              description={`Total users: ${formatCompactNumber(rewardProfile.data?.users)}`}
+            />
+            <StatCard
+              icon={<Star />}
+              className="[--accent:var(--color-casablanca)]"
+              label="Total Stars"
+              value={formatCompactNumber(rewardProfile.data?.stars)}
+              description="Keep Collecting!"
+            />
+            <StatCard
+              icon={<Zap />}
+              className="[--accent:var(--color-info)]"
+              label="Total XP"
+              value={formatCompactNumber(rewardProfile.data?.xp)}
+              description={`${formatCompactNumber(rewardProfile.data?.averageXpPerDay, { withSign: true })} XP per day`}
+            />
+          </div>
+
+          <TierRoadmap />
+        </div>
         <div className="flex flex-col gap-6">
           <ReferralCard />
-          <QuestsCard />
+
+          {/* Quests */}
+          <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">
+            <p className="font-medium text-foreground">Quests</p>
+            <div className="flex flex-1 items-center justify-center gap-16">
+              <QuestRing
+                label={"5 transactions per day = 150XP bonus"}
+                rewardXp={150}
+                progressPercent={
+                  (rewardProfile.data?.todayTransactions || 0) / 5
+                }
+                icon={"volume"}
+              />
+              <QuestRing
+                label={"Transaction volume is $500 = 500XPs"}
+                rewardXp={500}
+                progressPercent={
+                  (rewardProfile.data?.todayVolumeUsd || 0) / 500
+                }
+                icon={"transactions"}
+              />
+            </div>
+          </div>
         </div>
       </div>
-
-      <TierRoadmapDialog
-        open={tierDialogOpen}
-        onOpenChange={setTierDialogOpen}
-      />
     </DashboardSlot>
   );
 }

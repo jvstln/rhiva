@@ -9,7 +9,6 @@ import { Download, Globe, Share } from "lucide-react";
 import { share } from "@/lib/utils";
 import { downloadLink } from "@/lib/file.util";
 import { Button } from "@/components/ui/button";
-import type { RewardTier } from "@/components/ui/data/reward-data";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { RewardTier } from "@/features/reward/reward.schema";
 
 type TierShareDialogProps = Dialog.Props & {
   tier: RewardTier;

@@ -52,6 +52,8 @@ export interface FormatCompactNumberOptions {
   subscriptThreshold?: number;
   /** Fallback string returned for NaN / Infinity / -Infinity. Default: "0" */
   fallback?: string;
+  /** If true, appends + or - to the formatted number */
+  withSign?: boolean;
 }
 
 const UNITS: ReadonlyArray<readonly [threshold: number, suffix: string]> = [
@@ -107,15 +109,15 @@ export function formatCompactNumber(
     decimals = 2,
     significantDigits = 3,
     subscriptThreshold = 4,
-    fallback = "0",
+    fallback = "-",
   } = options;
 
-  const num = typeof value === "string" ? parseFloat(value) : value || 0;
+  const num = Number(value);
 
   if (!Number.isFinite(num)) return fallback;
   if (num === 0) return "0";
 
-  const sign = num < 0 ? "-" : "";
+  const sign = num < 0 ? "-" : options.withSign ? "+" : "";
   const abs = Math.abs(num);
 
   // --- Large numbers: apply K / M / B / T suffix -----------------------
