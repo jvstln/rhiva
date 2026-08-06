@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUp, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useMarketStore } from "../market.store";
-import { BondingCurveToggle } from "./ToolbarItems";
+import { PresetToggle } from "./ToolbarItems";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 
 export const PumpLiveToolbar = () => {
@@ -64,7 +64,7 @@ export const PumpLiveToolbar = () => {
         </Button>
       </SettingsDialog>
 
-      <BondingCurveToggle />
+      <PresetToggle />
     </div>
   );
 };

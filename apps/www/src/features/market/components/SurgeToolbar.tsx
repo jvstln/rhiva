@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { useMarketStore } from "../market.store";
 import { SurgeFilterDialog } from "./SurgeFilterDialog";
-import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
+import { PresetToggle, QuickBuyInput } from "./ToolbarItems";
 import {
   InputGroup,
   InputGroupAddon,
@@ -99,8 +99,8 @@ const SurgeBondingCurveToggle = () => {
   const setFilters = useMarketStore((state) => state.setSurgeFilters);
 
   return (
-    <BondingCurveToggle
-      value={bondingCurve}
+    <PresetToggle
+      value={[bondingCurve]}
       onValueChange={(value) => {
         setFilters({
           preset: value,

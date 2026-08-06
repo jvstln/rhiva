@@ -31,7 +31,9 @@ const TABLE_TABS = [
 export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
   const [activeTable, setActiveTable] =
     useState<(typeof TABLE_TABS)[number]>("Trades");
-  const [filters, setFilters] = useState<TokenDetailFilters>({});
+  const [filters, setFilters] = useState<TokenDetailFilters>({
+    timeframe: "5m",
+  });
 
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     const resolvedFilters = { ...filters, ...newFilters };

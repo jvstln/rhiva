@@ -7,7 +7,7 @@ import { ChevronDown, Repeat, Settings, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatCompactCurrency } from "@/lib/utils";
 import { SettingsDialog } from "../../settings/components/SettingsDialog";
-import { BondingCurveToggle } from "@/features/market/components/ToolbarItems";
+import { PresetToggle } from "@/features/market/components/ToolbarItems";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   InputGroup,
@@ -51,7 +51,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
       </div> */}
 
       <div className="flex items-center justify-between">
-        <BondingCurveToggle />
+        <PresetToggle />
 
         <SettingsDialog defaultTab="trading-settings">
           <Button

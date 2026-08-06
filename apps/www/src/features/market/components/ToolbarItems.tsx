@@ -20,22 +20,13 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 
-export const BondingCurveToggle = ({
-  value,
-  onValueChange,
-  className,
-}: {
-  onValueChange?: (value: Preset) => void;
-  value?: Preset;
-  className?: string;
-}) => {
+export const PresetToggle = ({ ...props }: ToggleGroup.Props) => {
   return (
     <ToggleGroup
-      value={value ? [value] : undefined}
-      onValueChange={([value]) => onValueChange?.(value as Preset)}
       size={"sm"}
       spacing={0}
-      className={className}
+      defaultValue={["p1"]}
+      {...props}
     >
       {Preset.options.map((p) => (
         <Tooltip key={p}>

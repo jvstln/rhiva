@@ -12,7 +12,7 @@ import type { Timeframe } from "../market.schema";
 import { BlacklistDialog } from "./BlacklistDialog";
 import { Button } from "../../../components/ui/button";
 import { TrendingFilterDialog } from "./TrendingFilterDialog";
-import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
+import { PresetToggle, QuickBuyInput } from "./ToolbarItems";
 import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
@@ -100,7 +100,7 @@ export const TrendingToolbar = () => {
 
       <div className="max-sm:flex max-sm:items-center max-sm:justify-between max-sm:space-x-4 sm:contents">
         <TrendingQuickBuyInput />
-        <BondingCurveToggle />
+        <PresetToggle />
       </div>
     </div>
   );

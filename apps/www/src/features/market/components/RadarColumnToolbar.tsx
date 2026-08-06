@@ -5,7 +5,7 @@ import { useMarketStore } from "../market.store";
 import type { RadarColumns } from "../market.schema";
 import { RadarFilterDialog } from "./RadarFilterDialog";
 import { SearchInput } from "@/components/ui/search-input";
-import { BondingCurveToggle, QuickBuyInput } from "./ToolbarItems";
+import { PresetToggle, QuickBuyInput } from "./ToolbarItems";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface ColumnToolbarProps {
@@ -34,7 +34,7 @@ export function RadarColumnToolbar({ column }: ColumnToolbarProps) {
           }
           className="max-w-20"
         />
-        <BondingCurveToggle />
+        <PresetToggle />
         <RadarFilterDialog defaultTab={column}>
           <Button
             size="icon-sm"

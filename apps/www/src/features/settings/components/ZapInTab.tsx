@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, ChartSpline, CircleDot, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { Fragment } from "react";
 
 import { capitalize } from "@/lib/utils";
@@ -232,23 +232,12 @@ export function ZapInTab() {
                   });
                 }}
               >
-                {(
-                  [
-                    { value: "Spot", label: "Spot", icon: CircleDot },
-                    { value: "Curve", label: "Curve", icon: ChartSpline },
-                    {
-                      value: "BidAsk",
-                      label: "Bid Ask",
-                      icon: ArrowLeftRight,
-                    },
-                  ] as const
-                ).map(({ value, label, icon: Icon }) => (
+                {(["Spot", "Curve", "BidAsk"] as const).map((value) => (
                   <ToggleGroupItem
                     key={value}
                     value={value}
                   >
-                    <Icon />
-                    {label}
+                    {value === "BidAsk" ? "Bid Ask" : value}
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>

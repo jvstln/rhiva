@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { TokenDetailFilters } from "../market.type";
 import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
+import type { Timeframe } from "../market.schema";
 
 type TokenDetailTimeframeStatsProps = {
   token: TokenDetail;
@@ -55,7 +56,9 @@ export const TokenDetailTimeframeStats = ({
           return (
             <Button
               key={timeframe}
-              onClick={() => onFilterChange({ timeframe: timeframe as any })}
+              onClick={() =>
+                onFilterChange({ timeframe: timeframe as Timeframe })
+              }
               variant={filters.timeframe === timeframe ? "outline" : "ghost"}
               data-active={filters.timeframe === timeframe || undefined}
               className={cn("h-auto flex-col rounded-md py-2")}
