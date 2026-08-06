@@ -1,37 +1,38 @@
 import UserApi from "@rhivadotfun/userapi";
+import { useToken } from "@privy-io/react-auth";
 import { createContext, useEffect, useRef } from "react";
-import { useToken, useActiveWallet } from "@privy-io/react-auth";
 
 import { env } from "@/lib";
+import { useAuth } from "@/hooks";
 
 export const UserApiContext = createContext<UserApi | null>(null);
 
 export default function UserApiProvider({ children }: React.PropsWithChildren) {
+  const auth = useAuth();
   const userApi = useRef<UserApi | null>(null);
-  const { wallet } = useActiveWallet();
   const { getAccessToken } = useToken({
     onAccessTokenRemoved() {},
     onAccessTokenGranted({ accessToken }) {
-      if (wallet)
+      if (auth.authenticated)
         userApi.current = new UserApi(
           env.userApiUrl,
           accessToken,
-          wallet.address,
+          auth.activeWallet.address,
         );
     },
   });
 
   useEffect(() => {
-    if (wallet)
+    if (auth)
       getAccessToken().then((accessToken) => {
-        if (accessToken)
+        if (accessToken && auth.authenticated)
           userApi.current = new UserApi(
-            env.dataApiUrl,
+            env.userApiUrl,
             accessToken,
-            wallet.address,
+            auth.activeWallet.address,
           );
       });
-  }, [wallet, getAccessToken]);
+  }, [auth, getAccessToken]);
 
   return (
     <UserApiContext.Provider value={userApi.current}>

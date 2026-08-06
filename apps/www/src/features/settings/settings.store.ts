@@ -1,5 +1,4 @@
 import { merge } from "lodash";
-import type { WritableDraft } from "immer";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { devtools, persist } from "zustand/middleware";
@@ -32,15 +31,14 @@ const defaultTransactionSettings: TransactionSettings = {
 };
 
 const defaultLpSettings: LpSettings = {
-  liquiditySlippage: 2,
+  liquiditySlippage: 0.02,
 };
 
 const defaultZapInDexSettings: ZapInDexSettings = {
   amount: 0.1,
   liquiditySlippage: 0.2,
   liquiditySlippageMode: "custom",
-  swapSlippage: 0.5,
-  swapSlippageMode: "custom",
+  swapSlippageMode: "dynamic",
   binRangeMode: "custom",
   rangeFromCurrentPrice: [34, 35],
   priceChangesFromCurrentPrice: [0.1, 0.1],

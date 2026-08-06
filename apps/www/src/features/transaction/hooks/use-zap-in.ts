@@ -45,7 +45,9 @@ export const useZapIn = () => {
       const [minDeltaId, maxDeltaId] = dexSettings.rangeFromCurrentPrice;
       const slippage = {
         liquidity: dexSettings.liquiditySlippage,
-        swap: dexSettings.swapSlippage,
+        swap: dexSettings.swapSlippage
+          ? dexSettings.swapSlippage
+          : ("dynamic" as const),
       };
 
       const inputMint = dexSettings.inputToken.mint;

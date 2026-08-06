@@ -7,7 +7,6 @@ import {
   useSigners,
   PrivyProvider as PrivyProviderPrimitive,
   type WalletWithMetadata,
-  usePrivy,
 } from "@privy-io/react-auth";
 
 import { env } from "@/lib/env";
@@ -30,7 +29,6 @@ export const AuthContext = createContext<TAuthContext | null>(null);
 const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
   const { user } = useUser();
   const { addSigners } = useSigners();
-  const { authenticated } = usePrivy();
 
   const activeWallet = useMemo(
     () =>

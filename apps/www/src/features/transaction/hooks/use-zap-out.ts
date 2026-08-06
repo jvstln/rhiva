@@ -1,13 +1,13 @@
 import type z from "zod";
+import { toast } from "sonner";
 import { useMemo } from "react";
+import { useMutation } from "@tanstack/react-query";
 import type { jitoConfigSchema } from "@rhivadotfun/api";
 
 import { useUserApi } from "../../../hooks/use-user-api";
+import type { PoolDex } from "@/features/liquidity/liquidity.schema";
 import { useSettingsStore } from "@/features/settings/settings.store";
 import { toJitoPriorityLevel } from "@/features/settings/settings.util";
-import type { PoolDex } from "@/features/liquidity/liquidity.schema";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 type ZapOutParams = {
   position: string;

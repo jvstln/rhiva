@@ -11,9 +11,10 @@ import { Bell, MenuIcon, Settings, Wallet, XIcon } from "lucide-react";
 import { env } from "@/lib/env";
 import { useAuth } from "@/hooks";
 import logo from "@/public/logo.svg";
+import RewardButton from "./RewardButton";
 import { Skeleton } from "../ui/skeleton";
+import { truncateString } from "@/lib/utils";
 import { SearchInput } from "../ui/search-input";
-import { cn, truncateString } from "@/lib/utils";
 import { DiscordIcon, TelegramIcon } from "../ui/icons";
 import { NotificationPopover } from "./NotificationPopover";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -21,11 +22,11 @@ import { UserMenuPopover } from "@/features/auth/components/UserMenuPopover";
 import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  NavigationMenuContent,
 } from "../ui/navigation-menu";
 
 const NAV_LINKS = [
@@ -37,10 +38,11 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const auth = useAuth();
-  const { createWallet } = useCreateWallet();
-  const { user, ready } = usePrivy();
   const pathname = usePathname();
+  const { user, ready } = usePrivy();
   const { addSigners } = useSigners();
+  const { createWallet } = useCreateWallet();
+
   const { login } = useLogin({
     async onComplete({ user, isNewUser }) {
       if (user.wallet) {
@@ -154,15 +156,7 @@ export function Navbar() {
             <Settings />
           </Button>
         </SettingsDialog>
-        <Link
-          href="/rewards"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "hidden border-primary sm:flex",
-          )}
-        >
-          10K XP
-        </Link>
+        {auth.authenticated && <RewardButton />}
         {ready ? (
           auth.authenticated ? (
             <UserMenuPopover

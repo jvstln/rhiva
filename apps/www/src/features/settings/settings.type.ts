@@ -61,7 +61,7 @@ export interface ZapInDexSettings {
   amount: number;
   liquiditySlippage: number;
   liquiditySlippageMode: SlippageMode;
-  swapSlippage: number;
+  swapSlippage?: number;
   swapSlippageMode: SlippageMode;
   binRangeMode: BinRangeMode;
   rangeFromCurrentPrice: [number, number];
