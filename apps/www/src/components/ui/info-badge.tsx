@@ -5,7 +5,10 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const infoBadgeVariants = cva(
-  "group/info-badge inline-flex shrink-0 items-center gap-1 font-geist font-medium text-[10px] text-accent tabular-nums leading-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 [&_svg]:not-[class*=size-]:size-3 [&_svg]:not-[class*=shrink-]:shrink-0 **:[[class*=--accent]]:text-accent",
+  cn(
+    "group/info-badge inline-flex shrink-0 items-center gap-1 font-geist font-medium text-[10px] tabular-nums leading-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 [&_svg]:not-[class*=size-]:size-3 [&_svg]:not-[class*=shrink-]:shrink-0",
+    "text-[color-mix(var(--accent)_70%,var(--color-foreground))] **:[[class*=--accent]]:text-[color-mix(var(--accent)_70%,var(--color-foreground))]",
+  ),
   {
     variants: {
       variant: {

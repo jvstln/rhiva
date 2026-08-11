@@ -8,10 +8,6 @@ import { useRewardProfile } from "@/features/reward/reward.hook";
 export default function RewardButton() {
   const { data } = useRewardProfile();
 
-  useQuery({
-    queryKey: [],
-  });
-
   return (
     data && (
       <Link

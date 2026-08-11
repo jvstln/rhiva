@@ -10,8 +10,14 @@ import { MeteoraTradeRail } from "@/features/liquidity/components/MeteoraTradeRa
 import { RaydiumTradeRail } from "@/features/liquidity/components/RaydiumTradeRail";
 import { PoolChart } from "@/features/tradeview/components/PoolChart";
 import { useLiquidityPool } from "../liquidity.hook";
+import {
+  useLiquidityDetailsWebsocket,
+  useLiquidityPoolWebsocket,
+} from "../liquidity.ws";
 
 export default function LiquidityPoolPage({ id }: { id: string }) {
+  useLiquidityPoolWebsocket(id);
+  useLiquidityDetailsWebsocket(id);
   const poolQuery = useLiquidityPool(id);
 
   return (

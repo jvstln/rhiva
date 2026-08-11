@@ -24,7 +24,7 @@ export function TradeViewChart({
       const w = new widget({
         symbol,
         container,
-        debug: true,
+        debug: false,
         autosize: true,
         locale: "en",
         interval: "5" as ResolutionString,

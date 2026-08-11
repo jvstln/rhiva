@@ -15,6 +15,10 @@ import {
 
 import { cn } from "@/lib/utils";
 import { useLiquidityPool } from "../liquidity.hook";
+import {
+  useLiquidityDetailsWebsocket,
+  useLiquidityPoolWebsocket,
+} from "../liquidity.ws";
 import { QueryState } from "@/components/layout/QueryState";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -29,9 +33,11 @@ import {
 import { BarGraph } from "./BarGraph";
 import { useZapOut } from "@/features/transaction/hooks/use-zap-out";
 
-export const LiquidityDetailPage = ({ id }: { id: string }) => {
+export const LiquidityDetailPage = ({ address }: { address: string }) => {
+  useLiquidityPoolWebsocket(address);
+  useLiquidityDetailsWebsocket(address);
   const router = useRouter();
-  const pool = useLiquidityPool(id);
+  const pool = useLiquidityPool(address);
   const zapOut = useZapOut();
 
   return (

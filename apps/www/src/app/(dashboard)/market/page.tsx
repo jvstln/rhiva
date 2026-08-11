@@ -1,3 +1,4 @@
+import { MarketLiveData } from "@/features/market/components/MarketLiveData";
 import { MarketPage } from "@/features/market/components/MarketPage";
 
 export default async function MarketRoute({
@@ -5,5 +6,9 @@ export default async function MarketRoute({
 }: PageProps<"/market">) {
   const awaitedSearchParams = await searchParams;
 
-  return <MarketPage searchParams={awaitedSearchParams} />;
+  return (
+    <MarketLiveData>
+      <MarketPage searchParams={awaitedSearchParams} />
+    </MarketLiveData>
+  );
 }

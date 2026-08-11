@@ -5,5 +5,5 @@ export default async function LiquidityDetailRoute({
 }: PageProps<"/liquidity/detail/[id]">) {
   const { id } = await params;
 
-  return <LiquidityDetailPage id={id} />;
+  return <LiquidityDetailPage address={id} />;
 }
