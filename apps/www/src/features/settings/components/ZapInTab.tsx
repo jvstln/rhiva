@@ -1,29 +1,30 @@
 "use client";
 
-import { Info } from "lucide-react";
 import { Fragment } from "react";
+import { Info } from "lucide-react";
+import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
 
 import { capitalize } from "@/lib/utils";
-import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
+import { SolanaIcon } from "@/components/ui/icons";
 import { useSettingsStore } from "../settings.store";
-import type { BinRangeMode, SlippageMode } from "../settings.type";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { BarGraph } from "@/features/liquidity/components/BarGraph";
+import type { BinRangeMode, SlippageMode } from "../settings.type";
+import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  POOL_DEXES,
+  type PoolDex,
+} from "@/features/liquidity/liquidity.schema";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
-import { SolanaIcon } from "@/components/ui/icons";
-import {
-  POOL_DEXES,
-  type PoolDex,
-} from "@/features/liquidity/liquidity.schema";
-import { BarGraph } from "@/features/liquidity/components/BarGraph";
+
 
 function toNumber(value: string) {
   const parsed = parseFloat(value);
