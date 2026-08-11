@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib";
 import { buttonVariants } from "../ui/button";
