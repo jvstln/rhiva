@@ -13,6 +13,7 @@ import { TokenChart } from "@/features/tradeview/components/TokenChart";
 import { TokenDetailTimeframeStats } from "./TokenDetailTimeframeStats";
 import { TokenDetailStatsGrid } from "@/features/market/components/TokenDetailStatsGrid";
 import { TokenDetailTradePanel } from "@/features/market/components/TokenDetailTradePanel";
+import { useTokenWebSocket } from "../market.ws";
 
 type TokenDetailPageProps = { token: TokenDetail };
 
@@ -29,6 +30,7 @@ const TABLE_TABS = [
 ] as const;
 
 export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
+  useTokenWebSocket(token.mint);
   const [activeTable, setActiveTable] =
     useState<(typeof TABLE_TABS)[number]>("Trades");
   const [filters, setFilters] = useState<TokenDetailFilters>({

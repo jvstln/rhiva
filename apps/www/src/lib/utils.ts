@@ -33,6 +33,12 @@ export function cn(...inputs: ClassValue[]) {
   return customTwMerge(clsx(inputs));
 }
 
+export function getRandomId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `sub_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 export function arrayWithId<T extends string | number>(
   arr: T[],
 ): Array<{ id: number; value: T }>;

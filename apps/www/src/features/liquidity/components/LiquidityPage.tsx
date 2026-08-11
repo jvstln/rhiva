@@ -5,6 +5,7 @@ import { Suspense, useMemo } from "react";
 import { PoolsToolbar } from "./LiquidityToolbar";
 import { Separator } from "@/components/ui/separator";
 import { useLiquidityPools } from "../liquidity.hook";
+import { useLiquidityWebsocket } from "../liquidity.ws";
 import { formatCompactCurrency } from "@/lib/finance.util";
 import {
   DashboardDescription,
@@ -14,6 +15,7 @@ import {
 import { PoolsTable } from "./LiquidityPoolsTable";
 
 const LiquidityPage = () => {
+  useLiquidityWebsocket();
   const { data: pools } = useLiquidityPools();
 
   const stats = useMemo(() => {

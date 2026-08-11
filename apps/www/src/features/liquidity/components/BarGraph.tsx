@@ -25,7 +25,7 @@ export function BarGraph({
   markerIndex,
   title,
   leftColor = "#a855f7",
-  rightColor = "#22d3ee",
+  rightColor = "var(--color-primary)",
   markerColor = "#ffffff",
   formatLabel,
   normalize = true,

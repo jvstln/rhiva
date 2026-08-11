@@ -53,7 +53,7 @@ export type RadarFilters = Record<
   RadarColumns,
   {
     search: string;
-    bondingCurve: Preset;
+    preset: Preset;
     quickBuy: number | null;
     quickSell: number | null;
   }

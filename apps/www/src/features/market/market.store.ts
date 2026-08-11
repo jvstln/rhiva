@@ -12,21 +12,21 @@ export const useMarketStore = create<MarketState>()(
         radarFilters: {
           fresh: {
             search: "",
-            bondingCurve: "p1",
+            preset: "p1",
             quickBuy: 0,
-            quickSell: 0,
+            quickSell: null,
           },
           heatingUp: {
             search: "",
-            bondingCurve: "p1",
+            preset: "p1",
             quickBuy: 0,
-            quickSell: 0,
+            quickSell: null,
           },
           graduated: {
             search: "",
-            bondingCurve: "p1",
+            preset: "p1",
             quickBuy: 0,
-            quickSell: 0,
+            quickSell: null,
           },
         },
         setRadarFilters(columns) {
@@ -38,7 +38,7 @@ export const useMarketStore = create<MarketState>()(
         // ------------------------------------------------------------------------
         trendingFilters: {
           timeframe: "1h",
-          quickSell: 0,
+          quickSell: null,
           quickBuy: 0,
           preset: "p1",
         },

@@ -45,7 +45,7 @@ import {
   TokenWebsite,
 } from "./tooltips/Socials";
 import { useSwap } from "@/features/transaction/hooks/use-swap";
-import { toast } from "sonner";
+import { BuyButton, SellButton } from "./ToolbarItems";
 
 export function AddTokenToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
@@ -205,66 +205,30 @@ function ActionButtons({ token }: { token: TokenDetail }) {
 
   return (
     <div className="flex items-center justify-start gap-2">
-      {quickSell !== null && (
-        <Button
-          variant="sell"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (quickSell <= 0) {
-              return toast.error("Quick sell amount must be greater than zero");
-            }
+      <BuyButton
+        value={quickBuy}
+        loading={swap.isPending && swap.variables.action === "buy"}
+        onClick={() => {
+          swap.mutate({
+            action: "buy",
+            outputMint: token.mint,
+            amount: Number(quickBuy),
+          });
+        }}
+      />
 
-            swap.mutate({
-              action: "sell",
-              inputMint: token.mint,
-              inputDecimals: token.decimals,
-              amount: quickSell,
-            });
-          }}
-          loading={swap.isPending && swap.variables.action === "sell"}
-          data-require-auth
-        >
-          <span className={cn(quickSell > 0 && "group-hover/button:hidden")}>
-            Sell
-          </span>
-          {quickSell > 0 && (
-            <span className="hidden group-hover/button:inline">
-              {quickSell}%
-            </span>
-          )}
-        </Button>
-      )}
-      {quickBuy !== null && (
-        <Button
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (quickBuy <= 0) {
-              return toast.error("Quick buy amount must be greater than zero");
-            }
-
-            swap.mutate({
-              action: "buy",
-              outputMint: token.mint,
-              amount: quickBuy,
-            });
-          }}
-          loading={swap.isPending && swap.variables.action === "buy"}
-          data-require-auth
-        >
-          <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
-            Buy
-          </span>
-          {quickBuy > 0 && (
-            <span className="hidden group-hover/button:inline">
-              {quickBuy} SOL
-            </span>
-          )}
-        </Button>
-      )}
+      <SellButton
+        value={quickSell}
+        loading={swap.isPending && swap.variables.action === "sell"}
+        onClick={() => {
+          swap.mutate({
+            action: "sell",
+            inputMint: token.mint,
+            inputDecimals: token.decimals,
+            amount: Number(quickSell),
+          });
+        }}
+      />
     </div>
   );
 }
@@ -346,14 +310,13 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
                   ? formatCompactNumber(totalTransaction)
                   : "N/A"}
               </span>
-              <span className="font-medium text-xs">
-                <span className="text-ocean-green">
-                  {buys !== null ? formatCompactNumber(buys) : "N/A"}
-                </span>
-                <span className="text-white/30"> / </span>
-                <span className="text-roman">
-                  {sells !== null ? formatCompactNumber(sells) : "N/A"}
-                </span>
+              <span className="font-medium **:data-[slot=info-badge]:text-xs ">
+                <InfoBadge className="[--accent:var(--color-up)]">
+                  {formatCompactNumber(buys)}
+                </InfoBadge>
+                {" "} / {" "}                <InfoBadge className="[--accent:var(--color-down)]">
+                  {formatCompactNumber(sells)}
+                </InfoBadge>
               </span>
             </div>
           );
