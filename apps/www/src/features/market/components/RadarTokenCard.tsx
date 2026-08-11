@@ -99,7 +99,13 @@ const TransactionInfo = ({ token }: { token: TokenDetail }) => {
 
         <InfoBadge tooltip="Net buy">
           N
-          <span className={cn(token.net_buy_usd < 0 ? "[--accent:var(--color-down)]" : "[--accent:var(--color-up)]")}>
+          <span
+            className={cn(
+              token.net_buy_usd < 0
+                ? "[--accent:var(--color-down)]"
+                : "[--accent:var(--color-up)]",
+            )}
+          >
             {formatCompactCurrency(token.net_buy_usd)}
           </span>
         </InfoBadge>

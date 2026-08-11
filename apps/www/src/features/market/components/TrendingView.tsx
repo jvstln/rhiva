@@ -310,11 +310,12 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
                   ? formatCompactNumber(totalTransaction)
                   : "N/A"}
               </span>
-              <span className="font-medium **:data-[slot=info-badge]:text-xs ">
+              <span className="font-medium **:data-[slot=info-badge]:text-xs">
                 <InfoBadge className="[--accent:var(--color-up)]">
                   {formatCompactNumber(buys)}
-                </InfoBadge>
-                {" "} / {" "}                <InfoBadge className="[--accent:var(--color-down)]">
+                </InfoBadge>{" "}
+                /{" "}
+                <InfoBadge className="[--accent:var(--color-down)]">
                   {formatCompactNumber(sells)}
                 </InfoBadge>
               </span>

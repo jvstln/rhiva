@@ -25,7 +25,6 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 
-
 function toNumber(value: string) {
   const parsed = parseFloat(value);
   return Number.isNaN(parsed) ? 0 : parsed;
