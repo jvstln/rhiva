@@ -17,6 +17,7 @@ import {
   getSurgeTokens,
   getTokenCandles,
   getTrendingTokens,
+  getSearchTokens,
 } from "./market.api";
 
 export type TokenCandleFilters = CandlesQuery & { mint: string };
@@ -93,5 +94,13 @@ export function useTokenTrades(mint: string) {
   return useQuery({
     queryKey: ["token", mint, "trades"],
     queryFn: () => getTokenTrades(mint),
+  });
+}
+
+export function useSearchTokens(query: string) {
+  return useQuery({
+    queryKey: ["tokens", "search", query],
+    queryFn: () => getSearchTokens(query),
+    enabled: query.trim().length > 0,
   });
 }

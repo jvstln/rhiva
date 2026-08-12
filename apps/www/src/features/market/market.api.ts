@@ -69,3 +69,43 @@ export const getTokenCandles = async (
 export const getTokenTrades = async (mint: string) => {
   return await dataapi.tokens.getTokenTrades(mint);
 };
+
+export const getSearchTokens = async (
+  query: string,
+): Promise<TokenDetail[]> => {
+  if (!query) return [];
+
+  const response = await dataapi.tokens.getScreener({
+    query,
+    limit: 10,
+    launchpad: null,
+    stage: null,
+    min_pct: null,
+    max_pct: null,
+    min_age_sec: null,
+    max_age_sec: null,
+    min_mcap: null,
+    max_mcap: null,
+    min_holders: null,
+    max_holders: null,
+    min_top10_pct: null,
+    max_top10_pct: null,
+    min_dev_pct: null,
+    max_dev_pct: null,
+    min_liquidity: null,
+    min_volume_1h: null,
+    has_socials: null,
+    dex_boost: null,
+    dex_paid: null,
+    dev_sold: null,
+    mint_auth_disabled: null,
+    freeze_auth_disabled: null,
+    include_incomplete: null,
+    sort: null,
+    order: null,
+    offset: null,
+  });
+
+  if (response.length === 0) return [];
+  return await getTokens(response.map((token) => token.mint));
+};
