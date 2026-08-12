@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import type { TokenInfoProps } from "./TokenInfo";
-import { cn, formatCompactNumber } from "@/lib/utils";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
 import { FishIcon, MouseLabIcon } from "@/components/ui/icons";
 import {
   InfoBadge,
@@ -19,18 +19,13 @@ import {
 
 export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
   const holdersPercent = token.holders?.top10_holder_pct;
-  const value =
-    holdersPercent !== null && holdersPercent !== undefined
-      ? `${formatCompactNumber(holdersPercent)}%`
-      : "N/A";
+  const value = `${formatCompactNumber(holdersPercent)}%`;
 
   return (
     <InfoBadge
       variant={"badge"}
       className={cn(
-        holdersPercent !== null &&
-          holdersPercent !== undefined &&
-          holdersPercent > 5
+        holdersPercent != null && holdersPercent > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -62,9 +57,7 @@ export const TotalHolders = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <Users />
-      {total !== null && total !== undefined
-        ? formatCompactNumber(total)
-        : "N/A"}
+      {formatCompactNumber(total)}
     </InfoBadge>
   );
 };
@@ -76,7 +69,7 @@ export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
     <InfoBadge
       variant={"badge"}
       className={cn(
-        insiderCount !== null && insiderCount !== undefined && insiderCount > 5
+        insiderCount != null && insiderCount > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -85,9 +78,7 @@ export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
           label="Insiders Hold"
           value={
             <span className="text-accent">
-              {insiderCount !== null && insiderCount !== undefined
-                ? `${formatCompactNumber(insiderCount)}`
-                : "N/A"}
+              {formatCompactNumber(insiderCount)}
             </span>
           }
         />
@@ -95,9 +86,7 @@ export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <MouseLabIcon />
-      {insiderCount !== null && insiderCount !== undefined
-        ? `${formatCompactNumber(insiderCount)}`
-        : "N/A"}
+      {formatCompactNumber(insiderCount)}
     </InfoBadge>
   );
 };
@@ -147,7 +136,7 @@ export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
     <InfoBadge
       variant={"badge"}
       className={cn(
-        sniperCount !== null && sniperCount !== undefined && sniperCount > 5
+        sniperCount != null && sniperCount > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -156,9 +145,7 @@ export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
           label="Snipers Hold"
           value={
             <span className="text-accent">
-              {sniperCount !== null && sniperCount !== undefined
-                ? `${formatCompactNumber(sniperCount)}`
-                : "N/A"}
+              {formatCompactNumber(sniperCount)}
             </span>
           }
         />
@@ -166,9 +153,7 @@ export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <LocateFixed />
-      {sniperCount !== null && sniperCount !== undefined
-        ? `${formatCompactNumber(sniperCount)}`
-        : "N/A"}
+      {formatCompactNumber(sniperCount)}
     </InfoBadge>
   );
 };
@@ -181,9 +166,7 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
     <InfoBadge
       variant={"badge"}
       className={cn(
-        bundledWalletCount !== null &&
-          bundledWalletCount !== undefined &&
-          Number(bundledWalletCount) > 5
+        bundledWalletCount != null && Number(bundledWalletCount) > 5
           ? "[--accent:var(--color-down)]"
           : "[--accent:var(--color-up)]",
       )}
@@ -192,39 +175,27 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
           <InfoBadgeTooltipGrid>
             <InfoBadgeTooltipRow
               label="Bundlers Hold"
-              value={
-                bundledWalletCount !== null && bundledWalletCount !== undefined
-                  ? `${formatCompactNumber(Number(bundledWalletCount))}`
-                  : "N/A"
-              }
+              value={formatCompactNumber(bundledWalletCount)}
             />
 
             <InfoBadgeTooltipRow
               label="ATH Hold"
-              value="N/A"
+              value={formatCompactCurrency(token.all_time_high_market_cap_usd)}
             />
 
             <InfoBadgeTooltipRow
               label="Total bundlers"
-              value={
-                bundledWalletCount !== null && bundledWalletCount !== undefined
-                  ? `${formatCompactNumber(Number(bundledWalletCount))}`
-                  : "N/A"
-              }
+              value={formatCompactNumber(bundledWalletCount)}
             />
 
             <InfoBadgeTooltipRow
               label="Bundled total"
-              value={
-                earlySol !== null && earlySol !== undefined
-                  ? `${formatCompactNumber(earlySol)} SOL`
-                  : "N/A"
-              }
+              value={`${formatCompactNumber(earlySol)} SOL`}
             />
 
             <InfoBadgeTooltipRow
               label="Bundled token"
-              value="N/A"
+              value={formatCompactNumber(token.bundled_supply)}
             />
           </InfoBadgeTooltipGrid>
         </div>
@@ -232,9 +203,7 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
       {...props}
     >
       <Layers />
-      {bundledWalletCount !== null && bundledWalletCount !== undefined
-        ? `${formatCompactNumber(Number(bundledWalletCount))}`
-        : "N/A"}
+      {formatCompactNumber(bundledWalletCount)}
     </InfoBadge>
   );
 };
@@ -247,9 +216,7 @@ export const KolHold = ({ token, ...props }: { token: TokenDetail }) => {
       {...props}
     >
       <Trophy />
-      {completionPct !== null && completionPct !== undefined
-        ? completionPct.toFixed(0)
-        : "N/A"}
+      {`${formatCompactNumber(completionPct)}%`}
     </InfoBadge>
   );
 };

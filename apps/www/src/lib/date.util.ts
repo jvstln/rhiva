@@ -1,7 +1,7 @@
 import { intervalToDuration } from "date-fns";
 
 /** "2d 5h", "45m" — compact duration label from a seconds count. */
-export function formatAge(seconds?: number | null): string {
+export function formatAge(seconds?: number | bigint | null): string {
   if (!seconds || seconds <= 0) return "-";
 
   const {
@@ -10,7 +10,7 @@ export function formatAge(seconds?: number | null): string {
     minutes = 0,
   } = intervalToDuration({
     start: 0,
-    end: seconds * 1000,
+    end: Number(seconds) * 1000,
   });
 
   if (days > 0) return `${days}d ${hours}h`;

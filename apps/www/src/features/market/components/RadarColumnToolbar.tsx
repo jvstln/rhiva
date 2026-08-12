@@ -24,7 +24,7 @@ export function RadarColumnToolbar({ column }: ColumnToolbarProps) {
         <SearchInput
           data-size="sm"
           placeholder="Keyword1,..."
-          className="max-w-28"
+          className="max-w-30"
         />
         <QuickBuyInput
           variant="minimal"
@@ -32,9 +32,9 @@ export function RadarColumnToolbar({ column }: ColumnToolbarProps) {
           onValueChange={(value) =>
             setFilters({ [column]: { quickBuy: value } })
           }
-          className="max-w-20"
+          className="shrink-0"
         />
-        <PresetToggle />
+        <PresetToggle size="xs" />
         <RadarFilterDialog defaultTab={column}>
           <Button
             size="icon-sm"

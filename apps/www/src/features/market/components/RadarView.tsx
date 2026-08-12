@@ -41,7 +41,7 @@ export const RadarView = () => {
             className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-border/70 border-r last:border-r-0"
           >
             <div className="flex items-center justify-between gap-4 border-border/70 border-b px-4 py-3">
-              <h2 className="shrink-0 font-bold text-b-1 text-white">
+              <h2 className="truncate font-bold text-b-1 text-white">
                 {capitalize(column)}
               </h2>
               <RadarColumnToolbar column={column} />

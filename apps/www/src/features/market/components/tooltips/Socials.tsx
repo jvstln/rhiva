@@ -11,7 +11,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-import { getInitials } from "@/lib/utils";
+import { formatAge, getInitials } from "@/lib/utils";
+import { formatCompactNumber } from "@/lib/finance.util";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { LeafIcon, SimpleIcon, XIcon } from "@/components/ui/icons";
 import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
@@ -84,26 +85,31 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
 
             {/* Bio */}
             <p className="text-muted-foreground text-sm">
-              {token.social?.twitter_handle
-                ? `@${token.social.twitter_handle}`
-                : "N/A"}
+              {token.description ||
+                (token.social?.twitter_handle
+                  ? `@${token.social.twitter_handle}`
+                  : "N/A")}
             </p>
 
             {/* Joined Date */}
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
               <CalendarDays className="size-[18px]" />
-              <span>Joined {new Date().toLocaleString()}</span>
+              <span>Joined {formatAge(token.recent_listing_time)}</span>
             </div>
 
             {/* Stats */}
             <div className="flex items-center gap-4 text-sm">
               <div>
-                <span className="font-bold text-white">1</span>{" "}
-                <span className="text-muted-foreground">Following</span>
+                <span className="font-bold text-white">
+                  {formatCompactNumber(token.holders?.holder_count)}
+                </span>{" "}
+                <span className="text-muted-foreground">Holders</span>
               </div>
               <div>
-                <span className="font-bold text-white">105</span>{" "}
-                <span className="text-muted-foreground">Followers</span>
+                <span className="font-bold text-white">
+                  {formatCompactNumber(token.snipers?.sniper_count)}
+                </span>{" "}
+                <span className="text-muted-foreground">Snipers</span>
               </div>
             </div>
 
@@ -215,8 +221,8 @@ export function TokenSocialSearch({ token }: SocialHoverTooltipProps) {
 
 export function TokenViewCount({ token }: { token: TokenDetail }) {
   return (
-    <InfoBadge tooltip={"Currently viewing"}>
-      <Eye /> N/A
+    <InfoBadge tooltip={"Holders / Viewers"}>
+      <Eye /> {formatCompactNumber(token.holders?.holder_count)}
     </InfoBadge>
   );
 }
@@ -269,6 +275,40 @@ export function TokenConnection({ token }: { token: TokenDetail }) {
       aria-label="Token connection"
     >
       <AlertCircle />
+    </InfoBadge>
+  );
+}
+
+export function TokenTwitterHandle({ token }: SocialHoverTooltipProps) {
+  if (!token.social?.twitter_handle) return null;
+
+  const handle = `@${token.social.twitter_handle}`;
+
+  return (
+    <InfoBadge
+      className="[--accent:var(--color-info)]"
+      tooltip={
+        <InfoBadgeTooltipRow
+          label="X / Twitter"
+          value={
+            token.social.twitter_url ? (
+              <a
+                href={token.social.twitter_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {handle}
+              </a>
+            ) : (
+              handle
+            )
+          }
+        />
+      }
+      aria-label="X handle"
+    >
+      <XIcon />
     </InfoBadge>
   );
 }

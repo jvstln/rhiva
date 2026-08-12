@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { debounce } from "lodash";
-import { Activity, Coins, Fuel, PercentIcon, Shield, Zap } from "lucide-react";
+import { Activity, Coins, Fuel, PercentIcon, Shield } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Preset } from "../market.schema";
@@ -19,8 +19,6 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/input-group";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 export const PresetToggle = ({ ...props }: ToggleGroup.Props) => {
   return (
@@ -87,7 +85,7 @@ export const QuickBuyInput = ({
   return (
     <InputGroup
       size="sm"
-      className={cn(variant === "minimal" ? "w-22" : "w-36", className)}
+      className={cn(variant === "minimal" ? "w-20" : "w-36", className)}
     >
       <InputGroupInput
         type="number"
@@ -149,72 +147,5 @@ export const QuickSellInput = ({
         </InputGroupAddon>
       )}
     </InputGroup>
-  );
-};
-
-export const BuyButton = ({
-  value,
-  valueUnit = "SOL",
-  children = "Buy",
-  className,
-  onClick,
-  icon = <Zap />,
-  ...props
-}: Omit<Button.Props, "value"> & {
-  value?: number | null;
-  valueUnit?: string;
-  icon?: React.ReactNode;
-}) => {
-  if (value === undefined || value === null) return null;
-
-  return (
-    <Button
-      size="sm"
-      variant={"soft"}
-      data-require-auth
-      className={cn("[&_svg:not([class*=fill])]:fill-current", className)}
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        if (value <= 0) {
-          return toast.error(
-            "Amount must be greater than zero. Check your settings",
-          );
-        }
-        onClick?.(e);
-      }}
-      {...props}
-    >
-      {icon}
-
-      <span className={cn(value > 0 && "group-hover/button:hidden")}>
-        {children}
-      </span>
-
-      {value ? (
-        <span className={cn(value > 0 && "hidden group-hover/button:inline")}>
-          {value} {valueUnit}
-        </span>
-      ) : null}
-    </Button>
-  );
-};
-
-export const SellButton = ({
-  children,
-  className,
-  icon,
-  valueUnit,
-  ...props
-}: React.ComponentProps<typeof BuyButton>) => {
-  return (
-    <BuyButton
-      className={cn("[--accent:var(--color-sell)]", className)}
-      icon={icon ?? <Coins className="fill-none" />}
-      valueUnit={valueUnit ?? "%"}
-      {...props}
-    >
-      {children ?? "Sell"}
-    </BuyButton>
   );
 };

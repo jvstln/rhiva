@@ -108,16 +108,25 @@ export function InfoBadgeTooltipRow({
   valueClassName?: string;
 }) {
   return (
-    <div className="flex w-full items-center justify-between gap-4 py-0.5">
+    <article
+      className="flex w-full items-center justify-between gap-4 py-0.5"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       {label && <span className="text-muted-foreground text-xs">{label}</span>}
       {value && (
         <span
-          className={cn("font-medium text-foreground text-xs", valueClassName)}
+          className={cn(
+            "truncate font-medium text-foreground text-xs",
+            valueClassName,
+          )}
+          title={typeof value === "string" ? value : undefined}
         >
           {value}
         </span>
       )}
-    </div>
+    </article>
   );
 }
 

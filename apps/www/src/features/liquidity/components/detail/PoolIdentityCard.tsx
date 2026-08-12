@@ -6,7 +6,7 @@ import type { TokenDetail } from "@rhivadotfun/dataapi";
 import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/LiquidityAvatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatCompactCurrency } from "@/lib/finance.util";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import { cn, getInitials } from "@/lib/utils";
 import { BarGraph } from "../BarGraph";
 import { formatPrice, getPoolPriceInQuote } from "../../liquidity.util";
@@ -74,8 +74,8 @@ export function PoolIdentityCard({ pool }: { pool: LiquidityPool }) {
           markerIndex={50}
         />
         <div className="mt-1 flex justify-between text-b-5 text-gray">
-          <span>{pool.tvl_distribution?.base_pct?.toFixed(2) ?? "—"}%</span>
-          <span>{pool.tvl_distribution?.quote_pct?.toFixed(2) ?? "—"}%</span>
+          <span>{`${formatCompactNumber(pool.tvl_distribution?.base_pct)}%`}</span>
+          <span>{`${formatCompactNumber(pool.tvl_distribution?.quote_pct)}%`}</span>
         </div>
       </div>
     </div>

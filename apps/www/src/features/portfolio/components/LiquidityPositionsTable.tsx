@@ -12,7 +12,7 @@ import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { POOL_DEXES } from "@/features/liquidity/liquidity.schema";
-import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import type { LpPosition, TokenDetail } from "@rhivadotfun/dataapi";
 import { useTokens } from "@/features/market/market.hook";
 import { useMemo } from "react";
@@ -215,9 +215,10 @@ export const LiquidityPositionsTable = ({
         totalDeposit: formatCompactCurrency(position.deposited),
         totalWithdraw: formatCompactCurrency(position.withdrawn),
         pnlUsd: formatCompactCurrency(pnlUsd),
-        pnlPct: formatSignedPercent(
-          position.net_amount > 0 ? (pnlUsd / position.net_amount) * 100 : null,
-        ),
+        pnlPct:
+          position.net_amount > 0
+            ? `${formatCompactNumber((pnlUsd / position.net_amount) * 100, { withSign: true })}%`
+            : "N/A",
       };
     });
   }, [positions, tokens.data, tokens.isPending]);

@@ -1,6 +1,6 @@
 import type { TokenDetail } from "@rhivadotfun/dataapi";
 
-import { cn } from "@/lib/utils";
+import { cn, formatCompactNumber } from "@/lib/utils";
 import { DexPaid } from "./tooltips/DexInfo";
 import { DevHoldOrDevSell } from "./tooltips/DevInfo";
 import {
@@ -92,18 +92,11 @@ export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
     { label: "No Blacklist", value: "" },
     {
       label: "Rug %",
-      value:
-        token.bot_activity !== undefined && token.bot_activity !== null
-          ? `${(token.bot_activity * 100).toFixed(0)}%`
-          : "N/A",
+      value: `${formatCompactNumber(token.bot_activity ? token.bot_activity * 100 : null)}%`,
     },
     {
       label: "Top 10",
-      value:
-        token.holders?.top10_holder_pct !== undefined &&
-        token.holders?.top10_holder_pct !== null
-          ? `${token.holders.top10_holder_pct.toFixed(0)}%`
-          : "N/A",
+      value: `${formatCompactNumber(token.holders?.top10_holder_pct)}%`,
     },
   ];
 

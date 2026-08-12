@@ -1,20 +1,21 @@
 "use client";
 
-import { Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatDistanceToNowStrict } from "date-fns";
 import type { TokenDetail } from "@rhivadotfun/dataapi";
 
-import { Button } from "@/components/ui/button";
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import { Separator } from "@/components/ui/separator";
-import { formatSignedPercent } from "@/lib/finance.util";
 import { QueryState } from "@/components/layout/QueryState";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BotActivity, DexPaid, TotalFees } from "./tooltips/DexInfo";
 import { DevHoldOrDevSell, DevMigratedAndLaunch } from "./tooltips/DevInfo";
-import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
+import {
+  cn,
+  formatAge,
+  formatCompactCurrency,
+  formatCompactNumber,
+} from "@/lib/utils";
 import {
   TokenConnection,
   TokenLatestPost,
@@ -41,8 +42,7 @@ import {
   SnipersHold,
   TotalHolders,
 } from "./tooltips/Holders";
-import { toast } from "sonner";
-import { useSwap } from "@/features/transaction/hooks/use-swap";
+import { BuyAndSellButton } from "./BuyAndSellButton";
 
 const SURGE_METRICS: Array<
   (props: { token: TokenDetail }) => React.JSX.Element
@@ -73,7 +73,7 @@ function TokenRow({ token }: TokenRowProps) {
   const buys = window?.buys !== undefined ? Number(window.buys) : 0;
   const sells = window?.sells ?? 0;
   const totalTransaction = buys + sells;
-  const updatedAt = token.live?.updated_at
+  const _updatedAt = token.live?.updated_at
     ? new Date(Number(token.live.updated_at))
     : new Date();
 
@@ -94,12 +94,7 @@ function TokenRow({ token }: TokenRowProps) {
 
           <div className="flex items-center gap-1.5 text-b-4 text-gray">
             <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-              {token.live?.updated_at
-                ? formatDistanceToNowStrict(updatedAt).replace(
-                    /^.*?(\d+)\s*(\w).*$/,
-                    "$1$2",
-                  )
-                : "N/A"}
+              {formatAge(token.live.updated_at)}
             </InfoBadge>
             <Separator
               orientation="vertical"
@@ -148,7 +143,7 @@ function TokenRow({ token }: TokenRowProps) {
             </span>
 
             <span className="text-up">
-              {formatSignedPercent(token.price_change_percent)}
+              {`${formatCompactNumber(token.price_change_percent, { withSign: true })}%`}
             </span>
           </div>
 
@@ -178,8 +173,7 @@ function TokenRow({ token }: TokenRowProps) {
               priceChangePct > 0 ? "text-up" : "text-down",
             )}
           >
-            {priceChangePct > 0 ? "+" : ""}
-            {priceChangePct.toFixed(2)}%
+            {`${formatCompactNumber(priceChangePct, { withSign: true })}%`}
           </span>
         </div>
       </div>
@@ -193,12 +187,7 @@ function TokenRow({ token }: TokenRowProps) {
       <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
         <div className="flex items-center gap-3">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-            {token.live?.updated_at
-              ? formatDistanceToNowStrict(updatedAt).replace(
-                  /^.*?(\d+)\s*(\w).*$/,
-                  "$1$2",
-                )
-              : "N/A"}
+            {formatAge(token.live?.updated_at)}
           </InfoBadge>
           <SurgeBuyButton token={token} />
         </div>
@@ -279,46 +268,11 @@ export function SurgeTable() {
 
 const SurgeBuyButton = ({ token }: { token: TokenDetail }) => {
   const quickBuy = useMarketStore((state) => state.surgeFilters.quickBuy) ?? 0;
-  const swap = useSwap();
-
   return (
-    quickBuy !== null && (
-      <Button
-        size="sm"
-        variant={"soft"}
-        data-require-auth
-        loading={swap.isPending}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (quickBuy <= 0) {
-            return toast.error("Quick buy amount must be greater than zero");
-          }
-
-          swap.mutate({
-            action: "buy",
-            outputMint: token.mint,
-            amount: quickBuy,
-          });
-        }}
-      >
-        <Zap
-          className="size-3"
-          fill="currentColor"
-        />
-
-        <span className={cn(quickBuy > 0 && "group-hover/button:hidden")}>
-          Buy
-        </span>
-
-        {quickBuy && (
-          <span
-            className={cn(quickBuy > 0 && "hidden group-hover/button:inline")}
-          >
-            {quickBuy} SOL
-          </span>
-        )}
-      </Button>
-    )
+    <BuyAndSellButton
+      type="buy"
+      token={token}
+      value={quickBuy}
+    />
   );
 };

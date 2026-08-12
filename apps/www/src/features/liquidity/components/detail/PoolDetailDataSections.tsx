@@ -4,14 +4,13 @@ import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import {
   formatCompactCurrency,
   formatCompactNumber,
-  formatSignedPercent,
   formatSignedUsd,
 } from "@/lib/finance.util";
 import { formatAge } from "@/lib/date.util";
 import { cn } from "@/lib/utils";
 
-const formatPercent = (value?: number | null, digits = 2) =>
-  value == null ? "-" : `${Number(value.toFixed(digits))}%`;
+const formatPercent = (value?: number | null) =>
+  value != null ? `${formatCompactNumber(value)}%` : "N/A";
 
 export function PoolDataSections({ pool }: { pool: LiquidityPool }) {
   const totalFeePct = Number(pool.total_fee_pct ?? 0);
@@ -27,7 +26,7 @@ export function PoolDataSections({ pool }: { pool: LiquidityPool }) {
       {value}
       {change != null && (
         <span className={change < 0 ? "text-down" : "text-up"}>
-          ({formatSignedPercent(change)})
+          ({`${formatCompactNumber(change, { withSign: true })}%`})
         </span>
       )}
     </span>
@@ -47,7 +46,9 @@ export function PoolDataSections({ pool }: { pool: LiquidityPool }) {
                     pool.fees_change_pct < 0 ? "text-down" : "text-up",
                   )}
                 >
-                  ({formatSignedPercent(pool.fees_change_pct)})
+                  (
+                  {`${formatCompactNumber(pool.fees_change_pct, { withSign: true })}%`}
+                  )
                 </span>
               )}
             </span>
@@ -57,14 +58,16 @@ export function PoolDataSections({ pool }: { pool: LiquidityPool }) {
           label="24h Fees/TVL"
           value={
             <span className="flex items-baseline gap-2">
-              {formatSignedPercent(fees24hTvlPct)}
+              {`${formatCompactNumber(fees24hTvlPct)}%`}
               {pool.fees_ratio_change_pct && (
                 <span
                   className={cn(
                     pool.fees_ratio_change_pct < 0 ? "text-down" : "text-up",
                   )}
                 >
-                  ({formatSignedPercent(pool.fees_ratio_change_pct)})
+                  (
+                  {`${formatCompactNumber(pool.fees_ratio_change_pct, { withSign: true })}%`}
+                  )
                 </span>
               )}
             </span>
@@ -82,24 +85,24 @@ export function PoolDataSections({ pool }: { pool: LiquidityPool }) {
           },
           {
             label: "Base Fee",
-            value: formatSignedPercent(pool.base_fee_pct),
+            value: `${formatCompactNumber(pool.base_fee_pct)}%`,
           },
           {
             label: "Dynamic Fee",
-            value: formatSignedPercent(pool.dynamic_fee_pct),
+            value: `${formatCompactNumber(pool.dynamic_fee_pct)}%`,
           },
           {
             label: "Total Trading Fee",
-            value: formatSignedPercent(pool.total_fee_pct),
+            value: `${formatCompactNumber(pool.total_fee_pct)}%`,
           },
           // TODO: max_fee_pct is specific to certain DLMM pools; "—" when not present.
           {
             label: "Max Fee",
-            value: formatSignedPercent(pool.max_fee_pct),
+            value: `${formatCompactNumber(pool.max_fee_pct)}%`,
           },
           {
             label: "Protocol Fee",
-            value: formatSignedPercent(pool.protocol_fee_pct),
+            value: `${formatCompactNumber(pool.protocol_fee_pct)}%`,
           },
           {
             label: "Fee Collection Token",

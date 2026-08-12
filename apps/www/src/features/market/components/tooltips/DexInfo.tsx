@@ -36,19 +36,13 @@ export const BotActivity = ({ token, ...props }: TokenInfoProps) => {
       tooltip={
         <InfoBadgeTooltipRow
           label="Bot activity"
-          value={
-            activity !== null && activity !== undefined
-              ? formatCompactNumber(activity)
-              : "N/A"
-          }
+          value={formatCompactNumber(activity)}
         />
       }
       {...props}
     >
       <Bot />
-      {activity !== null && activity !== undefined
-        ? formatCompactNumber(activity)
-        : "N/A"}
+      {formatCompactNumber(activity)}
     </InfoBadge>
   );
 };
@@ -61,18 +55,12 @@ export const TotalFees = ({ token }: { token: TokenDetail }) => {
       tooltip={
         <InfoBadgeTooltipRow
           label="Prio & Tip & Trading Fees"
-          value={
-            feesPaid !== null && feesPaid !== undefined
-              ? `${feesPaid} SOL`
-              : "N/A"
-          }
+          value={`${formatCompactNumber(feesPaid)} SOL`}
         />
       }
     >
       <HandCoins />
-      {feesPaid !== null && feesPaid !== undefined
-        ? formatCompactNumber(feesPaid)
-        : "N/A"}
+      {formatCompactNumber(feesPaid)}
     </InfoBadge>
   );
 };

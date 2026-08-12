@@ -1,21 +1,16 @@
 import React from "react";
 import { Separator } from "@base-ui/react";
 import { NetworkSolana } from "@web3icons/react";
-import { formatDistanceToNowStrict } from "date-fns";
 import type { TokenDetail } from "@rhivadotfun/dataapi";
 
-import { cn } from "@/lib/utils";
+import { cn, formatAge } from "@/lib/utils";
 import { TotalFees } from "./tooltips/DexInfo";
 import { AddTokenToWatchlistButton } from "./TrendingView";
 import { InfoBadge } from "@/components/ui/info-badge";
 import { TopHolders, TotalHolders } from "./tooltips/Holders";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevInfo";
-import {
-  formatCompactCurrency,
-  formatCompactNumber,
-  formatSignedPercent,
-} from "@/lib/finance.util";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import {
   TokenSocialSearch,
   TokenLatestPost,
@@ -39,52 +34,47 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
     Object.values(token.timeframes?.windows ?? {})[0];
   const volumeUsd = window24h?.volume_usd ?? 0;
   const bondingPct = token.bonding?.completion_pct ?? 0;
-  const updatedAt = token.live?.updated_at
+  const _updatedAt = token.live?.updated_at
     ? new Date(Number(token.live.updated_at))
     : new Date();
+
+  const totalSupply =
+    token.price_usd && token.market_cap_usd
+      ? token.market_cap_usd / token.price_usd
+      : 0;
 
   const headerStats = [
     {
       label: "Price",
-      value:
-        token.price_usd !== null && token.price_usd !== undefined
-          ? formatCompactCurrency(token.price_usd)
-          : "N/A",
+      value: formatCompactCurrency(token.price_usd),
     },
     {
       label: "Liq",
-      value:
-        token.liquidity_usd !== null && token.liquidity_usd !== undefined
-          ? formatCompactCurrency(token.liquidity_usd)
-          : "N/A",
+      value: formatCompactCurrency(token.liquidity_usd),
     },
     {
       label: "Vol",
-      value:
-        volumeUsd !== null && volumeUsd !== undefined
-          ? formatCompactCurrency(volumeUsd)
-          : "N/A",
+      value: formatCompactCurrency(volumeUsd),
     },
     {
       label: "Total Fees",
       value: (
         <span className="flex items-center gap-1">
           <NetworkSolana className="size-4" />
-          {token.global_fees_paid !== null &&
-          token.global_fees_paid !== undefined
-            ? formatCompactNumber(token.global_fees_paid)
-            : "N/A"}
+          {formatCompactNumber(token.global_fees_paid)}
         </span>
       ),
     },
     {
       label: "Total supply",
-      value: "N/A",
+      value: formatCompactNumber(totalSupply),
     },
     {
       label: "B. Curve",
       value: (
-        <span className={cn("text-up")}>{formatSignedPercent(bondingPct)}</span>
+        <span className={cn("text-up")}>
+          {`${formatCompactNumber(bondingPct, { withSign: true })}%`}
+        </span>
       ),
     },
     {
@@ -110,12 +100,7 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
           </div>
           <div className="flex items-baseline gap-1">
             <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-              {token.live?.updated_at
-                ? formatDistanceToNowStrict(updatedAt).replace(
-                    /^.*?(\d+)\s*(\w).*$/,
-                    "$1$2",
-                  )
-                : "N/A"}
+              {formatAge(token.live?.updated_at)}
             </InfoBadge>
             <TokenSymbolCopy token={token} />
             <TokenLatestPost token={token} />
@@ -133,9 +118,7 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
           className="mx-4 font-bold text-foreground text-h5"
           tooltip="Market cap"
         >
-          {token.market_cap_usd !== null && token.market_cap_usd !== undefined
-            ? formatCompactCurrency(token.market_cap_usd)
-            : "N/A"}
+          {formatCompactCurrency(token.market_cap_usd)}
         </InfoBadge>
 
         <div className="flex items-center gap-5">

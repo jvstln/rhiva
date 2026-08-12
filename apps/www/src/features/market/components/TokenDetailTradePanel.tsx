@@ -31,12 +31,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         <span className="text-muted-foreground">{token.name}</span>
         <span className="font-medium text-white">
           {token.symbol}
-          (ATH MC{" "}
-          {token.all_time_high_market_cap_usd !== null &&
-          token.all_time_high_market_cap_usd !== undefined
-            ? formatCompactCurrency(token.all_time_high_market_cap_usd)
-            : "N/A"}
-          )
+          (ATH MC {formatCompactCurrency(token.all_time_high_market_cap_usd)})
         </span>
       </div>
 
@@ -83,10 +78,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         </TabsList>
 
         <div className="flex items-center justify-end text-b-4 text-gray">
-          Price:{" "}
-          {token.price_usd !== null && token.price_usd !== undefined
-            ? formatCompactCurrency(token.price_usd)
-            : "N/A"}
+          Price: {formatCompactCurrency(token.price_usd)}
         </div>
 
         <div>
@@ -117,10 +109,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         </div>
 
         <p className="text-b-5 text-gray">
-          Price USD:{" "}
-          {token.price_usd !== null && token.price_usd !== undefined
-            ? formatCompactCurrency(token.price_usd)
-            : "N/A"}
+          Price USD: {formatCompactCurrency(token.price_usd)}
         </p>
 
         <TabsContent value="buy">
