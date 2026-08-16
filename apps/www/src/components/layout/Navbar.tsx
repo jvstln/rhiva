@@ -6,7 +6,7 @@ import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useCreateWallet } from "@privy-io/react-auth/solana";
 import { useLogin, usePrivy, useSigners } from "@privy-io/react-auth";
-import { Bell, MenuIcon, Settings, Wallet, XIcon } from "lucide-react";
+import { Bell, MenuIcon, Search, Settings, Wallet, XIcon } from "lucide-react";
 
 import { env } from "@/lib/env";
 import { useAuth } from "@/hooks";
@@ -14,11 +14,11 @@ import logo from "@/public/logo.svg";
 import RewardButton from "./RewardButton";
 import { Skeleton } from "../ui/skeleton";
 import { truncateString } from "@/lib/utils";
-import { SearchInput } from "../ui/search-input";
 import { DiscordIcon, TelegramIcon } from "../ui/icons";
 import { NotificationPopover } from "./NotificationPopover";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { UserMenuPopover } from "@/features/auth/components/UserMenuPopover";
+import { SearchTokenDialog } from "@/features/market/components/search-token-dialog";
 import { SettingsDialog } from "../../features/settings/components/SettingsDialog";
 import {
   NavigationMenu,
@@ -139,7 +139,15 @@ export function Navbar() {
       </NavigationMenu>
 
       <div className="ml-auto flex items-center gap-3">
-        <SearchInput />
+        <SearchTokenDialog>
+          <Button
+            variant="outline"
+            className="min-w-40 justify-start"
+          >
+            <Search />
+            Search
+          </Button>
+        </SearchTokenDialog>
         <NotificationPopover>
           <Button
             variant={"ghost"}

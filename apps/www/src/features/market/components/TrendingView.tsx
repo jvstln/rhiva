@@ -6,7 +6,6 @@
 import { useMemo } from "react";
 import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatDistanceToNowStrict } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TokenDetail } from "@rhivadotfun/dataapi";
 
@@ -20,9 +19,9 @@ import { useTrendingTokens, useWatchlistTokens } from "../market.hook";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
   cn,
+  formatAge,
   formatCompactCurrency,
   formatCompactNumber,
-  formatSignedPercent,
 } from "@/lib/utils";
 import {
   BundlersHold,
@@ -44,8 +43,7 @@ import {
   TokenViewCount,
   TokenWebsite,
 } from "./tooltips/Socials";
-import { useSwap } from "@/features/transaction/hooks/use-swap";
-import { BuyButton, SellButton } from "./ToolbarItems";
+import { BuyAndSellButton } from "./BuyAndSellButton";
 
 export function AddTokenToWatchlistButton({ mint }: { mint: string }) {
   const toggleWatchlist = useMarketStore((state) => state.watchlist.toggle);
@@ -105,7 +103,7 @@ export function AddTokenToWatchlistButton({ mint }: { mint: string }) {
 /* ------------------------------------------------------------------ */
 
 function PairInfoCell({ token }: { token: TokenDetail }) {
-  const updatedAt = token.live?.updated_at
+  const _updatedAt = token.live?.updated_at
     ? new Date(Number(token.live.updated_at))
     : new Date();
   return (
@@ -126,12 +124,7 @@ function PairInfoCell({ token }: { token: TokenDetail }) {
 
         <div className="flex items-baseline gap-1">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-            {token.live?.updated_at
-              ? formatDistanceToNowStrict(updatedAt).replace(
-                  /^.*?(\d+)\s*(\w).*$/,
-                  "$1$2",
-                )
-              : "N/A"}
+            {formatAge(token.live?.updated_at)}
           </InfoBadge>
           <TokenSymbolCopy token={token} />
           <TokenLatestPost token={token} />
@@ -160,20 +153,16 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
   return (
     <div className="flex flex-col">
       <span className="font-medium text-sm text-white">{value}</span>
-      {changePercent !== undefined && changePercent !== null ? (
-        <InfoBadge
-          className={cn(
-            "text-xs",
-            changePercent >= 0
-              ? "[--accent:var(--color-up)]"
-              : "[--accent:var(--color-down)]",
-          )}
-        >
-          {formatSignedPercent(changePercent)}
-        </InfoBadge>
-      ) : (
-        <span className="text-muted-foreground text-xs">N/A</span>
-      )}
+      <InfoBadge
+        className={cn(
+          "text-xs",
+          changePercent && changePercent >= 0
+            ? "[--accent:var(--color-up)]"
+            : "[--accent:var(--color-down)]",
+        )}
+      >
+        {`${formatCompactNumber(changePercent, { withSign: true })}%`}
+      </InfoBadge>
     </div>
   );
 }
@@ -201,33 +190,17 @@ function ActionButtons({ token }: { token: TokenDetail }) {
   const quickBuy = useMarketStore((state) => state.trendingFilters.quickBuy);
   const quickSell = useMarketStore((state) => state.trendingFilters.quickSell);
 
-  const swap = useSwap();
-
   return (
     <div className="flex items-center justify-start gap-2">
-      <BuyButton
+      <BuyAndSellButton
+        type="buy"
+        token={token}
         value={quickBuy}
-        loading={swap.isPending && swap.variables.action === "buy"}
-        onClick={() => {
-          swap.mutate({
-            action: "buy",
-            outputMint: token.mint,
-            amount: Number(quickBuy),
-          });
-        }}
       />
-
-      <SellButton
+      <BuyAndSellButton
+        type="sell"
+        token={token}
         value={quickSell}
-        loading={swap.isPending && swap.variables.action === "sell"}
-        onClick={() => {
-          swap.mutate({
-            action: "sell",
-            inputMint: token.mint,
-            inputDecimals: token.decimals,
-            amount: Number(quickSell),
-          });
-        }}
       />
     </div>
   );
@@ -258,14 +231,8 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
             row.original.timeframes?.windows?.[timeframe]?.price_change_pct;
           return (
             <MetricCell
-              value={
-                mcap !== null && mcap !== undefined
-                  ? formatCompactCurrency(mcap)
-                  : "N/A"
-              }
-              changePercent={
-                pct !== null && pct !== undefined ? pct : undefined
-              }
+              value={formatCompactCurrency(mcap)}
+              changePercent={pct ?? undefined}
             />
           );
         },
@@ -306,9 +273,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
           return (
             <div className="flex flex-col gap-0.5">
               <span className="font-medium text-foreground text-sm">
-                {totalTransaction !== null
-                  ? formatCompactNumber(totalTransaction)
-                  : "N/A"}
+                {formatCompactNumber(totalTransaction)}
               </span>
               <span className="font-medium **:data-[slot=info-badge]:text-xs">
                 <InfoBadge className="[--accent:var(--color-up)]">
@@ -380,7 +345,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         key={tokens[0]?.mint}
         table={table}
         classNames={{
-          table: "w-full table-fixed",
+          table: "size-full table-fixed",
           tr: "cursor-pointer",
           td: pinnedColumnClassName,
           th: pinnedColumnClassName,

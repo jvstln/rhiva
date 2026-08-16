@@ -10,7 +10,7 @@ import { PnlExportDialog } from "./PnlExportDialog";
 import { CopyButton } from "@/components/ui/button/copy-button";
 import {
   formatCompactCurrency,
-  formatSignedPercent,
+  formatCompactNumber,
   formatSignedUsd,
 } from "@/lib/finance.util";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
@@ -88,11 +88,11 @@ const columns = [
     header: "Remaining",
     cell: ({ row }) => (
       <p className="font-medium text-white">
-        {row.original.current_price_usd != null
-          ? formatCompactCurrency(
-              row.original.remaining * row.original.current_price_usd,
-            )
-          : "-"}
+        {formatCompactCurrency(
+          row.original.current_price_usd
+            ? row.original.remaining * row.original.current_price_usd
+            : null,
+        )}
       </p>
     ),
   }),
@@ -104,7 +104,7 @@ const columns = [
           {formatSignedUsd(positionPnlUsd(row.original))}
         </p>
         <p className="text-b-3 text-up/60">
-          {formatSignedPercent(positionPnlPct(row.original))}
+          {`${formatCompactNumber(positionPnlPct(row.original), { withSign: true })}%`}
         </p>
       </div>
     ),

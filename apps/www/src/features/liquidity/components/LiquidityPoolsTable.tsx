@@ -12,12 +12,7 @@ import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useLiquidityPools } from "../liquidity.hook";
 import { gsap } from "@/lib/gsap.util";
-import {
-  cn,
-  formatCompactCurrency,
-  formatCompactNumber,
-  formatSignedPercent,
-} from "@/lib/utils";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
 import { POOL_DEXES, type PoolDex } from "../liquidity.schema";
 import { useLiquidityStore } from "../liquidity.store";
 import type { LiquidityPool } from "../liquidity.type";
@@ -37,25 +32,20 @@ function ValueChangeCell({
   valueKind = "number",
 }: {
   value: number | string | null | undefined;
-  change: number | string | null | undefined;
+  change: number | null | undefined;
   valueKind?: "currency" | "percent" | "number";
 }) {
   const displayValue =
     value === null || value === undefined
-      ? "N/A"
+      ? "-"
       : valueKind === "currency"
         ? formatCompactCurrency(value)
         : valueKind === "percent"
-          ? formatSignedPercent(Number(value))
+          ? `${formatCompactNumber(Number(value), { withSign: true })}%`
           : typeof value === "number"
             ? value.toLocaleString("en-US")
             : value;
-  const displayChange =
-    change === null || change === undefined
-      ? "N/A"
-      : typeof change === "number"
-        ? formatSignedPercent(change)
-        : change;
+  const displayChange = `${formatCompactNumber(change, { withSign: true })}%`;
   const isDown =
     typeof displayChange === "string" && displayChange.trim().startsWith("-");
 
@@ -370,17 +360,17 @@ const columns: ColumnDef<LiquidityPool>[] = [
                 },
                 {
                   label: "Min Volatility",
-                  value: formatSignedPercent(null),
+                  value: `${formatCompactNumber(pool.volatility_pct)}%`,
                   className: "text-white",
                 },
                 {
                   label: "Top 10 Holders",
-                  value: formatSignedPercent(pool.top10_holder_pct),
+                  value: `${formatCompactNumber(pool.top10_holder_pct)}%`,
                   className: "text-orange-500",
                 },
                 {
                   label: "Dev Balance",
-                  value: formatSignedPercent(pool.dev_balance_pct),
+                  value: `${formatCompactNumber(pool.dev_balance_pct)}%`,
                   className: "text-cyan-400",
                 },
               ].map((stat) => (

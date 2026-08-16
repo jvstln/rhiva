@@ -3,8 +3,6 @@ import { NetworkSolana } from "@web3icons/react";
 import type { TokenDetail } from "@rhivadotfun/dataapi";
 
 import { DexPaid } from "./tooltips/DexInfo";
-import { useMarketStore } from "../market.store";
-import type { RadarColumns } from "../market.schema";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   cn,
@@ -49,7 +47,6 @@ import {
   TotalHolders,
   FreshHold,
 } from "./tooltips/Holders";
-import { BuyAndSellButton } from "./BuyAndSellButton";
 
 const TransactionInfo = ({ token }: { token: TokenDetail }) => {
   const window24h =
@@ -162,11 +159,12 @@ const RADAR_METRICS: Array<
   DexPaid,
 ];
 
-interface TokenCardProps {
+interface SearchTokenCardProps {
   token: TokenDetail;
-  column: RadarColumns;
+  onClick?: () => void;
 }
-export function RadarTokenCard({ token, column }: TokenCardProps) {
+
+export function SearchTokenCard({ token, onClick }: SearchTokenCardProps) {
   const router = useRouter();
 
   return (
@@ -176,6 +174,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
         className="group/token-display cursor-pointer border-border/70 border-b px-4 py-4 last:border-none hover:bg-white/5"
         onKeyDown={() => null}
         onClick={() => {
+          onClick?.();
           router.push(`/token/${token.mint}`);
         }}
       >
@@ -214,7 +213,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
               <TransactionInfo token={token} />
             </div>
 
-            <div className="flex w-full min-w-0 items-end justify-between gap-1">
+            <div className="mt-1 flex w-full min-w-0 items-end justify-between gap-1">
               <ScrollArea className="min-w-0 flex-1">
                 <div className="flex gap-x-1">
                   {RADAR_METRICS.map((Metric, index) => {
@@ -229,12 +228,6 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
-              <div className="flex shrink-0 gap-1.5">
-                <BuyAndSellActions
-                  column={column}
-                  token={token}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -245,33 +238,3 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
     </Tooltip>
   );
 }
-
-const BuyAndSellActions = ({
-  column,
-  token,
-}: {
-  column: RadarColumns;
-  token: TokenDetail;
-}) => {
-  const quickBuy = useMarketStore(
-    (state) => state.radarFilters[column].quickBuy,
-  );
-  const quickSell = useMarketStore(
-    (state) => state.radarFilters[column].quickSell,
-  );
-
-  return (
-    <div className="flex items-center justify-start gap-2">
-      <BuyAndSellButton
-        type="buy"
-        token={token}
-        value={quickBuy}
-      />
-      <BuyAndSellButton
-        type="sell"
-        token={token}
-        value={quickSell}
-      />
-    </div>
-  );
-};

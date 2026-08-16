@@ -6,6 +6,7 @@ import { AddressCopy } from "./tooltips/TokenInfo";
 import { Separator } from "@/components/ui/separator";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import { SideRailRow, SideRailSection } from "@/components/ui/side-rail";
+import { formatAge } from "@/lib/utils";
 
 export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
   const creator = useMemo(
@@ -13,22 +14,28 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
     [token.creator, token.insiders?.creator_wallet],
   );
 
+  const totalSupply =
+    token.price_usd && token.market_cap_usd
+      ? token.market_cap_usd / token.price_usd
+      : 0;
+
   const basicDataItems = [
     { label: "Mint", value: <AddressCopy address={token.mint} /> },
     {
       label: "Market cap",
-      value:
-        token.market_cap_usd !== null && token.market_cap_usd !== undefined
-          ? formatCompactCurrency(token.market_cap_usd)
-          : "N/A",
+      value: formatCompactCurrency(token.market_cap_usd),
     },
-    { label: "Holders", value: token.holders?.holder_count ?? "N/A" },
-    { label: "Total supply", value: "N/A" },
+    {
+      label: "Holders",
+      value: formatCompactNumber(token.holders?.holder_count),
+    },
+    {
+      label: "Total supply",
+      value: formatCompactNumber(totalSupply),
+    },
     {
       label: "Token last update",
-      value: token.live.updated_at
-        ? new Date(Number(token.live.updated_at)).toLocaleString()
-        : "N/A",
+      value: formatAge(token.live?.updated_at),
     },
   ];
 
@@ -59,7 +66,9 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
         </div>
         <div className="grid grid-cols-3 gap-2 py-0.5 text-b-4">
           <span>SOL</span>
-          <span className="text-up">N/A</span>
+          <span className="text-up">
+            {`${formatCompactNumber(token.bonding.completion_pct)}%`}
+          </span>
           <span className="text-right">
             {formatCompactCurrency(token.liquidity_usd)}
           </span>
@@ -81,12 +90,7 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
         />
         <SideRailRow
           label="Token Balance"
-          value={
-            token.holders?.dev_balance !== undefined &&
-            token.holders?.dev_balance !== null
-              ? formatCompactNumber(token.holders.dev_balance)
-              : "N/A"
-          }
+          value={formatCompactNumber(token.holders?.dev_balance)}
         />
       </SideRailSection>
 
@@ -111,15 +115,14 @@ export function TokenDetailDataSections({ token }: { token: TokenDetail }) {
           {
             label: "Burnt",
             ok: true,
-            value: token.bonding?.stage === "completed" ? "100%" : "N/A",
+            value:
+              token.bonding?.stage === "completed"
+                ? "100%"
+                : `${formatCompactNumber(token.bonding.completion_pct)}%`,
           },
           {
             label: "Top 10",
-            value:
-              token.holders?.top10_holder_pct !== undefined &&
-              token.holders?.top10_holder_pct !== null
-                ? `${token.holders.top10_holder_pct.toFixed(2)}%`
-                : "N/A",
+            value: `${formatCompactNumber(token.holders?.top10_holder_pct)}%`,
             warn: true,
           },
         ].map((item) => (

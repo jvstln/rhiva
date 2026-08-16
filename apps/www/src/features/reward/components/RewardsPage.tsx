@@ -43,78 +43,84 @@ function CurrentTierCard() {
   const rewardProfile = useRewardProfile();
 
   return (
-    <QueryState query={rewardProfile}>
-      {(rewardProfile) => {
-        const currentTier = REWARD_TIERS[rewardProfile.data.tier];
-        const nextTier = REWARD_TIERS[rewardProfile.data.tier + 1];
+    <div
+      className="relative overflow-hidden rounded-lg bg-surface-1 p-6"
+      style={{
+        boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
+      }}
+    >
+      <QueryState
+        query={rewardProfile}
+        requireAuth
+      >
+        {(rewardProfile) => {
+          const currentTier = REWARD_TIERS[rewardProfile.data.tier];
+          const nextTier = REWARD_TIERS[rewardProfile.data.tier + 1];
 
-        return (
-          <div
-            className="relative overflow-hidden rounded-lg bg-surface-1 p-6"
-            style={{
-              boxShadow: `inset 1px 1px 0 rgba(255, 255, 255, 0.6)`,
-            }}
-          >
-            <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
+          return (
+            <>
+              <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
 
-            <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-              <div className="flex shrink-0 flex-col items-center gap-1">
-                <TierBadge
-                  tier={currentTier}
-                  locked={false}
-                  size={110}
-                />
-                <span className="text-foreground/80 text-lg">1x</span>
-                <span className="text-muted-foreground/60 text-sm">
-                  10% Referral Rate
-                </span>
-              </div>
+              <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+                <div className="flex shrink-0 flex-col items-center gap-1">
+                  <TierBadge
+                    tier={currentTier}
+                    locked={false}
+                    size={110}
+                  />
+                  <span className="text-foreground/80 text-lg">1x</span>
+                  <span className="text-muted-foreground/60 text-sm">
+                    10% Referral Rate
+                  </span>
+                </div>
 
-              <div className="w-full flex-1 space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-muted-foreground text-sm">
-                    Next Tier:{" "}
-                    <span className="font-semibold text-foreground">
-                      {nextTier?.name ?? "MAX"}
-                    </span>
+                <div className="w-full flex-1 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground text-sm">
+                      Next Tier:{" "}
+                      <span className="font-semibold text-foreground">
+                        {nextTier?.name ?? "MAX"}
+                      </span>
+                    </p>
+
+                    <TierExportDialog tier={currentTier}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                      >
+                        <Share2 />
+                        Share
+                      </Button>
+                    </TierExportDialog>
+                  </div>
+
+                  <p className="font-medium text-foreground/90 text-xl">
+                    {formatCompactNumber(rewardProfile.data.xp)} of{" "}
+                    {formatCompactNumber(nextTier.minXp ?? currentTier.minXp)}{" "}
+                    XP
                   </p>
 
-                  <TierExportDialog tier={currentTier}>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                    >
-                      <Share2 />
-                      Share
-                    </Button>
-                  </TierExportDialog>
+                  <div className="h-3.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{
+                        width: `${rewardProfile.data.xp / nextTier.minXp}%`,
+                      }}
+                    />
+                  </div>
+
+                  <p className="text-muted-foreground text-sm">
+                    {nextTier
+                      ? `You're almost there! Trade ${nextTier.minXp - rewardProfile.data.xp} SOL to reach ${nextTier.name}`
+                      : "You've reached the highest tier!"}
+                  </p>
                 </div>
-
-                <p className="font-medium text-foreground/90 text-xl">
-                  {formatCompactNumber(rewardProfile.data.xp)} of{" "}
-                  {formatCompactNumber(nextTier.minXp ?? currentTier.minXp)} XP
-                </p>
-
-                <div className="h-3.5 w-full overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{
-                      width: `${rewardProfile.data.xp / nextTier.minXp}%`,
-                    }}
-                  />
-                </div>
-
-                <p className="text-muted-foreground text-sm">
-                  {nextTier
-                    ? `You're almost there! Trade ${nextTier.minXp - rewardProfile.data.xp} SOL to reach ${nextTier.name}`
-                    : "You've reached the highest tier!"}
-                </p>
               </div>
-            </div>
-          </div>
-        );
-      }}
-    </QueryState>
+            </>
+          );
+        }}
+      </QueryState>
+    </div>
   );
 }
 

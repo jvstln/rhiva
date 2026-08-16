@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks";
 import { QueryState } from "@/components/layout/QueryState";
 import type { LiquidityPool } from "@/features/liquidity/liquidity.type";
 import { useLiquidityPositions } from "@/features/portfolio/portfolio.hook";
-import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 
 const TABS = ["Positions", "History"] as const;
 
@@ -93,7 +93,7 @@ export function PositionsPanel({ pool }: { pool: LiquidityPool }) {
                       pnlUsd >= 0 ? "text-up" : "text-down",
                     )}
                   >
-                    {formatSignedPercent(pnlPct)} (
+                    {`${formatCompactNumber(pnlPct, { withSign: true })}%`} (
                     {formatCompactCurrency(pnlUsd)})
                   </span>
                 </div>

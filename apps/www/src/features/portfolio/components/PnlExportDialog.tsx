@@ -19,7 +19,7 @@ import { LpCard, PnlSummaryCard, TokenCard } from "./PnlCards";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   formatCompactCurrency,
-  formatSignedPercent,
+  formatCompactNumber,
   formatSignedUsd,
 } from "@/lib/finance.util";
 import type { LpPosition, TokenPosition } from "@rhivadotfun/dataapi";
@@ -207,8 +207,8 @@ const PnlExportDialog = ({
               <LpCard
                 ref={cardRef}
                 image={selectedBg}
-                pnl={formatSignedPercent(lpPnlPct)}
-                tvl={formatCompactCurrency(position?.current_value_usd ?? 0)}
+                pnl={`${formatCompactNumber(lpPnlPct, { withSign: true })}%`}
+                tvl={formatCompactCurrency(position?.current_value_usd)}
                 value={formatSignedUsd(lpPnlUsd)}
                 poolName={position?.symbol ?? "LP Position"}
                 timeAgo="—"
@@ -217,7 +217,7 @@ const PnlExportDialog = ({
               <TokenCard
                 ref={cardRef}
                 image={selectedBg}
-                pnl={formatSignedPercent(tokenPnlPct)}
+                pnl={`${formatCompactNumber(tokenPnlPct, { withSign: true })}%`}
                 invested={formatCompactCurrency(tokenInvestedUsd)}
                 value={formatSignedUsd(tokenPnlUsd)}
                 tokenName={token?.symbol ?? token?.mint ?? "Token"}

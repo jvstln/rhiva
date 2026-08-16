@@ -23,7 +23,7 @@ import { QueryState } from "@/components/layout/QueryState";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CoinIcon, MeteoraIcon, SolanaIcon } from "@/components/ui/icons";
-import { formatCompactCurrency, formatSignedPercent } from "@/lib/finance.util";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import { PnlExportDialog } from "@/features/portfolio/components/PnlExportDialog";
 import { LiquidityAvatar } from "@/features/liquidity/components/tooltips/LiquidityAvatar";
 import {
@@ -48,7 +48,7 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
         const currentPriceStr =
           currentPriceNum && currentPriceNum > 0
             ? formatPrice(currentPriceNum)
-            : "N/A";
+            : "-";
 
         const symbolA = p.token_a?.symbol ?? p.token_mint_a.slice(0, 6);
         const symbolB = p.token_b?.symbol ?? p.token_mint_b.slice(0, 6);
@@ -58,7 +58,9 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
           p.total_fee_pct ?? p.base_fee_pct ?? p.dynamic_fee_pct ?? 0,
         );
         const feeLabel =
-          totalFeePct > 0 ? `${totalFeePct.toFixed(2)}%` : `${p.bin_step}%`;
+          totalFeePct > 0
+            ? `${formatCompactNumber(totalFeePct)}%`
+            : `${p.bin_step}%`;
 
         const activeTvlNum = p.active_tvl_usd ?? p.tvl_usd ?? 0;
         const volume24h = p.volume_24h_usd ?? 0;
@@ -68,13 +70,10 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
         const activeTvlStr = formatCompactCurrency(activeTvlNum);
         const volumeStr = formatCompactCurrency(volume24h);
         const feesStr = formatCompactCurrency(feesValue);
-        const feesChangeStr = formatSignedPercent(p.fees_change_pct);
-        const feesRatioStr =
-          activeTvlNum > 0
-            ? `${((feesValue / activeTvlNum) * 100).toFixed(2)}%`
-            : "N/A";
-        const feesRatioChangeStr = formatSignedPercent(p.fees_ratio_change_pct);
-        const marketCapChangeStr = formatSignedPercent(p.price_change_24h_pct);
+        const feesChangeStr = `${formatCompactNumber(p.fees_change_pct, { withSign: true })}%`;
+        const feesRatioStr = `${formatCompactNumber(activeTvlNum > 0 ? (feesValue / activeTvlNum) * 100 : null)}%`;
+        const feesRatioChangeStr = `${formatCompactNumber(p.fees_ratio_change_pct, { withSign: true })}%`;
+        const marketCapChangeStr = `${formatCompactNumber(p.price_change_24h_pct, { withSign: true })}%`;
 
         return (
           <DashboardSlot>

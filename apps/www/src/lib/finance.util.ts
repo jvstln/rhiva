@@ -102,7 +102,7 @@ function getLeadingZerosAndDigits(
 }
 
 export function formatCompactNumber(
-  value?: string | number | null,
+  value?: string | number | bigint | null,
   options: FormatCompactNumberOptions = {},
 ): string {
   const {
@@ -111,6 +111,8 @@ export function formatCompactNumber(
     subscriptThreshold = 4,
     fallback = "-",
   } = options;
+
+  if (value === null || value === undefined || value === "") return fallback;
 
   const num = Number(value);
 
@@ -147,7 +149,10 @@ export function formatCompactNumber(
   return `${sign}${trimTrailingZeros(abs.toFixed(decimals))}`;
 }
 
-export function formatCompactCurrency(value?: number | string | null): string {
+export function formatCompactCurrency(
+  value?: number | string | bigint | null,
+): string {
+  if (value === null || value === undefined || value === "") return "-";
   return `$${formatCompactNumber(value)}`;
 }
 
@@ -155,13 +160,6 @@ export function formatCompactCurrency(value?: number | string | null): string {
 export function formatSignedUsd(value?: number | null): string {
   if (value === null || value === undefined) return "-";
   return `${value < 0 ? "-" : "+"}${formatCompactCurrency(Math.abs(value))}`;
-}
-
-/** "+23.45%", "-4.10%" */
-export function formatSignedPercent(value?: string | number | null): string {
-  if (value === null || value === undefined) return "-";
-
-  return `${formatCompactNumber(value)}%`;
 }
 
 export const currencies = [
