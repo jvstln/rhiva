@@ -1,11 +1,11 @@
 (self.webpackChunktradingview = self.webpackChunktradingview || []).push([
-  [5111],
-  {
-    77114: (e) => {
-      e.exports = {
-        en: ["erase level line"],
-        es: ["borrar la línea de nivel"],
-      };
-    },
-  },
+	[5111],
+	{
+		77114: (e) => {
+			e.exports = {
+				en: ["erase level line"],
+				es: ["borrar la línea de nivel"],
+			};
+		},
+	},
 ]);

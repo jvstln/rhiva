@@ -1,8 +1,8 @@
 (self.webpackChunktradingview = self.webpackChunktradingview || []).push([
-  [2578],
-  {
-    62578: (e) => {
-      e.exports = { en: ["Close"], ru: ["Закрыть"] };
-    },
-  },
+	[2578],
+	{
+		62578: (e) => {
+			e.exports = { en: ["Close"], ru: ["Закрыть"] };
+		},
+	},
 ]);
