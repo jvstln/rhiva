@@ -3,12 +3,12 @@ import type { CalendarDay } from "./CalendarDay";
 import type { TokenPosition } from "./TokenPosition";
 
 export type TokenPortfolioResponse = {
-	wallet: string;
-	total_wallet_worth_usd: number;
-	total_invested_usd: number;
-	total_pnl_usd: number;
-	realized_pnl_usd: number;
-	total_transactions: number;
-	tokens: Array<TokenPosition>;
-	calendar: Array<CalendarDay>;
+  wallet: string;
+  total_wallet_worth_usd: number;
+  total_invested_usd: number;
+  total_pnl_usd: number;
+  realized_pnl_usd: number;
+  total_transactions: number;
+  tokens: Array<TokenPosition>;
+  calendar: Array<CalendarDay>;
 };

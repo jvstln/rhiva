@@ -1,24 +1,24 @@
 {
-	"name": "@rhivadotfun/dataapi",
-	"version": "1.0.0",
-	"description": "SDK client for Rhiva data API",
-	"main": "./dist/index.js",
-	"types": "./src/index.ts",
-	"scripts": {
-		"build": "tsup src/index.ts --format=esm,cjs --minify --treeshake"
-	},
-	"dependencies": {
-		"xior": "^0.7.7"
-	},
-	"devDependencies": {
-		"typescript": "^5.0.0",
-		"@types/node": "^20.0.0"
-	},
-	"exports": {
-		".": {
-			"types": "./src/index.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.js"
-		}
-	}
+  "name": "@rhivadotfun/dataapi",
+  "version": "1.0.0",
+  "description": "SDK client for Rhiva data API",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format=esm,cjs --minify --treeshake"
+  },
+  "dependencies": {
+    "xior": "^0.7.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  }
 }

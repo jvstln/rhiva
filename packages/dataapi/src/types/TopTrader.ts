@@ -11,18 +11,18 @@
  * initial backlog; this stream provides the live tail.
  */
 export type TopTrader = {
-	wallet: string;
-	volume_lamports: number;
-	amount_bought_sol: number;
-	amount_sold_sol: number;
-	avg_buy_mcap: number;
-	avg_sell_mcap: number;
-	realized_pnl_sol: number;
-	realized_pnl_usd: number;
-	unrealized_pnl_sol: number;
-	unrealized_pnl_usd: number;
-	tokens_held: number;
-	buys: bigint;
-	sells: number;
-	trades: bigint;
+  wallet: string;
+  volume_lamports: number;
+  amount_bought_sol: number;
+  amount_sold_sol: number;
+  avg_buy_mcap: number;
+  avg_sell_mcap: number;
+  realized_pnl_sol: number;
+  realized_pnl_usd: number;
+  unrealized_pnl_sol: number;
+  unrealized_pnl_usd: number;
+  tokens_held: number;
+  buys: bigint;
+  sells: number;
+  trades: bigint;
 };

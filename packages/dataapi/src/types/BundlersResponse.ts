@@ -2,12 +2,12 @@
 import type { BundleCluster } from "./BundleCluster";
 
 export type BundlersResponse = {
-	creation_slot: number;
-	window_slots: bigint;
-	early_buyer_count: number;
-	total_early_sol: number;
-	bundle_cluster_count: number;
-	bundled_wallet_count: bigint;
-	bundled_pct_of_early_sol: number;
-	clusters: Array<BundleCluster>;
+  creation_slot: number;
+  window_slots: bigint;
+  early_buyer_count: number;
+  total_early_sol: number;
+  bundle_cluster_count: number;
+  bundled_wallet_count: bigint;
+  bundled_pct_of_early_sol: number;
+  clusters: Array<BundleCluster>;
 };

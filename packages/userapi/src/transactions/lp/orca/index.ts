@@ -4,9 +4,9 @@ import { WhirlpoolAPI } from ".";
 export * from "./whirlpool.api";
 
 export default class OrcaAPI {
-	readonly whirlpool: WhirlpoolAPI;
+  readonly whirlpool: WhirlpoolAPI;
 
-	constructor(xior: XiorInstance) {
-		this.whirlpool = new WhirlpoolAPI(xior);
-	}
+  constructor(xior: XiorInstance) {
+    this.whirlpool = new WhirlpoolAPI(xior);
+  }
 }

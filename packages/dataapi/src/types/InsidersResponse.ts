@@ -2,8 +2,8 @@
 import type { InsiderRow } from "./InsiderRow";
 
 export type InsidersResponse = {
-	creator_wallet: string;
-	creator_funder: string;
-	insider_count: number;
-	insiders: Array<InsiderRow>;
+  creator_wallet: string;
+  creator_funder: string;
+  insider_count: number;
+  insiders: Array<InsiderRow>;
 };

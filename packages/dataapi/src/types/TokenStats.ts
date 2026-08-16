@@ -3,9 +3,9 @@ import type { FeeSummary } from "./FeeSummary";
 import type { WindowStats } from "./WindowStats";
 
 export type TokenStats = {
-	created_at_ms: number;
-	age_seconds: bigint | null;
-	last_price_usd: number;
-	windows: { [key in string]?: WindowStats };
-	fees: FeeSummary;
+  created_at_ms: number;
+  age_seconds: bigint | null;
+  last_price_usd: number;
+  windows: { [key in string]?: WindowStats };
+  fees: FeeSummary;
 };

@@ -2,8 +2,8 @@
 import type { DevTokenEntry } from "./DevTokenEntry";
 
 export type DevTokensResponse = {
-	creator: string;
-	total_tokens: number;
-	migrated: Array<DevTokenEntry>;
-	unmigrated: Array<DevTokenEntry>;
+  creator: string;
+  total_tokens: number;
+  migrated: Array<DevTokenEntry>;
+  unmigrated: Array<DevTokenEntry>;
 };

@@ -2,8 +2,8 @@
 import type { SniperRow } from "./SniperRow";
 
 export type SnipersResponse = {
-	creation_slot: number;
-	window_slots: bigint;
-	sniper_count: number;
-	snipers: Array<SniperRow>;
+  creation_slot: number;
+  window_slots: bigint;
+  sniper_count: number;
+  snipers: Array<SniperRow>;
 };

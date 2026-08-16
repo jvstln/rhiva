@@ -3,8 +3,8 @@ import type { LpCalendarDay } from "./LpCalendarDay";
 import type { LpPosition } from "./LpPosition";
 
 export type LpPortfolioResponse = {
-	wallet: string;
-	lp_positions: Array<LpPosition>;
-	total_value_usd: number;
-	calendar: Array<LpCalendarDay>;
+  wallet: string;
+  lp_positions: Array<LpPosition>;
+  total_value_usd: number;
+  calendar: Array<LpCalendarDay>;
 };

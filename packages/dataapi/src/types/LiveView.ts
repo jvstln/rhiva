@@ -10,8 +10,8 @@
  * number, so they safely fall through to Value::String unchanged.
  */
 export type LiveView = {
-	price_usd: number | null;
-	volume_1h_usd: number | null;
-	txns_1m: number;
-	updated_at: number | null;
+  price_usd: number | null;
+  volume_1h_usd: number | null;
+  txns_1m: number;
+  updated_at: number | null;
 };

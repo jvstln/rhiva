@@ -2,9 +2,9 @@
 import type { JsonValue } from "./serde_json/JsonValue";
 
 export type RugcheckResponse = {
-	mint: string;
-	cached: boolean;
-	fetched_at_ms: number;
-	upstream_status: number;
-	report: JsonValue;
+  mint: string;
+  cached: boolean;
+  fetched_at_ms: number;
+  upstream_status: number;
+  report: JsonValue;
 };
