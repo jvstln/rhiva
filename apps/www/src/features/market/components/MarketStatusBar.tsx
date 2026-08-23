@@ -8,6 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { InfoBadge } from "@/components/ui/info-badge";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const DUMMY_TOKENS = [
   {
@@ -38,34 +39,41 @@ const DUMMY_TOKENS = [
 
 export const MarketStatusBar = (props: React.ComponentProps<"div">) => {
   return (
-    <div
-      {...props}
-      className={cn(
-        "flex h-8 shrink-0 items-center border-b *:h-full *:data-[slot=separator]:h-4/5 *:data-[slot=separator]:self-center",
-        props.className,
-      )}
-    >
-      {DUMMY_TOKENS.map((token, index) => (
-        <React.Fragment key={token.id}>
-          <InfoBadge className="px-2 transition hover:bg-foreground/10">
-            <token.Icon />
-            <span className="[--accent:var(--color-foreground)]">
-              {token.symbol}
-            </span>
-            <span className="">{token.price}</span>
-            <span
-              className={
-                token.isPositive
-                  ? "[--accent:var(--color-up)]"
-                  : "[--accent:var(--color-down)]"
-              }
-            >
-              {token.change}
-            </span>
-          </InfoBadge>
-          {index === 0 && <Separator orientation="vertical" />}
-        </React.Fragment>
-      ))}
-    </div>
+    <ScrollArea className="border-b">
+      <div
+        {...props}
+        className={cn(
+          "flex h-8 shrink-0 items-center *:h-full *:shrink-0 *:data-[slot=separator]:h-4/5 *:data-[slot=separator]:self-center",
+          props.className,
+        )}
+      >
+        {DUMMY_TOKENS.map((token, index) => (
+          <React.Fragment key={token.id}>
+            <InfoBadge className="px-2 transition hover:bg-foreground/10">
+              <token.Icon />
+              <span className="[--accent:var(--color-foreground)]">
+                {token.symbol}
+              </span>
+              <span className="">{token.price}</span>
+              <span
+                className={
+                  token.isPositive
+                    ? "[--accent:var(--color-up)]"
+                    : "[--accent:var(--color-down)]"
+                }
+              >
+                {token.change}
+              </span>
+            </InfoBadge>
+            {index === 0 && <Separator orientation="vertical" />}
+          </React.Fragment>
+        ))}
+      </div>
+      <ScrollBar
+        orientation="horizontal"
+        showIndicator
+        showScrollBar={false}
+      />
+    </ScrollArea>
   );
 };

@@ -103,7 +103,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
   return (
     <div
       className={cn(
-        "grid grid-cols-4 gap-2",
+        "grid grid-cols-2 gap-2 sm:grid-cols-4",
         "**:data-[slot=info-badge]:text-sm **:data-[slot=info-badge]:[&_svg]:size-4",
       )}
     >
@@ -113,7 +113,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
         return (
           <div
             key={item.label}
-            className="flex flex-col items-start gap-1 p-4"
+            className="flex flex-col items-start gap-1 p-2 sm:p-4"
           >
             <p className="whitespace-nowrap text-gray text-xs">{item.label}</p>
             {item.infoBadge}

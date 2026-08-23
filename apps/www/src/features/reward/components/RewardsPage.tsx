@@ -397,7 +397,7 @@ export function RewardsPage() {
           {/* Quests */}
           <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">
             <p className="font-medium text-foreground">Quests</p>
-            <div className="flex flex-1 items-center justify-center gap-16">
+            <div className="flex flex-1 items-center justify-center gap-8 sm:gap-16">
               <QuestRing
                 label={"5 transactions per day = 150XP bonus"}
                 rewardXp={150}

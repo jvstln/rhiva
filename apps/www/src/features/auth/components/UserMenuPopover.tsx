@@ -99,7 +99,7 @@ export function UserMenuPopover({
                       width={32}
                       height={32}
                     />
-                    <p className="text-muted-foreground text-xs">
+                    <p className="truncate text-muted-foreground text-xs">
                       {balance.metadata.name}
                     </p>
                     <p className="mt-1 truncate font-bold text-lg">

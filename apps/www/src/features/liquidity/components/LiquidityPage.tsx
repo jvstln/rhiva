@@ -50,24 +50,30 @@ const LiquidityPage = () => {
 
   return (
     <DashboardSlot>
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <DashboardHeader>Liquidity Pools</DashboardHeader>
           <DashboardDescription>
             Provide liquidity, earn yield.
           </DashboardDescription>
         </div>
-        <div className="flex gap-5">
+        <div className="grid grid-cols-3 gap-4 sm:flex sm:gap-5">
           <SummaryStat
             label="Total Value Locked"
             value={stats.tvl}
           />
-          <Separator orientation="vertical" />
+          <Separator
+            orientation="vertical"
+            className="max-sm:hidden"
+          />
           <SummaryStat
             label="24H Volume"
             value={stats.volume24h}
           />
-          <Separator orientation="vertical" />
+          <Separator
+            orientation="vertical"
+            className="max-sm:hidden"
+          />
           <SummaryStat
             label="24H Fees"
             value={stats.fees24h}

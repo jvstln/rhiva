@@ -25,13 +25,13 @@ export default function LiquidityPoolPage({ id }: { id: string }) {
       {({ data: pool }) => (
         <div className="flex h-full min-h-0 flex-col">
           <BackButton />
-          <main className="flex min-h-0 flex-1">
-            <ScrollArea className={"w-1/4 min-w-72 shrink-0"}>
+          <main className="flex min-h-0 flex-1 flex-col xl:flex-row">
+            <ScrollArea className="shrink-0 border-border/70 max-xl:border-b xl:h-full xl:w-1/4 xl:min-w-72">
               <PoolDetailSidebar pool={pool} />
               <ScrollBar showScrollBar />
             </ScrollArea>
 
-            <ScrollArea className={"grow"}>
+            <ScrollArea className="grow xl:h-full">
               <div className="h-[60vh]">
                 <PoolChart pool={pool} />
               </div>
@@ -39,7 +39,7 @@ export default function LiquidityPoolPage({ id }: { id: string }) {
               <ScrollBar showScrollBar />
             </ScrollArea>
 
-            <ScrollArea className={"w-full max-w-92.5 border-l px-2 pr-4"}>
+            <ScrollArea className="w-full border-border/70 px-2 pr-4 xl:h-full xl:max-w-92.5 xl:border-l">
               {pool.dex === "meteora-dlmm" && <MeteoraTradeRail pool={pool} />}
               {pool.dex === "orca-whirlpool" && <OrcaTradeRail pool={pool} />}
               {pool.dex === "raydium-clmm" && <RaydiumTradeRail pool={pool} />}

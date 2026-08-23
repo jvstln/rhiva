@@ -79,14 +79,14 @@ function TokenRow({ token }: TokenRowProps) {
 
   return (
     <article
-      className="group/token-display flex cursor-pointer items-center gap-6 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60"
+      className="group/token-display flex cursor-pointer flex-col gap-3 border-border/70 border-b px-4 py-3 transition-colors hover:bg-surface-1/60 lg:flex-row lg:items-center lg:gap-6"
       onKeyDown={() => null}
       onClick={() => {
         router.push(`/token/${token.mint}`);
       }}
     >
       {/* Token identity */}
-      <div className="flex min-w-0 max-w-100 flex-1 basis-3/10 gap-3">
+      <div className="flex min-w-0 flex-1 basis-3/10 gap-3 lg:max-w-100">
         <TokenAvatar token={token} />
 
         <div className="flex min-w-0 flex-1 flex-col">
@@ -128,7 +128,7 @@ function TokenRow({ token }: TokenRowProps) {
 
       <Separator
         orientation="vertical"
-        className=""
+        className="hidden lg:block"
       />
 
       {/* Market data */}
@@ -180,11 +180,11 @@ function TokenRow({ token }: TokenRowProps) {
 
       <Separator
         orientation="vertical"
-        className=""
+        className="hidden lg:block"
       />
 
       {/* Activity + buy */}
-      <div className="flex max-w-75 shrink-0 basis-1/5 flex-col items-end gap-1.5 text-b-4">
+      <div className="flex shrink-0 flex-col gap-1.5 text-b-4 max-lg:w-full lg:max-w-75 lg:basis-1/5 lg:items-end">
         <div className="flex items-center gap-3">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
             {formatAge(token.live?.updated_at)}

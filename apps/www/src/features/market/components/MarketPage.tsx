@@ -14,7 +14,7 @@ export async function MarketPage({ searchParams }: MarketPageProps) {
   const view = MarketView.parse(searchParams.view);
 
   return (
-    <DashboardSlot className="px-0 pt-0">
+    <DashboardSlot className="px-0 pt-0!">
       <MarketStatusBar />
       <MarketToolbar />
 

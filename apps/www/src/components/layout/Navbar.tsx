@@ -9,7 +9,7 @@ import { useLogin, usePrivy, useSigners } from "@privy-io/react-auth";
 import { Bell, MenuIcon, Search, Settings, Wallet, XIcon } from "lucide-react";
 
 import { env } from "@/lib/env";
-import { useAuth } from "@/hooks";
+import { useAuth, useBreakpoint } from "@/hooks";
 import logo from "@/public/logo.svg";
 import RewardButton from "./RewardButton";
 import { Skeleton } from "../ui/skeleton";
@@ -28,6 +28,7 @@ import {
   NavigationMenuTrigger,
   NavigationMenuContent,
 } from "../ui/navigation-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
@@ -36,9 +37,16 @@ const NAV_LINKS = [
   { label: "Portfolio", url: "/portfolio" },
 ] as const satisfies Array<{ label: string; url: Route }>;
 
+const MORE_LINKS = [
+  { label: "Legal", url: "#" },
+  { label: "Docs", url: "#" },
+  { label: "Brand kit", url: "#" },
+] as const satisfies Array<{ label: string; url: Route }>;
+
 export function Navbar() {
   const auth = useAuth();
   const pathname = usePathname();
+  const lgUp = useBreakpoint("lg");
   const { user, ready } = usePrivy();
   const { addSigners } = useSigners();
   const { createWallet } = useCreateWallet();
@@ -57,14 +65,53 @@ export function Navbar() {
   });
 
   return (
-    <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center gap-6 border-border border-b bg-background/95 pr-4 backdrop-blur sm:px-6">
-      <div className="flex items-center sm:contents">
-        <Button
-          variant="ghost"
-          className="sm:hidden"
-        >
-          <MenuIcon />
-        </Button>
+    <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center gap-2 border-border border-b bg-background/95 px-3 backdrop-blur lg:gap-6 lg:px-6">
+      <div className="flex items-center gap-1 lg:contents">
+        <Popover>
+          <PopoverTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open navigation menu"
+                className="lg:hidden"
+              />
+            }
+          >
+            <MenuIcon />
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-60 gap-4 lg:hidden"
+          >
+            <nav
+              aria-label="Main navigation"
+              className="flex flex-col items-start gap-1"
+            >
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.url}
+                  data-active={pathname.startsWith(link.url) ? true : undefined}
+                  className="w-full rounded-lg px-3 py-2 font-medium text-base transition-colors hover:bg-muted data-active:text-primary"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex w-full flex-col items-start gap-1 border-white/5 border-t pt-3">
+              {MORE_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.url}
+                  className="w-full rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
         <Link
           href="/"
           className="flex h-full shrink-0 items-center"
@@ -72,13 +119,13 @@ export function Navbar() {
           <Image
             src={logo}
             alt="Logo"
-            className="h-8 w-auto sm:h-2/3"
+            className="h-8 w-auto lg:h-2/3"
           />
         </Link>
       </div>
 
       <NavigationMenu>
-        <NavigationMenuList className="max-sm:hidden">
+        <NavigationMenuList className="max-lg:hidden">
           {NAV_LINKS.map((link) => (
             <NavigationMenuItem
               key={link.label}
@@ -138,20 +185,23 @@ export function Navbar() {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2 lg:gap-3">
         <SearchTokenDialog>
           <Button
-            variant="outline"
-            className="min-w-40 justify-start"
+            variant={lgUp ? "outline" : "ghost"}
+            size={lgUp ? "default" : "icon-sm"}
+            className={lgUp ? "min-w-40 justify-start" : ""}
+            aria-label="Search tokens"
           >
             <Search />
-            Search
+            {lgUp && <span>Search</span>}
           </Button>
         </SearchTokenDialog>
         <NotificationPopover>
           <Button
             variant={"ghost"}
             size="icon"
+            aria-label="Notifications"
           >
             <Bell />
           </Button>
@@ -160,6 +210,7 @@ export function Navbar() {
           <Button
             variant={"ghost"}
             size="icon"
+            aria-label="Settings"
           >
             <Settings />
           </Button>
@@ -176,7 +227,7 @@ export function Navbar() {
                 data-active
               >
                 <Wallet />
-                <span className="max-sm:hidden">
+                <span className="max-lg:hidden">
                   &nbsp;
                   {truncateString(auth.activeWallet.address)}
                 </span>

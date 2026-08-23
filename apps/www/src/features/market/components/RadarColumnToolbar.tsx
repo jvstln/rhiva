@@ -24,7 +24,7 @@ export function RadarColumnToolbar({ column }: ColumnToolbarProps) {
         <SearchInput
           data-size="sm"
           placeholder="Keyword1,..."
-          className="max-w-30"
+          className="w-30 shrink-0"
         />
         <QuickBuyInput
           variant="minimal"

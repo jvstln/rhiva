@@ -51,7 +51,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
   return (
     <div
       className={cn(
-        "relative flex shrink-0 flex-col items-center overflow-hidden rounded-3xl border px-6 py-14 text-center",
+        "relative flex shrink-0 flex-col items-center overflow-hidden rounded-3xl border px-4 py-10 text-center sm:px-6 sm:py-14",
         "border-white/5 bg-background/8 backdrop-blur-lg",
       )}
       style={{
@@ -124,7 +124,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
         </Button>
       ) : null}
 
-      <div className="mt-6 flex min-w-xs items-center justify-center gap-3">
+      <div className="mt-6 flex w-full min-w-0 max-w-xs items-center justify-center gap-3">
         <Tooltip>
           {({ payload }: { payload?: string }) => (
             <>

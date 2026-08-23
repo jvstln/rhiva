@@ -88,13 +88,13 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
                 Back
               </Button>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <LiquidityAvatar liquidity={p} />
                 <h1 className="flex items-center gap-2 font-bold text-xl">
                   {pair}
                   <MeteoraIcon className="size-4" />
                 </h1>
-                <div className="ml-2 flex items-center gap-3 border-border/70 border-l pl-4 text-gray text-sm">
+                <div className="ml-auto flex items-center gap-3 border-border/70 border-l pl-4 text-gray text-sm max-sm:border-l-0 max-sm:pl-0">
                   <p>
                     Bin Step: <span className="text-white">{p.bin_step}</span>
                   </p>
@@ -136,7 +136,7 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
                   <h3 className="font-medium text-gray text-sm">
                     Current Balance
                   </h3>
-                  <div className="flex items-center justify-between gap-2 rounded-lg border bg-background/50 p-4">
+                  <div className="flex flex-col gap-2 rounded-lg border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
                     <TokenBalanceRow
                       symbol={p.token_b?.symbol ?? "Token A"}
                       balance={tvlStr}
@@ -157,7 +157,7 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
                   <h3 className="font-medium text-gray text-sm">
                     Your Unclaimed Swap Fee
                   </h3>
-                  <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border bg-background/50 p-4">
+                  <div className="mb-4 flex flex-col gap-2 rounded-lg border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
                     <TokenBalanceRow
                       symbol={p.token_b?.symbol ?? "Token A"}
                       balance={feesStr}
@@ -196,7 +196,7 @@ export const LiquidityDetailPage = ({ address }: { address: string }) => {
               {/* RIGHT COLUMN */}
               <div className="space-y-6">
                 {/* Stat Cards */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-3">
                   <StatCard
                     label="Current pool price"
                     value={currentPriceStr}

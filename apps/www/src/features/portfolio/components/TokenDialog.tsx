@@ -114,8 +114,8 @@ export function TokenDialog({
                         </AvatarFallback>
                       </Avatar>
 
-                      <div>
-                        <p className="font-semibold text-b-3 text-white leading-tight">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-b-3 text-white leading-tight">
                           {token.symbol ?? token.mint}
                         </p>
                         {/* TODO: portfolio API exposes no per-token 24h change */}
@@ -133,15 +133,15 @@ export function TokenDialog({
                     </div>
 
                     {/* Balance */}
-                    <div className="text-right">
-                      <p className="font-semibold text-b-3 text-white leading-tight">
+                    <div className="min-w-0 text-right">
+                      <p className="truncate font-semibold text-b-3 text-white leading-tight">
                         {token.current_price_usd == null
                           ? "-"
                           : formatCompactCurrency(
                               token.remaining * token.current_price_usd,
                             )}
                       </p>
-                      <p className="mt-0.5 text-b-5 text-gray leading-tight">
+                      <p className="mt-0.5 truncate text-b-5 text-gray leading-tight">
                         {formatTokenAmount(token.remaining)}{" "}
                         {token.symbol ?? token.mint}
                       </p>

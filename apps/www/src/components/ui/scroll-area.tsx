@@ -54,11 +54,22 @@ function ScrollBar({
         data-orientation={orientation}
         orientation={orientation}
         className={cn(
-          "flex touch-none select-none p-px transition-colors data-horizontal:h-2.5 data-vertical:h-full data-vertical:w-2.5 data-horizontal:flex-col data-vertical:border-s data-vertical:border-s-transparent data-horizontal:border-t data-horizontal:border-t-transparent",
+          "flex touch-none select-none overflow-hidden p-px transition-colors data-horizontal:h-2.5 data-vertical:h-full data-vertical:w-2.5 data-horizontal:flex-col data-vertical:border-s data-vertical:border-s-transparent data-horizontal:border-t data-horizontal:border-t-transparent",
           className,
         )}
         {...props}
       >
+        {orientation === "vertical" ? (
+          <>
+            <div className="pointer-events-none absolute top-0 left-0 h-6 w-full bg-linear-to-b from-background to-transparent" />
+            <div className="pointer-events-none absolute bottom-0 left-0 h-6 w-full bg-linear-to-t from-background to-transparent" />
+          </>
+        ) : (
+          <>
+            <div className="pointer-events-none absolute top-0 left-0 h-full w-6 bg-linear-to-r from-background to-transparent" />
+            <div className="pointer-events-none absolute top-0 right-0 h-full w-6 bg-linear-to-l from-background to-transparent" />
+          </>
+        )}
         <ScrollAreaPrimitive.Thumb
           data-slot="scroll-area-thumb"
           className={cn(

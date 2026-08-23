@@ -74,7 +74,7 @@ const PortfolioPage = () => {
     statsQuery.isPending && statsQuery.fetchStatus !== "paused";
 
   return (
-    <DashboardSlot className="mx-auto xl:container">
+    <DashboardSlot className="mx-auto pt-0 xl:container sm:pt-0">
       <PortfolioHero query={tokenPortfolio} />
 
       <div className="space-y-3">
@@ -104,8 +104,8 @@ const PortfolioPage = () => {
           />
         )}
 
-        <div className="flex items-center justify-between rounded-xl border border-border/70 bg-card px-6 py-5">
-          <div className="flex flex-wrap gap-10">
+        <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex flex-wrap gap-x-10 gap-y-4">
             {summaryStats.map((stat) => (
               <div key={stat.label}>
                 <p className="font-medium text-b-4 text-gray tracking-wide">
