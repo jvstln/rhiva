@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area";
 import {
   ChevronDown,
@@ -9,6 +10,80 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+
+const HORIZONTAL_INDICATORS = [
+  {
+    key: "start",
+    className:
+      "inset-y-0 left-0 justify-start bg-linear-to-r pl-1 group-data-[overflow-x-start]:flex",
+    Icon: ChevronLeft,
+  },
+  {
+    key: "end",
+    className:
+      "inset-y-0 right-0 justify-end bg-linear-to-l pr-1 group-data-[overflow-x-end]:flex",
+    Icon: ChevronRight,
+  },
+];
+
+const VERTICAL_INDICATORS = [
+  {
+    key: "start",
+    className:
+      "inset-x-0 top-0 h-8 w-full items-start justify-center bg-linear-to-b pt-1 group-data-[overflow-y-start]:flex",
+    Icon: ChevronUp,
+  },
+  {
+    key: "end",
+    className:
+      "inset-x-0 bottom-0 h-8 w-full items-end justify-center bg-linear-to-t pb-1 group-data-[overflow-y-end]:flex",
+    Icon: ChevronDown,
+  },
+];
+
+function ScrollIndicators({
+  orientation = "both",
+}: {
+  orientation?: "horizontal" | "vertical" | "both";
+}) {
+  const showHorizontal = orientation === "horizontal" || orientation === "both";
+  const showVertical = orientation === "vertical" || orientation === "both";
+
+  return (
+    <>
+      {showHorizontal &&
+        HORIZONTAL_INDICATORS.map(({ key, className, Icon }) => (
+          <div
+            key={`h-${key}`}
+            className={cn(
+              "pointer-events-none absolute z-10 hidden w-8 items-center from-background to-transparent",
+              className,
+            )}
+          >
+            <Icon className="size-4 text-muted-foreground" />
+          </div>
+        ))}
+      {showVertical &&
+        VERTICAL_INDICATORS.map(({ key, className, Icon }) => (
+          <div
+            key={`v-${key}`}
+            className={cn(
+              "pointer-events-none absolute z-10 hidden from-background to-transparent",
+              className,
+            )}
+          >
+            <Icon className="size-4 text-muted-foreground" />
+          </div>
+        ))}
+    </>
+  );
+}
+
+const ScrollAreaContext = React.createContext<{
+  hasRootIndicator: boolean;
+}>({
+  hasRootIndicator: false,
+});
 
 type ScrollAreaProps = ScrollAreaPrimitive.Root.Props & {
   showIndicator?: boolean;
@@ -21,19 +96,22 @@ function ScrollArea({
   ...props
 }: ScrollAreaProps) {
   return (
-    <ScrollAreaPrimitive.Root
-      data-slot="scroll-area"
-      className={cn("group relative", className)}
-      {...props}
-    >
-      <ScrollAreaPrimitive.Viewport
-        data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:outline-1 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+    <ScrollAreaContext.Provider value={{ hasRootIndicator: showIndicator }}>
+      <ScrollAreaPrimitive.Root
+        data-slot="scroll-area"
+        className={cn("group relative", className)}
+        {...props}
       >
-        {children}
-      </ScrollAreaPrimitive.Viewport>
-      <ScrollAreaPrimitive.Corner />
-    </ScrollAreaPrimitive.Root>
+        <ScrollAreaPrimitive.Viewport
+          data-slot="scroll-area-viewport"
+          className="size-full rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:outline-1 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        >
+          {children}
+        </ScrollAreaPrimitive.Viewport>
+        {showIndicator && <ScrollIndicators orientation="both" />}
+        <ScrollAreaPrimitive.Corner />
+      </ScrollAreaPrimitive.Root>
+    </ScrollAreaContext.Provider>
   );
 }
 
@@ -47,6 +125,9 @@ function ScrollBar({
   showIndicator?: boolean;
   showScrollBar?: boolean;
 }) {
+  const { hasRootIndicator } = React.useContext(ScrollAreaContext);
+  const shouldShowIndicator = showIndicator && !hasRootIndicator;
+
   return (
     <>
       <ScrollAreaPrimitive.Scrollbar
@@ -59,17 +140,6 @@ function ScrollBar({
         )}
         {...props}
       >
-        {orientation === "vertical" ? (
-          <>
-            <div className="pointer-events-none absolute top-0 left-0 h-6 w-full bg-linear-to-b from-background to-transparent" />
-            <div className="pointer-events-none absolute bottom-0 left-0 h-6 w-full bg-linear-to-t from-background to-transparent" />
-          </>
-        ) : (
-          <>
-            <div className="pointer-events-none absolute top-0 left-0 h-full w-6 bg-linear-to-r from-background to-transparent" />
-            <div className="pointer-events-none absolute top-0 right-0 h-full w-6 bg-linear-to-l from-background to-transparent" />
-          </>
-        )}
         <ScrollAreaPrimitive.Thumb
           data-slot="scroll-area-thumb"
           className={cn(
@@ -78,26 +148,7 @@ function ScrollBar({
           )}
         />
       </ScrollAreaPrimitive.Scrollbar>
-      {showIndicator && orientation === "horizontal" && (
-        <>
-          <div className="pointer-events-none absolute top-1/2 right-0 hidden h-full w-8 -translate-y-1/2 items-center justify-end bg-linear-to-l bg-linear-to-l from-background from-background/20 to-transparent pr-1 group-data-overflow-x-end:flex">
-            <ChevronRight className="size-4 text-muted-foreground" />
-          </div>
-          <div className="pointer-events-none absolute top-1/2 left-0 hidden h-full w-8 -translate-y-1/2 items-center justify-start bg-linear-to-r bg-linear-to-r from-background from-background/20 to-transparent pl-1 group-data-overflow-x-start:flex">
-            <ChevronLeft className="size-4 text-muted-foreground" />
-          </div>
-        </>
-      )}
-      {showIndicator && orientation === "vertical" && (
-        <>
-          <div className="pointer-events-none absolute bottom-0 left-1/2 hidden h-8 w-full -translate-x-1/2 items-end justify-center bg-linear-to-t bg-linear-to-t from-background from-background/20 to-transparent pb-1 group-data-overflow-y-end:flex">
-            <ChevronDown className="size-4 text-muted-foreground" />
-          </div>
-          <div className="pointer-events-none absolute top-0 left-1/2 hidden h-8 w-full -translate-x-1/2 items-start justify-center bg-linear-to-b bg-linear-to-b from-background from-background/20 to-transparent pt-1 group-data-overflow-y-start:flex">
-            <ChevronUp className="size-4 text-muted-foreground" />
-          </div>
-        </>
-      )}
+      {shouldShowIndicator && <ScrollIndicators orientation={orientation} />}
     </>
   );
 }
