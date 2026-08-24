@@ -1,6 +1,9 @@
 import z from "zod";
 
-export const PortfolioTab = z.enum(["tradingPosition", "liquidityPosition"]);
+export const PortfolioTab = z.enum([
+  "tradingPosition",
+  // "liquidityPosition"
+]);
 export type PortfolioTab = z.infer<typeof PortfolioTab>;
 
 export const PNL_PROFIT_IMAGES = [

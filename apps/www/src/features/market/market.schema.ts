@@ -3,8 +3,19 @@ import z from "zod";
 import { NumberFilter } from "@/schemas";
 
 export const MarketView = z
-  .enum(["watchlist", "trending", "radar", "surge", "pumpLive"])
+  .enum([
+    "watchlist",
+    "trending",
+    "radar",
+    "surge",
+    "top-gainers",
+    "latest",
+    "stock",
+    "stablecoin",
+    // "pumpLive"
+  ])
   .catch("trending");
+export type MarketView = z.infer<typeof MarketView>;
 
 export const RadarColumns = z.enum(["fresh", "heatingUp", "graduated"]);
 export type RadarColumns = z.infer<typeof RadarColumns>;

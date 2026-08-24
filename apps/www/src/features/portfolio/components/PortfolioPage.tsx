@@ -22,7 +22,7 @@ import { QueryState } from "@/components/layout/QueryState";
 
 const PortfolioPage = () => {
   const searchParams = useSearchParams();
-  const activeView = PortfolioTab.catch("liquidityPosition").parse(
+  const activeView = PortfolioTab.catch("tradingPosition").parse(
     searchParams.get("view"),
   );
 
@@ -74,7 +74,7 @@ const PortfolioPage = () => {
     statsQuery.isPending && statsQuery.fetchStatus !== "paused";
 
   return (
-    <DashboardSlot className="mx-auto pt-0 xl:container sm:pt-0">
+    <DashboardSlot className="mx-auto xl:container">
       <PortfolioHero query={tokenPortfolio} />
 
       <div className="space-y-3">
@@ -91,18 +91,10 @@ const PortfolioPage = () => {
           ))}
         </div>
 
-        {activeView === "tradingPosition" && (
-          <PortfolioErrorBanner
-            query={tokenPortfolio}
-            message="Failed to load your trading positions."
-          />
-        )}
-        {activeView === "liquidityPosition" && (
-          <PortfolioErrorBanner
-            query={positions}
-            message="Failed to load your liquidity positions."
-          />
-        )}
+        <PortfolioErrorBanner
+          query={tokenPortfolio}
+          message="Failed to load your positions."
+        />
 
         <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="flex flex-wrap gap-x-10 gap-y-4">
@@ -151,7 +143,7 @@ const PortfolioPage = () => {
           {(query) => <TradingPositionsTable positions={query.data.tokens} />}
         </QueryState>
       )}
-      {activeView === "liquidityPosition" && (
+      {/* {activeView === "liquidityPosition" && (
         <QueryState
           query={positions}
           requireAuth
@@ -163,7 +155,7 @@ const PortfolioPage = () => {
             <LiquidityPositionsTable positions={query.data.lp_positions} />
           )}
         </QueryState>
-      )}
+      )} */}
     </DashboardSlot>
   );
 };
