@@ -85,7 +85,10 @@ export const QuickBuyInput = ({
   return (
     <InputGroup
       size="sm"
-      className={cn(variant === "minimal" ? "w-20" : "w-36", className)}
+      className={cn(
+        variant === "minimal" ? "w-20" : "w-36 shrink-0",
+        className,
+      )}
     >
       <InputGroupInput
         type="number"
@@ -123,7 +126,7 @@ export const QuickSellInput = ({
   return (
     <InputGroup
       size="sm"
-      className={cn("w-36", className)}
+      className={cn("w-36 shrink-0", className)}
     >
       <InputGroupInput
         type="number"

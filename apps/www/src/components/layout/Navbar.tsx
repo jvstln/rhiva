@@ -32,7 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
-  { label: "Liquidity", url: "/liquidity" },
+  { label: "Radar", url: "/radar" },
   { label: "Reward", url: "/rewards" },
   { label: "Portfolio", url: "/portfolio" },
 ] as const satisfies Array<{ label: string; url: Route }>;

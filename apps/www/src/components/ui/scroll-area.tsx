@@ -108,7 +108,7 @@ function ScrollArea({
         >
           {children}
         </ScrollAreaPrimitive.Viewport>
-        {showIndicator && <ScrollIndicators orientation="both" />}
+        {/* {showIndicator && <ScrollIndicators orientation="both" />} */}
         <ScrollAreaPrimitive.Corner />
       </ScrollAreaPrimitive.Root>
     </ScrollAreaContext.Provider>
