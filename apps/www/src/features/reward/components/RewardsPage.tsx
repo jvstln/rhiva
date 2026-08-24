@@ -359,7 +359,7 @@ export function RewardsPage() {
             Track your XP, level up, and climb the global ranks
           </DashboardDescription>
         </div>
-        <ClaimRewardsDialog />
+        <ClaimRewardsDialog draws={3} />
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-6">
