@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
-import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
+import { ClaimRewardsBanner } from "./ClaimRewardsBanner";
 import { LeaderboardDialog } from "./LeaderboardDialog";
 import { CopyButton } from "@/components/ui/button/copy-button";
 import {
@@ -352,76 +352,76 @@ export function RewardsPage() {
   const rewardProfile = useRewardProfile();
 
   return (
-    <DashboardSlot>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <DashboardHeader>Point System</DashboardHeader>
-          <DashboardDescription>
-            Track your XP, level up, and climb the global ranks
-          </DashboardDescription>
-        </div>
-        <div className="flex items-center gap-2">
-          <LeaderboardDialog />
-          <ClaimRewardsDialog draws={3} />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="space-y-6">
-          <CurrentTierCard />
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <StatCard
-              icon={<Globe />}
-              className="[--accent:var(--color-primary)]"
-              label="Global Rank"
-              value={`#${formatCompactNumber(rewardProfile.data?.rank)}`}
-              description={`Total users: ${formatCompactNumber(rewardProfile.data?.users)}`}
-            />
-            <StatCard
-              icon={<Star />}
-              className="[--accent:var(--color-casablanca)]"
-              label="Total Stars"
-              value={formatCompactNumber(rewardProfile.data?.stars)}
-              description="Keep Collecting!"
-            />
-            <StatCard
-              icon={<Zap />}
-              className="[--accent:var(--color-info)]"
-              label="Total XP"
-              value={formatCompactNumber(rewardProfile.data?.xp)}
-              description={`${formatCompactNumber(rewardProfile.data?.averageXpPerDay, { withSign: true })} XP per day`}
-            />
+    <>
+      <ClaimRewardsBanner />
+      <DashboardSlot>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <DashboardHeader>Point System</DashboardHeader>
+            <DashboardDescription>
+              Track your XP, level up, and climb the global ranks
+            </DashboardDescription>
           </div>
-
-          <TierRoadmap />
+          <LeaderboardDialog />
         </div>
-        <div className="flex flex-col gap-6">
-          <ReferralCard />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="space-y-6">
+            <CurrentTierCard />
 
-          {/* Quests */}
-          <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">
-            <p className="font-medium text-foreground">Quests</p>
-            <div className="flex flex-1 items-center justify-center gap-8 sm:gap-16">
-              <QuestRing
-                label={"5 transactions per day = 150XP bonus"}
-                rewardXp={150}
-                progressPercent={
-                  (rewardProfile.data?.todayTransactions || 0) / 5
-                }
-                icon={"volume"}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <StatCard
+                icon={<Globe />}
+                className="[--accent:var(--color-primary)]"
+                label="Global Rank"
+                value={`#${formatCompactNumber(rewardProfile.data?.rank)}`}
+                description={`Total users: ${formatCompactNumber(rewardProfile.data?.users)}`}
               />
-              <QuestRing
-                label={"Transaction volume is $500 = 500XPs"}
-                rewardXp={500}
-                progressPercent={
-                  (rewardProfile.data?.todayVolumeUsd || 0) / 500
-                }
-                icon={"transactions"}
+              <StatCard
+                icon={<Star />}
+                className="[--accent:var(--color-casablanca)]"
+                label="Total Stars"
+                value={formatCompactNumber(rewardProfile.data?.stars)}
+                description="Keep Collecting!"
               />
+              <StatCard
+                icon={<Zap />}
+                className="[--accent:var(--color-info)]"
+                label="Total XP"
+                value={formatCompactNumber(rewardProfile.data?.xp)}
+                description={`${formatCompactNumber(rewardProfile.data?.averageXpPerDay, { withSign: true })} XP per day`}
+              />
+            </div>
+
+            <TierRoadmap />
+          </div>
+          <div className="flex flex-col gap-6">
+            <ReferralCard />
+
+            {/* Quests */}
+            <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">
+              <p className="font-medium text-foreground">Quests</p>
+              <div className="flex flex-1 items-center justify-center gap-8 sm:gap-16">
+                <QuestRing
+                  label={"5 transactions per day = 150XP bonus"}
+                  rewardXp={150}
+                  progressPercent={
+                    (rewardProfile.data?.todayTransactions || 0) / 5
+                  }
+                  icon={"volume"}
+                />
+                <QuestRing
+                  label={"Transaction volume is $500 = 500XPs"}
+                  rewardXp={500}
+                  progressPercent={
+                    (rewardProfile.data?.todayVolumeUsd || 0) / 500
+                  }
+                  icon={"transactions"}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </DashboardSlot>
+      </DashboardSlot>
+    </>
   );
 }

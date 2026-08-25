@@ -281,26 +281,14 @@ type Phase = "idle" | "shuffling" | "revealed" | "summary";
 type ClaimRewardsDialogProps = Dialog.Props & {
   children?: React.ReactElement;
   /** How many card draws the user has pending. Defaults to 1. */
-  draws?: number;
+  draws: number;
   /** Called with every drawn reward once the user claims them all. */
   onClaim?: (rewards: Reward[]) => void | Promise<void>;
 };
 
 export const ClaimRewardsDialog = ({
-  children = (
-    <Button
-      style={{
-        ...GOLD_STYLE,
-        color: "#1A1208",
-        boxShadow: "0 10px 26px rgba(180,123,46,0.3)",
-      }}
-      data-require-auth
-    >
-      <Sparkles />
-      Open reward vault
-    </Button>
-  ),
-  draws = 1,
+  draws,
+  children,
   onClaim,
   ...props
 }: ClaimRewardsDialogProps) => {
@@ -468,7 +456,7 @@ export const ClaimRewardsDialog = ({
     >
       {children && <DialogTrigger render={children} />}
       <DialogContent
-        className="flex min-h-[80vh] flex-col sm:max-w-3xl"
+        className="flex min-h-[80vh] flex-col overflow-hidden sm:max-w-3xl"
         style={{
           backgroundImage:
             "radial-gradient(circle at 80% 0, rgb(255 255 255 / 0.1), transparent 60%), url(/reward-tiers/card-pattern.svg)",
@@ -522,7 +510,7 @@ export const ClaimRewardsDialog = ({
           <div className="relative mx-auto w-fit">
             <span
               aria-hidden
-              className="absolute inset-0 animate-[ping_1.6s_cubic-bezier(0,0,0.2,1)_infinite] rounded-full opacity-50"
+              className="absolute inset-0 animate-ping rounded-full opacity-10"
               style={GOLD_STYLE}
             />
             <Button
