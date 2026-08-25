@@ -10,10 +10,15 @@ export const PNL_PROFIT_IMAGES = [
   "/pnl/pnl-profit-1.webp",
   "/pnl/pnl-profit-2.webp",
   "/pnl/pnl-profit-3.webp",
+  "/pnl/pnl-profit-4.webp",
+  "/pnl/pnl-profit-5.webp",
 ];
 
 export const PNL_LOSS_IMAGES = [
   "/pnl/pnl-loss-1.webp",
   "/pnl/pnl-loss-2.webp",
   "/pnl/pnl-loss-3.webp",
+  "/pnl/pnl-loss-4.webp",
+  "/pnl/pnl-loss-5.webp",
+  "/pnl/pnl-loss-6.webp",
 ];
