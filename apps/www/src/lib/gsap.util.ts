@@ -1,4 +1,5 @@
 import { useGSAP } from "@gsap/react";
+import { Observer } from "gsap/Observer";
 import SplitText from "gsap/SplitText";
 import { InertiaPlugin } from "gsap/all";
 import gsap, { Draggable, DrawSVGPlugin, Flip, ScrollTrigger } from "gsap/all";
@@ -10,6 +11,7 @@ gsap.registerPlugin(
   Draggable,
   DrawSVGPlugin,
   InertiaPlugin,
+  Observer,
 );
 
 const useGSAPWrapper = (...wrapperArgs: Parameters<typeof useGSAP>) => {
@@ -39,5 +41,6 @@ export {
   ScrollTrigger,
   SplitText,
   Draggable,
+  Observer,
   useGSAPWrapper as useGSAP,
 };

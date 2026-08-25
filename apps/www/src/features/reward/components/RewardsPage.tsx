@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatCompactNumber } from "@/lib/utils";
 import { TierExportDialog } from "./TierExportDialog";
 import { ClaimRewardsDialog } from "./ClaimRewardsDialog";
+import { LeaderboardDialog } from "./LeaderboardDialog";
 import { CopyButton } from "@/components/ui/button/copy-button";
 import {
   InputGroup,
@@ -352,14 +353,17 @@ export function RewardsPage() {
 
   return (
     <DashboardSlot>
-      <div className="flex justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <DashboardHeader>Point System</DashboardHeader>
           <DashboardDescription>
             Track your XP, level up, and climb the global ranks
           </DashboardDescription>
         </div>
-        <ClaimRewardsDialog draws={3} />
+        <div className="flex items-center gap-2">
+          <LeaderboardDialog />
+          <ClaimRewardsDialog draws={3} />
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-6">
