@@ -1,9 +1,13 @@
-import { LiquidityDetailPage } from "@/features/liquidity/components/LiquidityDetailPage";
+// import { LiquidityDetailPage } from "@/features/liquidity/components/LiquidityDetailPage";
 
-export default async function LiquidityDetailRoute({
-  params,
-}: PageProps<"/liquidity/detail/[id]">) {
-  const { id } = await params;
+// export default async function LiquidityDetailRoute({
+//   params,
+// }: PageProps<"/liquidity/detail/[id]">) {
+//   const { id } = await params;
 
-  return <LiquidityDetailPage address={id} />;
+//   return <LiquidityDetailPage address={id} />;
+// }
+
+export default function LiquidityDetailRoute() {
+  return null;
 }

@@ -22,7 +22,7 @@ import { QueryState } from "@/components/layout/QueryState";
 
 const PortfolioPage = () => {
   const searchParams = useSearchParams();
-  const activeView = PortfolioTab.catch("liquidityPosition").parse(
+  const activeView = PortfolioTab.catch("tradingPosition").parse(
     searchParams.get("view"),
   );
 
@@ -91,21 +91,13 @@ const PortfolioPage = () => {
           ))}
         </div>
 
-        {activeView === "tradingPosition" && (
-          <PortfolioErrorBanner
-            query={tokenPortfolio}
-            message="Failed to load your trading positions."
-          />
-        )}
-        {activeView === "liquidityPosition" && (
-          <PortfolioErrorBanner
-            query={positions}
-            message="Failed to load your liquidity positions."
-          />
-        )}
+        <PortfolioErrorBanner
+          query={tokenPortfolio}
+          message="Failed to load your positions."
+        />
 
-        <div className="flex items-center justify-between rounded-xl border border-border/70 bg-card px-6 py-5">
-          <div className="flex flex-wrap gap-10">
+        <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-card px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex flex-wrap gap-x-10 gap-y-4">
             {summaryStats.map((stat) => (
               <div key={stat.label}>
                 <p className="font-medium text-b-4 text-gray tracking-wide">
@@ -151,7 +143,7 @@ const PortfolioPage = () => {
           {(query) => <TradingPositionsTable positions={query.data.tokens} />}
         </QueryState>
       )}
-      {activeView === "liquidityPosition" && (
+      {/* {activeView === "liquidityPosition" && (
         <QueryState
           query={positions}
           requireAuth
@@ -163,7 +155,7 @@ const PortfolioPage = () => {
             <LiquidityPositionsTable positions={query.data.lp_positions} />
           )}
         </QueryState>
-      )}
+      )} */}
     </DashboardSlot>
   );
 };

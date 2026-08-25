@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { mergeProps, useRender } from "@base-ui/react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Draggable, gsap, useGSAP } from "@/lib/gsap.util";
+import { gsap, useGSAP } from "@/lib/gsap.util";
 import {
   createDialogHandle,
   Dialog,
@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-type Reward = {
+export type Reward = {
   name: string;
   image: string;
   value: string;
@@ -70,14 +70,25 @@ const REWARDS: Reward[] = [
   },
 ];
 
-function pickWeightedIndex() {
-  const total = REWARDS.reduce((sum, r) => sum + r.weight, 0);
+const CARD_BACK_IMAGE = "/reward-tiers/reward-card-back.svg";
+const CARD_PATTERN_IMAGE = "/reward-tiers/card-pattern.svg";
+
+const GOLD_STYLE = {
+  background: "linear-gradient(160deg, #E3B872, #B47B2E)",
+} as const;
+
+function pickWeightedIndex(pool: Reward[]) {
+  const total = pool.reduce((sum, r) => sum + r.weight, 0);
   let rand = Math.random() * total;
-  for (let i = 0; i < REWARDS.length; i++) {
-    rand -= REWARDS[i].weight;
+  for (let i = 0; i < pool.length; i++) {
+    rand -= pool[i].weight;
     if (rand <= 0) return i;
   }
   return 0;
+}
+
+function getRewardValue(reward: Reward) {
+  return Number(reward.value.replace("$", ""));
 }
 
 async function burst(container: HTMLElement | null, count = 26) {
@@ -182,16 +193,19 @@ const Card = function Card({
 }: CardProps) {
   const internalRef = useRef<HTMLDivElement | null>(null);
 
-  // Positioning animation
-  useGSAP(() => {
-    const cardTransform = getCardTransform({ index, total: totalCards });
+  // Positioning animation — re-runs when the fan shape changes
+  useGSAP(
+    () => {
+      const cardTransform = getCardTransform({ index, total: totalCards });
 
-    gsap.to(internalRef.current, {
-      ...cardTransform,
-      scale: 1,
-      ease: "power2.out",
-    });
-  });
+      gsap.to(internalRef.current, {
+        ...cardTransform,
+        scale: 1,
+        ease: "power2.out",
+      });
+    },
+    { dependencies: [index, totalCards] },
+  );
 
   // Bop animation
   useGSAP(
@@ -222,15 +236,16 @@ const Card = function Card({
             className="card-flip-inner perspective-midrange relative size-full"
             style={{
               transformStyle: "preserve-3d",
-              transition: "transform 0.7s cubic-bezier(.2,.8,.2,1)",
+              transition: "transform 0.45s cubic-bezier(.2,.8,.2,1)",
               transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
             }}
           >
             {/* BACK FACE */}
             <Image
-              src={"/reward-tiers/reward-card-back.svg"}
+              src={CARD_BACK_IMAGE}
               alt="Back of reward card"
               fill
+              unoptimized
               className="backface-hidden inset-shadow-md flex flex-col items-center justify-center rounded-xl border object-cover"
               style={{
                 background:
@@ -243,6 +258,7 @@ const Card = function Card({
               src={reward.image}
               alt="Back of reward card"
               fill
+              unoptimized
               className="backface-hidden inset-shadow-md flex flex-col items-center justify-center rounded-xl border object-cover"
               style={{
                 background:
@@ -259,51 +275,78 @@ const Card = function Card({
 };
 
 const claimRewardsDialogHandle = createDialogHandle();
-type ClaimRewardsDialogProps = Dialog.Props & { children?: React.ReactElement };
+
+type Phase = "idle" | "shuffling" | "revealed" | "summary";
+
+type ClaimRewardsDialogProps = Dialog.Props & {
+  children?: React.ReactElement;
+  /** How many card draws the user has pending. Defaults to 1. */
+  draws: number;
+  /** Called with every drawn reward once the user claims them all. */
+  onClaim?: (rewards: Reward[]) => void | Promise<void>;
+};
 
 export const ClaimRewardsDialog = ({
-  children = (
-    <Button
-      style={{
-        background: "linear-gradient(160deg, #E3B872, #B47B2E)",
-        color: "#1A1208",
-        boxShadow: "0 10px 26px rgba(180,123,46,0.3)",
-      }}
-      data-require-auth
-    >
-      <Sparkles />
-      Open reward vault
-    </Button>
-  ),
+  draws,
+  children,
+  onClaim,
   ...props
 }: ClaimRewardsDialogProps) => {
-  const [claimedItem, setClaimedItem] = useState<Reward | null>(null);
-  const [isShuffling, setIsShuffling] = useState(false);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [won, setWon] = useState<Reward[]>([]);
+  const [current, setCurrent] = useState<Reward | null>(null);
   const cardContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Keyed by reward name so the deck can shrink as rewards are drawn
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const { contextSafe } = useGSAP();
 
+  // Warm the browser cache for every card face as soon as the trigger mounts,
+  // so nothing pops in late when the dialog opens
+  useEffect(() => {
+    for (const src of [
+      CARD_BACK_IMAGE,
+      CARD_PATTERN_IMAGE,
+      ...REWARDS.map((reward) => reward.image),
+    ]) {
+      const img = new window.Image();
+      img.src = src;
+    }
+  }, []);
+
+  const pool = REWARDS.filter(
+    (reward) => !won.some((w) => w.name === reward.name),
+  );
+  const drawsLeft = draws - won.length - (phase === "revealed" ? 1 : 0);
+  const deckDone = pool.length === 0;
+  const displayedRewards = phase === "summary" || deckDone ? won : pool;
+
   const triggerPickAnimation = contextSafe(() => {
-    setIsShuffling(true);
+    if (pool.length === 0 || phase !== "idle") return;
+
+    setPhase("shuffling");
     const tl = gsap.timeline();
     const RAISE_Y = -20; // shared delta so every raise has an exact matching return
 
     // Pick a card
-    const pickedIndex = pickWeightedIndex();
+    const pickedIndex = pickWeightedIndex(pool);
+    const cards = pool
+      .map((reward) => cardRefs.current[reward.name])
+      .filter((card): card is HTMLDivElement => !!card);
     const loops = 3; // how many full passes through the deck before landing
-    const totalTicks = loops * cardRefs.current.length + pickedIndex;
+    const totalTicks = loops * cards.length + pickedIndex;
 
     let prevCard: HTMLElement | null = null;
 
     for (let i = 0; i <= totalTicks; i++) {
-      const cardIndex = i % cardRefs.current.length;
-      const card = cardRefs.current[cardIndex];
+      const cardIndex = i % cards.length;
+      const card = cards[cardIndex];
       const isFinal = i === totalTicks;
 
       // ease the delay: quick early on, slower as we approach the winner
       const t = i / totalTicks;
-      const delay = 0.05 + 0.18 * Math.pow(t, 2.2);
+      const delay = 0.03 + 0.11 * Math.pow(t, 2.2);
 
       // return the previously-highlighted card to rest, exactly undoing the raise
       if (prevCard && prevCard !== card) {
@@ -312,7 +355,7 @@ export const ClaimRewardsDialog = ({
           {
             scale: 1,
             y: `-=${RAISE_Y}`,
-            duration: 0.15,
+            duration: 0.12,
             ease: "power1.out",
             overwrite: "auto",
           },
@@ -326,7 +369,7 @@ export const ClaimRewardsDialog = ({
           {
             scale: 1.12,
             y: `+=${RAISE_Y}`,
-            duration: 0.15,
+            duration: 0.12,
             ease: "power1.out",
             overwrite: "auto",
           },
@@ -343,17 +386,17 @@ export const ClaimRewardsDialog = ({
             rotate: 0,
             scale: 1.8,
             zIndex: 100,
-            duration: 0.55,
+            duration: 0.42,
             ease: "back.out(1.6)",
             overwrite: "auto",
             onComplete() {
-              setClaimedItem(REWARDS[cardIndex]);
-              setIsShuffling(false);
+              setCurrent(pool[pickedIndex]);
+              setPhase("revealed");
             },
           },
           prevCard && prevCard !== card ? "<" : `+=${delay}`,
         ).to(
-          cardRefs.current.filter((c) => c !== card),
+          cards.filter((c) => c !== card),
           {
             rotateX: "-60deg",
             autoAlpha: 0,
@@ -366,36 +409,81 @@ export const ClaimRewardsDialog = ({
     }
   });
 
+  const handleContinue = contextSafe(() => {
+    if (!current) return;
+
+    const nextWon = [...won, current];
+
+    // Clean leftover reveal styles off the surviving deck cards so they can re-fan
+    for (const reward of REWARDS) {
+      if (reward.name === current.name) continue;
+      const el = cardRefs.current[reward.name];
+      if (el) gsap.set(el, { clearProps: "all" });
+    }
+
+    const isLastDraw =
+      nextWon.length >= draws || REWARDS.length - nextWon.length === 0;
+
+    setWon(nextWon);
+    setCurrent(null);
+    setPhase(isLastDraw ? "summary" : "idle");
+  });
+
+  const handleClaim = async () => {
+    await burst(cardContainerRef.current);
+    const total = won.reduce((sum, reward) => sum + getRewardValue(reward), 0);
+    toast.success("Reward claimed!", {
+      description: `$${total} has been added to your balance!`,
+    });
+    await onClaim?.(won);
+    claimRewardsDialogHandle.close();
+  };
+
+  const reset = () => {
+    setWon([]);
+    setCurrent(null);
+    setPhase("idle");
+  };
+
   return (
     <Dialog
       {...props}
       onOpenChange={(...args) => {
         props.onOpenChange?.(...args);
-        if (args[0] === false) {
-          setClaimedItem(null);
-        }
+        if (args[0] === false) reset();
       }}
       handle={claimRewardsDialogHandle}
     >
       {children && <DialogTrigger render={children} />}
       <DialogContent
-        className="flex min-h-[80vh] flex-col sm:max-w-3xl"
+        className="flex min-h-[80vh] flex-col overflow-hidden sm:max-w-3xl"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 80% 0, rgb(255 255 255 / 0.1), transparent 60%)",
+            "radial-gradient(circle at 80% 0, rgb(255 255 255 / 0.1), transparent 60%), url(/reward-tiers/card-pattern.svg)",
+          backgroundSize: "auto, 160px",
         }}
       >
         <DialogHeader>
-          {claimedItem && <DialogDescription>Your pull</DialogDescription>}
+          {phase === "revealed" && (
+            <DialogDescription>Your pull</DialogDescription>
+          )}
+          {phase === "idle" && drawsLeft > 1 && (
+            <DialogDescription>{drawsLeft} draws left</DialogDescription>
+          )}
+          {(phase === "summary" || (phase === "idle" && deckDone)) && (
+            <DialogDescription>All draws complete</DialogDescription>
+          )}
           <DialogTitle>
-            {claimedItem
-              ? `${claimedItem.name} - ${claimedItem.value}`
-              : "Claim your gift"}
+            {phase === "revealed" && current
+              ? `${current.name} - ${current.value}`
+              : phase === "summary"
+                ? "Your rewards"
+                : "Claim your gift"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="relative flex h-60 grow items-center justify-center">
-          {REWARDS.map((reward, index, arr) => (
+          {displayedRewards.map((reward, index, arr) => (
             <Card
               key={reward.name}
               index={index}
@@ -403,139 +491,67 @@ export const ClaimRewardsDialog = ({
               reward={reward}
               className="absolute"
               ref={(el) => {
-                cardRefs.current[index] = el;
+                cardRefs.current[reward.name] = el;
               }}
-              animationDisabled={isShuffling || !!claimedItem}
-              flipped={claimedItem?.name === reward.name}
+              animationDisabled={phase !== "idle"}
+              flipped={
+                phase === "summary" ||
+                (phase === "revealed" && current?.name === reward.name)
+              }
             />
           ))}
         </div>
-        <p
-          className={cn(
-            "invisible text-center text-amber-100 transition",
-            claimedItem && "visible",
-          )}
-        >
-          {claimedItem?.desc}
-        </p>
-        <Button
-          size="lg"
-          className={cn(
-            "invisible mx-auto w-32 rounded-full shadow-2xl transition-none",
-            claimedItem && "visible",
-          )}
-          style={{ background: "linear-gradient(160deg, #E3B872, #B47B2E)" }}
-          onClick={async () => {
-            await burst(cardContainerRef.current);
-            toast.success("Reward claimed!", {
-              description: `${claimedItem?.value} has been added to your balance!`,
-            });
-            claimRewardsDialogHandle.close();
-          }}
-        >
-          <Sparkles /> Claim
-        </Button>
-        {!claimedItem && !isShuffling && (
-          <DraggableLever
-            onTrigger={triggerPickAnimation}
-            disabled={isShuffling || !!claimedItem}
-            className="mx-auto w-4/5"
-          />
+
+        {phase === "revealed" && current && (
+          <p className="text-center text-amber-100">{current.desc}</p>
+        )}
+
+        {phase === "idle" && !deckDone && (
+          <div className="relative mx-auto w-fit">
+            <span
+              aria-hidden
+              className="absolute inset-0 animate-ping rounded-full opacity-10"
+              style={GOLD_STYLE}
+            />
+            <Button
+              size="lg"
+              className="relative w-64 rounded-full text-base shadow-2xl transition-none"
+              style={GOLD_STYLE}
+              onClick={triggerPickAnimation}
+            >
+              <Sparkles className="size-5" /> Pull
+            </Button>
+          </div>
+        )}
+
+        {phase === "revealed" && (
+          <Button
+            size="lg"
+            className="mx-auto w-44 rounded-full shadow-2xl transition-none"
+            style={GOLD_STYLE}
+            onClick={handleContinue}
+          >
+            {drawsLeft > 0 ? `Pull again (${drawsLeft} left)` : "See results"}
+          </Button>
+        )}
+
+        {phase === "summary" && (
+          <Button
+            size="lg"
+            className="mx-auto w-32 rounded-full shadow-2xl transition-none"
+            style={GOLD_STYLE}
+            onClick={handleClaim}
+          >
+            <Sparkles /> Claim
+          </Button>
+        )}
+
+        {phase !== "summary" && drawsLeft > 0 && (
+          <span className="absolute bottom-4 left-4 font-medium text-amber-200/70 text-xs">
+            {drawsLeft} {drawsLeft === 1 ? "pull" : "pulls"} left
+          </span>
         )}
       </DialogContent>
     </Dialog>
-  );
-};
-
-type DraggableLeverProps = {
-  disabled?: boolean;
-  onTrigger?: () => void;
-  className?: string;
-};
-
-export const DraggableLever = ({
-  disabled,
-  onTrigger,
-  className,
-}: DraggableLeverProps) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const boundsRef = useRef<HTMLDivElement | null>(null);
-
-  useGSAP(
-    () => {
-      const trackProgress = (x: number) => {
-        gsap.set(containerRef.current, {
-          "--drag-progress-width": `${x + 4}px`,
-        });
-      };
-
-      const draggable = Draggable.create("[data-draggable-trigger]", {
-        bounds: "[data-draggable-bounds]",
-        liveSnap: {
-          x: (x) => {
-            trackProgress(x);
-            return x;
-          },
-        },
-        onClick() {
-          onTrigger?.();
-        },
-        onDragEnd: function () {
-          let x = 0;
-          if (this.maxX && this.x > this.maxX * 0.4) x = this.maxX;
-
-          gsap.to(this.target, {
-            x,
-            duration: 0.5,
-            ease: "elastic.out(1,0.55)",
-            onUpdate: () => trackProgress(x),
-            onComplete: () => {
-              if (x > 0) onTrigger?.();
-            },
-          });
-        },
-      });
-
-      if (disabled) {
-        draggable.map((d) => d.disable());
-      }
-    },
-    { scope: containerRef, dependencies: [disabled] },
-  );
-
-  return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "relative flex grow-0 items-center overflow-hidden rounded-full border p-1",
-        disabled && "pointer-events-none opacity-45 transition",
-        className,
-      )}
-    >
-      <span
-        className="pointer-events-none absolute inset-0 left-4 flex select-none items-center justify-center text-center font-mono text-[#9C96A8] text-xs uppercase tracking-widest"
-        data-draggable-text
-      >
-        Drag or tap to pull
-      </span>
-
-      <div
-        ref={boundsRef}
-        className={cn(
-          "size-full",
-          "min-w-4 before:absolute before:top-0 before:left-0 before:h-full before:w-(--drag-progress-width) before:bg-background",
-        )}
-        data-draggable-bounds
-      >
-        <Button
-          size="icon-lg"
-          className="rounded-full shadow-lg transition-none"
-          style={{ background: "linear-gradient(160deg, #E3B872, #B47B2E)" }}
-          data-draggable-trigger
-        >
-          <Sparkles />
-        </Button>
-      </div>
-    </div>
   );
 };

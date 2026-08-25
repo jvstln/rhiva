@@ -1,4 +1,3 @@
-import { mockRewardAccount } from "@/components/ui/data/reward-data";
 import { cn } from "@/lib";
 import type * as React from "react";
 import {
@@ -171,7 +170,7 @@ function TierRoadmapDialog({
 
         <QueryState query={rewardProfile}>
           {(rewardProfile) => (
-            <div className="grid grid-cols-5 gap-x-4 gap-y-8">
+            <div className="grid grid-cols-3 gap-x-4 gap-y-8 min-[480px]:grid-cols-5">
               {REWARD_TIERS.map((tier) => {
                 const unlocked = rewardProfile.data.xp >= tier.minXp;
                 return (

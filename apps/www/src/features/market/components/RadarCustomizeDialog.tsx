@@ -106,9 +106,9 @@ export function SettingRow({
   icon?: React.ElementType;
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2 font-medium text-xs">
-        {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+    <div className="flex flex-wrap items-center justify-between gap-y-2">
+      <div className="flex min-w-0 items-center gap-2 font-medium text-xs">
+        {Icon && <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />}
         {label}
       </div>
       <div className="flex items-center gap-2">{control}</div>
@@ -272,13 +272,13 @@ export function RadarCustomizeDialog({
             </TabsList>
           </DialogHeader>
 
-          <ScrollArea className="h-[500px]">
+          <ScrollArea className="h-[min(500px,60dvh)]">
             <TabsContent
               value="display"
               className="m-0 space-y-6 p-4 outline-none"
             >
               <SettingsSection>
-                <div className="mb-4 grid grid-cols-4 gap-2">
+                <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <SizeCardOption
                     label="Small"
                     selected={cardSize === "small"}
@@ -416,7 +416,7 @@ export function RadarCustomizeDialog({
                   }
                 />
 
-                <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="mt-4 grid grid-cols-1 gap-2 min-[420px]:grid-cols-3">
                   <BalanceCardOption
                     label="Balance"
                     topLabel={

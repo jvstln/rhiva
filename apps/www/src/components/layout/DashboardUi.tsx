@@ -48,7 +48,7 @@ export const DashboardSlot = ({
     props: mergeProps(
       {
         className: cn(
-          "flex min-h-0 flex-col gap-6 px-(--padding-x) pt-9 pb-6 [--padding-x:--spacing(6)]",
+          "flex min-h-0 flex-col gap-6 px-(--padding-x) pt-5 pb-6 [--padding-x:--spacing(4)] sm:pt-9 sm:[--padding-x:--spacing(6)]",
           className,
         ),
       },

@@ -134,7 +134,7 @@ export function PnlCalendarDialog({
         ) : (
           <div className="flex min-h-0 w-full flex-1 flex-col sm:flex-row">
             {/* Sidebar */}
-            <div className="flex shrink-0 flex-col gap-8 border-border border-r bg-surface-1/30 p-(--padding) [--padding:--spacing(6)] sm:w-1/4">
+            <div className="flex shrink-0 flex-col gap-8 border-border bg-surface-1/30 p-(--padding) [--padding:--spacing(6)] max-sm:border-b sm:w-1/4 sm:border-r">
               <div className="space-y-1.5">
                 <p className="text-gray text-sm">Total Net Worth</p>
                 <p className="font-bold text-xl">{metrics.totalNetWorth}</p>
@@ -187,14 +187,14 @@ export function PnlCalendarDialog({
             </div>
 
             {/* Calendar Grid area */}
-            <div className="flex h-full flex-1 flex-col bg-surface-2/10 p-6">
+            <div className="flex h-full flex-1 flex-col bg-surface-2/10 p-4 sm:p-6">
               <SharePnl
                 timeframe={timeframe}
                 onTimeframeChange={setTimeframe}
                 summary={summary}
               />
 
-              <div className="mb-8 flex items-center justify-between">
+              <div className="mb-8 flex flex-wrap items-center justify-between gap-y-3">
                 <div className="flex items-center gap-4">
                   <Button
                     variant="outline"
@@ -249,7 +249,7 @@ export function PnlCalendarDialog({
                         <div
                           key={dateKey}
                           className={cn(
-                            "flex min-h-[85px] flex-col justify-between rounded-sm border-transparent border-l-2 p-2 transition-colors",
+                            "flex min-h-[85px] flex-col justify-between rounded-sm border-transparent border-l-2 p-1 transition-colors sm:p-2",
                             !isCurrentMonth
                               ? "pointer-events-none opacity-0"
                               : "bg-surface-1/40",
@@ -271,7 +271,7 @@ export function PnlCalendarDialog({
                               <span className="font-bold text-sm text-white">
                                 {dayData}
                               </span>
-                              <span className="mt-0.5 text-[10px] text-gray">
+                              <span className="mt-0.5 truncate text-[10px] text-gray">
                                 {liquidityType === "tradingPosition"
                                   ? "Trades"
                                   : "Positions"}

@@ -230,7 +230,7 @@ export const LiquidityPositionsTable = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-6 px-1">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-1">
         <ToggleGroup defaultValue={["all"]}>
           <ToggleGroupItem value="all">All pools</ToggleGroupItem>
           {Object.entries(POOL_DEXES).map(([key, pool]) => (

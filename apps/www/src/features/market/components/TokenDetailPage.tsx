@@ -43,9 +43,9 @@ export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-var(--header-height))]">
-      <ScrollArea className="h-full min-h-0 w-full min-w-0">
-        <div className="flex h-full min-w-0 flex-1 flex-col">
+    <div className="flex flex-col lg:h-[calc(100dvh-var(--header-height))] lg:flex-row">
+      <ScrollArea className="min-h-0 w-full min-w-0 lg:h-full lg:flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           <BackButton />
           <TokenDetailHeader token={token} />
 
@@ -55,18 +55,33 @@ export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
 
           {/* Tables */}
           <div>
-            <div className="sticky top-0 z-1 flex gap-2 bg-background px-4 py-2">
-              {TABLE_TABS.map((tab) => (
-                <Button
-                  key={tab}
-                  variant="ghost"
-                  size="sm"
-                  data-active={activeTable === tab}
-                  onClick={() => setActiveTable(tab)}
+            <div className="sticky top-0 z-1 bg-background px-4 py-2">
+              <ScrollArea
+                className="w-full"
+                showIndicator
+              >
+                <div
+                  className="flex w-max gap-2"
+                  role="tablist"
+                  aria-label="Token data tables"
                 >
-                  {tab}
-                </Button>
-              ))}
+                  {TABLE_TABS.map((tab) => (
+                    <Button
+                      key={tab}
+                      variant="ghost"
+                      size="sm"
+                      data-active={activeTable === tab}
+                      onClick={() => setActiveTable(tab)}
+                    >
+                      {tab}
+                    </Button>
+                  ))}
+                </div>
+                <ScrollBar
+                  orientation="horizontal"
+                  showIndicator={false}
+                />
+              </ScrollArea>
             </div>
 
             {activeTable === "Trades" && (
@@ -81,8 +96,8 @@ export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
       </ScrollArea>
 
       {/* Right rail */}
-      <aside className="w-95 shrink-0 border-border/70 border-l">
-        <ScrollArea className="h-full">
+      <aside className="w-full shrink-0 border-border/70 border-t lg:w-95 lg:border-t-0 lg:border-l">
+        <ScrollArea className="lg:h-full">
           <TokenDetailTimeframeStats
             token={token}
             filters={filters}

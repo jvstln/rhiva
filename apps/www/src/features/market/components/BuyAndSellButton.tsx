@@ -29,7 +29,7 @@ export const BuyAndSellButton = ({
       variant={"soft"}
       data-require-auth
       className={cn(
-        "[&_svg:not([class*=fill])]:fill-current",
+        "max-sm:h-9 [&_svg:not([class*=fill])]:fill-current",
         type === "sell" && "[--accent:var(--color-sell)]",
         className,
       )}

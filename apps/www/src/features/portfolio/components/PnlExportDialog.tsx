@@ -66,7 +66,7 @@ const PnlExportDialog = ({
   const [hideTime, setHideTime] = useState(false);
 
   const searchParams = useSearchParams();
-  const activeView = PortfolioTab.catch("liquidityPosition").parse(
+  const activeView = PortfolioTab.catch("tradingPosition").parse(
     searchParams.get("view"),
   );
 
@@ -86,9 +86,9 @@ const PnlExportDialog = ({
   const isLoss =
     type === "summary"
       ? (summary?.value ?? 0) < 0
-      : activeView === "liquidityPosition"
-        ? lpPnlUsd < 0
-        : tokenPnlUsd < 0;
+      : activeView === "tradingPosition"
+        ? tokenPnlUsd < 0
+        : lpPnlUsd < 0;
   const allImages = isLoss ? PNL_LOSS_IMAGES : PNL_PROFIT_IMAGES;
 
   const [selectedBg, setSelectedBg] = useState(allImages[0]);
@@ -203,7 +203,16 @@ const PnlExportDialog = ({
                 winRate="-"
                 timeframe={timeframe ?? "30d"}
               />
-            ) : activeView === "liquidityPosition" ? (
+            ) : activeView === "tradingPosition" ? (
+              <TokenCard
+                ref={cardRef}
+                image={selectedBg}
+                pnl={`${formatCompactNumber(tokenPnlPct, { withSign: true })}%`}
+                invested={formatCompactCurrency(tokenInvestedUsd)}
+                value={formatSignedUsd(tokenPnlUsd)}
+                tokenName={token?.symbol ?? token?.mint ?? "Token"}
+              />
+            ) : (
               <LpCard
                 ref={cardRef}
                 image={selectedBg}
@@ -212,15 +221,6 @@ const PnlExportDialog = ({
                 value={formatSignedUsd(lpPnlUsd)}
                 poolName={position?.symbol ?? "LP Position"}
                 timeAgo="—"
-              />
-            ) : (
-              <TokenCard
-                ref={cardRef}
-                image={selectedBg}
-                pnl={`${formatCompactNumber(tokenPnlPct, { withSign: true })}%`}
-                invested={formatCompactCurrency(tokenInvestedUsd)}
-                value={formatSignedUsd(tokenPnlUsd)}
-                tokenName={token?.symbol ?? token?.mint ?? "Token"}
               />
             )}
           </div>

@@ -39,7 +39,7 @@ export function PoolsToolbar() {
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-2">
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         {PoolColumns.options.map((col, index) => (
           <React.Fragment key={col}>
             <Link

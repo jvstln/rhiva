@@ -54,14 +54,14 @@ const columns = [
             <SolanaIcon className="size-4" />
           </AvatarFallback>
         </Avatar>
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <p className="font-medium text-b-3 text-white">
+            <p className="truncate font-medium text-b-3 text-white">
               {row.original.symbol ?? row.original.mint}
             </p>
             <CopyButton copy={row.original.mint} />
           </div>
-          <p className="text-b-5 text-gray">{row.original.mint}</p>
+          <p className="truncate text-b-5 text-gray">{row.original.mint}</p>
         </div>
       </div>
     ),

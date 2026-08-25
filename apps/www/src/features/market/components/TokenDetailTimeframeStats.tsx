@@ -83,7 +83,7 @@ export const TokenDetailTimeframeStats = ({
 
       <Separator />
 
-      <div className="grid grid-cols-4 gap-2 text-center">
+      <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
         {[
           { label: "Vol", value: formatCompactCurrency(volumeUsd) },
           {
