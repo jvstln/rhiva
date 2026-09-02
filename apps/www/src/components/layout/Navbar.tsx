@@ -10,6 +10,7 @@ import { Bell, MenuIcon, Search, Settings, Wallet, XIcon } from "lucide-react";
 
 import { env } from "@/lib/env";
 import { useAuth, useBreakpoint } from "@/hooks";
+import { LogoIcon } from "@/public/logo-icon";
 import logo from "@/public/logo.svg";
 import RewardButton from "./RewardButton";
 import { Skeleton } from "../ui/skeleton";
@@ -28,7 +29,14 @@ import {
   NavigationMenuTrigger,
   NavigationMenuContent,
 } from "../ui/navigation-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
 
 const NAV_LINKS = [
   { label: "Market", url: "/market" },
@@ -67,8 +75,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center gap-2 border-border border-b bg-background/95 px-3 backdrop-blur lg:gap-6 lg:px-6">
       <div className="flex items-center gap-1 lg:contents">
-        <Popover>
-          <PopoverTrigger
+        <Sheet>
+          <SheetTrigger
             render={
               <Button
                 variant="ghost"
@@ -79,47 +87,67 @@ export function Navbar() {
             }
           >
             <MenuIcon />
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-60 gap-4 lg:hidden"
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="gap-0 p-4"
           >
+            <SheetHeader className="flex-row items-center justify-between">
+              <SheetTitle className="flex items-center">
+                <Image
+                  src={logo}
+                  alt="Logo"
+                  className="h-7 w-auto"
+                />
+              </SheetTitle>
+            </SheetHeader>
             <nav
               aria-label="Main navigation"
-              className="flex flex-col items-start gap-1"
+              className="flex flex-col items-start gap-1 pt-3"
             >
               {NAV_LINKS.map((link) => (
-                <Link
+                <SheetClose
                   key={link.label}
-                  href={link.url}
-                  data-active={pathname.startsWith(link.url) ? true : undefined}
-                  className="w-full rounded-lg px-3 py-2 font-medium text-base transition-colors hover:bg-muted data-active:text-primary"
+                  render={
+                    <Link
+                      href={link.url}
+                      data-active={
+                        pathname.startsWith(link.url) ? true : undefined
+                      }
+                      className="w-full rounded-lg px-3 py-2 font-medium text-base transition-colors hover:bg-muted data-active:text-primary"
+                    />
+                  }
                 >
                   {link.label}
-                </Link>
+                </SheetClose>
               ))}
+              <div className="mt-2 flex w-full flex-col items-start gap-1 border-white/5 border-t pt-3">
+                {MORE_LINKS.map((link) => (
+                  <SheetClose
+                    key={link.label}
+                    render={
+                      <Link
+                        href={link.url}
+                        className="w-full rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
+                      />
+                    }
+                  >
+                    {link.label}
+                  </SheetClose>
+                ))}
+              </div>
             </nav>
-            <div className="flex w-full flex-col items-start gap-1 border-white/5 border-t pt-3">
-              {MORE_LINKS.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.url}
-                  className="w-full rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+          </SheetContent>
+        </Sheet>
         <Link
           href="/"
           className="flex h-full shrink-0 items-center"
         >
+          <LogoIcon className="h-8 w-8 lg:hidden" />
           <Image
             src={logo}
             alt="Logo"
-            className="h-8 w-auto lg:h-2/3"
+            className="hidden h-8 w-auto lg:block lg:h-2/3"
           />
         </Link>
       </div>
