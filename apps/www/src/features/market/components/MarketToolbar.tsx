@@ -19,7 +19,10 @@ type MarketToolbarProps = { exclude?: MarketView[]; include?: MarketView[] };
 export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const view = MarketView.parse(searchParams.get("view"));
+  const view: MarketView =
+    pathname === "/radar"
+      ? "radar"
+      : MarketView.parse(searchParams.get("view"));
 
   return (
     <div

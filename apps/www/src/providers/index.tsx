@@ -9,6 +9,7 @@ import UserApiProvider from "./UserApiProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { queryClient } from "@/lib/query-client";
 import { TooltipProvider } from "./ToolTipProvider";
+import { AuthProtection } from "@/components/layout/AuthProtection";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -16,11 +17,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <ConnectionProvider endpoint={env.solanaRpcUrl}>
         <TooltipProvider>
           <PrivyProvider>
-            <UserApiProvider>{children}</UserApiProvider>
-            <Toaster
-              position="top-center"
-              richColors
-            />
+            <UserApiProvider>
+              <AuthProtection />
+              {children}
+              <Toaster
+                position="top-center"
+                richColors
+              />
+            </UserApiProvider>
           </PrivyProvider>
         </TooltipProvider>
       </ConnectionProvider>

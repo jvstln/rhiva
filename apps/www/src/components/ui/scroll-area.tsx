@@ -41,11 +41,28 @@ const VERTICAL_INDICATORS = [
   },
 ];
 
+function scrollViewport(
+  viewport: HTMLDivElement | null,
+  orientation: "horizontal" | "vertical",
+  direction: "start" | "end",
+) {
+  if (!viewport) return;
+  const amount =
+    orientation === "horizontal" ? viewport.clientWidth : viewport.clientHeight;
+  const delta = direction === "end" ? amount : -amount;
+  viewport.scrollBy(
+    orientation === "horizontal"
+      ? { left: delta, behavior: "smooth" }
+      : { top: delta, behavior: "smooth" },
+  );
+}
+
 function ScrollIndicators({
   orientation = "both",
 }: {
   orientation?: "horizontal" | "vertical" | "both";
 }) {
+  const { viewportRef } = React.useContext(ScrollAreaContext);
   const showHorizontal = orientation === "horizontal" || orientation === "both";
   const showVertical = orientation === "vertical" || orientation === "both";
 
@@ -60,7 +77,20 @@ function ScrollIndicators({
               className,
             )}
           >
-            <Icon className="size-4 text-muted-foreground" />
+            <button
+              type="button"
+              aria-label={`Scroll ${key === "end" ? "right" : "left"}`}
+              onClick={() =>
+                scrollViewport(
+                  viewportRef.current,
+                  "horizontal",
+                  key === "end" ? "end" : "start",
+                )
+              }
+              className="pointer-events-auto cursor-pointer rounded-full p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Icon className="size-4" />
+            </button>
           </div>
         ))}
       {showVertical &&
@@ -72,7 +102,20 @@ function ScrollIndicators({
               className,
             )}
           >
-            <Icon className="size-4 text-muted-foreground" />
+            <button
+              type="button"
+              aria-label={`Scroll ${key === "end" ? "down" : "up"}`}
+              onClick={() =>
+                scrollViewport(
+                  viewportRef.current,
+                  "vertical",
+                  key === "end" ? "end" : "start",
+                )
+              }
+              className="pointer-events-auto cursor-pointer rounded-full p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Icon className="size-4" />
+            </button>
           </div>
         ))}
     </>
@@ -81,8 +124,10 @@ function ScrollIndicators({
 
 const ScrollAreaContext = React.createContext<{
   hasRootIndicator: boolean;
+  viewportRef: React.RefObject<HTMLDivElement | null>;
 }>({
   hasRootIndicator: false,
+  viewportRef: React.createRef<HTMLDivElement | null>(),
 });
 
 type ScrollAreaProps = ScrollAreaPrimitive.Root.Props & {
@@ -95,14 +140,19 @@ function ScrollArea({
   showIndicator = false,
   ...props
 }: ScrollAreaProps) {
+  const viewportRef = React.useRef<HTMLDivElement | null>(null);
+
   return (
-    <ScrollAreaContext.Provider value={{ hasRootIndicator: showIndicator }}>
+    <ScrollAreaContext.Provider
+      value={{ hasRootIndicator: showIndicator, viewportRef }}
+    >
       <ScrollAreaPrimitive.Root
         data-slot="scroll-area"
         className={cn("group relative", className)}
         {...props}
       >
         <ScrollAreaPrimitive.Viewport
+          ref={viewportRef}
           data-slot="scroll-area-viewport"
           className="size-full rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:outline-1 focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >

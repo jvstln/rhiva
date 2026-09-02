@@ -11,6 +11,7 @@ import { useMarketStore } from "../market.store";
 import type { Timeframe } from "../market.schema";
 import { BlacklistDialog } from "./BlacklistDialog";
 import { Button } from "../../../components/ui/button";
+import { TimeframeFilter } from "./TimeframeFilter";
 import { TrendingFilterDialog } from "./TrendingFilterDialog";
 import { PresetToggle, QuickBuyInput } from "./ToolbarItems";
 import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
@@ -49,24 +50,14 @@ export const TrendingToolbar = () => {
 
   return (
     <div className="flex gap-2 max-sm:flex-col max-sm:px-4 sm:items-center">
-      <ToggleGroup
-        value={[filters.timeframe]}
-        onValueChange={([timeframe]) => {
-          setFilters({ timeframe: timeframe as Timeframe });
-        }}
-        size={"sm"}
-      >
-        {TIMEFRAMES.map((tf) => (
-          <ToggleGroupItem
-            key={tf}
-            value={tf}
-          >
-            {tf}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
-
       <div className="flex items-center gap-2">
+        <TimeframeFilter
+          timeframes={TIMEFRAMES}
+          value={filters.timeframe}
+          onValueChange={(timeframe) => {
+            setFilters({ timeframe });
+          }}
+        />
         <BlacklistDialog>
           <Button
             variant="ghost"
@@ -98,7 +89,7 @@ export const TrendingToolbar = () => {
         <TrendingQuickSellInput />
       </div>
 
-      <div className="max-sm:flex max-sm:items-center max-sm:justify-between max-sm:space-x-4 sm:contents">
+      <div className="max-sm:flex max-sm:items-center max-sm:space-x-4 sm:contents">
         <TrendingQuickBuyInput />
         <PresetToggle />
       </div>
