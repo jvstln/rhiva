@@ -2,8 +2,11 @@
   "name": "@rhivadotfun/dataapi",
   "version": "1.0.0",
   "description": "SDK client for Rhiva data API",
-  "main": "./dist/index.js",
+  "type": "module",
+  "sideEffects": false,
   "types": "./src/index.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "scripts": {
     "build": "tsup src/index.ts --format=esm,cjs --minify --treeshake"
   },
@@ -17,8 +20,9 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./src/index.ts",
+      "require": "./dist/index.cjs",
+      "default": "./src/index.ts"
     }
   }
 }
