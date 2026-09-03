@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { useSurgeTokens } from "../market.hook";
 import { useMarketStore } from "../market.store";
@@ -44,21 +44,20 @@ import {
 } from "./tooltips/Holders";
 import { BuyAndSellButton } from "./BuyAndSellButton";
 
-const SURGE_METRICS: Array<
-  (props: { token: TokenDetail }) => React.JSX.Element
-> = [
-  TopHolders,
-  DevHoldOrDevSell,
-  InsidersHold,
-  BundlersHold,
-  PhishingsHold,
-  FreshHold,
-  SnipersHold,
-  DexPaid,
-];
+const SURGE_METRICS: Array<(props: { token: TokenFull }) => React.JSX.Element> =
+  [
+    TopHolders,
+    DevHoldOrDevSell,
+    InsidersHold,
+    BundlersHold,
+    PhishingsHold,
+    FreshHold,
+    SnipersHold,
+    DexPaid,
+  ];
 
 interface TokenRowProps {
-  token: TokenDetail;
+  token: TokenFull;
 }
 
 function TokenRow({ token }: TokenRowProps) {
@@ -66,15 +65,14 @@ function TokenRow({ token }: TokenRowProps) {
   const timeframe =
     useMarketStore((state) => state.surgeFilters.timeframe) || "24h";
 
-  const window = token.timeframes?.windows?.[timeframe];
-  const priceChangePct =
-    window?.price_change_pct ?? token.price_change_percent ?? 0;
+  const window = token.stats?.[timeframe as keyof typeof token.stats];
+  const priceChangePct = window?.price_change_pct ?? 0;
   const volumeUsd = window?.volume_usd ?? 0;
   const buys = window?.buys !== undefined ? Number(window.buys) : 0;
   const sells = window?.sells ?? 0;
   const totalTransaction = buys + sells;
-  const _updatedAt = token.live?.updated_at
-    ? new Date(Number(token.live.updated_at))
+  const _updatedAt = token.created_time
+    ? new Date(Number(token.created_time))
     : new Date();
 
   return (
@@ -94,7 +92,7 @@ function TokenRow({ token }: TokenRowProps) {
 
           <div className="flex items-center gap-1.5 text-b-4 text-gray">
             <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-              {formatAge(token.live.updated_at)}
+              {formatAge(token.created_time)}
             </InfoBadge>
             <Separator
               orientation="vertical"
@@ -138,12 +136,12 @@ function TokenRow({ token }: TokenRowProps) {
             <span className="text-gray">
               ATH{" "}
               <span className="font-medium text-white">
-                {formatCompactCurrency(token.all_time_high_market_cap_usd)}
+                {formatCompactCurrency(token.ath_mcap_usd)}
               </span>
             </span>
 
             <span className="text-up">
-              {`${formatCompactNumber(token.price_change_percent, { withSign: true })}%`}
+              {`${formatCompactNumber(priceChangePct, { withSign: true })}%`}
             </span>
           </div>
 
@@ -187,7 +185,7 @@ function TokenRow({ token }: TokenRowProps) {
       <div className="flex shrink-0 flex-col gap-1.5 text-b-4 max-lg:w-full lg:max-w-75 lg:basis-1/5 lg:items-end">
         <div className="flex items-center gap-3">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-            {formatAge(token.live?.updated_at)}
+            {formatAge(token.created_time)}
           </InfoBadge>
           <SurgeBuyButton token={token} />
         </div>
@@ -258,7 +256,7 @@ export function SurgeTable() {
         {query.data?.map((token) => (
           <TokenRow
             key={token.mint}
-            token={token as unknown as TokenDetail}
+            token={token}
           />
         ))}
       </QueryState>
@@ -266,7 +264,7 @@ export function SurgeTable() {
   );
 }
 
-const SurgeBuyButton = ({ token }: { token: TokenDetail }) => {
+const SurgeBuyButton = ({ token }: { token: TokenFull }) => {
   const quickBuy = useMarketStore((state) => state.surgeFilters.quickBuy) ?? 0;
   return (
     <BuyAndSellButton

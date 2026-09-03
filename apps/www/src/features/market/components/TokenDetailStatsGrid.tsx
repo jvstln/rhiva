@@ -1,6 +1,6 @@
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
-import { cn, formatCompactNumber } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { DexPaid } from "./tooltips/DexInfo";
 import { DevHoldOrDevSell } from "./tooltips/DevInfo";
 import {
@@ -12,7 +12,7 @@ import {
   TotalHolders,
 } from "./tooltips/Holders";
 
-export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
+export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
   const items = [
     {
       label: "Top 10",
@@ -85,18 +85,6 @@ export function TokenDetailStatsGrid({ token }: { token: TokenDetail }) {
           variant={"inline"}
         />
       ),
-    },
-
-    // Unknown properties
-    { label: "NoMint", value: "" },
-    { label: "No Blacklist", value: "" },
-    {
-      label: "Rug %",
-      value: `${formatCompactNumber(token.bot_activity ? token.bot_activity * 100 : null)}%`,
-    },
-    {
-      label: "Top 10",
-      value: `${formatCompactNumber(token.holders?.top10_holder_pct)}%`,
     },
   ];
 

@@ -1,10 +1,11 @@
 import { useRouter } from "next/navigation";
 import { NetworkSolana } from "@web3icons/react";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { DexPaid } from "./tooltips/DexInfo";
 import { useMarketStore } from "../market.store";
 import type { RadarColumns } from "../market.schema";
+import { getTokenBondingPct, getTokenWindowStats } from "../market.schema";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   cn,
@@ -51,15 +52,14 @@ import {
 } from "./tooltips/Holders";
 import { BuyAndSellButton } from "./BuyAndSellButton";
 
-const TransactionInfo = ({ token }: { token: TokenDetail }) => {
-  const window24h =
-    token.timeframes?.windows?.["24h"] ??
-    token.timeframes?.windows?.["1h"] ??
-    Object.values(token.timeframes?.windows ?? {})[0];
+const TransactionInfo = ({ token }: { token: TokenFull }) => {
+  const window24h = getTokenWindowStats(token, "24h");
   const volumeUsd = window24h?.volume_usd ?? 0;
   const buys = window24h?.buys !== undefined ? Number(window24h.buys) : 0;
   const sells = window24h?.sells ?? 0;
   const totalTransaction = buys + sells;
+  const fees = token.intel?.fees?.total_sol ?? 0;
+  const netBuyUsd = token.screener?.net_buy_usd ?? 0;
 
   return (
     <div className="flex flex-col">
@@ -83,14 +83,14 @@ const TransactionInfo = ({ token }: { token: TokenDetail }) => {
           tooltip={
             <InfoBadgeTooltipRow
               label="Prio & Tip & Trading Fees"
-              value={`${formatCompactNumber(token.global_fees_paid)} SOL`}
+              value={`${formatCompactNumber(fees)} SOL`}
             />
           }
         >
           F
           <NetworkSolana className="size-4" />
           <span className="[--accent:var(--color-foreground)]">
-            {formatCompactNumber(token.global_fees_paid)}
+            {formatCompactNumber(fees)}
           </span>
         </InfoBadge>
 
@@ -98,12 +98,12 @@ const TransactionInfo = ({ token }: { token: TokenDetail }) => {
           N
           <span
             className={cn(
-              token.net_buy_usd < 0
+              netBuyUsd < 0
                 ? "[--accent:var(--color-down)]"
                 : "[--accent:var(--color-up)]",
             )}
           >
-            {formatCompactCurrency(token.net_buy_usd)}
+            {formatCompactCurrency(netBuyUsd)}
           </span>
         </InfoBadge>
 
@@ -149,21 +149,20 @@ const TransactionInfo = ({ token }: { token: TokenDetail }) => {
   );
 };
 
-const RADAR_METRICS: Array<
-  (props: { token: TokenDetail }) => React.JSX.Element
-> = [
-  TopHolders,
-  DevHoldOrDevSell,
-  InsidersHold,
-  BundlersHold,
-  PhishingsHold,
-  FreshHold,
-  SnipersHold,
-  DexPaid,
-];
+const RADAR_METRICS: Array<(props: { token: TokenFull }) => React.JSX.Element> =
+  [
+    TopHolders,
+    DevHoldOrDevSell,
+    InsidersHold,
+    BundlersHold,
+    PhishingsHold,
+    FreshHold,
+    SnipersHold,
+    DexPaid,
+  ];
 
 interface TokenCardProps {
-  token: TokenDetail;
+  token: TokenFull;
   column: RadarColumns;
 }
 export function RadarTokenCard({ token, column }: TokenCardProps) {
@@ -196,7 +195,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
                 <TokenNameAndSymbol token={token} />
                 <div className="flex flex-wrap items-center gap-x-1">
                   <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-                    {formatAge(token.live?.updated_at)}
+                    {formatAge(token.created_time)}
                   </InfoBadge>
                   <CashbackNotice token={token} />
                   <TokenDescription token={token} />
@@ -240,7 +239,7 @@ export function RadarTokenCard({ token, column }: TokenCardProps) {
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        Bonding: {formatCompactNumber(token.bonding?.completion_pct)}%
+        Bonding: {formatCompactNumber(getTokenBondingPct(token))}%
       </TooltipContent>
     </Tooltip>
   );
@@ -251,7 +250,7 @@ const BuyAndSellActions = ({
   token,
 }: {
   column: RadarColumns;
-  token: TokenDetail;
+  token: TokenFull;
 }) => {
   const quickBuy = useMarketStore(
     (state) => state.radarFilters[column].quickBuy,

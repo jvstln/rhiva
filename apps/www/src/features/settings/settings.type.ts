@@ -1,6 +1,6 @@
 import z from "zod";
 import { feeConfig } from "@rhivadotfun/api";
-import type { PoolDex } from "@/features/liquidity/liquidity.schema";
+export type PoolDex = "meteora-dlmm" | "raydium-clmm" | "orca-whirlpool";
 import type { Strategy } from "@rhivadotfun/zap/dex/meteora";
 
 export type RebalancingType = "swap" | "swapless";

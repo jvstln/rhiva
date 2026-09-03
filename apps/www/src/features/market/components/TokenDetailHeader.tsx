@@ -1,7 +1,7 @@
 import React from "react";
 import { Separator } from "@base-ui/react";
 import { NetworkSolana } from "@web3icons/react";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { cn, formatAge } from "@/lib/utils";
 import { TotalFees } from "./tooltips/DexInfo";
@@ -25,28 +25,28 @@ import {
   TokenSymbolCopy,
 } from "@/features/market/components/tooltips/TokenAvatar";
 
-type TokenDetailHeaderProps = { token: TokenDetail };
+import { getTokenBondingPct, getTokenWindowStats } from "../market.schema";
+import { useTokenPrice } from "../market.hook";
+
+type TokenDetailHeaderProps = { token: TokenFull };
 
 export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
-  const window24h =
-    token.timeframes?.windows?.["24h"] ??
-    token.timeframes?.windows?.["1h"] ??
-    Object.values(token.timeframes?.windows ?? {})[0];
+  const priceQuery = useTokenPrice(token.mint);
+  const livePriceUsd = priceQuery.data?.price_usd ?? token.price_usd;
+  const window24h = getTokenWindowStats(token, "24h");
   const volumeUsd = window24h?.volume_usd ?? 0;
-  const bondingPct = token.bonding?.completion_pct ?? 0;
-  const _updatedAt = token.live?.updated_at
-    ? new Date(Number(token.live.updated_at))
-    : new Date();
+  const bondingPct = getTokenBondingPct(token);
 
   const totalSupply =
-    token.price_usd && token.market_cap_usd
-      ? token.market_cap_usd / token.price_usd
-      : 0;
+    token.supply ||
+    (livePriceUsd && token.market_cap_usd
+      ? token.market_cap_usd / livePriceUsd
+      : 0);
 
   const headerStats = [
     {
       label: "Price",
-      value: formatCompactCurrency(token.price_usd),
+      value: formatCompactCurrency(livePriceUsd),
     },
     {
       label: "Liq",
@@ -61,7 +61,7 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
       value: (
         <span className="flex items-center gap-1">
           <NetworkSolana className="size-4" />
-          {formatCompactNumber(token.global_fees_paid)}
+          {formatCompactNumber(token.intel?.fees?.total_sol ?? 0)}
         </span>
       ),
     },
@@ -73,13 +73,13 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
       label: "B. Curve",
       value: (
         <span className={cn("text-up")}>
-          {`${formatCompactNumber(bondingPct, { withSign: true })}%`}
+          {`${formatCompactNumber(bondingPct)}%`}
         </span>
       ),
     },
     {
       label: "Status",
-      value: token.social?.has_paid_order ? "Paid" : "Unpaid",
+      value: token.screener?.is_graduated ? "Graduated" : "Bonding",
     },
   ];
 
@@ -100,7 +100,7 @@ export function TokenDetailHeader({ token }: TokenDetailHeaderProps) {
           </div>
           <div className="flex items-baseline gap-1">
             <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-              {formatAge(token.live?.updated_at)}
+              {formatAge(token.created_time)}
             </InfoBadge>
             <TokenSymbolCopy token={token} />
             <TokenLatestPost token={token} />

@@ -1,7 +1,7 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { TokenPortfolioResponse } from "@rhivadotfun/dataapi";
+import type { PortfolioPnl } from "../portfolio.type";
 
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -30,11 +30,11 @@ export function TokenDialog({
   onOpenChange,
   children,
 }: React.ComponentProps<typeof Dialog> & {
-  query: UseQueryResult<TokenPortfolioResponse, Error>;
+  query: UseQueryResult<PortfolioPnl, Error>;
   children: React.ReactElement;
 }) {
   const isLoading = query.isPending && query.fetchStatus !== "paused";
-  const tokens = query.data?.tokens;
+  const tokens = query.data?.positions;
 
   return (
     <Dialog
@@ -66,7 +66,10 @@ export function TokenDialog({
                     {isLoading ? (
                       <Spinner className="size-5" />
                     ) : (
-                      formatCompactCurrency(query.data?.total_wallet_worth_usd)
+                      formatCompactCurrency(
+                        query.data?.summary?.total_value_usd ??
+                          query.data?.total_usd,
+                      )
                     )}
                   </h2>
 
@@ -135,14 +138,10 @@ export function TokenDialog({
                     {/* Balance */}
                     <div className="min-w-0 text-right">
                       <p className="truncate font-semibold text-b-3 text-white leading-tight">
-                        {token.current_price_usd == null
-                          ? "-"
-                          : formatCompactCurrency(
-                              token.remaining * token.current_price_usd,
-                            )}
+                        {formatCompactCurrency(token.value_usd)}
                       </p>
                       <p className="mt-0.5 truncate text-b-5 text-gray leading-tight">
-                        {formatTokenAmount(token.remaining)}{" "}
+                        {formatTokenAmount(token.remaining_ui ?? token.holding)}{" "}
                         {token.symbol ?? token.mint}
                       </p>
                     </div>

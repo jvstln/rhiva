@@ -2,6 +2,7 @@ import { Filter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import type { Preset } from "../market.schema";
 import { useMarketStore } from "../market.store";
 import { SurgeFilterDialog } from "./SurgeFilterDialog";
 import { PresetToggle, QuickBuyInput } from "./ToolbarItems";
@@ -103,7 +104,7 @@ const SurgeBondingCurveToggle = () => {
       value={[bondingCurve]}
       onValueChange={(value) => {
         setFilters({
-          preset: value,
+          preset: value[0] as Preset,
         });
       }}
     />

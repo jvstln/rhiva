@@ -12,8 +12,8 @@ export function useBreakpoint<K extends keyof typeof BREAKPOINTS>(query: K) {
 
   React.useEffect(() => {
     const mql = window.matchMedia(BREAKPOINTS[query]);
-    const handler = (e: MediaQueryListEvent | MediaQueryList) =>
-      setMatches(e.matches);
+    const handler = (event: MediaQueryListEvent | MediaQueryList) =>
+      setMatches(event.matches);
 
     handler(mql);
     mql.addEventListener("change", handler);

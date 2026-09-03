@@ -1,13 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getLiquidityPositions, getTokenPortfolio } from "./portfolio.api";
-
-export const useLiquidityPositions = (walletAddress: string) => {
-  return useQuery({
-    queryKey: ["portfolio", "liquidityPositions", walletAddress],
-    queryFn: () => getLiquidityPositions(walletAddress),
-    enabled: !!walletAddress,
-  });
-};
+import { getTokenPortfolio } from "./portfolio.api";
 
 export const useTokenPortfolio = (walletAddress: string) => {
   return useQuery({

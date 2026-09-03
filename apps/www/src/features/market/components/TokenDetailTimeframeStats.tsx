@@ -1,64 +1,43 @@
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { TokenDetailFilters } from "../market.type";
 import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
-import type { Timeframe } from "../market.schema";
+import { type Timeframe, getTokenWindowStats } from "../market.schema";
 
 type TokenDetailTimeframeStatsProps = {
-  token: TokenDetail;
+  token: TokenFull;
   filters: TokenDetailFilters;
   onFilterChange: (filters: Partial<TokenDetailFilters>) => void;
 };
 
-const UNIT_TO_MINUTES: Record<string, number> = {
-  m: 1,
-  h: 60,
-  d: 1440,
-  w: 10080,
-};
-
-function timeframeToMinutes(timeframe: string): number {
-  const match = /^(\d+)([mhdw])?$/.exec(timeframe.trim());
-  if (!match) return 0;
-  const value = Number(match[1]);
-  const unit = (match[2] ?? "h").toLowerCase();
-  return value * (UNIT_TO_MINUTES[unit] ?? 60);
-}
+const DISPLAY_TIMEFRAMES: Timeframe[] = ["5m", "1h", "4h", "24h"];
 
 export const TokenDetailTimeframeStats = ({
   token,
   filters,
   onFilterChange,
 }: TokenDetailTimeframeStatsProps) => {
-  const availableTimeframes = token.timeframes?.windows
-    ? Object.keys(token.timeframes.windows).sort(
-        (a, b) => timeframeToMinutes(a) - timeframeToMinutes(b),
-      )
-    : [];
-
   const activeTimeframe = filters.timeframe || "24h";
-  const activeWindow = token.timeframes?.windows?.[activeTimeframe];
+  const activeWindow = getTokenWindowStats(token, activeTimeframe);
 
   const volumeUsd = activeWindow?.volume_usd ?? 0;
   const buys = activeWindow?.buys !== undefined ? Number(activeWindow.buys) : 0;
   const sells = activeWindow?.sells ?? 0;
-  const netBuyUsd = token.net_buy_usd;
+  const netBuyUsd = token.screener?.net_buy_usd ?? 0;
 
   return (
     <div className="space-y-3 p-4">
       <div className="grid grid-cols-4 gap-2">
-        {availableTimeframes.map((timeframe) => {
-          const window = token.timeframes?.windows?.[timeframe];
+        {DISPLAY_TIMEFRAMES.map((timeframe) => {
+          const window = getTokenWindowStats(token, timeframe);
           const priceChangePct = window?.price_change_pct ?? 0;
 
           return (
             <Button
               key={timeframe}
-              onClick={() =>
-                onFilterChange({ timeframe: timeframe as Timeframe })
-              }
+              onClick={() => onFilterChange({ timeframe })}
               variant={filters.timeframe === timeframe ? "outline" : "ghost"}
               data-active={filters.timeframe === timeframe || undefined}
               className={cn("h-auto flex-col rounded-md py-2")}
@@ -74,7 +53,9 @@ export const TokenDetailTimeframeStats = ({
                       : "text-muted-foreground",
                 )}
               >
-                {formatCompactNumber(priceChangePct)}%
+                {priceChangePct != null
+                  ? `${formatCompactNumber(priceChangePct, { withSign: true })}%`
+                  : "--"}
               </p>
             </Button>
           );
@@ -83,38 +64,39 @@ export const TokenDetailTimeframeStats = ({
 
       <Separator />
 
-      <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
-        {[
-          { label: "Vol", value: formatCompactCurrency(volumeUsd) },
-          {
-            label: "Buys",
-            value: <span className="text-up">{formatCompactNumber(buys)}</span>,
-          },
-          {
-            label: "Sells",
-            value: (
-              <span className="text-down">{formatCompactNumber(sells)}</span>
-            ),
-          },
-          {
-            label: "Net Buy",
-            value: (
-              <span
-                className={cn(
-                  netBuyUsd > 0 && "text-up",
-                  netBuyUsd < 0 && "text-down",
-                )}
-              >
-                {formatCompactCurrency(netBuyUsd)}
-              </span>
-            ),
-          },
-        ].map((s) => (
-          <div key={s.label}>
-            <p className="text-muted-foreground text-xs">{s.label}</p>
-            <p className="font-medium text-sm text-white">{s.value}</p>
-          </div>
-        ))}
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray">Vol</span>
+        <span className="font-medium text-white">
+          {formatCompactCurrency(volumeUsd)}
+        </span>
+      </div>
+
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray">Buys</span>
+        <span className="font-medium text-up">{formatCompactNumber(buys)}</span>
+      </div>
+
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray">Sells</span>
+        <span className="font-medium text-down">
+          {formatCompactNumber(sells)}
+        </span>
+      </div>
+
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray">Net Buy</span>
+        <span
+          className={cn(
+            "font-medium",
+            netBuyUsd > 0
+              ? "text-up"
+              : netBuyUsd < 0
+                ? "text-down"
+                : "text-white",
+          )}
+        >
+          {formatCompactCurrency(netBuyUsd)}
+        </span>
       </div>
     </div>
   );

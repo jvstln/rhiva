@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -7,6 +7,10 @@ import { TokenDetailHeader } from "./TokenDetailHeader";
 import type { TokenDetailFilters } from "../market.type";
 import { BackButton } from "@/components/layout/BackButton";
 import { TokenDetailTradesTable } from "./TokenDetailTradesTable";
+import { TokenDetailHoldersTable } from "./TokenDetailHoldersTable";
+import { TokenDetailTopTradersTable } from "./TokenDetailTopTradersTable";
+import { TokenDetailPoolsTable } from "./TokenDetailPoolsTable";
+import { TokenDetailDevHistoryTable } from "./TokenDetailDevHistoryTable";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TokenDetailDataSections } from "./TokenDetailDataSections";
 import { TokenChart } from "@/features/tradeview/components/TokenChart";
@@ -15,16 +19,12 @@ import { TokenDetailStatsGrid } from "@/features/market/components/TokenDetailSt
 import { TokenDetailTradePanel } from "@/features/market/components/TokenDetailTradePanel";
 import { useTokenWebSocket } from "../market.ws";
 
-type TokenDetailPageProps = { token: TokenDetail };
+type TokenDetailPageProps = { token: TokenFull };
 
 const TABLE_TABS = [
   "Trades",
-  "Positions",
-  "Orders",
   "Holders",
   "Top Traders",
-  "Tracking",
-  "DCA",
   "Liquidity Pool",
   "Dev Token",
 ] as const;
@@ -86,6 +86,18 @@ export const TokenDetailPage = ({ token }: TokenDetailPageProps) => {
 
             {activeTable === "Trades" && (
               <TokenDetailTradesTable mint={token.mint} />
+            )}
+            {activeTable === "Holders" && (
+              <TokenDetailHoldersTable mint={token.mint} />
+            )}
+            {activeTable === "Top Traders" && (
+              <TokenDetailTopTradersTable mint={token.mint} />
+            )}
+            {activeTable === "Liquidity Pool" && (
+              <TokenDetailPoolsTable mint={token.mint} />
+            )}
+            {activeTable === "Dev Token" && (
+              <TokenDetailDevHistoryTable mint={token.mint} />
             )}
           </div>
         </div>

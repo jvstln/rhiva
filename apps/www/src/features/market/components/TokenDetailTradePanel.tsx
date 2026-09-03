@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 import { ChevronDown, Repeat, Settings, Zap } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { cn, formatCompactCurrency } from "@/lib/utils";
+import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
 import { SettingsDialog } from "../../settings/components/SettingsDialog";
 import { PresetToggle } from "@/features/market/components/ToolbarItems";
+import { getTokenWindowStats } from "../market.schema";
+import { useTokenPrice } from "../market.hook";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   InputGroup,
@@ -20,10 +22,13 @@ import { useSwap } from "@/features/transaction/hooks/use-swap";
 
 const QUICK_AMOUNTS = ["0.01", "0.1", "0.5", "1"] as const;
 
-export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
-  const [side, setSide] = useState<"buy" | "sell" | "lp">("buy");
+export function TokenDetailTradePanel({ token }: { token: TokenFull }) {
+  const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const swap = useSwap();
+  const priceQuery = useTokenPrice(token.mint);
+  const livePriceUsd = priceQuery.data?.price_usd ?? token.price_usd;
+  const livePriceNative = priceQuery.data?.price_native;
 
   return (
     <div className="space-y-3 p-4">
@@ -31,7 +36,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         <span className="text-muted-foreground">{token.name}</span>
         <span className="font-medium text-white">
           {token.symbol}
-          (ATH MC {formatCompactCurrency(token.all_time_high_market_cap_usd)})
+          (ATH MC {formatCompactCurrency(token.ath_mcap_usd)})
         </span>
       </div>
 
@@ -78,7 +83,10 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         </TabsList>
 
         <div className="flex items-center justify-end text-b-4 text-gray">
-          Price: {formatCompactCurrency(token.price_usd)}
+          Price:{" "}
+          {livePriceNative != null
+            ? `${formatCompactNumber(livePriceNative)} SOL`
+            : formatCompactCurrency(livePriceUsd)}
         </div>
 
         <div>
@@ -109,7 +117,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         </div>
 
         <p className="text-b-5 text-gray">
-          Price USD: {formatCompactCurrency(token.price_usd)}
+          Price USD: {formatCompactCurrency(livePriceUsd)}
         </p>
 
         <TabsContent value="buy">
@@ -175,12 +183,17 @@ export function TokenDetailTradePanel({ token }: { token: TokenDetail }) {
         <span className="flex items-center gap-1">
           <Zap className="size-3" /> Auto
         </span>
-        <span>{token.price_change_percent ?? "--"}</span>
+        <span>
+          {getTokenWindowStats(token, "24h")?.price_change_pct != null
+            ? `${getTokenWindowStats(token, "24h")?.price_change_pct.toFixed(2)}%`
+            : "--"}
+        </span>
         <span className="flex items-center gap-1">
           <Repeat className="size-3" />
-          {"<0.01"}
+          {livePriceNative != null
+            ? `${formatCompactNumber(livePriceNative)} SOL`
+            : "<0.01 SOL"}
         </span>
-        <span>Red.</span>
         <ChevronDown className="size-3" />
       </div>
     </div>

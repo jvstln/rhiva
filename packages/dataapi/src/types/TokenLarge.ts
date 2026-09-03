@@ -1,0 +1,42 @@
+import type { Dex } from "./Dex";
+import type { WalletTag } from "./WalletTag";
+
+export type TradeLarge = {
+  mint: string;
+  signature: string;
+  slot: number;
+  block_time: number;
+  tx_index: number;
+  ix_index: number;
+  dex: Dex;
+  pool: string;
+  side: "buy" | "sell";
+  trader: string;
+  price: number;
+  price_usd: number;
+  volume_usd: number;
+  volume_sol: number;
+  base_amount: number;
+  quote_amount: number;
+  base_decimals: number;
+  quote_decimals: number;
+  base_reserve: number;
+  quote_reserve: number;
+  fee_amount: number;
+  fee_mint: string;
+  fee_pct: number;
+  price_impact_pct: number;
+  name: string;
+  symbol: string;
+  image: string | null;
+  socials: {
+    website: string | null;
+    x: string | null;
+    telegram: string | null;
+    discord: string | null;
+    youtube: string | null;
+    instagram: string | null;
+    tiktok: string | null;
+  };
+  trader_tags: WalletTag[];
+};

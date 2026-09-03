@@ -1,4 +1,4 @@
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 import {
   Layers,
   LocateFixed,
@@ -8,9 +8,11 @@ import {
   UserStar,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import type { TokenInfoProps } from "./TokenInfo";
-import { cn, formatCompactCurrency, formatCompactNumber } from "@/lib/utils";
+import { getTokenBondingPct } from "../../market.schema";
 import { FishIcon, MouseLabIcon } from "@/components/ui/icons";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
 import {
   InfoBadge,
   InfoBadgeTooltipGrid,
@@ -18,7 +20,7 @@ import {
 } from "@/components/ui/info-badge";
 
 export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
-  const holdersPercent = token.holders?.top10_holder_pct;
+  const holdersPercent = token.top10_pct;
   const value = `${formatCompactNumber(holdersPercent)}%`;
 
   return (
@@ -50,7 +52,7 @@ export const TopHolders = ({ token, children, ...props }: TokenInfoProps) => {
 };
 
 export const TotalHolders = ({ token, ...props }: TokenInfoProps) => {
-  const total = token.holders?.holder_count;
+  const total = token.holders;
   return (
     <InfoBadge
       tooltip={"Total holders"}
@@ -63,7 +65,7 @@ export const TotalHolders = ({ token, ...props }: TokenInfoProps) => {
 };
 
 export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
-  const insiderCount = token.insiders?.insider_count;
+  const insiderCount = token.intel?.insiders?.wallets;
 
   return (
     <InfoBadge
@@ -92,45 +94,67 @@ export const InsidersHold = ({ token, ...props }: TokenInfoProps) => {
 };
 
 export const FreshHold = ({ token, ...props }: TokenInfoProps) => {
+  const freshPct = token.intel?.dev?.initial_pct ?? 0;
   return (
     <InfoBadge
       variant={"badge"}
       className="[--accent:var(--color-up)]"
       tooltip={
         <InfoBadgeTooltipRow
-          label="Fresh Hold"
-          value={<span className="text-accent">N/A</span>}
+          label="Fresh / Dev Initial"
+          value={
+            <span className="text-accent">
+              {formatCompactNumber(freshPct)}%
+            </span>
+          }
         />
       }
       {...props}
     >
       <Sprout />
-      N/A
+      {`${formatCompactNumber(freshPct)}%`}
     </InfoBadge>
   );
 };
 
 export const PhishingsHold = ({ token, ...props }: TokenInfoProps) => {
+  const suspiciousFlags =
+    token.intel?.flags?.filter(
+      (f) =>
+        f.name.toLowerCase().includes("phish") ||
+        f.detail.toLowerCase().includes("phish"),
+    ) ?? [];
+  const isSuspicious =
+    suspiciousFlags.length > 0 || (token.intel?.rugged ?? false);
+
   return (
     <InfoBadge
       variant={"badge"}
-      className="[--accent:var(--color-up)]"
+      className={
+        isSuspicious
+          ? "[--accent:var(--color-down)]"
+          : "[--accent:var(--color-up)]"
+      }
       tooltip={
         <InfoBadgeTooltipRow
-          label="Phishings Hold"
-          value={<span className="text-accent">N/A</span>}
+          label="Phishing / Malicious Flags"
+          value={
+            <span className="text-accent">
+              {isSuspicious ? `${suspiciousFlags.length || 1} Flags` : "Clean"}
+            </span>
+          }
         />
       }
       {...props}
     >
       <FishIcon />
-      N/A
+      {isSuspicious ? "Warn" : "0"}
     </InfoBadge>
   );
 };
 
 export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
-  const sniperCount = token.snipers?.sniper_count;
+  const sniperCount = token.intel?.snipers?.wallets;
 
   return (
     <InfoBadge
@@ -159,8 +183,8 @@ export const SnipersHold = ({ token, ...props }: TokenInfoProps) => {
 };
 
 export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
-  const bundledWalletCount = token.bundlers?.bundled_wallet_count;
-  const earlySol = token.bundlers?.total_early_sol;
+  const bundledWalletCount = token.intel?.bundlers?.wallets;
+  const earlySol = token.intel?.bundlers?.held;
 
   return (
     <InfoBadge
@@ -180,7 +204,7 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
 
             <InfoBadgeTooltipRow
               label="ATH Hold"
-              value={formatCompactCurrency(token.all_time_high_market_cap_usd)}
+              value={formatCompactCurrency(token.ath_mcap_usd)}
             />
 
             <InfoBadgeTooltipRow
@@ -195,7 +219,7 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
 
             <InfoBadgeTooltipRow
               label="Bundled token"
-              value={formatCompactNumber(token.bundled_supply)}
+              value={formatCompactNumber(token.intel?.bundlers?.held)}
             />
           </InfoBadgeTooltipGrid>
         </div>
@@ -208,8 +232,8 @@ export const BundlersHold = ({ token, ...props }: TokenInfoProps) => {
   );
 };
 
-export const KolHold = ({ token, ...props }: { token: TokenDetail }) => {
-  const completionPct = token.bonding?.completion_pct;
+export const KolHold = ({ token, ...props }: { token: TokenFull }) => {
+  const completionPct = getTokenBondingPct(token);
   return (
     <InfoBadge
       tooltip="KOL Hold"

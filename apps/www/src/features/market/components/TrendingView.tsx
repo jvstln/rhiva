@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { Button } from "@/components/ui/button";
 import { useMarketStore } from "../market.store";
@@ -16,6 +16,7 @@ import { DexPaid, TotalFees } from "./tooltips/DexInfo";
 import { QueryState } from "@/components/layout/QueryState";
 import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevInfo";
 import { useTrendingTokens, useWatchlistTokens } from "../market.hook";
+import { getTokenWindowStats } from "../market.schema";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
   cn,
@@ -102,9 +103,9 @@ export function AddTokenToWatchlistButton({ mint }: { mint: string }) {
 /* Pair info cell (star, avatar, name, sub-icons, watcher count)       */
 /* ------------------------------------------------------------------ */
 
-function PairInfoCell({ token }: { token: TokenDetail }) {
-  const _updatedAt = token.live?.updated_at
-    ? new Date(Number(token.live.updated_at))
+function PairInfoCell({ token }: { token: TokenFull }) {
+  const _updatedAt = token.created_time
+    ? new Date(Number(token.created_time))
     : new Date();
   return (
     <div
@@ -124,7 +125,7 @@ function PairInfoCell({ token }: { token: TokenDetail }) {
 
         <div className="flex items-baseline gap-1">
           <InfoBadge className="font-semibold text-sm [--accent:var(--color-up)]">
-            {formatAge(token.live?.updated_at)}
+            {formatAge(token.created_time)}
           </InfoBadge>
           <TokenSymbolCopy token={token} />
           <TokenLatestPost token={token} />
@@ -171,7 +172,7 @@ function MetricCell({ value, changePercent }: MetricCellProps) {
 /* Token security badge grid                                           */
 /* ------------------------------------------------------------------ */
 
-type TokenMetric = (props: { token: TokenDetail }) => React.JSX.Element;
+type TokenMetric = (props: { token: TokenFull }) => React.JSX.Element;
 const METRICS: TokenMetric[] = [
   TopHolders,
   DevHoldOrDevSell,
@@ -186,7 +187,7 @@ const METRICS: TokenMetric[] = [
 /* Sell / Buy action buttons                                            */
 /* ------------------------------------------------------------------ */
 
-function ActionButtons({ token }: { token: TokenDetail }) {
+function ActionButtons({ token }: { token: TokenFull }) {
   const quickBuy = useMarketStore((state) => state.trendingFilters.quickBuy);
   const quickSell = useMarketStore((state) => state.trendingFilters.quickSell);
 
@@ -210,11 +211,11 @@ function ActionButtons({ token }: { token: TokenDetail }) {
 /* Column definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
+export function TrendingTable({ tokens }: { tokens: TokenFull[] }) {
   const router = useRouter();
   const timeframe = useMarketStore((state) => state.trendingFilters.timeframe);
 
-  const columns = useMemo<ColumnDef<TokenDetail>[]>(() => {
+  const columns = useMemo<ColumnDef<TokenFull>[]>(() => {
     return [
       {
         id: "pairInfo",
@@ -227,8 +228,10 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         header: "Market Cap",
         cell: ({ row }) => {
           const mcap = row.original.market_cap_usd;
-          const pct =
-            row.original.timeframes?.windows?.[timeframe]?.price_change_pct;
+          const pct = getTokenWindowStats(
+            row.original,
+            timeframe,
+          )?.price_change_pct;
           return (
             <MetricCell
               value={formatCompactCurrency(mcap)}
@@ -252,7 +255,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         id: "volume",
         header: "Volume",
         cell: ({ row }) => {
-          const vol = row.original.timeframes?.windows?.[timeframe]?.volume_usd;
+          const vol = getTokenWindowStats(row.original, timeframe)?.volume_usd;
           return (
             <span className="font-medium text-sm">
               {formatCompactCurrency(vol)}
@@ -264,7 +267,7 @@ export function TrendingTable({ tokens }: { tokens: TokenDetail[] }) {
         id: "txns",
         header: "TXNS",
         cell: ({ row }) => {
-          const window = row.original.timeframes?.windows?.[timeframe];
+          const window = getTokenWindowStats(row.original, timeframe);
           const buys = window?.buys !== undefined ? Number(window.buys) : null;
           const sells = window?.sells ?? null;
           const totalTransaction =

@@ -1,0 +1,60 @@
+export type WalletPnl = {
+  wallet: string;
+  updated_time: number;
+  realized_usd: number;
+  unrealized_usd: number;
+  total_usd: number;
+  invested_usd: number;
+  proceeds_usd: number;
+  roi_pct: number;
+  summary: {
+    total_value_usd: number;
+    total_value_sol: number;
+    unrealized_pnl_usd: number;
+    unrealized_pnl_sol: number;
+    tradeable_value_usd: number;
+    tradeable_value_sol: number;
+    realized_pnl_usd: number;
+    pnl_usd: number;
+    pnl_pct: number;
+    pnl_change_usd: number;
+    sol_usd_rate: number;
+    total_value_change_usd: number;
+    unrealized_pnl_change_usd: number;
+    tradeable_value_change_usd: number;
+  };
+  wins: number;
+  losses: number;
+  buys: number;
+  sells: number;
+  tokens_traded: number;
+  first_trade: number;
+  last_trade: number;
+};
+
+export type WalletPnlWithPosition = WalletPnl & {
+  positions: {
+    mint: string;
+    holding: number;
+    decimals: number;
+    bought: number;
+    sold: number;
+    transfer_net: number;
+    cost_usd: number;
+    value_usd: number;
+    invested_usd: number;
+    proceeds_usd: number;
+    realized_usd: number;
+    unrealized_usd: number;
+    avg_buy_usd: number;
+    avg_sell_usd: number;
+    buys: number;
+    sells: number;
+    first_trade: number;
+    last_trade: number;
+    holding_duration_secs: number;
+    remaining_ui: number;
+    pnl_usd: number;
+    pnl_pct: number;
+  }[];
+};

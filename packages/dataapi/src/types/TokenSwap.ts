@@ -1,0 +1,35 @@
+import type { Dex } from "./Dex";
+
+export type TokenSwap = {
+  signature: string;
+  slot: number;
+  block_time: number;
+  tx_index: number;
+  ix_index: number;
+  inner_ix_index: number;
+  dex: Dex;
+  pool: string;
+  mint: string;
+  quote_mint: string;
+  trader: string;
+  side: "buy" | "sell";
+  base_amount: number;
+  quote_amount: number;
+  base_decimals: number;
+  quote_decimals: number;
+  base_reserve: number;
+  quote_reserve: number;
+  fee_amount: number;
+  fee_mint: string;
+  fee_pct: number;
+  fee_paid_out: number;
+  price_impact_pct: number;
+  price: number;
+  price_usd: number;
+  volume_usd: number;
+  mcap_usd: number;
+  candle_ok: boolean;
+  indexed_at: number;
+  virtual_base_reserve: number;
+  virtual_quote_reserve: number;
+};

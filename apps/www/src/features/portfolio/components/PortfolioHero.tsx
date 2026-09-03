@@ -10,7 +10,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { TokenPortfolioResponse } from "@rhivadotfun/dataapi";
+import type { PortfolioPnl } from "../portfolio.type";
 
 import { useAuth } from "@/hooks";
 import { TokenDialog } from "./TokenDialog";
@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/select";
 
 type PortfolioHeroProps = {
-  query: UseQueryResult<TokenPortfolioResponse, Error>;
+  query: UseQueryResult<PortfolioPnl, Error>;
 };
 
 export function PortfolioHero({ query }: PortfolioHeroProps) {
@@ -44,7 +44,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
   const auth = useAuth();
 
   const totalValue = formatCompactCurrency(
-    query.data?.total_wallet_worth_usd,
+    query.data?.summary?.total_value_usd ?? query.data?.total_usd,
   ).slice(1);
   const isLoading = query.isPending && query.fetchStatus !== "paused";
 

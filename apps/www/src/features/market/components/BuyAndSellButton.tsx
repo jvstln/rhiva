@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useSwap } from "@/features/transaction/hooks/use-swap";
 import { cn } from "@/lib";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 import { Coins, Zap } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,7 +16,7 @@ export const BuyAndSellButton = ({
 }: Omit<Button.Props, "value" | "type"> & {
   type: "buy" | "sell";
   value?: number | null;
-  token: TokenDetail;
+  token: TokenFull;
   icon?: React.ReactNode;
 }) => {
   const swap = useSwap();

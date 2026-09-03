@@ -1,13 +1,35 @@
 import { Bot, HandCoins } from "lucide-react";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import { EagleIcon } from "@/components/ui/icons";
 import type { TokenInfoProps } from "./TokenInfo";
 import { cn, formatCompactNumber } from "@/lib/utils";
-import { InfoBadge, InfoBadgeTooltipRow } from "@/components/ui/info-badge";
+import {
+  InfoBadge,
+  InfoBadgeTooltipGrid,
+  InfoBadgeTooltipRow,
+} from "@/components/ui/info-badge";
+import { formatCompactCurrency } from "@/lib/finance.util";
 
 export const DexPaid = ({ token, ...props }: TokenInfoProps) => {
-  const isPaid = token.dex_paid ?? false;
+  const screener = token.screener as {
+    fees_usd?: number;
+    fee_usd?: number;
+    has_social_update?: number | boolean;
+    socials?: { any?: boolean };
+    launchpad?: string | null;
+  } | null;
+  const feesPaidUsd =
+    screener?.fees_usd ??
+    screener?.fee_usd ??
+    token.intel?.fees?.total_paid_usd ??
+    0;
+  const hasSocials = Boolean(
+    screener?.has_social_update || screener?.socials?.any,
+  );
+  const isPaid =
+    hasSocials || feesPaidUsd > 0 || Boolean(token.screener?.is_graduated);
+
   return (
     <InfoBadge
       variant={"badge"}
@@ -15,10 +37,30 @@ export const DexPaid = ({ token, ...props }: TokenInfoProps) => {
         isPaid ? "[--accent:var(--color-up)]" : "[--accent:var(--color-down)]",
       )}
       tooltip={
-        <InfoBadgeTooltipRow
-          label="Dex Paid"
-          value={isPaid ? "Paid" : "Unpaid"}
-        />
+        <InfoBadgeTooltipGrid>
+          <InfoBadgeTooltipRow
+            label="Dex Paid"
+            value={isPaid ? "Paid" : "Unpaid"}
+          />
+          {feesPaidUsd > 0 && (
+            <InfoBadgeTooltipRow
+              label="Dex Fees Paid"
+              value={formatCompactCurrency(feesPaidUsd)}
+            />
+          )}
+          {token.screener?.is_graduated && (
+            <InfoBadgeTooltipRow
+              label="Graduation"
+              value="Graduated"
+            />
+          )}
+          {screener?.launchpad && (
+            <InfoBadgeTooltipRow
+              label="Launchpad"
+              value={screener.launchpad}
+            />
+          )}
+        </InfoBadgeTooltipGrid>
       }
       {...props}
     >
@@ -29,7 +71,7 @@ export const DexPaid = ({ token, ...props }: TokenInfoProps) => {
 };
 
 export const BotActivity = ({ token, ...props }: TokenInfoProps) => {
-  const activity = token.bot_activity;
+  const activity = token.intel?.score ?? 0;
   return (
     <InfoBadge
       variant={"badge"}
@@ -47,8 +89,8 @@ export const BotActivity = ({ token, ...props }: TokenInfoProps) => {
   );
 };
 
-export const TotalFees = ({ token }: { token: TokenDetail }) => {
-  const feesPaid = token.global_fees_paid;
+export const TotalFees = ({ token }: { token: TokenFull }) => {
+  const feesPaid = token.intel?.fees?.total_sol ?? 0;
   return (
     <InfoBadge
       className="[--accent:var(--color-warn)]"

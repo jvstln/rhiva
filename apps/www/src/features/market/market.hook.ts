@@ -1,8 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { CandlesQuery } from "@rhivadotfun/dataapi";
-
 import { SurgeFilters } from "./market.schema";
 import { useMarketStore } from "./market.store";
 import type {
@@ -14,13 +12,25 @@ import {
   getTokens,
   getRadarTokens,
   getTokenTrades,
+  getTokenHolders,
+  getTokenTopTraders,
+  getTokenPools,
+  getTokenDevHistory,
+  getTokenSecurity,
+  getTokenPrice,
   getSurgeTokens,
   getTokenCandles,
   getTrendingTokens,
   getSearchTokens,
 } from "./market.api";
 
-export type TokenCandleFilters = CandlesQuery & { mint: string };
+export type TokenCandleFilters = {
+  mint: string;
+  interval?: "1m";
+  from?: number;
+  to?: number;
+  count?: number;
+};
 
 export function useToken(mint: string) {
   return useQuery({
@@ -72,13 +82,8 @@ export function useSurgeTokens(filters: SurgeFiltersInput) {
     queryKey: ["market", "surge", params],
     queryFn: () =>
       getSurgeTokens({
-        direction: params.direction ?? null,
-        min_surge_pct: params.min_surge_pct ?? null,
-        sort: params.sort ?? null,
-        order: params.order ?? null,
-        include_incomplete: null,
-        limit: null,
-        offset: null,
+        direction: params.direction === "down" ? "losers" : "gainers",
+        limit: 50,
       }),
   });
 }
@@ -94,6 +99,49 @@ export function useTokenTrades(mint: string) {
   return useQuery({
     queryKey: ["token", mint, "trades"],
     queryFn: () => getTokenTrades(mint),
+  });
+}
+
+export function useTokenHolders(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "holders"],
+    queryFn: () => getTokenHolders(mint),
+  });
+}
+
+export function useTokenTopTraders(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "top-traders"],
+    queryFn: () => getTokenTopTraders(mint),
+  });
+}
+
+export function useTokenPools(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "pools"],
+    queryFn: () => getTokenPools(mint),
+  });
+}
+
+export function useTokenDevHistory(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "dev-history"],
+    queryFn: () => getTokenDevHistory(mint),
+  });
+}
+
+export function useTokenSecurity(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "security"],
+    queryFn: () => getTokenSecurity(mint),
+  });
+}
+
+export function useTokenPrice(mint: string) {
+  return useQuery({
+    queryKey: ["token", mint, "price"],
+    queryFn: () => getTokenPrice(mint),
+    refetchInterval: 10_000,
   });
 }
 

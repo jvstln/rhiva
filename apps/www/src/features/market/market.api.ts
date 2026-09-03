@@ -1,111 +1,143 @@
-import type {
-  CandlesQuery,
-  SurgeQuery,
-  TokenDetail,
-} from "@rhivadotfun/dataapi";
+import type { TokenFull, Window } from "@rhivadotfun/dataapi";
 
 import { dataapi } from "@/lib/dataapi";
 import type { RadarFilters, TrendingFilters } from "./market.type";
+import { TIMEFRAME_TO_WINDOW } from "./market.schema";
 
-export const getTokens = async (mints: Array<string | undefined>) => {
-  const response = await dataapi.tokens.getTokensBatch({
-    mints: mints.filter(Boolean).join(","),
-  });
-  return response;
+export type SurgeParams = {
+  window?: Window;
+  direction?: "gainers" | "losers";
+  limit?: number;
+};
+
+export const getTokens = async (
+  mints: Array<string | undefined>,
+): Promise<TokenFull[]> => {
+  const valid = mints.filter((m): m is string => Boolean(m));
+  if (valid.length === 0) return [];
+  const results = await Promise.allSettled(
+    valid.map((address) => dataapi.token.getToken({ address })),
+  );
+  return results
+    .filter(
+      (r): r is PromiseFulfilledResult<TokenFull> =>
+        r.status === "fulfilled" && Boolean(r.value),
+    )
+    .map((r) => r.value);
 };
 
 export const getTrendingTokens = async (
   filters: TrendingFilters,
-): Promise<TokenDetail[]> => {
-  const response = await dataapi.tokens.getTrending({
-    limit: null,
-    window: filters.timeframe,
+): Promise<TokenFull[]> => {
+  const window: Window =
+    (filters.timeframe ? TIMEFRAME_TO_WINDOW[filters.timeframe] : undefined) ??
+    "86400";
+
+  const response = await dataapi.token.getTrending({
+    enrich: true,
+    window,
+    limit: 50,
   });
 
-  return await getTokens(response.map((token) => token.mint));
+  const enriched = response
+    .map((item) => ("token" in item ? item.token : null))
+    .filter((t): t is TokenFull => Boolean(t));
+
+  if (enriched.length > 0) return enriched;
+  return await getTokens(response.map((t) => t.mint));
 };
 
 export const getRadarTokens = async (
   filters: RadarFilters[keyof RadarFilters] & { type: keyof RadarFilters },
-) => {
-  const stageMap: Record<keyof RadarFilters, string> = {
-    fresh: "new_creation",
-    graduated: "completed",
-    heatingUp: "near_completion",
-  };
+): Promise<TokenFull[]> => {
+  if (filters.type === "fresh") {
+    const launches = await dataapi.token.getLaunches({ limit: 50 });
+    return await getTokens(launches.map((l) => l.mint));
+  }
+  if (filters.type === "heatingUp") {
+    const graduating = await dataapi.token.getGraduating({
+      enrich: true,
+      limit: 50,
+    });
+    const enriched = graduating
+      .map((item) => ("token" in item ? item.token : null))
+      .filter((t): t is TokenFull => Boolean(t));
+    if (enriched.length > 0) return enriched;
+    return await getTokens(graduating.map((g) => g.mint));
+  }
+  if (filters.type === "graduated") {
+    const graduated = await dataapi.token.getGraduated({
+      enrich: true,
+      launchpad: "pumpfun",
+      limit: 50,
+    });
+    const enriched = graduated
+      .map((item) => ("token" in item ? item.token : null))
+      .filter((t): t is TokenFull => Boolean(t));
+    if (enriched.length > 0) return enriched;
+    return await getTokens(graduated.map((g) => g.mint));
+  }
+  return [];
+};
 
-  const response = await dataapi.tokens.getTrenches({
-    limit: null,
-    stage: stageMap[filters.type],
+export const getSurgeTokens = async (params: SurgeParams) => {
+  const movers = await dataapi.token.getMovers({
+    enrich: true,
+    limit: 50,
+    ...params,
   });
-
-  return await getTokens(response.map(({ mint }) => mint));
+  const enriched = movers
+    .map((item) => ("token" in item ? item.token : null))
+    .filter((t): t is TokenFull => Boolean(t));
+  if (enriched.length > 0) return enriched;
+  return await getTokens(movers.map((m) => m.mint));
 };
 
-export const getSurgeTokens = async (params: SurgeQuery) => {
-  const response = await dataapi.tokens.getSurge(params);
-
-  const tokens = new Map(
-    (await getTokens(response.map((token) => token.mint))).map((token) => [
-      token.mint,
-      token,
-    ]),
-  );
-  const combinedTokens = response.map((data) => ({
-    ...tokens.get(data.mint),
-    ...data,
-  }));
-
-  return combinedTokens;
-};
-
-export const getTokenCandles = async (
-  params: CandlesQuery & { mint: string },
-) => {
+export const getTokenCandles = async (params: {
+  mint: string;
+  interval?: "1m";
+  from?: number;
+  to?: number;
+  count?: number;
+}) => {
   const { mint, ...rest } = params;
-  return await dataapi.tokens.getTokenCandles(mint, rest);
+  return await dataapi.token.getTokenOhlcv({ address: mint, ...rest });
 };
 
 export const getTokenTrades = async (mint: string) => {
-  return await dataapi.tokens.getTokenTrades(mint);
+  return await dataapi.token.getTokenTrades({ address: mint, limit: 100 });
 };
 
-export const getSearchTokens = async (
-  query: string,
-): Promise<TokenDetail[]> => {
-  if (!query) return [];
+export const getTokenHolders = async (mint: string) => {
+  return await dataapi.token.getTokenHolders({ address: mint, limit: 50 });
+};
 
-  const response = await dataapi.tokens.getScreener({
-    query,
-    limit: 10,
-    launchpad: null,
-    stage: null,
-    min_pct: null,
-    max_pct: null,
-    min_age_sec: null,
-    max_age_sec: null,
-    min_mcap: null,
-    max_mcap: null,
-    min_holders: null,
-    max_holders: null,
-    min_top10_pct: null,
-    max_top10_pct: null,
-    min_dev_pct: null,
-    max_dev_pct: null,
-    min_liquidity: null,
-    min_volume_1h: null,
-    has_socials: null,
-    dex_boost: null,
-    dex_paid: null,
-    dev_sold: null,
-    mint_auth_disabled: null,
-    freeze_auth_disabled: null,
-    include_incomplete: null,
-    sort: null,
-    order: null,
-    offset: null,
+export const getTokenTopTraders = async (mint: string) => {
+  return await dataapi.token.getTopTraders({
+    address: mint,
+    sort: "realized",
+    limit: 50,
   });
+};
 
-  if (response.length === 0) return [];
-  return await getTokens(response.map((token) => token.mint));
+export const getTokenPools = async (mint: string) => {
+  return await dataapi.token.getTokenPools({ address: mint });
+};
+
+export const getTokenDevHistory = async (mint: string) => {
+  return await dataapi.token.getTokenDevHistory({ address: mint });
+};
+
+export const getTokenSecurity = async (mint: string) => {
+  return await dataapi.token.getTokenSecurity({ address: mint });
+};
+
+export const getTokenPrice = async (mint: string) => {
+  return await dataapi.token.getTokenPrice({ address: mint, liquidity: true });
+};
+
+export const getSearchTokens = async (query: string): Promise<TokenFull[]> => {
+  if (!query) return [];
+  const results = await dataapi.token.searchToken({ q: query, enrich: true });
+  return await getTokens(results.map((r) => r.mint));
 };

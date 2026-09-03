@@ -1,11 +1,10 @@
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 import { siGoogle, siTiktok, siX, siYoutube } from "simple-icons";
 import {
   Eye,
   User,
   Globe,
   Search,
-  AlertCircle,
   BadgeCheck,
   CalendarDays,
   ExternalLink,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface SocialHoverTooltipProps {
-  token: TokenDetail;
+  token: TokenFull;
 }
 
 export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
@@ -37,10 +36,10 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
         <div className="flex flex-col">
           {/* Top Banner Section */}
           <div className="relative flex h-28 w-full items-center justify-center bg-linear-to-t from-violet-900 to-violet-600">
-            {token.logo_uri && (
+            {token.image && (
               <picture>
                 <img
-                  src={token.logo_uri}
+                  src={token.image}
                   alt={token.name ?? "Token"}
                   className="h-16 w-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]"
                 />
@@ -52,7 +51,7 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
             {/* Profile Info */}
             <div className="relative -mt-2/3 flex items-start justify-between">
               <Avatar>
-                <AvatarImage src={token.logo_uri || ""} />
+                <AvatarImage src={token.image || ""} />
                 <AvatarFallback>
                   {token.name ? getInitials(token.name) : <User />}
                 </AvatarFallback>
@@ -61,8 +60,8 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
                 size="icon-sm"
                 variant={"ghost"}
                 onClick={() =>
-                  token.social?.twitter_url
-                    ? window.open(token.social.twitter_url, "_blank")
+                  token.socials?.x
+                    ? window.open(token.socials.x, "_blank")
                     : undefined
                 }
               >
@@ -77,8 +76,11 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
                 <XIcon className="size-3.5" />
               </div>
               <span className="text-muted-foreground text-sm">
-                {token.social?.twitter_handle
-                  ? `@${token.social.twitter_handle}`
+                {token.socials?.x
+                  ? token.socials.x.replace(
+                      /^https?:\/\/(x|twitter)\.com\//,
+                      "@",
+                    )
                   : "N/A"}
               </span>
             </div>
@@ -86,36 +88,39 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
             {/* Bio */}
             <p className="text-muted-foreground text-sm">
               {token.description ||
-                (token.social?.twitter_handle
-                  ? `@${token.social.twitter_handle}`
+                (token.socials?.x
+                  ? token.socials.x.replace(
+                      /^https?:\/\/(x|twitter)\.com\//,
+                      "@",
+                    )
                   : "N/A")}
             </p>
 
             {/* Joined Date */}
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
               <CalendarDays className="size-[18px]" />
-              <span>Joined {formatAge(token.recent_listing_time)}</span>
+              <span>Joined {formatAge(token.created_time)}</span>
             </div>
 
             {/* Stats */}
             <div className="flex items-center gap-4 text-sm">
               <div>
                 <span className="font-bold text-white">
-                  {formatCompactNumber(token.holders?.holder_count)}
+                  {formatCompactNumber(token.holders)}
                 </span>{" "}
                 <span className="text-muted-foreground">Holders</span>
               </div>
               <div>
                 <span className="font-bold text-white">
-                  {formatCompactNumber(token.snipers?.sniper_count)}
+                  {formatCompactNumber(token.intel?.snipers?.wallets)}
                 </span>{" "}
                 <span className="text-muted-foreground">Snipers</span>
               </div>
             </div>
 
-            {token.social?.twitter_url && (
+            {token.socials?.x && (
               <a
-                href={token.social.twitter_url}
+                href={token.socials.x}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonVariants({ variant: "default", size: "sm" })}
@@ -219,16 +224,16 @@ export function TokenSocialSearch({ token }: SocialHoverTooltipProps) {
   );
 }
 
-export function TokenViewCount({ token }: { token: TokenDetail }) {
+export function TokenViewCount({ token }: { token: TokenFull }) {
   return (
     <InfoBadge tooltip={"Holders / Viewers"}>
-      <Eye /> {formatCompactNumber(token.holders?.holder_count)}
+      <Eye /> {formatCompactNumber(token.holders)}
     </InfoBadge>
   );
 }
 
-export function TokenWebsite({ token }: { token: TokenDetail }) {
-  if (!token.social?.website_url) return null;
+export function TokenWebsite({ token }: { token: TokenFull }) {
+  if (!token.socials?.website) return null;
 
   return (
     <InfoBadge
@@ -237,11 +242,11 @@ export function TokenWebsite({ token }: { token: TokenDetail }) {
           label="Website"
           value={
             <a
-              href={token.social.website_url}
+              href={token.socials.website}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {token.social.website_url}
+              {token.socials.website}
             </a>
           }
         />
@@ -253,8 +258,8 @@ export function TokenWebsite({ token }: { token: TokenDetail }) {
   );
 }
 
-export function TokenConnection({ token }: { token: TokenDetail }) {
-  if (!token.social?.twitter_url) return null;
+export function TokenConnection({ token }: { token: TokenFull }) {
+  if (!token.socials?.x) return null;
 
   return (
     <InfoBadge
@@ -263,26 +268,26 @@ export function TokenConnection({ token }: { token: TokenDetail }) {
           label="X Connection"
           value={
             <a
-              href={token.social.twitter_url}
+              href={token.socials.x}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {token.social.twitter_url}
+              {token.socials.x}
             </a>
           }
         />
       }
-      aria-label="Token connection"
+      aria-label="X Connection"
     >
-      <AlertCircle />
+      <XIcon />
     </InfoBadge>
   );
 }
 
 export function TokenTwitterHandle({ token }: SocialHoverTooltipProps) {
-  if (!token.social?.twitter_handle) return null;
+  if (!token.socials?.x) return null;
 
-  const handle = `@${token.social.twitter_handle}`;
+  const handle = token.socials.x.replace(/^https?:\/\/(x|twitter)\.com\//, "@");
 
   return (
     <InfoBadge
@@ -291,18 +296,14 @@ export function TokenTwitterHandle({ token }: SocialHoverTooltipProps) {
         <InfoBadgeTooltipRow
           label="X / Twitter"
           value={
-            token.social.twitter_url ? (
-              <a
-                href={token.social.twitter_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-              >
-                {handle}
-              </a>
-            ) : (
-              handle
-            )
+            <a
+              href={token.socials.x}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {handle}
+            </a>
           }
         />
       }

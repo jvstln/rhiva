@@ -2,9 +2,7 @@
 
 import { Suspense } from "react";
 import { Calendar } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
-import { PortfolioTab } from "../portfolio.schema";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -13,62 +11,51 @@ import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { PortfolioErrorBanner } from "./PortfolioErrorBanner";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
-import { useLiquidityPositions, useTokenPortfolio } from "../portfolio.hook";
+import { useTokenPortfolio } from "../portfolio.hook";
 import { useAuth } from "@/hooks";
 import { QueryState } from "@/components/layout/QueryState";
 
 const PortfolioPage = () => {
-  const searchParams = useSearchParams();
-  const activeView = PortfolioTab.catch("tradingPosition").parse(
-    searchParams.get("view"),
-  );
-
   const auth = useAuth();
   const walletAddress = auth.authenticated ? auth.activeWallet.address : "";
-  const positions = useLiquidityPositions(walletAddress);
   const tokenPortfolio = useTokenPortfolio(walletAddress);
 
-  const summaryStats =
-    activeView === "tradingPosition"
-      ? [
-          {
-            label: "TOTAL VALUE",
-            value: formatCompactCurrency(
-              tokenPortfolio.data?.total_wallet_worth_usd,
-            ),
-          },
-          {
-            label: "UNREALIZED PNL",
-            value: formatSignedUsd(tokenPortfolio.data?.total_pnl_usd),
-          },
-          {
-            label: "TRADEABLE BALANCE",
-            value: formatCompactCurrency(
-              tokenPortfolio.data?.total_invested_usd,
-            ),
-          },
-        ]
-      : [
-          {
-            label: "TOTAL VALUE",
-            value: formatCompactCurrency(positions.data?.total_value_usd),
-          },
-        ];
+  const summaryStats = [
+    {
+      label: "TOTAL VALUE",
+      value: formatCompactCurrency(
+        tokenPortfolio.data?.summary?.total_value_usd ??
+          tokenPortfolio.data?.total_usd,
+      ),
+    },
+    {
+      label: "UNREALIZED PNL",
+      value: formatSignedUsd(
+        tokenPortfolio.data?.summary?.unrealized_pnl_usd ??
+          tokenPortfolio.data?.unrealized_usd,
+      ),
+    },
+    {
+      label: "TRADEABLE BALANCE",
+      value: formatCompactCurrency(
+        tokenPortfolio.data?.summary?.tradeable_value_usd ??
+          tokenPortfolio.data?.invested_usd,
+      ),
+    },
+  ];
 
   const pnlSummary = tokenPortfolio.data
     ? {
-        value: tokenPortfolio.data.total_pnl_usd,
-        realized: tokenPortfolio.data.realized_pnl_usd,
-        unrealized:
-          tokenPortfolio.data.total_pnl_usd -
-          tokenPortfolio.data.realized_pnl_usd,
+        value:
+          tokenPortfolio.data.summary?.pnl_usd ??
+          tokenPortfolio.data.realized_usd + tokenPortfolio.data.unrealized_usd,
+        realized: tokenPortfolio.data.realized_usd,
+        unrealized: tokenPortfolio.data.unrealized_usd,
       }
     : undefined;
 
-  const statsQuery =
-    activeView === "tradingPosition" ? tokenPortfolio : positions;
   const isStatsLoading =
-    statsQuery.isPending && statsQuery.fetchStatus !== "paused";
+    tokenPortfolio.isPending && tokenPortfolio.fetchStatus !== "paused";
 
   return (
     <DashboardSlot className="mx-auto xl:container">
@@ -76,16 +63,6 @@ const PortfolioPage = () => {
 
       <div className="space-y-3">
         <div className="flex gap-3">
-          {/* {PortfolioTab.options.map((view) => (
-            <Link
-              key={view}
-              href={`?view=${view}`}
-              className={cn(buttonVariants({ variant: "outline" }))}
-              data-active={activeView === view ? true : undefined}
-            >
-              {capitalize(view)}
-            </Link>
-          ))} */}
           <h2 className="font-bold text-h4 text-white">Trading Positions</h2>
         </div>
 
@@ -114,9 +91,7 @@ const PortfolioPage = () => {
             ))}
           </div>
           <PnlCalendarDialog
-            liquidityType={activeView}
             tokenPortfolioQuery={tokenPortfolio}
-            positionsQuery={positions}
             summary={pnlSummary}
           >
             <Button
@@ -130,30 +105,15 @@ const PortfolioPage = () => {
         </div>
       </div>
 
-      {activeView === "tradingPosition" && (
-        <QueryState
-          query={tokenPortfolio}
-          requireAuth
-          getIsEmpty={(q) =>
-            q.data.tokens.length === 0 && "No trading positions yet"
-          }
-        >
-          {(query) => <TradingPositionsTable positions={query.data.tokens} />}
-        </QueryState>
-      )}
-      {/* {activeView === "liquidityPosition" && (
-        <QueryState
-          query={positions}
-          requireAuth
-          getIsEmpty={(q) =>
-            q.data.lp_positions.length === 0 && "No liquidity positions yet"
-          }
-        >
-          {(query) => (
-            <LiquidityPositionsTable positions={query.data.lp_positions} />
-          )}
-        </QueryState>
-      )} */}
+      <QueryState
+        query={tokenPortfolio}
+        requireAuth
+        getIsEmpty={(q) =>
+          q.data.positions.length === 0 && "No trading positions yet"
+        }
+      >
+        {(query) => <TradingPositionsTable positions={query.data.positions} />}
+      </QueryState>
     </DashboardSlot>
   );
 };

@@ -3,7 +3,7 @@
 import type React from "react";
 import { useRef } from "react";
 import { siGoogle, siX } from "simple-icons";
-import type { TokenDetail } from "@rhivadotfun/dataapi";
+import type { TokenFull } from "@rhivadotfun/dataapi";
 import {
   AtSign,
   Check,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { cn, getInitials } from "@/lib/utils";
+import { getTokenBondingPct } from "../../market.schema";
 import { Button } from "@/components/ui/button";
 import { gsap, useGSAP } from "@/lib/gsap.util";
 import { useCopyToClipboard } from "@/hooks/use-clipboard";
@@ -72,7 +73,7 @@ const TokenAvatarBorderSvg = ({
 };
 
 interface TokenAvatarProps {
-  token: TokenDetail;
+  token: TokenFull;
   size?: "default" | "sm";
 }
 
@@ -101,7 +102,7 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
             variant="square"
             className={cn("group/image relative size-full shrink-0")}
           >
-            <AvatarImage src={token.logo_uri ?? ""} />
+            <AvatarImage src={token.image ?? ""} />
             <AvatarFallback>
               {token.name ? getInitials(token.name) : <User />}
             </AvatarFallback>
@@ -109,7 +110,7 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
 
           <TokenAvatarBorderSvg
             className="stroke-accent"
-            strokeLengthInPercent={token.bonding?.completion_pct ?? 0}
+            strokeLengthInPercent={getTokenBondingPct(token)}
           />
           <PumpFunIcon className="translate-1/2 absolute right-0 bottom-0 z-10 size-2 rounded-full border border-current bg-background p-px text-accent sm:size-3" />
 
@@ -148,7 +149,7 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
           variant="square"
           className={"size-59"}
         >
-          <AvatarImage src={token.logo_uri ?? ""} />
+          <AvatarImage src={token.image ?? ""} />
           <AvatarFallback>
             {token.name ? getInitials(token.name) : <User />}
           </AvatarFallback>
@@ -158,7 +159,7 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
   );
 }
 
-export function TokenNameAndSymbol({ token }: { token: TokenDetail }) {
+export function TokenNameAndSymbol({ token }: { token: TokenFull }) {
   const { copy } = useCopyToClipboard();
 
   return (
@@ -228,7 +229,7 @@ export function TokenNameAndSymbol({ token }: { token: TokenDetail }) {
   );
 }
 
-export function TokenSymbolCopy({ token }: { token: TokenDetail }) {
+export function TokenSymbolCopy({ token }: { token: TokenFull }) {
   const { copy, copyState } = useCopyToClipboard();
 
   return (
@@ -246,7 +247,7 @@ export function TokenSymbolCopy({ token }: { token: TokenDetail }) {
   );
 }
 
-export function TokenDescription({ token }: { token: TokenDetail }) {
+export function TokenDescription({ token }: { token: TokenFull }) {
   if (!token.description) return null;
 
   return (

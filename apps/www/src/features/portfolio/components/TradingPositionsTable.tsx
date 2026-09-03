@@ -15,19 +15,23 @@ import {
 } from "@/lib/finance.util";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { TokenPosition } from "@rhivadotfun/dataapi";
+import type { PositionItem } from "../portfolio.type";
 
-const columnHelper = createColumnHelper<TokenPosition>();
+const columnHelper = createColumnHelper<PositionItem>();
 
-const positionPnlUsd = (position: TokenPosition) =>
-  position.realized_pnl_usd + (position.unrealized_pnl_usd ?? 0);
+const positionPnlUsd = (position: PositionItem) =>
+  position.pnl_usd ?? position.realized_usd + (position.unrealized_usd ?? 0);
 
-const positionInvestedUsd = (position: TokenPosition) =>
-  position.bought * position.avg_buy_price_usd;
+const positionInvestedUsd = (position: PositionItem) =>
+  position.invested_usd ?? position.bought * position.avg_buy_usd;
 
-const positionPnlPct = (position: TokenPosition) => {
-  const invested = positionInvestedUsd(position);
-  return invested > 0 ? (positionPnlUsd(position) / invested) * 100 : null;
+const positionPnlPct = (position: PositionItem) => {
+  return (
+    position.pnl_pct ??
+    (position.invested_usd > 0
+      ? (positionPnlUsd(position) / position.invested_usd) * 100
+      : null)
+  );
 };
 
 const formatHoldingDuration = (seconds: number) => {
@@ -49,7 +53,7 @@ const columns = [
         data-token-id={row.original.mint}
       >
         <Avatar>
-          <AvatarImage />
+          <AvatarImage src={row.original.image} />
           <AvatarFallback>
             <SolanaIcon className="size-4" />
           </AvatarFallback>
@@ -74,24 +78,26 @@ const columns = [
       </p>
     ),
   }),
-  columnHelper.accessor((row) => row.sold * row.avg_buy_price_usd, {
+  columnHelper.accessor((row) => row.proceeds_usd, {
     header: "Sold",
     cell: ({ row }) => (
       <p className="font-medium text-sell">
         {formatCompactCurrency(
-          row.original.sold * row.original.avg_buy_price_usd,
+          row.original.proceeds_usd ??
+            row.original.sold * row.original.avg_sell_usd,
         )}
       </p>
     ),
   }),
-  columnHelper.accessor((row) => row.remaining, {
+  columnHelper.accessor((row) => row.remaining_ui, {
     header: "Remaining",
     cell: ({ row }) => (
       <p className="font-medium text-white">
         {formatCompactCurrency(
-          row.original.current_price_usd
-            ? row.original.remaining * row.original.current_price_usd
-            : null,
+          row.original.value_usd ??
+            (row.original.current_price_usd
+              ? row.original.remaining_ui * row.original.current_price_usd
+              : null),
         )}
       </p>
     ),
@@ -113,7 +119,7 @@ const columns = [
     header: "Holding Duration",
     cell: ({ row }) => (
       <p className="text-b-3 text-gray">
-        {formatHoldingDuration(row.original.holding_duration_secs)}
+        {formatHoldingDuration(row.original.holding_duration_secs ?? 0)}
       </p>
     ),
   }),
@@ -134,9 +140,9 @@ const columns = [
         >
           <ArrowUpDown className="text-gray" />
         </Button>
-        <PnlExportDialog token={row.original}>
+        <PnlExportDialog position={row.original}>
           <Button
-            tooltip="Share"
+            tooltip="Share PnL"
             variant="ghost"
             size="icon-sm"
             onClick={(e) => {
@@ -152,46 +158,39 @@ const columns = [
   }),
 ];
 
-const filters = ["activePositions", "history"];
+type TradingPositionsTableProps = {
+  positions: PositionItem[];
+};
 
 export const TradingPositionsTable = ({
   positions,
-}: {
-  positions: TokenPosition[];
-}) => {
-  const router = useRouter();
-  const table = useDataTable({ data: positions, columns });
-  const [activeFilter, setActiveFilter] = useState("activePositions");
+}: TradingPositionsTableProps) => {
+  const _router = useRouter();
+  const [direction, setDirection] = useState<"all" | "in" | "out">("all");
+
+  const table = useDataTable({
+    data: positions,
+    columns,
+  });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-1">
-        {filters.map((filter) => (
+    <div className="space-y-3">
+      <div className="flex items-center gap-1.5">
+        {(["all", "in", "out"] as const).map((d) => (
           <Button
-            key={filter}
-            onClick={() => setActiveFilter(filter)}
-            variant={"ghost"}
+            key={d}
+            variant="outline"
             size="sm"
-            data-active={activeFilter === filter ? true : undefined}
+            className="rounded-full"
+            data-active={direction === d ? true : undefined}
+            onClick={() => setDirection(d)}
           >
-            {capitalize(filter)}
+            {capitalize(d)}
           </Button>
         ))}
       </div>
-      <nav
-        onClick={(e) => {
-          if (!(e.target instanceof HTMLElement)) return;
-          const tableRow = e.target.closest("tr");
-          const tokenId =
-            tableRow?.querySelector<HTMLElement>("[data-token-id]")?.dataset
-              .tokenId;
 
-          if (tokenId) router.push(`/token/${tokenId}`);
-        }}
-        onKeyDown={() => null}
-      >
-        <DataTable table={table} />
-      </nav>
+      <DataTable table={table} />
     </div>
   );
 };

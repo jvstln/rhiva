@@ -1,29 +1,28 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import type { TokenDetail, Candle } from "@rhivadotfun/dataapi";
+import type { TokenFull, TokenOHlvc } from "@rhivadotfun/dataapi";
 
 import { getTokenCandles } from "@/features/market/market.api";
 import type { Bar, ResolutionString } from "@/public/tradeview";
-import type { Timeframe } from "@/features/market/market.schema";
 import type { SearchResultItem } from "@/features/tradeview/tradeview.type";
 import type { CreateDataFeedArgs } from "@/features/tradeview/datafeed-trpc";
 import { TradeViewChart } from "@/features/tradeview/components/TradeViewChart";
 
 const candleToBar = ({
-  t_ms,
+  time,
   open,
   high,
   low,
   close,
-  volume_usd,
-}: Candle): Bar => ({
-  time: t_ms, // already in milliseconds — TradingView expects ms
+  volume,
+}: TokenOHlvc): Bar => ({
+  time: time > 1e12 ? time : time * 1000,
   open,
   high,
   low,
   close,
-  volume: volume_usd,
+  volume,
 });
 
 const SUPPORTED_RESOLUTIONS: ResolutionString[] = [
@@ -37,7 +36,7 @@ const SUPPORTED_RESOLUTIONS: ResolutionString[] = [
   "1D",
 ] as ResolutionString[];
 
-type TokenChartProps = { token: TokenDetail };
+type TokenChartProps = { token: TokenFull };
 
 export const TokenChart = ({ token }: TokenChartProps) => {
   // Keyed by mint so resolveSymbol cache-hits immediately without a search round-trip
@@ -49,37 +48,22 @@ export const TokenChart = ({ token }: TokenChartProps) => {
           address: token.mint,
           name: token.name ?? token.mint,
           symbol: token.symbol ?? "???",
-          image_url: token.logo_uri ?? "",
-          // decimals is currently not available from the token API — defaulted to 9 (SOL standard)
+          image_url: token.image ?? "",
           decimals: token.decimals ?? 9,
         },
-        // No dex/pool context at the token level; treated as a bare token (no quote_token)
       },
     }),
-    [token.mint, token.name, token.symbol, token.logo_uri, token.decimals],
+    [token.mint, token.name, token.symbol, token.image, token.decimals],
   );
 
   // getBars fetches candles directly (not via hook) because it's called inside
   // the TradingView datafeed — hooks cannot be used here
   const getBars = useCallback<CreateDataFeedArgs["getBars"]>(
-    async ({ address, timeframe, filter }) => {
-      // Map ChartTimeframe back to a market Timeframe for the candles API.
-      // The datafeed translates TradingView resolutions → ChartTimeframe internally;
-      // we re-derive from the filter limit/timestamps to pick the right bucket.
-      // Simpler: use the resolution the widget passes via the datafeed pipeline,
-      // which is already in `timeframe` ("minute" | "hour" | "day").
-      const tfMap: Record<string, Timeframe> = {
-        minute: "1m",
-        hour: "1h",
-        day: "24h",
-        second: "1m",
-      };
-      const apiTimeframe = tfMap[timeframe] ?? "5m";
-
+    async ({ address, filter }) => {
       const candles = await getTokenCandles({
         mint: address,
-        timeframe: apiTimeframe,
-        limit: filter.limit,
+        count: filter.limit,
+        to: filter.before_timestamp,
       });
 
       return candles
