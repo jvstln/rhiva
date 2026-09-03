@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSettingsStore } from "../settings.store";
-import type { PriorityLevel } from "../settings.type";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -21,19 +20,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ZapInTab } from "./ZapInTab";
 
 type SettingsTabId =
-  | "transaction"
-  | "lp"
-  | "zap-in"
-  | "trading-settings"
-  | "others";
+  // | "transaction"
+  // | "lp"
+  // | "zap-in"
+  "trading-settings" | "others";
 
 const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
-  { id: "transaction", label: "Transaction" },
-  { id: "lp", label: "LP" },
-  { id: "zap-in", label: "Zap In" },
+  // { id: "transaction", label: "Transaction" },
+  // { id: "lp", label: "LP" },
+  // { id: "zap-in", label: "Zap In" },
   { id: "trading-settings", label: "Trading Settings" },
   { id: "others", label: "Others" },
 ];
@@ -183,181 +180,6 @@ function TextInputRow({
     />
   );
 }
-
-function SectionDivider() {
-  return <div className="border-border border-t" />;
-}
-
-/* ------------------------------------------------------------------ */
-/* Tab: Transaction                                                      */
-/* ------------------------------------------------------------------ */
-
-function TransactionTab() {
-  const transaction = useSettingsStore((state) => state.transaction);
-  const { broadcastMode, rebalancingType } = transaction;
-  const priorityLevel =
-    "priorityLevel" in transaction ? transaction.priorityLevel : undefined;
-  const setTransactionSettings = useSettingsStore(
-    (state) => state.setTransactionSettings,
-  );
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <p className="mb-3 text-muted-foreground text-sm">
-          Transaction Broadcasting
-        </p>
-        <SegmentedControl
-          value={broadcastMode}
-          onChange={(val) => setTransactionSettings({ broadcastMode: val })}
-          options={[
-            { value: "priority-fee", label: "Priority Fee" },
-            { value: "jito-only", label: "Jito Only" },
-            { value: "mixed", label: "Mixed" },
-          ]}
-        />
-        <p className="mt-3 text-muted-foreground text-sm">
-          Rhiva submits your transaction through Jito Bundle only
-        </p>
-      </div>
-
-      <SectionDivider />
-
-      <div>
-        <p className="mb-3 text-muted-foreground text-sm">Priority Level</p>
-        <SegmentedControl
-          value={priorityLevel ?? "ultra"}
-          onChange={(val) =>
-            setTransactionSettings({ priorityLevel: val as PriorityLevel })
-          }
-          options={[
-            { value: "fast", label: "Fast" },
-            { value: "turbo", label: "Turbo" },
-            { value: "ultra", label: "Ultra" },
-          ]}
-        />
-      </div>
-
-      <SectionDivider />
-
-      <div className="flex items-center justify-between rounded-lg bg-surface-2 px-4 py-3.5">
-        <span className="text-foreground">Rebalancing type</span>
-        <div className="flex items-center gap-4">
-          {(
-            [
-              { value: "swap", label: "Swap" },
-              { value: "swapless", label: "Swapless" },
-            ] as const
-          ).map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() =>
-                setTransactionSettings({ rebalancingType: option.value })
-              }
-              className="flex items-center gap-2 text-sm"
-            >
-              <span
-                className={cn(
-                  "flex size-4 items-center justify-center rounded-full border-2",
-                  rebalancingType === option.value
-                    ? "border-primary"
-                    : "border-muted-foreground/40",
-                )}
-              >
-                {rebalancingType === option.value && (
-                  <span className="size-2 rounded-full bg-primary" />
-                )}
-              </span>
-              <span
-                className={
-                  rebalancingType === option.value
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                }
-              >
-                {option.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Tab: Lp                                                            */
-/* ------------------------------------------------------------------ */
-
-function SlippagePresetField({
-  label,
-  value,
-  onValueChange,
-}: {
-  label: string;
-  value?: number;
-  onValueChange: (value: number) => void;
-}) {
-  const options: SegmentedOption<number>[] = useMemo(
-    () => [
-      { value: 0.1, label: "0.1%" },
-      { value: 0.5, label: "0.5%" },
-      { value: 1, label: "1%" },
-      { value: "custom" as const, label: "Custom" },
-    ],
-    [],
-  );
-
-  const preset = useMemo(() => {
-    const option = options.find((option) => option.value === value);
-    return option ? option.value : "custom";
-  }, [value, options]);
-
-  return (
-    <div>
-      <p className="mb-3 font-semibold text-foreground text-sm">{label}</p>
-      <SegmentedControl
-        tone="neutral"
-        value={preset}
-        onChange={onValueChange}
-        options={options}
-      />
-      <ValueInputRow
-        className="mt-3"
-        placeholder="Value"
-        value={value}
-        onChange={(value) => {
-          onValueChange(parseFloat(value));
-        }}
-      />
-    </div>
-  );
-}
-
-function LpTab() {
-  const lp = useSettingsStore((state) => state.lp);
-  const setLpSettings = useSettingsStore((state) => state.setLpSettings);
-
-  return (
-    <div className="space-y-6">
-      <SlippagePresetField
-        label="Liquidity Spillage"
-        value={lp.liquiditySlippage}
-        onValueChange={(value) => setLpSettings({ liquiditySlippage: value })}
-      />
-      <SlippagePresetField
-        label="Swap Slippage"
-        value={lp.swapSlippage}
-        onValueChange={(value) => setLpSettings({ swapSlippage: value })}
-      />
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Tab: Zap In                                                          */
-/* ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------ */
 /* Tab: Trading Settings                                                */
@@ -539,7 +361,7 @@ type SettingsDialogProps = React.ComponentProps<typeof Dialog> & {
 export function SettingsDialog({
   open,
   onOpenChange,
-  defaultTab = "transaction",
+  defaultTab = "trading-settings",
   children,
 }: SettingsDialogProps) {
   const [activeTab, setActiveTab] = useState<SettingsTabId>(defaultTab);
@@ -572,9 +394,9 @@ export function SettingsDialog({
             className={"-mx-(--padding-x) h-full min-h-0 px-(--padding-x)"}
           >
             <div>
-              {activeTab === "transaction" && <TransactionTab />}
+              {/* {activeTab === "transaction" && <TransactionTab />}
               {activeTab === "lp" && <LpTab />}
-              {activeTab === "zap-in" && <ZapInTab />}
+              {activeTab === "zap-in" && <ZapInTab />} */}
               {activeTab === "trading-settings" && <TradingSettingsTab />}
               {activeTab === "others" && <OthersTab />}
             </div>
