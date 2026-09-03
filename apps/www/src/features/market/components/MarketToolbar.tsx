@@ -8,7 +8,6 @@ import { capitalize, cn } from "@/lib/utils";
 import { MarketView } from "../market.schema";
 import { RadarToolbar } from "./RadarToolbar";
 import { SurgeToolbar } from "./SurgeToolbar";
-import { PumpLiveToolbar } from "./PumpLiveToolbar";
 import { TrendingToolbar } from "./TrendingToolbar";
 import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -69,7 +68,7 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
         />
       </ScrollArea>
 
-      <ScrollArea className={"min-w-0"}>
+      <ScrollArea className={"w-fit min-w-0"}>
         {view === "trending" && <TrendingToolbar />}
         {view === "radar" && <RadarToolbar />}
         {view === "surge" && <SurgeToolbar />}

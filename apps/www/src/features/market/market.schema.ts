@@ -5,11 +5,11 @@ import { NumberFilter } from "@/schemas";
 export const MarketView = z
   .enum([
     "watchlist",
+    "latest",
     "trending",
     "radar",
     "surge",
     "top-gainers",
-    "latest",
     "stock",
     "stablecoin",
     // "pumpLive"
