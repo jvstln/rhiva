@@ -45,4 +45,5 @@ jobs:
               "NEXT_PUBLIC_POSTHOG_KEY": "${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}",
               "NEXT_PUBLIC_POSTHOG_HOST": "${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}",
               "NEXT_POSTHOG_PERSONAL_API_KEY": "${{ secrets.NEXT_POSTHOG_PERSONAL_API_KEY }}"
+              "NEXT_PUBLIC_DATA_API_KEY": "${{ secrets.NEXT_PUBLIC_DATA_API_KEY }}"
             }
