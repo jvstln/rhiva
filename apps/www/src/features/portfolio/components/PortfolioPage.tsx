@@ -1,21 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { Suspense } from "react";
 import { Calendar } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-import { capitalize, cn } from "@/lib/utils";
 import { PortfolioTab } from "../portfolio.schema";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Spinner } from "@/components/ui/spinner";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { formatCompactCurrency, formatSignedUsd } from "@/lib/finance.util";
 import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { PortfolioErrorBanner } from "./PortfolioErrorBanner";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
-import { LiquidityPositionsTable } from "@/features/portfolio/components/LiquidityPositionsTable";
 import { useLiquidityPositions, useTokenPortfolio } from "../portfolio.hook";
 import { useAuth } from "@/hooks";
 import { QueryState } from "@/components/layout/QueryState";
@@ -79,7 +76,7 @@ const PortfolioPage = () => {
 
       <div className="space-y-3">
         <div className="flex gap-3">
-          {PortfolioTab.options.map((view) => (
+          {/* {PortfolioTab.options.map((view) => (
             <Link
               key={view}
               href={`?view=${view}`}
@@ -88,7 +85,8 @@ const PortfolioPage = () => {
             >
               {capitalize(view)}
             </Link>
-          ))}
+          ))} */}
+          <h2 className="font-bold text-h4 text-white">Trading Positions</h2>
         </div>
 
         <PortfolioErrorBanner
