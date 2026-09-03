@@ -38,7 +38,8 @@ const HEADERS = [
 // Shared grid template — applied to the header AND every row so columns stay
 // perfectly aligned without a real <table>
 const GRID_STYLE: React.CSSProperties = {
-  gridTemplateColumns: "56px minmax(140px, 1.5fr) 100px 95px 105px 95px",
+  // gridTemplateColumns: "56px minmax(140px, 1.5fr) 100px 95px 105px 95px",
+  gridTemplateColumns: "56px repeat(5, 1fr)",
 };
 
 const HEADER_STYLE = {
@@ -78,7 +79,7 @@ function LeaderboardRow({ entry, ...props }: { entry: LeaderboardEntry }) {
       {...props}
     >
       <div className="whitespace-nowrap px-3 py-2.5">
-        <span className="font-semibold tabular-nums">{entry.rank}</span>
+        <span className="font-semibold tabular-nums">#{entry.rank}</span>
       </div>
       <div className="whitespace-nowrap px-3 py-2.5 font-mono text-xs">
         <span className="flex items-center gap-2">
@@ -163,7 +164,7 @@ export const LeaderboardDialog = ({
       handle={leaderboardDialogHandle}
     >
       {children && <DialogTrigger render={children} />}
-      <DialogContent className="flex h-[85vh] max-h-[600px] flex-col overflow-hidden sm:h-[580px] sm:max-w-2xl">
+      <DialogContent className="flex h-[85vh] min-h-[600px] flex-col overflow-hidden sm:w-[80vw] sm:min-w-2xl sm:max-w-auto">
         <DialogHeader>
           <DialogTitle>Leaderboard</DialogTitle>
           <DialogDescription>
@@ -189,7 +190,7 @@ export const LeaderboardDialog = ({
               <div className="min-w-[580px]">
                 <div
                   style={HEADER_STYLE}
-                  className="sticky top-0 z-20 grid h-(--header-height) items-center border-border/40 border-b bg-popover font-semibold text-muted-foreground text-xs uppercase tracking-wider"
+                  className="sticky top-0 z-20 grid h-(--header-height) items-center border-border/40 border-b bg-popover font-semibold text-muted-foreground text-xs capitalize tracking-wider"
                 >
                   {HEADERS.map((header) => (
                     <div
