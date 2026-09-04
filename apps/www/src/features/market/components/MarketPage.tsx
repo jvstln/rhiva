@@ -1,51 +1,71 @@
 "use client";
+
+import type { TokenQuery, RadarQueries } from "../market.hook";
 import { RadarView } from "./RadarView";
 import { SurgeTable } from "./SurgeView";
-import type { SearchParams } from "@/types";
 import { MarketToolbar } from "./MarketToolbar";
 import { MarketStatusBar } from "./MarketStatusBar";
-import { MarketView } from "@/features/market/market.schema";
 import { TrendingView, WatchlistView } from "./TrendingView";
+import type { MarketView } from "@/features/market/market.schema";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
-import { useMarketWebsocket } from "../market.ws";
 
-type MarketPageProps = { searchParams: SearchParams };
+/**
+ * Presentational market views. The route pages (`market/page.tsx`,
+ * `radar/page.tsx`) fetch all data and pass it in as `queries` — these
+ * components never call data hooks themselves.
+ */
 
-export function MarketPage({ searchParams }: MarketPageProps) {
-  /**
-   * Mounts the market WebSocket feeds for every market view (trending, surge,
-   * radar, ...) */
-  useMarketWebsocket();
-  const view = MarketView.parse(searchParams.view);
+/** One query result per market view, supplied by `market/page.tsx`. */
+export type MarketQueries = {
+  trending: TokenQuery;
+  watchlist: TokenQuery;
+  radar: RadarQueries;
+  surge: TokenQuery;
+};
 
+const TRENDING_VIEWS: readonly MarketView[] = [
+  "latest",
+  "trending",
+  "top-gainers",
+  "stock",
+  "stablecoin",
+];
+
+type MarketPageProps = {
+  view: MarketView;
+  queries: MarketQueries;
+};
+
+export function MarketPage({ view, queries }: MarketPageProps) {
   return (
     <DashboardSlot className="px-0 pt-0!">
       <MarketStatusBar />
       <MarketToolbar exclude={["radar"]} />
-      {view === "watchlist" && <WatchlistView />}
-      {view === "trending" && <TrendingView />}
-      {view === "radar" && <RadarView />}
-      {view === "surge" && <SurgeTable />}
-
-      {view === "top-gainers" && <TrendingView />}
-      {view === "latest" && <TrendingView />}
-      {view === "stock" && <TrendingView />}
-      {view === "stablecoin" && <TrendingView />}
-      {/* {view === "pumpLive" && <PumpLiveGrid />} */}
+      {TRENDING_VIEWS.includes(view) && (
+        <TrendingView query={queries.trending} />
+      )}
+      {view === "watchlist" && <WatchlistView query={queries.watchlist} />}
+      {view === "radar" && <RadarView queries={queries.radar} />}
+      {view === "surge" && <SurgeTable query={queries.surge} />}
     </DashboardSlot>
   );
 }
 
-export function RadarPage({ searchParams }: MarketPageProps) {
-  useMarketWebsocket();
+type RadarPageProps = {
+  view: MarketView;
+  queries: Pick<MarketQueries, "radar" | "watchlist">;
+};
 
-  const view = MarketView.parse(searchParams.view);
-
+export function RadarPage({ view, queries }: RadarPageProps) {
   return (
     <DashboardSlot className="px-0 pt-0!">
       <MarketStatusBar />
       <MarketToolbar include={["watchlist", "radar"]} />
-      {view === "watchlist" ? <WatchlistView /> : <RadarView />}
+      {view === "watchlist" ? (
+        <WatchlistView query={queries.watchlist} />
+      ) : (
+        <RadarView queries={queries.radar} />
+      )}
     </DashboardSlot>
   );
 }

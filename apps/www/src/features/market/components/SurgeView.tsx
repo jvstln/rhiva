@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { TokenFull } from "@rhivadotfun/dataapi";
 
-import { useSurgeTokens } from "../market.hook";
+import type { TokenQuery } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import { Separator } from "@/components/ui/separator";
 import { QueryState } from "@/components/layout/QueryState";
@@ -243,10 +243,7 @@ function TokenRow({ token }: TokenRowProps) {
   );
 }
 
-export function SurgeTable() {
-  const filters = useMarketStore((state) => state.surgeFilters);
-  const query = useSurgeTokens(filters);
-
+export function SurgeTable({ query }: { query: TokenQuery }) {
   return (
     <div className="w-full">
       <QueryState

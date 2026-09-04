@@ -9,6 +9,7 @@ import {
   Star,
   Zap,
 } from "lucide-react";
+import type { UseQueryResult } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { cn, formatCompactNumber } from "@/lib/utils";
@@ -31,7 +32,10 @@ import {
   TierRoadmap,
 } from "@/features/reward/components/TierRoadmap";
 import { REWARD_TIERS } from "@/features/reward/reward.schema";
-import { useRewardProfile } from "@/features/reward/reward.hook";
+import type {
+  LeaderboardEntry,
+  RewardProfile,
+} from "@/features/reward/reward.hook";
 import { QueryState } from "@/components/layout/QueryState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
@@ -40,9 +44,11 @@ import { useEffect, useState } from "react";
 /* Current tier card                                                    */
 /* ------------------------------------------------------------------ */
 
-function CurrentTierCard() {
-  const rewardProfile = useRewardProfile();
-
+function CurrentTierCard({
+  rewardProfile,
+}: {
+  rewardProfile: UseQueryResult<RewardProfile>;
+}) {
   return (
     <div
       className="relative overflow-hidden rounded-lg bg-surface-1 p-6"
@@ -175,8 +181,11 @@ function StatCard({
 
 /* ------------------------------------------------------------------ */
 
-function ReferralCard() {
-  const rewardProfile = useRewardProfile();
+function ReferralCard({
+  rewardProfile,
+}: {
+  rewardProfile: UseQueryResult<RewardProfile>;
+}) {
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
 
@@ -348,9 +357,14 @@ function QuestRing({
 
 /* ------------------------------------------------------------------ */
 
-export function RewardsPage() {
-  const rewardProfile = useRewardProfile();
+type RewardsPageProps = {
+  /** Rewards-profile query owned by `rewards/page.tsx`. */
+  rewardProfile: UseQueryResult<RewardProfile>;
+  /** Global leaderboard query owned by `rewards/page.tsx`. */
+  leaderboard: UseQueryResult<LeaderboardEntry[]>;
+};
 
+export function RewardsPage({ rewardProfile, leaderboard }: RewardsPageProps) {
   return (
     <>
       <ClaimRewardsBanner />
@@ -362,11 +376,11 @@ export function RewardsPage() {
               Track your XP, level up, and climb the global ranks
             </DashboardDescription>
           </div>
-          <LeaderboardDialog />
+          <LeaderboardDialog leaderboard={leaderboard} />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-6">
-            <CurrentTierCard />
+            <CurrentTierCard rewardProfile={rewardProfile} />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <StatCard
@@ -392,10 +406,10 @@ export function RewardsPage() {
               />
             </div>
 
-            <TierRoadmap />
+            <TierRoadmap rewardProfile={rewardProfile} />
           </div>
           <div className="flex flex-col gap-6">
-            <ReferralCard />
+            <ReferralCard rewardProfile={rewardProfile} />
 
             {/* Quests */}
             <div className="flex grow flex-col space-y-8 rounded-lg border border-border p-6">

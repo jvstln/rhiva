@@ -1,5 +1,6 @@
 import { cn } from "@/lib";
 import type * as React from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +14,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Sparkles, Trophy } from "lucide-react";
 import Image from "next/image";
 import { REWARD_TIERS, type RewardTier } from "@/features/reward/reward.schema";
-import { useRewardProfile } from "@/features/reward/reward.hook";
+import type { RewardProfile } from "@/features/reward/reward.hook";
 import { QueryState } from "@/components/layout/QueryState";
 
 export function TierBadge({
@@ -85,9 +86,12 @@ function RoadmapStep({
   );
 }
 
-export function TierRoadmap() {
+export function TierRoadmap({
+  rewardProfile,
+}: {
+  rewardProfile: UseQueryResult<RewardProfile>;
+}) {
   const visibleTiers = REWARD_TIERS.slice(0, 5);
-  const rewardProfile = useRewardProfile();
 
   return (
     <div className="space-y-7 rounded-lg border border-border p-6">
@@ -98,7 +102,7 @@ export function TierRoadmap() {
             Progress through the ranks and unlock exclusive badges
           </p>
         </div>
-        <TierRoadmapDialog>
+        <TierRoadmapDialog rewardProfile={rewardProfile}>
           <Button
             size="sm"
             variant="outline"
@@ -153,10 +157,12 @@ export function TierRoadmap() {
 
 function TierRoadmapDialog({
   children,
+  rewardProfile,
   ...props
-}: Dialog.Props & { children?: React.ReactElement }) {
-  const rewardProfile = useRewardProfile();
-
+}: Dialog.Props & {
+  children?: React.ReactElement;
+  rewardProfile: UseQueryResult<RewardProfile>;
+}) {
   return (
     <Dialog {...props}>
       {children && <DialogTrigger render={children} />}

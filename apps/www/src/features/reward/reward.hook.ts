@@ -1,5 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+import type UserApi from "@rhivadotfun/userapi";
+
 import { useUserApi } from "@/hooks";
+
+/**
+ * The user's rewards profile — the return type of the `user.getMe()` API call.
+ * `rewards/page.tsx` fetches it via `useRewardProfile()` and passes the query
+ * down to `<RewardsPage>`.
+ */
+export type RewardProfile = Awaited<ReturnType<UserApi["user"]["getMe"]>>;
 
 export function useRewardProfile() {
   const userApi = useUserApi();

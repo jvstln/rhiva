@@ -1,3 +1,12 @@
+/**
+ * Market data layer — the ONE place to change where market data comes from.
+ *
+ * Every function returns fully-enriched `TokenFull[]` objects (the shared token
+ * type from `@rhivadotfun/dataapi`). They are called by the hooks in
+ * `market.hook.ts`, which feed the props of `MarketPage`/`RadarPage`.
+ * To integrate a real backend, swap the `dataapi.*` calls here — the UI code
+ * (and the hooks) stay untouched.
+ */
 import type { TokenFull, Window } from "@rhivadotfun/dataapi";
 
 import { dataapi } from "@/lib/dataapi";

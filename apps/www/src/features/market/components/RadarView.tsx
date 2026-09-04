@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { capitalize, cn } from "@/lib/utils";
-import { useRadarTokens } from "../market.hook";
+import type { RadarQueries } from "../market.hook";
 import { RadarColumns } from "../market.schema";
-import { useMarketStore } from "../market.store";
 import { RadarTokenCard } from "./RadarTokenCard";
 import { RadarColumnToolbar } from "./RadarColumnToolbar";
 import { QueryState } from "@/components/layout/QueryState";
@@ -17,22 +16,11 @@ const COLUMN_LABELS: Record<RadarColumns, string> = {
   graduated: "Graduated",
 };
 
-export const RadarView = () => {
-  const radarFilters = useMarketStore((state) => state.radarFilters);
+export const RadarView = ({ queries }: { queries: RadarQueries }) => {
   const [activeColumn, setActiveColumn] = useState<RadarColumns>("fresh");
-
-  const freshQuery = useRadarTokens({
-    ...radarFilters.fresh,
-    type: "fresh",
-  });
-  const heatingQuery = useRadarTokens({
-    ...radarFilters.heatingUp,
-    type: "heatingUp",
-  });
-  const graduatedQuery = useRadarTokens({
-    ...radarFilters.graduated,
-    type: "graduated",
-  });
+  const freshQuery = queries.fresh;
+  const heatingQuery = queries.heatingUp;
+  const graduatedQuery = queries.graduated;
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col rounded-xl border">

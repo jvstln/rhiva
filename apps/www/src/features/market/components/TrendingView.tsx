@@ -15,7 +15,7 @@ import { InfoBadge } from "@/components/ui/info-badge";
 import { DexPaid, TotalFees } from "./tooltips/DexInfo";
 import { QueryState } from "@/components/layout/QueryState";
 import { CashbackNotice, DevHoldOrDevSell } from "./tooltips/DevInfo";
-import { useTrendingTokens, useWatchlistTokens } from "../market.hook";
+import type { TokenQuery } from "../market.hook";
 import { getTokenWindowStats } from "../market.schema";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import {
@@ -358,22 +358,17 @@ export function TrendingTable({ tokens }: { tokens: TokenFull[] }) {
   );
 }
 
-export function TrendingView() {
-  const trendingFilters = useMarketStore((state) => state.trendingFilters);
-  const trendingTokens = useTrendingTokens(trendingFilters);
-
+export function TrendingView({ query }: { query: TokenQuery }) {
   return (
-    <QueryState query={trendingTokens}>
-      <TrendingTable tokens={trendingTokens.data ?? []} />
+    <QueryState query={query}>
+      <TrendingTable tokens={query.data ?? []} />
     </QueryState>
   );
 }
 
-export function WatchlistView() {
-  const watchlistTokens = useWatchlistTokens();
-
+export function WatchlistView({ query }: { query: TokenQuery }) {
   return (
-    <QueryState query={watchlistTokens}>
+    <QueryState query={query}>
       {(query) => <TrendingTable tokens={query.data ?? []} />}
     </QueryState>
   );

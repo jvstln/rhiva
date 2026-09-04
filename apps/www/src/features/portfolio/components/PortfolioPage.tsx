@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { Calendar } from "lucide-react";
+import type { UseQueryResult } from "@tanstack/react-query";
 
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,55 +12,51 @@ import { PortfolioHero } from "@/features/portfolio/components/PortfolioHero";
 import { PnlCalendarDialog } from "@/features/portfolio/components/PnlCalendarDialog";
 import { PortfolioErrorBanner } from "./PortfolioErrorBanner";
 import { TradingPositionsTable } from "@/features/portfolio/components/TradingPositionsTable";
-import { useTokenPortfolio } from "../portfolio.hook";
-import { useAuth } from "@/hooks";
 import { QueryState } from "@/components/layout/QueryState";
+import type { PortfolioPnl } from "../portfolio.type";
 
-const PortfolioPage = () => {
-  const auth = useAuth();
-  const walletAddress = auth.authenticated ? auth.activeWallet.address : "";
-  const tokenPortfolio = useTokenPortfolio(walletAddress);
+type PortfolioPageProps = {
+  /** Token-portfolio query owned by `portfolio/page.tsx`; this component renders it only. */
+  query: UseQueryResult<PortfolioPnl, Error>;
+};
 
+const PortfolioPage = ({ query }: PortfolioPageProps) => {
   const summaryStats = [
     {
       label: "TOTAL VALUE",
       value: formatCompactCurrency(
-        tokenPortfolio.data?.summary?.total_value_usd ??
-          tokenPortfolio.data?.total_usd,
+        query.data?.summary?.total_value_usd ?? query.data?.total_usd,
       ),
     },
     {
       label: "UNREALIZED PNL",
       value: formatSignedUsd(
-        tokenPortfolio.data?.summary?.unrealized_pnl_usd ??
-          tokenPortfolio.data?.unrealized_usd,
+        query.data?.summary?.unrealized_pnl_usd ?? query.data?.unrealized_usd,
       ),
     },
     {
       label: "TRADEABLE BALANCE",
       value: formatCompactCurrency(
-        tokenPortfolio.data?.summary?.tradeable_value_usd ??
-          tokenPortfolio.data?.invested_usd,
+        query.data?.summary?.tradeable_value_usd ?? query.data?.invested_usd,
       ),
     },
   ];
 
-  const pnlSummary = tokenPortfolio.data
+  const pnlSummary = query.data
     ? {
         value:
-          tokenPortfolio.data.summary?.pnl_usd ??
-          tokenPortfolio.data.realized_usd + tokenPortfolio.data.unrealized_usd,
-        realized: tokenPortfolio.data.realized_usd,
-        unrealized: tokenPortfolio.data.unrealized_usd,
+          query.data.summary?.pnl_usd ??
+          query.data.realized_usd + query.data.unrealized_usd,
+        realized: query.data.realized_usd,
+        unrealized: query.data.unrealized_usd,
       }
     : undefined;
 
-  const isStatsLoading =
-    tokenPortfolio.isPending && tokenPortfolio.fetchStatus !== "paused";
+  const isStatsLoading = query.isPending && query.fetchStatus !== "paused";
 
   return (
     <DashboardSlot className="mx-auto xl:container">
-      <PortfolioHero query={tokenPortfolio} />
+      <PortfolioHero query={query} />
 
       <div className="space-y-3">
         <div className="flex gap-3">
@@ -67,7 +64,7 @@ const PortfolioPage = () => {
         </div>
 
         <PortfolioErrorBanner
-          query={tokenPortfolio}
+          query={query}
           message="Failed to load your positions."
         />
 
@@ -91,7 +88,7 @@ const PortfolioPage = () => {
             ))}
           </div>
           <PnlCalendarDialog
-            tokenPortfolioQuery={tokenPortfolio}
+            tokenPortfolioQuery={query}
             summary={pnlSummary}
           >
             <Button
@@ -106,7 +103,7 @@ const PortfolioPage = () => {
       </div>
 
       <QueryState
-        query={tokenPortfolio}
+        query={query}
         requireAuth
         getIsEmpty={(q) =>
           q.data.positions.length === 0 && "No trading positions yet"
@@ -118,10 +115,10 @@ const PortfolioPage = () => {
   );
 };
 
-const PortfolioPageWithSuspense = () => {
+const PortfolioPageWithSuspense = ({ query }: PortfolioPageProps) => {
   return (
     <Suspense>
-      <PortfolioPage />
+      <PortfolioPage query={query} />
     </Suspense>
   );
 };

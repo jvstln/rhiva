@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { Trophy } from "lucide-react";
 import {
   cn,
@@ -20,7 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useLeaderboard, type LeaderboardEntry } from "../reward.hook";
+import type { LeaderboardEntry } from "../reward.hook";
 import { Observer, useGSAP } from "@/lib/gsap.util";
 import { useRef, useState } from "react";
 
@@ -108,7 +109,10 @@ function LeaderboardRow({ entry, ...props }: { entry: LeaderboardEntry }) {
   );
 }
 
-type LeaderboardDialogProps = Dialog.Props & { children?: React.ReactElement };
+type LeaderboardDialogProps = Dialog.Props & {
+  children?: React.ReactElement;
+  leaderboard: UseQueryResult<LeaderboardEntry[]>;
+};
 
 export const LeaderboardDialog = ({
   children = (
@@ -117,9 +121,10 @@ export const LeaderboardDialog = ({
       Leaderboard
     </Button>
   ),
+  leaderboard,
   ...props
 }: LeaderboardDialogProps) => {
-  const { data, isLoading } = useLeaderboard();
+  const { data, isLoading } = leaderboard;
   const entries = data ?? [];
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
