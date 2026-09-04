@@ -1,11 +1,4 @@
-import {
-  ArrowDownUp,
-  Ban,
-  Filter,
-  PercentIcon,
-  Settings,
-  XIcon,
-} from "lucide-react";
+import { ArrowDownUp, Ban, Filter, PercentIcon, XIcon } from "lucide-react";
 
 import { useMarketStore } from "../market.store";
 import type { Timeframe } from "../market.schema";
@@ -16,7 +9,6 @@ import { TrendingFilterDialog } from "./TrendingFilterDialog";
 import { PresetToggle, QuickBuyInput } from "./ToolbarItems";
 import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import {
   InputGroup,
   InputGroupAddon,
@@ -77,15 +69,6 @@ export const TrendingToolbar = () => {
           </Button>
         </TrendingFilterDialog>
 
-        <SettingsDialog defaultTab="trading-settings">
-          <Button
-            variant="ghost"
-            size="sm"
-          >
-            <Settings className="text-purple-500" />
-            Settings
-          </Button>
-        </SettingsDialog>
         <TrendingQuickSellInput />
       </div>
 

@@ -1,11 +1,10 @@
-import { ArrowDownUp, Ban, Filter, LayoutList, Settings } from "lucide-react";
+import { ArrowDownUp, Ban, Filter, LayoutList } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { BlacklistDialog } from "./BlacklistDialog";
 import { RadarFilterDialog } from "./RadarFilterDialog";
 import { RadarCustomizeDialog } from "./RadarCustomizeDialog";
 import { RadarQuickSellDialog } from "./RadarQuickSellDialog";
-import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 
 export const RadarToolbar = () => {
   return (
@@ -49,16 +48,6 @@ export const RadarToolbar = () => {
           Quick sell
         </Button>
       </RadarQuickSellDialog>
-
-      <SettingsDialog defaultTab="trading-settings">
-        <Button
-          variant="ghost"
-          size="sm"
-        >
-          <Settings className="text-purple-500" />
-          Settings
-        </Button>
-      </SettingsDialog>
     </div>
   );
 };
