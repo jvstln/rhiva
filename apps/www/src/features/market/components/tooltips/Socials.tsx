@@ -107,13 +107,15 @@ export function TokenLatestPost({ token }: SocialHoverTooltipProps) {
               <div>
                 <span className="font-bold text-white">
                   {formatCompactNumber(token.holders)}
-                </span>{" "}
+                </span>
+                &nbsp;
                 <span className="text-muted-foreground">Holders</span>
               </div>
               <div>
                 <span className="font-bold text-white">
                   {formatCompactNumber(token.intel?.snipers?.wallets)}
-                </span>{" "}
+                </span>
+                &nbsp;
                 <span className="text-muted-foreground">Snipers</span>
               </div>
             </div>
@@ -162,7 +164,7 @@ export function TokenSocialSearch({ token }: SocialHoverTooltipProps) {
           href={`https://google.com/search?q=${token.name}+token`}
           className="truncate"
         >
-          <SimpleIcon icon={siGoogle} /> Google for{" "}
+          <SimpleIcon icon={siGoogle} /> Google for&nbsp;
           <span className="truncate">{token.name}</span>
         </DropdownMenuLinkItem>
         <DropdownMenuLinkItem

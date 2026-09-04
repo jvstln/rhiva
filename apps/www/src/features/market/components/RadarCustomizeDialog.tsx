@@ -441,7 +441,7 @@ export function RadarCustomizeDialog({
                     label="Both"
                     topLabel={
                       <>
-                        Ticker <span className="text-primary">= 0.1</span>{" "}
+                        Ticker <span className="text-primary">= 0.1</span>&nbsp;
                         <span className="text-primary">= +0.1</span>
                       </>
                     }

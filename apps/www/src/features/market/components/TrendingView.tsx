@@ -281,8 +281,8 @@ export function TrendingTable({ tokens }: { tokens: TokenFull[] }) {
               <span className="font-medium **:data-[slot=info-badge]:text-xs">
                 <InfoBadge className="[--accent:var(--color-up)]">
                   {formatCompactNumber(buys)}
-                </InfoBadge>{" "}
-                /{" "}
+                </InfoBadge>
+                &nbsp;/&nbsp;
                 <InfoBadge className="[--accent:var(--color-down)]">
                   {formatCompactNumber(sells)}
                 </InfoBadge>

@@ -134,7 +134,7 @@ function TokenRow({ token }: TokenRowProps) {
         <div className="flex w-full items-center justify-between gap-1.5">
           <div className="flex w-1/2 items-center gap-2 text-base">
             <span className="text-gray">
-              ATH{" "}
+              ATH&nbsp;
               <span className="font-medium text-white">
                 {formatCompactCurrency(token.ath_mcap_usd)}
               </span>
@@ -150,7 +150,7 @@ function TokenRow({ token }: TokenRowProps) {
 
         <div className="flex w-full items-center gap-2">
           <span className="whitespace-nowrap text-muted-foreground text-sm">
-            MC{" "}
+            MC&nbsp;
             <span className="w-16 font-medium text-info text-lg">
               {formatCompactCurrency(token.market_cap_usd)}
             </span>

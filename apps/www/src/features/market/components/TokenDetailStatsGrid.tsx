@@ -1,4 +1,5 @@
 import type { TokenFull } from "@rhivadotfun/dataapi";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { DexPaid } from "./tooltips/DexInfo";
@@ -13,9 +14,11 @@ import {
 } from "./tooltips/Holders";
 
 export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
+  const t = useTranslations("metrics");
+
   const items = [
     {
-      label: "Top 10",
+      label: t("top10.label"),
       infoBadge: (
         <TopHolders
           token={token}
@@ -24,7 +27,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "DEV",
+      label: t("dev.label"),
       infoBadge: (
         <DevHoldOrDevSell
           token={token}
@@ -33,7 +36,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "Holders",
+      label: t("totalHolders.label"),
       infoBadge: (
         <TotalHolders
           token={token}
@@ -42,7 +45,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "Snipers",
+      label: t("snipers.label"),
       infoBadge: (
         <SnipersHold
           token={token}
@@ -51,7 +54,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "Insiders",
+      label: t("insiders.label"),
       infoBadge: (
         <InsidersHold
           token={token}
@@ -60,7 +63,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "Phishing",
+      label: t("phishing.label"),
       infoBadge: (
         <PhishingsHold
           token={token}
@@ -69,7 +72,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "Bundler",
+      label: t("bundlers.label"),
       infoBadge: (
         <BundlersHold
           token={token}
@@ -78,7 +81,7 @@ export function TokenDetailStatsGrid({ token }: { token: TokenFull }) {
       ),
     },
     {
-      label: "Dex Paid",
+      label: t("dex.label"),
       infoBadge: (
         <DexPaid
           token={token}

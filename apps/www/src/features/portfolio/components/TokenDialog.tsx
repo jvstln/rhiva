@@ -141,7 +141,8 @@ export function TokenDialog({
                         {formatCompactCurrency(token.value_usd)}
                       </p>
                       <p className="mt-0.5 truncate text-b-5 text-gray leading-tight">
-                        {formatTokenAmount(token.remaining_ui ?? token.holding)}{" "}
+                        {formatTokenAmount(token.remaining_ui ?? token.holding)}
+                        &nbsp;
                         {token.symbol ?? token.mint}
                       </p>
                     </div>

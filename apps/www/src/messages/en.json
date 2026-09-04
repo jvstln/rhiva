@@ -1,0 +1,113 @@
+{
+  "metrics": {
+    "top10": {
+      "label": "Top 10",
+      "tooltip": "Top 10 Holders"
+    },
+    "dev": {
+      "label": "DEV",
+      "sold": "Dev Sold",
+      "hold": "Dev Hold",
+      "ds": "DS",
+      "bought": "Dev bought",
+      "balance": "Dev balance",
+      "lastTrade": "Last trade",
+      "migrated": "Dev Migrated",
+      "launched": "Dev Launched",
+      "completed": "Completed",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "totalHolders": {
+      "label": "Holders",
+      "tooltip": "Total holders"
+    },
+    "snipers": {
+      "label": "Snipers",
+      "tooltip": "Snipers Hold"
+    },
+    "insiders": {
+      "label": "Insiders",
+      "tooltip": "Insiders Hold"
+    },
+    "fresh": {
+      "label": "Fresh",
+      "tooltip": "Fresh / Dev Initial"
+    },
+    "phishing": {
+      "label": "Phishing",
+      "tooltip": "Phishing / Malicious Flags",
+      "clean": "Clean",
+      "warn": "Warn",
+      "flags": "{count} Flags"
+    },
+    "bundlers": {
+      "label": "Bundler",
+      "tooltip": "Bundlers Hold",
+      "athHold": "ATH Hold",
+      "total": "Total bundlers",
+      "bundledTotal": "Bundled total",
+      "bundledToken": "Bundled token"
+    },
+    "dex": {
+      "label": "Dex Paid",
+      "tooltip": "Dex Paid",
+      "feesPaid": "Dex Fees Paid",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "graduation": "Graduation",
+      "graduated": "Graduated",
+      "launchpad": "Launchpad"
+    },
+    "bot": {
+      "label": "Bot Activity",
+      "tooltip": "Bot activity"
+    },
+    "totalFees": {
+      "label": "Total Fees",
+      "tooltip": "Prio & Tip & Trading Fees"
+    },
+    "kol": {
+      "label": "KOL",
+      "tooltip": "KOL Hold"
+    },
+    "address": {
+      "notFound": "Address not found",
+      "copy": "Copy"
+    }
+  },
+  "socials": {
+    "postTooltip": "Token latest post",
+    "holders": "Holders",
+    "snipers": "Snipers",
+    "joined": "Joined {time}",
+    "seeProfileOnX": "See Profile on X",
+    "googleFor": "Google for",
+    "xSearchFor": "X search for",
+    "xSearchForDev": "X search for DEV",
+    "youtubeSearchFor": "YouTube search for",
+    "tiktokSearchFor": "TikTok search for",
+    "viewers": "Holders / Viewers",
+    "website": "Website",
+    "xConnection": "X Connection",
+    "xTwitter": "X / Twitter"
+  },
+  "market": {
+    "action": "Action",
+    "volume": "Volume",
+    "txns": "TXNS",
+    "tokenInfo": "Token Info",
+    "bonding": "Bonding: {pct}%",
+    "price": "Price"
+  },
+  "rewards": {
+    "nextTier": "Next Tier",
+    "currentPoint": "Current Point",
+    "rank": "Rank",
+    "youHave": "You have",
+    "of": "of"
+  },
+  "portfolio": {
+    "estTotalValue": "Est. total value"
+  }
+}

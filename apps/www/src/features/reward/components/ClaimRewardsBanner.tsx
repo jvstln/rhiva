@@ -29,11 +29,11 @@ export const ClaimRewardsBanner = ({
       >
         <Sparkles className="size-4 shrink-0" />
         <span>
-          You have{" "}
+          You have&nbsp;
           <span className="font-bold">
             {pendingDraws} reward draw{pendingDraws > 1 ? "s" : ""}
-          </span>{" "}
-          waiting — open your reward vault to claim
+          </span>
+          &nbsp;waiting — open your reward vault to claim
         </span>
         <ChevronRight className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
       </button>

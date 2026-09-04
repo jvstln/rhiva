@@ -92,13 +92,13 @@ export const TierExportDialog = ({
           <div className="pointer-events-none absolute top-0 left-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30 blur-[100px]" />
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-2 font-medium text-xl">
-              Current Point:{" "}
+              Current Point:&nbsp;
               <div className="font-extrabold text-3xl text-primary">
                 1000{tier.minXp.toLocaleString()} XP
               </div>
             </div>
             <div className="flex items-center gap-2 font-medium text-lg text-muted-foreground">
-              Rank:{" "}
+              Rank:&nbsp;
               <div className="font-bold text-foreground text-xl">#{100}</div>
             </div>
           </div>

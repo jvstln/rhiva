@@ -40,7 +40,7 @@ export type WsSubscribeQueryParams = BaseWsSubscribeQueryParams & {
 };
 
 export class WsApi extends BaseApiImpl {
-  protected override path?: string | undefined;
+  protected override path = "data/subscribe";
 
   constructor(
     private readonly url: string,
@@ -62,22 +62,19 @@ export class WsApi extends BaseApiImpl {
         .replace(/^http:\/\//i, "ws://")
         .replace(/\/+$/, String());
 
-      const pathWithQuery = this.buildPathWithQueryString(
-        this.buildPath("data/subscribe"),
-        {
-          chain: "solana",
-          api_key: this.apiKey,
-          ...params,
-        },
-      );
+      const pathWithQuery = this.buildPathWithQueryString(this.path, {
+        chain: "solana",
+        api_key: this.apiKey,
+        ...params,
+      });
 
       const fullUrl = format("%s/%s", baseWs, pathWithQuery);
 
       let ws: WebSocket;
       try {
         ws = new WebSocket(fullUrl);
-      } catch (err) {
-        return reject(err);
+      } catch (error) {
+        return reject(error);
       }
 
       const onMessage = (event: MessageEvent) => {
@@ -95,6 +92,8 @@ export class WsApi extends BaseApiImpl {
       ws.addEventListener("close", onClose);
       ws.addEventListener("message", onMessage);
       ws.onopen = () => {
+        ws.send(JSON.stringify({ filter: params }));
+
         if (closed) {
           ws.close();
           return;

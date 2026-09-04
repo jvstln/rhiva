@@ -1,5 +1,6 @@
 import type { TokenFull } from "@rhivadotfun/dataapi";
 import { ChefHat, Crown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn, formatAge } from "@/lib/utils";
 import type { TokenInfoProps } from "./TokenInfo";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/info-badge";
 
 export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
+  const t = useTranslations("metrics.dev");
   const devHoldPercent = token.intel?.dev?.held_pct ?? 0;
   const hasDevSoldAll = devHoldPercent === 0;
   const devWallet = token.creator || token.dev?.wallet;
@@ -46,20 +48,20 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
         <div>
           <InfoBadgeTooltipGrid>
             <InfoBadgeTooltipHeader>
-              {hasDevSoldAll ? "Dev Sold" : "Dev Hold"}{" "}
+              {hasDevSoldAll ? t("sold") : t("hold")}&nbsp;
               {formatCompactNumber(devHoldPercent)}%
             </InfoBadgeTooltipHeader>
 
             {devWallet && (
               <InfoBadgeTooltipRow
-                label="Dev"
+                label={t("label")}
                 value={`${devWallet.slice(0, 4)}...${devWallet.slice(-4)}`}
               />
             )}
 
             {boughtTokens != null && (
               <InfoBadgeTooltipRow
-                label="Dev bought"
+                label={t("bought")}
                 value={
                   <span className="flex items-center gap-1">
                     {formatCompactNumber(boughtTokens)}
@@ -75,21 +77,21 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
 
             {soldTokens != null && (
               <InfoBadgeTooltipRow
-                label="Dev sold"
+                label={t("sold")}
                 value={formatCompactNumber(soldTokens)}
               />
             )}
 
             {devBalance != null && (
               <InfoBadgeTooltipRow
-                label="Dev balance"
+                label={t("balance")}
                 value={formatCompactNumber(devBalance)}
               />
             )}
 
             {lastUpdateMs && (
               <InfoBadgeTooltipRow
-                label="Last trade"
+                label={t("lastTrade")}
                 value={formatAge(lastUpdateMs)}
               />
             )}
@@ -102,17 +104,18 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
       {props.children
         ? props.children
         : hasDevSoldAll
-          ? "DS"
+          ? t("ds")
           : `${formatCompactNumber(devHoldPercent)}%`}
     </InfoBadge>
   );
 };
 
 export const DevMigratedAndLaunch = ({ token }: { token: TokenFull }) => {
+  const t = useTranslations("metrics.dev");
   const isMigrated = token.screener?.is_graduated ?? false;
   const bondingPct = getTokenBondingPct(token);
   const statusLabel = isMigrated
-    ? "Completed"
+    ? t("completed")
     : `${formatCompactNumber(bondingPct)}%`;
 
   return (
@@ -121,15 +124,15 @@ export const DevMigratedAndLaunch = ({ token }: { token: TokenFull }) => {
       tooltip={
         <InfoBadgeTooltipGrid>
           <InfoBadgeTooltipRow
-            label="Dev Migrated"
-            value={isMigrated ? "Yes" : "No"}
+            label={t("migrated")}
+            value={isMigrated ? t("yes") : t("no")}
           />
           <InfoBadgeTooltipRow
-            label="Dev Launched"
+            label={t("launched")}
             value={formatAge(token.created_time)}
           />
           <InfoBadgeTooltipRow
-            label="Migrated"
+            label={t("migrated")}
             value={statusLabel}
           />
         </InfoBadgeTooltipGrid>

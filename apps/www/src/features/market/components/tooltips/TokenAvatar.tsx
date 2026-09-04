@@ -210,7 +210,7 @@ export function TokenNameAndSymbol({ token }: { token: TokenFull }) {
           href={`https://google.com/search?q=${token.symbol}+token`}
           className="truncate"
         >
-          <SimpleIcon icon={siGoogle} /> Google for{" "}
+          <SimpleIcon icon={siGoogle} /> Google for&nbsp;
           <span className="truncate">{token.symbol}</span>
         </DropdownMenuLinkItem>
         <DropdownMenuLinkItem
@@ -222,7 +222,7 @@ export function TokenNameAndSymbol({ token }: { token: TokenFull }) {
             icon={siX}
             className="text-foreground"
           />
-          X search for <span className="truncate">{token.symbol}</span>
+          X search for&nbsp;<span className="truncate">{token.symbol}</span>
         </DropdownMenuLinkItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -241,7 +241,7 @@ export function TokenSymbolCopy({ token }: { token: TokenFull }) {
       }}
       className="cursor-pointer text-sm"
     >
-      {token.mint.slice(0, 4)}...{token.mint.slice(-4)}{" "}
+      {token.mint.slice(0, 4)}...{token.mint.slice(-4)}&nbsp;
       {copyState === "copied" ? <Check /> : <Copy />}
     </InfoBadge>
   );

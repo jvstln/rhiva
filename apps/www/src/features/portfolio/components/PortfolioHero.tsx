@@ -61,7 +61,7 @@ export function PortfolioHero({ query }: PortfolioHeroProps) {
       }}
     >
       <p className="flex items-center gap-1.5 text-b-2 text-gray">
-        Est. total value{" "}
+        Est. total value&nbsp;
         <Button
           variant={"ghost"}
           size="icon-sm"

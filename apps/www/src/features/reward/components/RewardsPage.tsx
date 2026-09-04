@@ -78,7 +78,7 @@ function CurrentTierCard() {
                 <div className="w-full flex-1 space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="text-muted-foreground text-sm">
-                      Next Tier:{" "}
+                      Next Tier:&nbsp;
                       <span className="font-semibold text-foreground">
                         {nextTier?.name ?? "MAX"}
                       </span>
@@ -96,9 +96,9 @@ function CurrentTierCard() {
                   </div>
 
                   <p className="font-medium text-foreground/90 text-xl">
-                    {formatCompactNumber(rewardProfile.data.xp)} of{" "}
-                    {formatCompactNumber(nextTier.minXp ?? currentTier.minXp)}{" "}
-                    XP
+                    {formatCompactNumber(rewardProfile.data.xp)} of&nbsp;
+                    {formatCompactNumber(nextTier.minXp ?? currentTier.minXp)}
+                    &nbsp; XP
                   </p>
 
                   <div className="h-3.5 w-full overflow-hidden rounded-full bg-white/10">

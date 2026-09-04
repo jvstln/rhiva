@@ -83,7 +83,7 @@ export function TokenDetailTradePanel({ token }: { token: TokenFull }) {
         </TabsList>
 
         <div className="flex items-center justify-end text-b-4 text-gray">
-          Price:{" "}
+          Price:&nbsp;
           {livePriceNative != null
             ? `${formatCompactNumber(livePriceNative)} SOL`
             : formatCompactCurrency(livePriceUsd)}
