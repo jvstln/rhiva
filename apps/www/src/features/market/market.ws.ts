@@ -18,7 +18,7 @@ import {
   useWatchList,
 } from "@/states";
 
-const MAX_LIVE_TRADES = 100;
+const MAX_LIVE_TRADES = 25;
 
 const registerSubscription = (
   promise: Promise<() => void>,
@@ -270,8 +270,13 @@ export const useTokenWebSocket = (mint: string) => {
               ["token", mint, "trades"],
               (oldData: TokenTrade[] | undefined) => {
                 const existing = oldData ?? [];
-                if (existing.some((t) => t.signature === row.signature)) {
-                  return existing;
+                const index = existing.findIndex(
+                  (t) => t.signature === row.signature,
+                );
+                if (index !== -1) {
+                  const updated = [...existing];
+                  updated[index] = row;
+                  return updated.slice(0, MAX_LIVE_TRADES);
                 }
                 return [row, ...existing].slice(0, MAX_LIVE_TRADES);
               },

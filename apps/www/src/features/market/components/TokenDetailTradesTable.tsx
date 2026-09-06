@@ -104,16 +104,18 @@ const columns = [
   }),
 ];
 
+const MAX_TRADES = 25;
+
 type TokenDetailTradesTableProps = { mint: string };
 
 export const TokenDetailTradesTable = ({
   mint,
 }: TokenDetailTradesTableProps) => {
   useTokenWebSocket(mint);
-  const trades = useTokenTrades(mint);
+  const trades = useTokenTrades(mint, MAX_TRADES);
 
   const table = useDataTable({
-    data: trades.data ?? [],
+    data: (trades.data ?? []).slice(0, MAX_TRADES),
     columns,
   });
 

@@ -113,8 +113,8 @@ export const getTokenCandles = async (params: {
   return await dataapi.token.getTokenOhlcv({ address: mint, ...rest });
 };
 
-export const getTokenTrades = async (mint: string) => {
-  return await dataapi.token.getTokenTrades({ address: mint, limit: 100 });
+export const getTokenTrades = async (mint: string, limit = 25) => {
+  return await dataapi.token.getTokenTrades({ address: mint, limit });
 };
 
 export const getTokenHolders = async (mint: string) => {

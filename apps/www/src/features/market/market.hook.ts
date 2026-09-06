@@ -475,11 +475,12 @@ export function useTokenCandles(filters: TokenCandleFilters) {
   });
 }
 
-export function useTokenTrades(mint: string) {
+export function useTokenTrades(mint: string, limit = 25) {
   return useQuery({
     queryKey: ["token", mint, "trades"],
-    queryFn: () => getTokenTrades(mint),
+    queryFn: () => getTokenTrades(mint, limit),
     refetchInterval: 3_000,
+    select: (data) => data.slice(0, limit),
   });
 }
 
