@@ -70,7 +70,7 @@ export const useLatest = create<State & Action>((set) => {
       });
     },
     addTokens(...tokens: TokenFull[]) {
-      set((state) => ({ tokens: [...state.tokens!, ...tokens] }));
+      set((state) => ({ tokens: [...(state.tokens ?? []), ...tokens] }));
     },
     setTokens(tokens: TokenFull[]) {
       set((state) => ({ tokens: mergeFreshTokens(state.tokens, tokens) }));

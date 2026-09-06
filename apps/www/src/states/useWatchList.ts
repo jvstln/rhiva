@@ -46,13 +46,13 @@ export const useWatchList = create<State & Action>((set) => {
     removeWatchlist(value) {
       set((state) => {
         const watchlists = state.watchlists?.filter(
-          (watchlist) => watchlist === value,
+          (watchlist) => watchlist !== value,
         );
         return { watchlists };
       });
     },
     addTokens(...tokens: TokenFull[]) {
-      set((state) => ({ tokens: [...state.tokens!, ...tokens] }));
+      set((state) => ({ tokens: [...(state.tokens ?? []), ...tokens] }));
     },
     setTokens(tokens: TokenFull[]) {
       set(() => ({ tokens }));

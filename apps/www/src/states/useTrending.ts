@@ -71,7 +71,7 @@ export const useTrending = create<State & Action>()(
         });
       },
       addTokens(...tokens: TokenFull[]) {
-        set((state) => ({ tokens: [...state.tokens!, ...tokens] }));
+        set((state) => ({ tokens: [...(state.tokens ?? []), ...tokens] }));
       },
       setTokens(tokens: TokenFull[]) {
         set((state) => ({ tokens: mergeFreshTokens(state.tokens, tokens) }));

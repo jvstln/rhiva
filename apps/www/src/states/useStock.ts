@@ -27,7 +27,7 @@ export const useStock = create<State & Action>((set) => {
   return {
     tokens: null,
     addTokens(...tokens: TokenFull[]) {
-      set((state) => ({ tokens: [...state.tokens!, ...tokens] }));
+      set((state) => ({ tokens: [...(state.tokens ?? []), ...tokens] }));
     },
     setTokens(tokens: TokenFull[]) {
       set(() => ({ tokens }));

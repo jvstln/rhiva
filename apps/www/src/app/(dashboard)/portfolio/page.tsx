@@ -14,6 +14,10 @@ export default function Portfolio() {
   const auth = useAuth();
   const router = useRouter();
 
+  const walletAddress = auth.authenticated ? auth.activeWallet?.address : "";
+  usePortfolioWebSocket(walletAddress);
+  const tokenPortfolio = useTokenPortfolio(walletAddress);
+
   useEffect(() => {
     if (auth.ready && !auth.authenticated) {
       router.replace("/");
@@ -23,10 +27,6 @@ export default function Portfolio() {
   if (!auth.authenticated) {
     return null;
   }
-
-  const walletAddress = auth.activeWallet.address;
-  usePortfolioWebSocket(walletAddress);
-  const tokenPortfolio = useTokenPortfolio(walletAddress);
 
   return <PortfolioPage query={tokenPortfolio} />;
 }

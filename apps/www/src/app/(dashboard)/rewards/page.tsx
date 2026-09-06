@@ -14,6 +14,9 @@ export default function Rewards() {
   const auth = useAuth();
   const router = useRouter();
 
+  const rewardProfile = useRewardProfile();
+  const leaderboard = useLeaderboard();
+
   useEffect(() => {
     if (auth.ready && !auth.authenticated) {
       router.replace("/");
@@ -23,9 +26,6 @@ export default function Rewards() {
   if (!auth.authenticated) {
     return null;
   }
-
-  const rewardProfile = useRewardProfile();
-  const leaderboard = useLeaderboard();
 
   return (
     <RewardsPage
