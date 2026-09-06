@@ -4,10 +4,12 @@ import { useMemo } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import type { WalletFunding } from "@rhivadotfun/dataapi";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
-import { CopyButton } from "@/components/ui/button";
+import { CopyButton } from "@/components/ui/button/copy-button";
 import { formatCompactNumber } from "@/lib/finance.util";
 import { formatAge } from "@/lib";
 import { truncateString } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SolanaIcon } from "@/components/ui/icons";
 
 type FunderItem = WalletFunding["funders"][number];
 
@@ -20,13 +22,21 @@ const columns = [
       const w = getValue();
       const initial = (w || "W").slice(0, 1).toUpperCase();
       return (
-        <span className="flex items-center gap-2 font-mono text-white text-xs">
-          <div className="flex aspect-square size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 font-bold font-sans text-[10px] text-muted-foreground">
-            {initial}
-          </div>
-          <span>{truncateString(w, 4)}</span>
+        <div className="flex items-center gap-2.5">
+          <Avatar
+            variant="square"
+            className="size-8 rounded-md"
+          >
+            <AvatarFallback className="border border-border/40 bg-surface-2 font-bold font-sans text-white text-xs">
+              {initial || <SolanaIcon className="size-4" />}
+            </AvatarFallback>
+          </Avatar>
+
+          <span className="font-mono text-b-3 text-white">
+            {truncateString(w, 4)}
+          </span>
           <CopyButton copy={w} />
-        </span>
+        </div>
       );
     },
     size: 260,
@@ -34,7 +44,7 @@ const columns = [
   columnHelper.accessor("total", {
     header: "Total Funded (SOL)",
     cell: ({ getValue }) => (
-      <span className="font-semibold text-emerald-400 text-xs">
+      <span className="font-medium text-sm text-up">
         {formatCompactNumber(getValue())} SOL
       </span>
     ),
@@ -43,7 +53,7 @@ const columns = [
   columnHelper.accessor("transfers", {
     header: "Transfers",
     cell: ({ getValue }) => (
-      <span className="text-muted-foreground text-xs">{getValue()} txs</span>
+      <span className="text-b-4 text-gray">{getValue()} txs</span>
     ),
     size: 120,
   }),
@@ -72,16 +82,21 @@ export const FundingTab = ({ funding }: FundingTabProps) => {
     <div className="flex flex-col gap-4">
       {/* First Funder Highlight Banner */}
       {firstFunder && (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border/50 bg-card/30 p-4 text-xs">
-          <div className="flex flex-col gap-1">
-            <span className="font-semibold text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+          <div className="flex flex-col gap-1.5">
+            <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
               Initial Funder
             </span>
             <div className="flex items-center gap-2 font-mono text-white">
-              <div className="flex aspect-square size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 font-bold font-sans text-[10px] text-muted-foreground">
-                {(firstFunder || "W").slice(0, 1).toUpperCase()}
-              </div>
-              <span className="font-medium text-sm">
+              <Avatar
+                variant="square"
+                className="size-8 rounded-md"
+              >
+                <AvatarFallback className="border border-border/40 bg-surface-2 font-bold font-sans text-white text-xs">
+                  {(firstFunder || "W").slice(0, 1).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="font-medium text-b-2">
                 {truncateString(firstFunder, 4)}
               </span>
               <CopyButton copy={firstFunder} />
@@ -89,7 +104,7 @@ export const FundingTab = ({ funding }: FundingTabProps) => {
                 href={`https://solscan.io/account/${firstFunder}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground text-xs hover:text-white"
+                className="text-b-4 text-gray transition-colors hover:text-white"
               >
                 Explorer ↗
               </a>
@@ -97,32 +112,34 @@ export const FundingTab = ({ funding }: FundingTabProps) => {
           </div>
 
           <div className="flex items-center gap-8">
-            <div className="flex flex-col">
-              <span className="text-[11px] text-muted-foreground uppercase">
+            <div className="flex flex-col gap-1">
+              <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
                 Initial Amount
               </span>
-              <span className="font-bold text-emerald-400 text-sm">
+              <span className="font-bold text-h6 text-up">
                 {firstAmount} SOL
               </span>
             </div>
 
-            <div className="flex flex-col">
-              <span className="text-[11px] text-muted-foreground uppercase">
+            <div className="flex flex-col gap-1">
+              <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
                 Age
               </span>
-              <span className="font-medium text-white">{firstTime}</span>
+              <span className="font-medium text-b-2 text-white">
+                {firstTime}
+              </span>
             </div>
 
             {firstSig && (
-              <div className="flex flex-col">
-                <span className="text-[11px] text-muted-foreground uppercase">
+              <div className="flex flex-col gap-1">
+                <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
                   Transaction
                 </span>
                 <a
                   href={`https://solscan.io/tx/${firstSig}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-muted-foreground hover:text-white hover:underline"
+                  className="font-mono text-b-3 text-gray transition-colors hover:text-white hover:underline"
                 >
                   {truncateString(firstSig, 4)}
                 </a>
@@ -133,10 +150,7 @@ export const FundingTab = ({ funding }: FundingTabProps) => {
       )}
 
       {/* Funders Table */}
-      <DataTable
-        table={table}
-        variant="compact"
-      />
+      <DataTable table={table} />
     </div>
   );
 };

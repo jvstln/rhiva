@@ -22,6 +22,10 @@ import { FundingTab } from "./FundingTab";
 import { TipsTab } from "./TipsTab";
 import { DashboardSlot } from "@/components/layout/DashboardUi";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
 const TABS = [
   "Positions",
   "Balances",
@@ -98,50 +102,77 @@ export const WalletTrackerPage = ({ address }: WalletTrackerPageProps) => {
       />
 
       {/* 3. Navigation Tabs */}
-      <div className="flex flex-col gap-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as TabKey)}
+        className="flex flex-col gap-4"
+      >
         <div className="border-border/60 border-b">
-          <nav className="-mb-px flex space-x-6 overflow-x-auto">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab;
-              return (
-                <button
-                  type="button"
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`cursor-pointer whitespace-nowrap border-b-2 py-3 font-semibold text-xs transition-colors ${
-                    isActive
-                      ? "border-white text-white"
-                      : "border-transparent text-muted-foreground hover:border-border hover:text-white/80"
-                  }`}
-                >
-                  {getTabLabel(tab)}
-                </button>
-              );
-            })}
-          </nav>
+          <TabsList
+            variant="line"
+            className="flex h-auto w-max items-center gap-1 bg-transparent p-0"
+          >
+            {TABS.map((tab) => (
+              <TabsTrigger
+                key={tab}
+                value={tab}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "cursor-pointer rounded-none border-transparent border-b-2 px-3 py-2 font-medium text-b-3 transition-colors",
+                  "text-gray hover:text-white data-active:border-primary data-active:text-white",
+                )}
+              >
+                {getTabLabel(tab)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
 
         {/* Tab Contents */}
         <div className="min-h-[400px]">
-          {activeTab === "Balances" && (
+          <TabsContent
+            value="Balances"
+            className="mt-0 outline-none"
+          >
             <BalancesTable tokens={balanceData?.tokens} />
-          )}
+          </TabsContent>
 
-          {activeTab === "Positions" && (
+          <TabsContent
+            value="Positions"
+            className="mt-0 outline-none"
+          >
             <TradingPositionsTable positions={pnlData?.positions ?? []} />
-          )}
+          </TabsContent>
 
-          {activeTab === "Trades" && <TradesTable trades={tradesData} />}
+          <TabsContent
+            value="Trades"
+            className="mt-0 outline-none"
+          >
+            <TradesTable trades={tradesData} />
+          </TabsContent>
 
-          {activeTab === "Transfers" && (
+          <TabsContent
+            value="Transfers"
+            className="mt-0 outline-none"
+          >
             <TransfersTable transfers={transfersData} />
-          )}
+          </TabsContent>
 
-          {activeTab === "Funding" && <FundingTab funding={fundingData} />}
+          <TabsContent
+            value="Funding"
+            className="mt-0 outline-none"
+          >
+            <FundingTab funding={fundingData} />
+          </TabsContent>
 
-          {activeTab === "Tips" && <TipsTab fees={feesData} />}
+          <TabsContent
+            value="Tips"
+            className="mt-0 outline-none"
+          >
+            <TipsTab fees={feesData} />
+          </TabsContent>
         </div>
-      </div>
+      </Tabs>
     </DashboardSlot>
   );
 };

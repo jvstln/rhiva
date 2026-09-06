@@ -66,10 +66,10 @@ export const PortfolioHeader = ({
   const sells = pnl?.sells ?? 56_000;
 
   return (
-    <div className="flex flex-col justify-between gap-4 rounded-xl border border-border/60 bg-card/40 p-4 backdrop-blur-sm lg:flex-row lg:items-center">
+    <div className="flex flex-col justify-between gap-4 rounded-xl border border-border/70 bg-card p-4 sm:p-5 lg:flex-row lg:items-center">
       {/* Left: Wallet Info */}
       <div className="flex items-center gap-3.5">
-        <div className="flex aspect-square size-11 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-950/40 text-emerald-400">
+        <div className="flex aspect-square size-11 shrink-0 items-center justify-center rounded-lg border border-up/30 bg-up/10 text-up">
           <Wallet className="size-5.5" />
         </div>
 
@@ -83,11 +83,11 @@ export const PortfolioHeader = ({
                 variant="ghost"
                 size="icon-xs"
                 onClick={handleCopy}
-                className="size-7 text-muted-foreground hover:text-white"
+                className="size-7 text-gray hover:text-white"
                 title="Copy address"
               >
                 {copied ? (
-                  <Check className="size-3.5 text-emerald-400" />
+                  <Check className="size-3.5 text-up" />
                 ) : (
                   <Copy className="size-3.5" />
                 )}
@@ -96,7 +96,7 @@ export const PortfolioHeader = ({
                 href={`https://solscan.io/account/${wallet}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-white"
+                className="inline-flex size-7 items-center justify-center rounded-md text-gray transition-colors hover:text-white"
                 title="View on Solscan"
               >
                 <ExternalLink className="size-3.5" />
@@ -108,14 +108,14 @@ export const PortfolioHeader = ({
                 className="ml-1 h-6 gap-1 px-2 text-xs"
               >
                 <Radio
-                  className={`size-3 ${isTracked ? "animate-pulse text-emerald-400" : ""}`}
+                  className={`size-3 ${isTracked ? "animate-pulse text-up" : ""}`}
                 />
                 <span>{isTracked ? "Tracking" : "Track"}</span>
               </Button>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-b-4 text-gray">
             <span>
               <span className="font-semibold text-white">SOL</span>{" "}
               {formatCompactNumber(sol)}
@@ -143,66 +143,66 @@ export const PortfolioHeader = ({
 
       {/* Right: Key PnL & Trade Metrics */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-border/40 border-t pt-3 lg:border-t-0 lg:pt-0">
-        <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
             Total PnL
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="font-bold text-sm text-up sm:text-base">
+            <span className="font-bold text-b-2 text-up">
               {formatSignedUsd(totalPnlUsd)}
             </span>
-            <span className="font-semibold text-up text-xs">
+            <span className="font-semibold text-b-4 text-up">
               +{formatCompactNumber(totalPnlPct)}%
             </span>
           </div>
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
             Realized
           </span>
-          <span className="font-bold text-sm text-up sm:text-base">
+          <span className="font-bold text-b-2 text-up">
             {formatSignedUsd(realizedUsd)}
           </span>
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
             Unrealized
           </span>
-          <span className="font-bold text-down text-sm sm:text-base">
+          <span className="font-bold text-b-2 text-down">
             {formatSignedUsd(unrealizedUsd)}
           </span>
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
             Invested / Proceeds
           </span>
-          <span className="font-semibold text-sm text-white sm:text-base">
+          <span className="font-semibold text-b-2 text-white">
             {formatCompactCurrency(investedUsd)} /{" "}
             {formatCompactCurrency(proceedsUsd)}
           </span>
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
             Win / Loss
           </span>
-          <span className="font-bold text-sm sm:text-base">
+          <span className="font-bold text-b-2">
             <span className="text-up">{wins}</span>
-            <span className="text-muted-foreground"> / </span>
+            <span className="text-gray"> / </span>
             <span className="text-down">{losses}</span>
           </span>
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground uppercase">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-medium text-b-4 text-gray uppercase tracking-wider">
             Buys / Sells
           </span>
-          <span className="font-bold text-sm sm:text-base">
+          <span className="font-bold text-b-2">
             <span className="text-up">{formatCompactNumber(buys)}</span>
-            <span className="text-muted-foreground"> / </span>
+            <span className="text-gray"> / </span>
             <span className="text-down">{formatCompactNumber(sells)}</span>
           </span>
         </div>

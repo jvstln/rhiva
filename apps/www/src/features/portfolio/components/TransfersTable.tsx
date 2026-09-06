@@ -1,14 +1,16 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createColumnHelper } from "@tanstack/react-table";
 import type { WalletTransfer } from "@rhivadotfun/dataapi";
 import { DataTable, useDataTable } from "@/components/ui/table/data-table";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/finance.util";
-import { CopyButton } from "@/components/ui/button";
+import { CopyButton } from "@/components/ui/button/copy-button";
 import { cn, formatAge } from "@/lib";
 import { truncateString } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SolanaIcon } from "@/components/ui/icons";
 
 const columnHelper = createColumnHelper<WalletTransfer>();
 
@@ -20,14 +22,14 @@ const columns = [
       const timestamp = val > 1_000_000_000_000 ? val : val * 1000;
       return (
         <span
-          className="text-muted-foreground text-xs"
+          className="text-b-4 text-gray"
           title={new Date(timestamp).toLocaleString()}
         >
           {formatAge(timestamp)}
         </span>
       );
     },
-    size: 90,
+    size: 100,
   }),
   columnHelper.accessor("mint", {
     header: "Token",
@@ -35,18 +37,31 @@ const columns = [
       const mint = getValue();
       const initial = (mint || "T").slice(0, 1).toUpperCase();
       return (
-        <Link
-          href={`/token/${mint}`}
-          className="flex items-center gap-2 font-mono text-white text-xs hover:underline"
+        <div
+          className="group flex items-center gap-2.5 transition-opacity hover:opacity-85"
+          data-token-id={mint}
         >
-          <div className="flex aspect-square size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 font-bold font-sans text-[10px] text-muted-foreground">
-            {initial}
+          <Avatar
+            variant="square"
+            className="size-8 rounded-md"
+          >
+            <AvatarFallback className="border border-border/40 bg-surface-2 font-bold font-sans text-white text-xs">
+              {initial || <SolanaIcon className="size-4" />}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="font-mono text-b-3 text-white">
+                {truncateString(mint, 4)}
+              </span>
+              <CopyButton copy={mint} />
+            </div>
           </div>
-          <span>{truncateString(mint, 4)}</span>
-        </Link>
+        </div>
       );
     },
-    size: 140,
+    size: 180,
   }),
   columnHelper.accessor("direction", {
     header: "Direction",
@@ -55,67 +70,68 @@ const columns = [
       return (
         <span
           className={cn(
-            "rounded px-1.5 py-0.5 font-semibold text-[10px] uppercase",
+            "rounded px-2 py-0.5 font-medium text-b-4 uppercase",
             dir === "in"
-              ? "border border-emerald-800/40 bg-emerald-950/60 text-emerald-400"
-              : "border border-rose-800/40 bg-rose-950/60 text-rose-400",
+              ? "border border-up/20 bg-up/10 text-up"
+              : "border border-sell/20 bg-sell/10 text-sell",
           )}
         >
           {dir}
         </span>
       );
     },
-    size: 90,
+    size: 100,
   }),
   columnHelper.accessor("counterparty", {
     header: "Counterparty",
     cell: ({ getValue }) => {
       const cp = getValue();
-      if (!cp) return "--";
+      if (!cp) return <span className="text-gray">--</span>;
       return (
-        <span className="flex items-center gap-1 font-mono text-white text-xs">
-          {truncateString(cp, 4)}
+        <span className="flex items-center gap-1.5 font-mono text-b-3 text-white">
+          <span>{truncateString(cp, 4)}</span>
           <CopyButton copy={cp} />
         </span>
       );
     },
-    size: 160,
+    size: 170,
   }),
   columnHelper.accessor("amount", {
     header: "Amount",
     cell: ({ getValue }) => (
-      <span className="text-white text-xs">
+      <span className="text-sm text-white">
         {formatCompactNumber(getValue())}
       </span>
     ),
-    size: 110,
+    size: 120,
   }),
   columnHelper.accessor("value_usd", {
     header: "Value (USD)",
     cell: ({ getValue }) => (
-      <span className="font-medium text-white text-xs">
+      <span className="font-medium text-sm text-white">
         {formatCompactCurrency(getValue())}
       </span>
     ),
-    size: 110,
+    size: 130,
   }),
   columnHelper.accessor("signature", {
     header: "Tx",
     cell: ({ getValue }) => {
       const sig = getValue();
-      if (!sig) return "--";
+      if (!sig) return <span className="text-gray">--</span>;
       return (
         <a
           href={`https://solscan.io/tx/${sig}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-muted-foreground text-xs hover:text-white hover:underline"
+          onClick={(e) => e.stopPropagation()}
+          className="font-mono text-b-4 text-gray transition-colors hover:text-white hover:underline"
         >
           {truncateString(sig, 4)}
         </a>
       );
     },
-    size: 100,
+    size: 110,
   }),
 ];
 
@@ -124,6 +140,7 @@ type TransfersTableProps = {
 };
 
 export const TransfersTable = ({ transfers = [] }: TransfersTableProps) => {
+  const router = useRouter();
   const data = useMemo(() => transfers, [transfers]);
 
   const table = useDataTable({
@@ -132,11 +149,19 @@ export const TransfersTable = ({ transfers = [] }: TransfersTableProps) => {
   });
 
   return (
-    <div className="w-full">
-      <DataTable
-        table={table}
-        variant="compact"
-      />
-    </div>
+    <nav
+      onClick={(e) => {
+        if (!(e.target instanceof HTMLElement)) return;
+        const tableRow = e.target.closest("tr");
+        const tokenId =
+          tableRow?.querySelector<HTMLElement>("[data-token-id]")?.dataset
+            .tokenId;
+        if (tokenId) router.push(`/token/${tokenId}`);
+      }}
+      onKeyDown={() => null}
+      className="w-full"
+    >
+      <DataTable table={table} />
+    </nav>
   );
 };

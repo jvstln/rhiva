@@ -78,10 +78,8 @@ export const PortfolioCharts = ({
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       {/* Card 1: Portfolio value */}
-      <div className="flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 backdrop-blur-sm">
-        <span className="font-semibold text-sm text-white">
-          Portfolio value
-        </span>
+      <div className="flex flex-col justify-between rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+        <span className="font-bold text-sm text-white">Portfolio value</span>
 
         <div className="h-44 w-full pt-3">
           <ResponsiveContainer
@@ -116,7 +114,7 @@ export const PortfolioCharts = ({
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#71717a", fontSize: 11 }}
+                tick={{ fill: "#737373", fontSize: 11 }}
               />
               <YAxis
                 hide
@@ -150,8 +148,8 @@ export const PortfolioCharts = ({
       </div>
 
       {/* Card 2: Realized PnL per day */}
-      <div className="flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 backdrop-blur-sm">
-        <span className="font-semibold text-sm text-white">
+      <div className="flex flex-col justify-between rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+        <span className="font-bold text-sm text-white">
           Realized PnL per day
         </span>
 
@@ -168,13 +166,13 @@ export const PortfolioCharts = ({
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#71717a", fontSize: 11 }}
+                tick={{ fill: "#737373", fontSize: 11 }}
               />
               <YAxis
                 orientation="right"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#71717a", fontSize: 10 }}
+                tick={{ fill: "#737373", fontSize: 10 }}
                 tickFormatter={(val) => formatCompactCurrency(val)}
                 domain={[0, "auto"]}
               />
@@ -194,7 +192,7 @@ export const PortfolioCharts = ({
               />
               <Bar
                 dataKey="pnl"
-                fill="#22c55e"
+                fill="#00d897"
                 radius={[2, 2, 0, 0]}
                 barSize={70}
               />
@@ -204,44 +202,44 @@ export const PortfolioCharts = ({
       </div>
 
       {/* Card 3: Performance */}
-      <div className="flex flex-col justify-between rounded-xl border border-border/60 bg-card/40 p-4 text-xs backdrop-blur-sm">
-        <span className="font-semibold text-sm text-white">Performance</span>
+      <div className="flex flex-col justify-between rounded-xl border border-border/70 bg-card p-4 text-xs sm:p-5">
+        <span className="font-bold text-sm text-white">Performance</span>
 
         <div className="flex flex-col gap-2.5 pt-2">
           {/* 1d */}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">1d</span>
+          <div className="flex items-center justify-between text-b-3">
+            <span className="text-gray">1d</span>
             <div className="flex items-center gap-3">
               <span className="font-semibold text-up">
                 {formatCompactCurrency(p1d.realized_usd)}
               </span>
-              <span className="text-muted-foreground">
+              <span className="text-b-4 text-gray">
                 {p1d.trades} tx · {p1d.wins}W/{p1d.losses}L
               </span>
             </div>
           </div>
 
           {/* 7d */}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">7d</span>
+          <div className="flex items-center justify-between text-b-3">
+            <span className="text-gray">7d</span>
             <div className="flex items-center gap-3">
               <span className="font-semibold text-up">
                 {formatCompactCurrency(p7d.realized_usd)}
               </span>
-              <span className="text-muted-foreground">
+              <span className="text-b-4 text-gray">
                 {p7d.trades} tx · {p7d.wins}W/{p7d.losses}L
               </span>
             </div>
           </div>
 
           {/* 30d */}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">30d</span>
+          <div className="flex items-center justify-between text-b-3">
+            <span className="text-gray">30d</span>
             <div className="flex items-center gap-3">
               <span className="font-semibold text-up">
                 {formatCompactCurrency(p30d.realized_usd)}
               </span>
-              <span className="text-muted-foreground">
+              <span className="text-b-4 text-gray">
                 {p30d.trades} tx · {p30d.wins}W/{p30d.losses}L
               </span>
             </div>
@@ -250,8 +248,8 @@ export const PortfolioCharts = ({
           <div className="my-1 border-border/40 border-t" />
 
           {/* Max drawdown */}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Max drawdown</span>
+          <div className="flex items-center justify-between text-b-3">
+            <span className="text-gray">Max drawdown</span>
             <span
               className={`font-semibold ${maxDrawdown > 0 ? "text-down" : "text-white"}`}
             >
@@ -260,11 +258,11 @@ export const PortfolioCharts = ({
           </div>
 
           {/* Best / worst day */}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Best / worst day</span>
+          <div className="flex items-center justify-between text-b-3">
+            <span className="text-gray">Best / worst day</span>
             <span className="font-semibold">
               <span className="text-up">{formatCompactCurrency(bestDay)}</span>
-              <span className="text-muted-foreground"> / </span>
+              <span className="text-gray"> / </span>
               <span className="text-down">
                 {formatCompactCurrency(worstDay)}
               </span>
