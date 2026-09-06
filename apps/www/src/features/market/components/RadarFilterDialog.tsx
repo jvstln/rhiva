@@ -491,7 +491,7 @@ export function RadarFilterDialog({
           </ScrollArea>
 
           <DialogFooter>
-            <DialogClose render={<Button className={"w-full"} />}>
+            <DialogClose render={<Button className="w-full" />}>
               Apply All
             </DialogClose>
           </DialogFooter>

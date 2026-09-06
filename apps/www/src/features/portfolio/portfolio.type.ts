@@ -14,9 +14,9 @@ export type CalendarDay = {
 };
 
 export type PositionItem = WalletPnlWithPosition["positions"][number] & {
-  symbol?: string;
-  name?: string;
-  image?: string;
+  symbol?: string | null;
+  name?: string | null;
+  image?: string | null;
   current_price_usd?: number;
 };
 

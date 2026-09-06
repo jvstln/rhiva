@@ -42,7 +42,10 @@ export function MarketPage({ view, queries }: MarketPageProps) {
       <MarketStatusBar />
       <MarketToolbar exclude={["radar"]} />
       {TRENDING_VIEWS.includes(view) && (
-        <TrendingView query={queries.trending} />
+        <TrendingView
+          query={queries.trending}
+          view={view}
+        />
       )}
       {view === "watchlist" && <WatchlistView query={queries.watchlist} />}
       {view === "radar" && <RadarView queries={queries.radar} />}

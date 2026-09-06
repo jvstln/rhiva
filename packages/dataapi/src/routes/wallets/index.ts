@@ -1,6 +1,7 @@
 import { format } from "util";
 import { ApiImpl } from "../../api-impl";
 import type {
+  Window,
   WalletBalance,
   WalletCluster,
   WalletFee,
@@ -11,19 +12,24 @@ import type {
   WalletSaved,
   WalletTransfer,
   WalletPnlWithPosition,
+  WalletPnlHistory,
+  WalletPnlPerformance,
 } from "../../types";
 import type {
   GetWalletBalanceParams,
   GetWalletClusterParams,
   GetWalletFeesParams,
   GetWalletFundingParams,
+  GetWalletPnlHistoryParams,
   GetWalletPnlParams,
+  GetWalletPnlPerformanceParams,
   GetWalletPnlTokenParams,
   GetWalletSavedParams,
   GetWalletTradesParams,
   GetWalletTransfersParams,
 } from "./types";
 
+export * from "./types";
 export class WalletApi extends ApiImpl {
   protected override path = "data/wallet";
 
@@ -107,6 +113,32 @@ export class WalletApi extends ApiImpl {
     return await ApiImpl.getData<WalletPnl | WalletPnlWithPosition>(
       this.xior.get(
         this.buildPathWithQueryString(this.buildPath("pnl"), {
+          chain: "solana",
+          ...params,
+        }),
+      ),
+    );
+  }
+
+  async getPnlHistory(
+    params: GetWalletPnlHistoryParams,
+  ): Promise<WalletPnlHistory[]> {
+    return await ApiImpl.getData<WalletPnlHistory[]>(
+      this.xior.get(
+        this.buildPathWithQueryString(this.buildPath("pnl/history"), {
+          chain: "solana",
+          ...params,
+        }),
+      ),
+    );
+  }
+
+  async getPnlPerformance<T extends Window>(
+    params: GetWalletPnlPerformanceParams<T>,
+  ): Promise<WalletPnlPerformance<T>[]> {
+    return await ApiImpl.getData<WalletPnlPerformance<T>[]>(
+      this.xior.get(
+        this.buildPathWithQueryString(this.buildPath("pnl/performance"), {
           chain: "solana",
           ...params,
         }),

@@ -69,6 +69,7 @@ import type {
   TokenTrade,
 } from "../../types";
 
+export * from "./types";
 export class TokenApi extends ApiImpl {
   protected override path = "data/token";
 

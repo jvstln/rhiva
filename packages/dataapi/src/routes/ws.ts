@@ -16,21 +16,27 @@ export type BaseWsSubscribeQueryParams = {
   metadata?: boolean;
 };
 
-export type WsSubscribeQueryParams = BaseWsSubscribeQueryParams & {
-  type:
-    | "swap"
-    | "liquidity"
-    | "token_created"
-    | "token_create"
-    | "pool_create"
-    | "transfer"
-    | "candle"
-    | "stats"
-    | "meme"
-    | "graduation"
-    | "surge"
-    | "radar"
-    | "metadata";
+export type SubscriptionType =
+  | "swap"
+  | "liquidity"
+  | "token_create"
+  | "graduating"
+  | "graduated"
+  | "pool_create"
+  | "transfer"
+  | "candle"
+  | "stats"
+  | "meme"
+  | "graduation"
+  | "surge"
+  | "radar"
+  | "metadata"
+  | "launches";
+
+export type WsSubscribeQueryParams<
+  T extends SubscriptionType | SubscriptionType[],
+> = BaseWsSubscribeQueryParams & {
+  type: T;
   side?: "buy" | "sell";
   min_progress?: number;
   max_progress?: number;
@@ -49,9 +55,15 @@ export class WsApi extends BaseApiImpl {
     super();
   }
 
-  subscribe(
-    params: WsSubscribeQueryParams,
-    onCallback: (event: WsEvent) => void,
+  subscribe<
+    T extends SubscriptionType | SubscriptionType[],
+    E = Extract<
+      WsEvent,
+      { type: T extends readonly string[] | string[] ? T[number] : T }
+    >,
+  >(
+    params: WsSubscribeQueryParams<T>,
+    onCallback: (event: E) => void,
     onDisconnect?: () => void,
   ): Promise<UnSubscribeFn> {
     return new Promise<UnSubscribeFn>((resolve, reject) => {
@@ -79,7 +91,7 @@ export class WsApi extends BaseApiImpl {
 
       const onMessage = (event: MessageEvent) => {
         try {
-          const data = JSON.parse(event.data) as WsEvent;
+          const data = JSON.parse(event.data) as E;
           onCallback(data);
         } catch {}
       };

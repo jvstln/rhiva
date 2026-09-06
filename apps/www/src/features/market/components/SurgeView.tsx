@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { TokenFull } from "@rhivadotfun/dataapi";
 
+import { useSurge } from "@/states";
+import { useSurgeWebSocket } from "../market.ws";
 import type { TokenQuery } from "../market.hook";
 import { useMarketStore } from "../market.store";
 import { Separator } from "@/components/ui/separator";
@@ -244,13 +247,26 @@ function TokenRow({ token }: TokenRowProps) {
 }
 
 export function SurgeTable({ query }: { query: TokenQuery }) {
+  useSurgeWebSocket({ enabled: true });
+
+  const storeTokens = useSurge((state) => state.tokens);
+  const setTokens = useSurge((state) => state.setTokens);
+
+  useEffect(() => {
+    if (query.data?.length) {
+      setTokens(query.data);
+    }
+  }, [query.data, setTokens]);
+
+  const displayTokens = storeTokens ?? query.data ?? [];
+
   return (
     <div className="w-full">
       <QueryState
         query={query}
         getIsLoading={(q) => q.isPending}
       >
-        {query.data?.map((token) => (
+        {displayTokens.map((token) => (
           <TokenRow
             key={token.mint}
             token={token}

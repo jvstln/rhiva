@@ -1,5 +1,5 @@
-import type { Chain, Dex, LaunchPad, WalletTag } from "../../types";
 import type { Window } from "../../types/Window";
+import type { Chain, Dex, LaunchPad, WalletTag } from "../../types";
 
 export type GetMetadataParams = {
   chain?: Chain;
@@ -107,83 +107,47 @@ export type SearchTokenParams = {
   limit?: boolean;
 };
 
-export type GetLaunchesParams = {
-  chain?: Chain;
-  limit?: number;
-  before_time?: number;
-};
-
-export type GetGraduatingParams = {
-  chain?: Chain;
-  limit?: number;
-  min_progress_pct?: number;
-};
-
-export type GetGraduatedParams = {
-  chain?: Chain;
-  limit?: number;
-  before_time?: number;
-  launchpad: LaunchPad;
-};
-
-export type GetTrendingParams = {
-  chain?: Chain;
-  window?: Window;
-  sort?: "volume";
-  min_liquidity_usd?: number;
-  limit?: number;
-};
-
-export type GetMoversParams = {
-  chain?: Chain;
-  limit?: number;
-  direction?: "gainers" | "losers";
-  min_volume_usd?: number;
-  max_volume_usd?: number;
-};
-
-export type GetTokensParams = {
-  chain?: Chain;
-  sort: "volume_usd" | "trades" | "traders" | "price_chnage_pct";
-  window?: Window;
-  order?: "desc" | "asc";
-  limit?: number;
-  min_volume_usd?: number;
-  max_volume_usd?: number;
-  min_trades?: number;
-  max_trades?: number;
-  min_traders?: number;
-  max_traders?: number;
-  min_price_change_pct?: number;
-  max_price_change_pct?: number;
-  min_liquidity_usd?: number;
-};
-
-export type GetScreenerParams = {
-  chain?: Chain;
-  limit?: number;
-  offset?: number;
-  sort?: string;
-  order?: "desc" | "asc";
+export type BaseTokenFilterParams = {
   min_mcap_usd?: number;
   max_mcap_usd?: number;
   min_liquidity_usd?: number;
+  max_liquidity_usd?: number;
   min_volume_usd?: number;
+  max_volume_usd?: number;
   min_holdsers?: number;
+  max_holdsers?: number;
   min_top10_pct?: number;
+  max_top10_pct?: number;
   min_dev_pct?: number;
+  max_dev_pct?: number;
   min_bot_volume_pct?: number;
+  max_bot_volume_pct?: number;
   min_organic_score?: number;
+  max_organic_score?: number;
   min_bonding_pct?: number;
+  max_bonding_pct?: number;
   min_age_secs?: number;
+  max_age_secs?: number;
   min_sniper_pct?: number;
+  max_sniper_pct?: number;
   min_insider_pct?: number;
+  max_insider_pct?: number;
   min_bundler_pct?: number;
+  max_bundler_pct?: number;
   min_fresh_pct?: number;
+  max_fresh_pct?: number;
   min_pro_traders?: number;
+  max_pro_traders?: number;
   min_dev_sold_usd?: number;
+  max_dev_sold_usd?: number;
   min_reused_symbol_count?: number;
+  max_reused_symbol_count?: number;
   min_dev_migrations?: number;
+  max_dev_migrations?: number;
+  min_dev_sold?: number;
+  max_dev_sold?: number;
+  min_created_time?: number;
+  max_created_time?: number;
   is_graduated?: number;
   is_rug?: number;
   has_socials?: number;
@@ -198,6 +162,57 @@ export type GetScreenerParams = {
   category?: string;
   creator?: string;
 };
+
+export type GetLaunchesParams = {
+  chain?: Chain;
+  limit?: number;
+  before_time?: number;
+} & BaseTokenFilterParams;
+
+export type GetGraduatingParams = {
+  chain?: Chain;
+  limit?: number;
+  min_progress_pct?: number;
+} & BaseTokenFilterParams;
+
+export type GetGraduatedParams = {
+  chain?: Chain;
+  limit?: number;
+  before_time?: number;
+  launchpad?: LaunchPad;
+} & BaseTokenFilterParams;
+
+export type GetTrendingParams = {
+  chain?: Chain;
+  window?: Window;
+  sort?: "volume";
+  min_liquidity_usd?: number;
+  limit?: number;
+} & BaseTokenFilterParams;
+
+export type GetMoversParams = {
+  chain?: Chain;
+  limit?: number;
+  direction?: "gainers" | "losers";
+  min_volume_usd?: number;
+  max_volume_usd?: number;
+} & BaseTokenFilterParams;
+
+export type GetTokensParams = {
+  chain?: Chain;
+  sort: "volume_usd" | "trades" | "traders" | "price_chnage_pct";
+  window?: Window;
+  order?: "desc" | "asc";
+  limit?: number;
+} & BaseTokenFilterParams;
+
+export type GetScreenerParams = {
+  chain?: Chain;
+  limit?: number;
+  offset?: number;
+  sort?: string;
+  order?: "desc" | "asc";
+} & BaseTokenFilterParams;
 
 export type GetTokenPriceParams = {
   chain?: Chain;

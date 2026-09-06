@@ -3,7 +3,6 @@
 import { use } from "react";
 
 import { MarketView } from "@/features/market/market.schema";
-import { useMarketWebsocket } from "@/features/market/market.ws";
 import { useMarketStore } from "@/features/market/market.store";
 import {
   useMarketFiltersFromSearchParams,
@@ -15,7 +14,6 @@ import { RadarPage } from "@/features/market/components/MarketPage";
 export default function RadarRoute({ searchParams }: PageProps<"/radar">) {
   const params = use(searchParams);
 
-  useMarketWebsocket();
   useMarketFiltersFromSearchParams(params);
 
   const view = MarketView.parse(params.view);

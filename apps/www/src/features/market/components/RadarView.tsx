@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { capitalize, cn } from "@/lib/utils";
+import { useFresh, useGraduated, useHeatingUp } from "@/states";
+import { useRadarWebSocket } from "../market.ws";
 import type { RadarQueries } from "../market.hook";
 import { RadarColumns } from "../market.schema";
 import { RadarTokenCard } from "./RadarTokenCard";
@@ -17,10 +19,31 @@ const COLUMN_LABELS: Record<RadarColumns, string> = {
 };
 
 export const RadarView = ({ queries }: { queries: RadarQueries }) => {
+  useRadarWebSocket({ enabled: true });
+
   const [activeColumn, setActiveColumn] = useState<RadarColumns>("fresh");
   const freshQuery = queries.fresh;
   const heatingQuery = queries.heatingUp;
   const graduatedQuery = queries.graduated;
+
+  const freshTokens = useFresh((s) => s.tokens);
+  const setFreshTokens = useFresh((s) => s.setTokens);
+  const heatingTokens = useHeatingUp((s) => s.tokens);
+  const setHeatingTokens = useHeatingUp((s) => s.setTokens);
+  const graduatedTokens = useGraduated((s) => s.tokens);
+  const setGraduatedTokens = useGraduated((s) => s.setTokens);
+
+  useEffect(() => {
+    if (freshQuery.data?.length) setFreshTokens(freshQuery.data);
+  }, [freshQuery.data, setFreshTokens]);
+
+  useEffect(() => {
+    if (heatingQuery.data?.length) setHeatingTokens(heatingQuery.data);
+  }, [heatingQuery.data, setHeatingTokens]);
+
+  useEffect(() => {
+    if (graduatedQuery.data?.length) setGraduatedTokens(graduatedQuery.data);
+  }, [graduatedQuery.data, setGraduatedTokens]);
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col rounded-xl border">
@@ -57,6 +80,13 @@ export const RadarView = ({ queries }: { queries: RadarQueries }) => {
                 ? heatingQuery
                 : graduatedQuery;
 
+          const columnTokens =
+            column === "fresh"
+              ? (freshTokens ?? query.data ?? [])
+              : column === "heatingUp"
+                ? (heatingTokens ?? query.data ?? [])
+                : (graduatedTokens ?? query.data ?? []);
+
           return (
             <section
               key={column}
@@ -79,7 +109,7 @@ export const RadarView = ({ queries }: { queries: RadarQueries }) => {
                   query={query}
                   getIsLoading={(q) => q.isPending}
                 >
-                  {query.data?.map((token) => (
+                  {columnTokens.map((token) => (
                     <RadarTokenCard
                       key={token.mint}
                       token={token}

@@ -53,7 +53,7 @@ const columns = [
         data-token-id={row.original.mint}
       >
         <Avatar>
-          <AvatarImage src={row.original.image} />
+          <AvatarImage src={row.original.image ?? undefined} />
           <AvatarFallback>
             <SolanaIcon className="size-4" />
           </AvatarFallback>

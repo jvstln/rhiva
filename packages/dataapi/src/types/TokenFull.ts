@@ -1,15 +1,16 @@
 import type { Window } from "./Window";
 import type { FeeVenue } from "./FeeVenue";
 import type { LaunchPad } from "./LaunchPad";
+import type { Dex } from "./Dex";
 
 export type TokenFull = {
   mint: string;
-  name: string;
-  symbol: string;
+  name: string | null;
+  symbol: string | null;
   decimals: number;
   uri: string | null;
   image: string | null;
-  description: null;
+  description: string | null;
   socials: {
     website: string | null;
     x: string | null;
@@ -25,13 +26,32 @@ export type TokenFull = {
   created_time: number | null;
   price_usd: number;
   price_native: number;
-  quote_mint: string;
+  quote_mint: string | null;
   supply: number;
   market_cap_usd: number;
   fdv_usd: number;
   holders: number;
   top10_pct: number;
-  pools: [];
+  pools: {
+    pool: string;
+    dex: Dex;
+    quote_mint: string | null;
+    price_usd: number;
+    liquidity_usd: number;
+    base_usd: number;
+    quote_usd: number;
+    tvl_usd: number;
+    virtual_base_reserve: number;
+    virtual_quote_reserve: number;
+    base_reserve: number;
+    quote_reserve: number;
+    volume_usd: number;
+    fees_usd: number;
+    trades: number;
+    traders: number;
+    created_time: number;
+    lp_burn_pct: number | null;
+  }[];
   stats: Record<
     Window,
     {
@@ -46,7 +66,7 @@ export type TokenFull = {
       low: number;
       close: number;
       price_change_pct: number;
-    }
+    } | null
   >;
   intel: {
     mint: string;

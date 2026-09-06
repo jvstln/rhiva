@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Fragment } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 
 import { capitalize, cn } from "@/lib/utils";
 import { MarketView } from "../market.schema";
@@ -11,7 +11,6 @@ import { SurgeToolbar } from "./SurgeToolbar";
 import { TrendingToolbar } from "./TrendingToolbar";
 import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { usePathname } from "next/navigation";
 
 type MarketToolbarProps = { exclude?: MarketView[]; include?: MarketView[] };
 
@@ -76,7 +75,6 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
         {view === "latest" && <TrendingToolbar />}
         {view === "stock" && <TrendingToolbar />}
         {view === "stablecoin" && <TrendingToolbar />}
-        {/* {view === "pumpLive" && <PumpLiveToolbar />} */}
         <ScrollBar
           orientation="horizontal"
           showIndicator

@@ -159,7 +159,7 @@ export type WsMemeEvent = {
     uri: string;
     creator: string | null;
     decimals: number;
-    suppy: number;
+    supply: number;
     logo_uri: string;
     descriprion: string;
     socials: {
@@ -205,6 +205,59 @@ export type WsGraduationEvent = {
   type: "graduation";
 };
 
+export type BaseWsGraduatingEvent = {
+  mint: string;
+  name: string;
+  symbol: string;
+  launchpad: LaunchPad;
+  progress_pct: number;
+  price_usd: number;
+  volume_usd: number;
+  created_time: number;
+};
+
+export type WsGraduatingEvent =
+  | ({
+      type: "graduating";
+      event: "update";
+      min_progress_pct: number;
+      rank: number;
+      generated_at: number;
+    } & BaseWsGraduatingEvent)
+  | {
+      type: "graduating";
+      event: "snapshot";
+      min_progress_pct: number;
+      generated_at: number;
+      rows: BaseWsGraduatingEvent[];
+    };
+
+export type BaseWsGraduatedEvent = {
+  mint: string;
+  name: string;
+  symbol: string;
+  launchpad: LaunchPad;
+  graduated_time: number;
+  pool: string;
+  dex: Dex;
+  price_usd: number;
+  liquidity_usd: number;
+};
+
+export type WsGraduatedEvent =
+  | ({
+      type: "graduated";
+      event: "update";
+      rank: number;
+      generated_at: number;
+    } & BaseWsGraduatedEvent)
+  | {
+      type: "graduated";
+      event: "snapshot";
+      generated_at: number;
+      rows: BaseWsGraduatedEvent[];
+    };
+
 export type WsSurgeEvent = {
   mint: string;
   trigger_time: number;
@@ -233,6 +286,48 @@ export type WsRadarEvent = {
   type: "radar";
 };
 
+export type BaseWsLaunchEvent = {
+  mint: string;
+  name: string;
+  symbol: string;
+  uri: string;
+  creator: string;
+  launchpad: LaunchPad;
+  slot: number;
+  block_time: number;
+};
+
+export type WsLaunchEvent =
+  | ({
+      type: "launches";
+      event: "update";
+      rank: number;
+      generated_at: number;
+    } & BaseWsLaunchEvent)
+  | {
+      type: "launches";
+      event: "snapshot";
+      generated_at: 1788594767;
+      rows: BaseWsLaunchEvent[];
+    };
+
+export type WsMetadataEvent = {
+  type: "metadata";
+  mint: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  uri: string;
+  logo_uri: string | null;
+  socials: {
+    website: string | null;
+    x: string | null;
+    telegram: string | null;
+  };
+  resolved_at: number;
+  catchup: boolean;
+};
+
 export type WsEvent =
   | WsSwapEvent
   | WsLiquidityEvent
@@ -244,4 +339,8 @@ export type WsEvent =
   | WsMemeEvent
   | WsGraduationEvent
   | WsSurgeEvent
-  | WsRadarEvent;
+  | WsRadarEvent
+  | WsMetadataEvent
+  | WsGraduatedEvent
+  | WsGraduatingEvent
+  | WsLaunchEvent;

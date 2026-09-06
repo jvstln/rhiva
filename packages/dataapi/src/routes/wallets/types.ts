@@ -1,4 +1,4 @@
-import type { Chain, Window } from "../../types";
+import type { Chain, Interval, Window } from "../../types";
 
 export type GetWalletBalanceParams = {
   chain?: Chain;
@@ -36,6 +36,20 @@ export type GetWalletPnlParams = {
   address: string;
   limit?: number;
 };
+
+export type GetWalletPnlHistoryParams = {
+  chain?: Chain;
+  address: string;
+  interval?: Interval;
+  from?: number;
+  to?: number;
+};
+export type GetWalletPnlPerformanceParams<T extends Window> = {
+  chain?: Chain;
+  address: string;
+  windows?: T[] | T;
+};
+
 export type GetWalletPnlTokenParams = {
   chain?: Chain;
   address: number;

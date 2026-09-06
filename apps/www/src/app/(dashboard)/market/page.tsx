@@ -3,7 +3,6 @@
 import { use } from "react";
 
 import { MarketView } from "@/features/market/market.schema";
-import { useMarketWebsocket } from "@/features/market/market.ws";
 import { useMarketStore } from "@/features/market/market.store";
 import {
   useMarketFiltersFromSearchParams,
@@ -39,7 +38,6 @@ const isTrendingView = (view: MarketView): boolean =>
 export default function MarketRoute({ searchParams }: PageProps<"/market">) {
   const params = use(searchParams);
 
-  useMarketWebsocket();
   useMarketFiltersFromSearchParams(params);
 
   const view = MarketView.parse(params.view);
