@@ -33,12 +33,16 @@ const columns = [
     header: "Token",
     cell: ({ getValue }) => {
       const mint = getValue();
+      const initial = (mint || "T").slice(0, 1).toUpperCase();
       return (
         <Link
           href={`/token/${mint}`}
-          className="font-mono text-white text-xs hover:underline"
+          className="flex items-center gap-2 font-mono text-white text-xs hover:underline"
         >
-          {truncateString(mint, 12)}
+          <div className="flex aspect-square size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 font-bold font-sans text-[10px] text-muted-foreground">
+            {initial}
+          </div>
+          <span>{truncateString(mint, 4)}</span>
         </Link>
       );
     },
@@ -70,7 +74,7 @@ const columns = [
       if (!cp) return "--";
       return (
         <span className="flex items-center gap-1 font-mono text-white text-xs">
-          {truncateString(cp, 12)}
+          {truncateString(cp, 4)}
           <CopyButton copy={cp} />
         </span>
       );
@@ -107,7 +111,7 @@ const columns = [
           rel="noopener noreferrer"
           className="font-mono text-muted-foreground text-xs hover:text-white hover:underline"
         >
-          {truncateString(sig, 8)}
+          {truncateString(sig, 4)}
         </a>
       );
     },

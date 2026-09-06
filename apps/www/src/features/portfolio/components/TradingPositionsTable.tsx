@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { ArrowUpDown, Share } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { capitalize } from "@/lib/utils";
+import { capitalize, truncateString } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SolanaIcon } from "@/components/ui/icons";
 import { PnlExportDialog } from "./PnlExportDialog";
@@ -52,7 +52,10 @@ const columns = [
         className="group flex items-center gap-2 transition-opacity hover:opacity-80"
         data-token-id={row.original.mint}
       >
-        <Avatar>
+        <Avatar
+          variant="square"
+          className="size-8 rounded-md"
+        >
           <AvatarImage src={row.original.image ?? undefined} />
           <AvatarFallback>
             <SolanaIcon className="size-4" />
@@ -65,7 +68,9 @@ const columns = [
             </p>
             <CopyButton copy={row.original.mint} />
           </div>
-          <p className="truncate text-b-5 text-gray">{row.original.mint}</p>
+          <p className="truncate font-mono text-[11px] text-muted-foreground/80">
+            {truncateString(row.original.mint, 4)}
+          </p>
         </div>
       </div>
     ),

@@ -10,7 +10,7 @@ import type {
 import type { PortfolioPnl } from "./portfolio.type";
 
 export const DEMO_WALLET_ADDRESS =
-  "AgmLJBp2N1wB8h55W2kE9VnBvCgYq8HHM13kCyYcdQbgpump";
+  "AgmLJBp2N1wB8h55W2kE9VnBvCgYq8HHM13kCyYcdLjzN51";
 
 export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
   wallet: DEMO_WALLET_ADDRESS,
@@ -127,7 +127,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 4,
     },
     {
-      mint: "USD1EnuBxT293m8zYQjQd7s8K39bJk83m1p3n9pump",
+      mint: "USD1EnuBxT293m8zYQjQd7s8K39bJk83m1p3n9EmuB",
       symbol: "USD1",
       name: "World Liberty Financial USD",
       bought: 100,
@@ -154,7 +154,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 1,
     },
     {
-      mint: "6pXvdogeK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "6pXvdogeK7x98bV1j3M89pK23b8Jk83m1p3n9doge",
       symbol: "SUS",
       name: "Sus Dog",
       bought: 500_000,
@@ -181,7 +181,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 5,
     },
     {
-      mint: "7vMEv1Y8K7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "7vMEv1Y8K7x98bV1j3M89pK23b8Jk83m1p3n9v1Y8",
       symbol: "QAnon",
       name: "QAnon",
       bought: 3_000_000,
@@ -208,7 +208,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 2,
     },
     {
-      mint: "7GCiW2hrK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "7GCiW2hrK7x98bV1j3M89pK23b8Jk83m1p3n9W2hr",
       symbol: "POPCAT",
       name: "POPCAT",
       bought: 800,
@@ -235,7 +235,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 3,
     },
     {
-      mint: "FnYJWzayK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "FnYJWrayK7x98bV1j3M89pK23b8Jk83m1p3n9Wray",
       symbol: "RONNIE",
       name: "RONNIE",
       bought: 20_000,
@@ -262,7 +262,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 2,
     },
     {
-      mint: "3gj8ov18K7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "3gj8ov18K7x98bV1j3M89pK23b8Jk83m1p3n9ov1B",
       symbol: "aoc",
       name: "ay oh see",
       bought: 100_000,
@@ -289,7 +289,7 @@ export const DEMO_PORTFOLIO_PNL: PortfolioPnl = {
       sells: 1,
     },
     {
-      mint: "HoldpumpK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "EaR4HoldFlowK7x98bV1j3M89pK23b8Jk83m1p3n9iQE",
       symbol: "HOLD",
       name: "HoldFlow",
       bought: 150_000,
@@ -370,7 +370,7 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 57.35,
     },
     {
-      mint: "USD1EnuBxT293m8zYQjQd7s8K39bJk83m1p3n9pump",
+      mint: "USD1EnuBxT293m8zYQjQd7s8K39bJk83m1p3n9EmuB",
       token_account: "USD1EnuBAccount...",
       amount: "46740000",
       program: "spl",
@@ -383,7 +383,7 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 46.73,
     },
     {
-      mint: "6pXvdogeK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "6pXvdogeK7x98bV1j3M89pK23b8Jk83m1p3n9doge",
       token_account: "6pXvdogeAccount...",
       amount: "220810000000",
       program: "spl",
@@ -396,7 +396,7 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 42.62,
     },
     {
-      mint: "7vMEv1Y8K7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "7vMEv1Y8K7x98bV1j3M89pK23b8Jk83m1p3n9v1Y8",
       token_account: "7vMEv1Y8Account...",
       amount: "1700000000000",
       program: "spl",
@@ -409,7 +409,7 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 18.88,
     },
     {
-      mint: "7GCiW2hrK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "7GCiW2hrK7x98bV1j3M89pK23b8Jk83m1p3n9W2hr",
       token_account: "7GCiW2hrAccount...",
       amount: "336000000",
       program: "spl",
@@ -422,8 +422,8 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 17.55,
     },
     {
-      mint: "FnYJWzayK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
-      token_account: "FnYJWzayAccount...",
+      mint: "FnYJWrayK7x98bV1j3M89pK23b8Jk83m1p3n9Wray",
+      token_account: "FnYJWrayAccount...",
       amount: "10000000000",
       program: "spl",
       decimals: null,
@@ -435,7 +435,7 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 17.35,
     },
     {
-      mint: "3gj8ov18K7x98bV1j3M89pK23b8Jk83m1p3n9pump",
+      mint: "3gj8ov18K7x98bV1j3M89pK23b8Jk83m1p3n9ov1B",
       token_account: "3gj8ov18Account...",
       amount: "48050000000",
       program: "spl",
@@ -448,8 +448,8 @@ export const DEMO_WALLET_BALANCE: WalletBalance = {
       value_usd: 15.4,
     },
     {
-      mint: "HoldpumpK7x98bV1j3M89pK23b8Jk83m1p3n9pump",
-      token_account: "HoldpumpAccount...",
+      mint: "EaR4HoldFlowK7x98bV1j3M89pK23b8Jk83m1p3n9iQE",
+      token_account: "HoldFlowAccount...",
       amount: "71220000000",
       program: "spl",
       decimals: null,

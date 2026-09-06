@@ -42,9 +42,21 @@ const columns = [
           className="group flex items-center gap-3 py-1 text-left transition-opacity hover:opacity-85"
         >
           <div
-            className={`flex size-8 shrink-0 items-center justify-center rounded-md border font-bold text-xs ${colorClass}`}
+            className={`flex aspect-square size-8 shrink-0 items-center justify-center overflow-hidden rounded-md border font-bold text-xs ${colorClass}`}
           >
-            {initial}
+            {token.uri ? (
+              // biome-ignore lint/performance/noImgElement: external dynamic token uri
+              <img
+                src={token.uri}
+                alt={token.symbol || token.name}
+                className="size-full rounded-md object-cover"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = "none";
+                }}
+              />
+            ) : (
+              initial
+            )}
           </div>
 
           <div className="flex min-w-0 flex-col">
@@ -55,7 +67,7 @@ const columns = [
               </span>
             </span>
             <span className="font-mono text-[11px] text-muted-foreground/80">
-              {truncateString(token.mint, 12)}
+              {truncateString(token.mint, 4)}
             </span>
           </div>
         </Link>
@@ -74,11 +86,16 @@ const columns = [
   }),
   columnHelper.accessor("price_usd", {
     header: "Price",
-    cell: ({ getValue }) => (
-      <span className="text-white text-xs">
-        {formatCompactCurrency(getValue())}
-      </span>
-    ),
+    cell: ({ getValue }) => {
+      const price = getValue();
+      const formatted =
+        price === 0
+          ? "$0"
+          : price >= 1
+            ? formatCompactCurrency(price)
+            : `$${formatCompactNumber(price, { decimals: 5, subscriptThreshold: 4, significantDigits: 3 })}`;
+      return <span className="text-white text-xs">{formatted}</span>;
+    },
     size: 140,
   }),
   columnHelper.accessor("value_usd", {

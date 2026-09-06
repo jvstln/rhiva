@@ -7,12 +7,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const avatarVariants = cva(
-  "group/avatar relative flex shrink-0 select-none bg-muted after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten",
+  "group/avatar relative flex shrink-0 select-none bg-muted after:absolute after:inset-0 after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten",
   {
     variants: {
       variant: {
-        circle: "rounded-full",
-        square: "rounded-sm",
+        circle: "rounded-full after:rounded-full",
+        square: "rounded-md after:rounded-md",
       },
       size: {
         default: "size-9",
@@ -49,7 +49,7 @@ function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn(
-        "aspect-square size-full rounded-full object-cover group-data-[variant=square]/avatar:rounded-sm",
+        "aspect-square size-full rounded-full object-cover group-data-[variant=square]/avatar:rounded-md",
         className,
       )}
       {...props}
@@ -65,7 +65,7 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "shimmer flex size-full items-center justify-center rounded-full bg-muted text-muted-foreground text-sm group-data-[size=sm]/avatar:text-xs",
+        "shimmer flex size-full items-center justify-center rounded-full bg-muted text-muted-foreground text-sm group-data-[variant=square]/avatar:rounded-md group-data-[size=sm]/avatar:text-xs",
         className,
       )}
       {...props}

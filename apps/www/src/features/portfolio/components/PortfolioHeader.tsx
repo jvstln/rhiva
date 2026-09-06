@@ -10,6 +10,7 @@ import {
   formatSignedUsd,
 } from "@/lib/finance.util";
 import { formatAge } from "@/lib";
+import { truncateString } from "@/lib/utils";
 import type { PortfolioPnl } from "../portfolio.type";
 
 type PortfolioHeaderProps = {
@@ -26,9 +27,7 @@ export const PortfolioHeader = ({
   const [copied, setCopied] = useState(false);
   const [isTracked, setIsTracked] = useState(false);
 
-  const displayWallet = wallet
-    ? `${wallet.slice(0, 6)}...${wallet.slice(-6)}`
-    : "AgmLJB...LjzN51";
+  const displayWallet = wallet ? truncateString(wallet, 6) : "AgmLJB...LjzN51";
 
   const handleCopy = () => {
     if (!wallet) return;
@@ -70,7 +69,7 @@ export const PortfolioHeader = ({
     <div className="flex flex-col justify-between gap-4 rounded-xl border border-border/60 bg-card/40 p-4 backdrop-blur-sm lg:flex-row lg:items-center">
       {/* Left: Wallet Info */}
       <div className="flex items-center gap-3.5">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-950/40 text-emerald-400">
+        <div className="flex aspect-square size-11 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-950/40 text-emerald-400">
           <Wallet className="size-5.5" />
         </div>
 

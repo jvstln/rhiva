@@ -18,9 +18,13 @@ const columns = [
     header: "Funder Address",
     cell: ({ getValue }) => {
       const w = getValue();
+      const initial = (w || "W").slice(0, 1).toUpperCase();
       return (
-        <span className="flex items-center gap-1.5 font-mono text-white text-xs">
-          {truncateString(w, 16)}
+        <span className="flex items-center gap-2 font-mono text-white text-xs">
+          <div className="flex aspect-square size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 font-bold font-sans text-[10px] text-muted-foreground">
+            {initial}
+          </div>
+          <span>{truncateString(w, 4)}</span>
           <CopyButton copy={w} />
         </span>
       );
@@ -74,8 +78,11 @@ export const FundingTab = ({ funding }: FundingTabProps) => {
               Initial Funder
             </span>
             <div className="flex items-center gap-2 font-mono text-white">
+              <div className="flex aspect-square size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 font-bold font-sans text-[10px] text-muted-foreground">
+                {(firstFunder || "W").slice(0, 1).toUpperCase()}
+              </div>
               <span className="font-medium text-sm">
-                {truncateString(firstFunder, 16)}
+                {truncateString(firstFunder, 4)}
               </span>
               <CopyButton copy={firstFunder} />
               <a
@@ -117,7 +124,7 @@ export const FundingTab = ({ funding }: FundingTabProps) => {
                   rel="noopener noreferrer"
                   className="font-mono text-muted-foreground hover:text-white hover:underline"
                 >
-                  {truncateString(firstSig, 10)}
+                  {truncateString(firstSig, 4)}
                 </a>
               </div>
             )}
