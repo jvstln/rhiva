@@ -70,11 +70,15 @@ export class WsApi extends BaseApiImpl {
   ): Promise<UnSubscribeFn> {
     return new Promise<UnSubscribeFn>((resolve, reject) => {
       let closed = false;
+      let currentWs: WebSocket | null = null;
+      let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+      let retryCount = 0;
+      let hasResolved = false;
 
       const baseWs = this.url
         .replace(/^https:\/\//i, "wss://")
         .replace(/^http:\/\//i, "ws://")
-        .replace(/\/+$/, String());
+        .replace(/\/+$/, "");
 
       const pathWithQuery = this.buildPathWithQueryString(this.path, {
         chain: "solana",
@@ -84,41 +88,97 @@ export class WsApi extends BaseApiImpl {
 
       const fullUrl = format("%s/%s", baseWs, pathWithQuery);
 
-      let ws: WebSocket;
-      try {
-        ws = new WebSocket(fullUrl);
-      } catch (error) {
-        return reject(error);
-      }
-
-      const onMessage = (event: MessageEvent) => {
-        try {
-          const data = JSON.parse(event.data) as E;
-          onCallback(data);
-        } catch {}
-      };
-
-      const onClose = () => {
-        onDisconnect?.();
-      };
-
-      ws.onerror = (event) => reject(event);
-      ws.addEventListener("close", onClose);
-      ws.addEventListener("message", onMessage);
-      ws.onopen = () => {
-        ws.send(JSON.stringify({ filter: params }));
-
-        if (closed) {
-          ws.close();
-          return;
+      const unsubscribe: UnSubscribeFn = () => {
+        closed = true;
+        if (reconnectTimer) {
+          clearTimeout(reconnectTimer);
+          reconnectTimer = null;
         }
-        resolve(() => {
-          closed = true;
-          ws.removeEventListener("message", onMessage);
-          ws.removeEventListener("close", onClose);
-          ws.close();
-        });
+        if (currentWs) {
+          currentWs.onopen = null;
+          currentWs.onmessage = null;
+          currentWs.onerror = null;
+          currentWs.onclose = null;
+          try {
+            currentWs.close();
+          } catch {}
+          currentWs = null;
+        }
       };
+
+      const scheduleReconnect = () => {
+        if (closed || reconnectTimer) return;
+        const backoffMs = Math.min(1000 * 1.5 ** retryCount, 10_000);
+        retryCount++;
+        reconnectTimer = setTimeout(() => {
+          reconnectTimer = null;
+          if (!closed) {
+            connect();
+          }
+        }, backoffMs);
+      };
+
+      const connect = () => {
+        if (closed) return;
+
+        try {
+          const ws = new WebSocket(fullUrl);
+          currentWs = ws;
+
+          ws.onopen = () => {
+            if (closed) {
+              try {
+                ws.close();
+              } catch {}
+              if (!hasResolved) {
+                hasResolved = true;
+                resolve(unsubscribe);
+              }
+              return;
+            }
+            retryCount = 0;
+            try {
+              ws.send(JSON.stringify({ filter: params }));
+            } catch {}
+
+            if (!hasResolved) {
+              hasResolved = true;
+              resolve(unsubscribe);
+            }
+          };
+
+          ws.onmessage = (event: MessageEvent) => {
+            if (closed) return;
+            try {
+              const data = JSON.parse(event.data) as E;
+              onCallback(data);
+            } catch {}
+          };
+
+          ws.onerror = (error) => {
+            if (!hasResolved && retryCount > 5) {
+              hasResolved = true;
+              reject(error);
+            }
+          };
+
+          ws.onclose = () => {
+            onDisconnect?.();
+            if (!closed) {
+              scheduleReconnect();
+            }
+          };
+        } catch (error) {
+          if (!hasResolved && retryCount > 5) {
+            hasResolved = true;
+            reject(error);
+          } else {
+            scheduleReconnect();
+          }
+        }
+      };
+
+      connect();
     });
   }
 }

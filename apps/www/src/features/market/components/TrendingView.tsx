@@ -3,24 +3,15 @@
 // import { ChartContainer } from "@/components/ui/chart";
 // import { Area, AreaChart } from "recharts";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TokenFull } from "@rhivadotfun/dataapi";
 
-import {
-  useLatest,
-  useStableCoin,
-  useStock,
-  useTopGainer,
-  useTrending,
-  useWatchList,
-} from "@/states";
+import { useLatest, useTopGainer, useTrending, useWatchList } from "@/states";
 import {
   useLatestWebSocket,
-  useStablecoinWebSocket,
-  useStockWebSocket,
   useTopGainersWebSocket,
   useTrendingWebSocket,
   useWatchlistWebSocket,
@@ -385,59 +376,17 @@ export function TrendingView({ query, view = "trending" }: TrendingViewProps) {
   useTrendingWebSocket({ enabled: view === "trending" });
   useLatestWebSocket({ enabled: view === "latest" });
   useTopGainersWebSocket({ enabled: view === "top-gainers" });
-  useStockWebSocket({ enabled: view === "stock" });
-  useStablecoinWebSocket({ enabled: view === "stablecoin" });
 
   const trendingTokens = useTrending((state) => state.tokens);
-  const setTrendingTokens = useTrending((state) => state.setTokens);
   const latestTokens = useLatest((state) => state.tokens);
-  const setLatestTokens = useLatest((state) => state.setTokens);
   const topGainerTokens = useTopGainer((state) => state.tokens);
-  const setTopGainerTokens = useTopGainer((state) => state.setTokens);
-  const stockTokens = useStock((state) => state.tokens);
-  const setStockTokens = useStock((state) => state.setTokens);
-  const stablecoinTokens = useStableCoin((state) => state.tokens);
-  const setStablecoinTokens = useStableCoin((state) => state.setTokens);
-
-  useEffect(() => {
-    if (!query.data?.length) return;
-    switch (view) {
-      case "trending":
-        setTrendingTokens(query.data);
-        break;
-      case "latest":
-        setLatestTokens(query.data);
-        break;
-      case "top-gainers":
-        setTopGainerTokens(query.data);
-        break;
-      case "stock":
-        setStockTokens(query.data);
-        break;
-      case "stablecoin":
-        setStablecoinTokens(query.data);
-        break;
-    }
-  }, [
-    query.data,
-    view,
-    setTrendingTokens,
-    setLatestTokens,
-    setTopGainerTokens,
-    setStockTokens,
-    setStablecoinTokens,
-  ]);
 
   const activeStoreTokens =
     view === "latest"
       ? latestTokens
       : view === "top-gainers"
         ? topGainerTokens
-        : view === "stock"
-          ? stockTokens
-          : view === "stablecoin"
-            ? stablecoinTokens
-            : trendingTokens;
+        : trendingTokens;
 
   const displayTokens = activeStoreTokens ?? query.data ?? [];
 
@@ -456,14 +405,6 @@ export function WatchlistView({ query }: { query: TokenQuery }) {
   useWatchlistWebSocket(watchlistItems, { enabled: true });
 
   const storeTokens = useWatchList((state) => state.tokens);
-  const setTokens = useWatchList((state) => state.setTokens);
-
-  useEffect(() => {
-    if (query.data?.length) {
-      setTokens(query.data);
-    }
-  }, [query.data, setTokens]);
-
   const displayTokens = storeTokens ?? query.data ?? [];
 
   return (

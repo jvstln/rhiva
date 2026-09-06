@@ -1,12 +1,13 @@
 import type { TokenFull, WsTokenCreateEvent } from "@rhivadotfun/dataapi";
 
+import { _metadataCache } from "@/cache";
 import { createTokenFull } from "../defaults/token";
 import type { State, AddToTop } from "./utils";
 
 export const onTokenCreate = <T extends State>(
   state: T,
   event: WsTokenCreateEvent,
-  addToTop?: AddToTop<T>,
+  addToTop?: AddToTop<T> | boolean,
 ) => {
   const tokens = state.tokens ? [...state.tokens] : [];
   const index = tokens.findIndex((token) => token.mint === event.mint);
@@ -23,22 +24,22 @@ export const onTokenCreate = <T extends State>(
     };
 
     tokens[index] = token;
-    return { tokens };
-  } else {
-    if (addToTop) {
-      const token = createTokenFull({
-        uri: event.uri,
-        name: event.name,
-        mint: event.mint,
-        symbol: event.symbol,
-        creator: event.creator,
-        created_time: event.block_time,
-        created_slot: event.slot,
-      });
+    return { ...state, tokens };
+  } else if (addToTop) {
+    const cachedMeta = _metadataCache.get(event.mint);
+    const token = createTokenFull({
+      uri: event.uri || cachedMeta?.uri || null,
+      name: event.name || cachedMeta?.name || "",
+      mint: event.mint,
+      symbol: event.symbol || cachedMeta?.symbol || "",
+      image: cachedMeta?.logo_uri || null,
+      creator: event.creator,
+      created_time: event.block_time,
+      created_slot: event.slot,
+    });
 
-      tokens.unshift(token);
-      return { tokens };
-    }
+    tokens.unshift(token);
+    return { ...state, tokens };
   }
 
   return state;

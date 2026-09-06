@@ -34,24 +34,7 @@ type Action = {
   removeToken(id: TokenFull["mint"]): void;
   updateToken(value: Partial<TokenFull> & { mint: string }): void;
   updateQueries(value: Partial<BaseTokenFilterParams> | null): void;
-  onWsEvent: (
-    event: Extract<
-      WsEvent,
-      | { type: "metadata" }
-      | { type: "graduation" }
-      | { type: "graduated" }
-      | { type: "graduating" }
-      | { type: "liquidity" }
-      | { type: "stats" }
-      | { type: "swap" }
-      | { type: "pool_create" }
-      | { type: "surge" }
-      | { type: "radar" }
-      | { type: "meme" }
-      | { type: "token_create" }
-      | { type: "movers" }
-    >,
-  ) => void;
+  onWsEvent: (event: WsEvent) => void;
 };
 
 export const useTopGainer = create<State & Action>((set) => {

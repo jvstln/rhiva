@@ -124,9 +124,9 @@ export const useTrending = create<State & Action>()(
             case "surge":
               return onSurge(state, event);
             case "meme":
-              return onMeme(state, event);
+              return onMeme(state, event, true);
             case "token_create":
-              return onTokenCreate(state, event);
+              return onTokenCreate(state, event, true);
             case "launches":
               return onLaunches(state, event);
             case "token_update":

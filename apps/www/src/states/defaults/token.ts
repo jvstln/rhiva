@@ -149,7 +149,8 @@ export const createTokenFull = (
     pools?.find((pool) => pool.uri)?.uri ??
     null;
 
-  const image = value.image ?? meme?.metadata?.logo_uri ?? null;
+  const image =
+    value.image ?? metadata?.logo_uri ?? meme?.metadata?.logo_uri ?? null;
 
   const description = value.description ?? meme?.metadata?.descriprion ?? null;
 

@@ -3,3 +3,4 @@ export * from "./use-wallet-tokens";
 export * from "./use-user-api";
 export * from "./use-clipboard";
 export * from "./use-breakpoint";
+export * from "./use-notifications";

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { UseQueryResult } from "@tanstack/react-query";
 import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import type { SearchParams } from "@/types";
@@ -19,7 +18,16 @@ import type {
   SurgeFiltersInput,
   TrendingFilters,
 } from "./market.type";
-import { queryClient } from "@/lib";
+import {
+  useFresh,
+  useGraduated,
+  useHeatingUp,
+  useLatest,
+  useSurge,
+  useTopGainer,
+  useTrending,
+  useWatchList,
+} from "@/states";
 import { mergeFreshTokens } from "@/states/token/utils";
 import { useBlacklistStore } from "./blacklist.store";
 import {
@@ -72,46 +80,6 @@ async function reconcileWithHttp(
   return mergeFreshTokens(existing, allIncoming);
 }
 
-function useEnrichQueryTokens(
-  queryKey: readonly unknown[],
-  tokens: TokenFull[] | undefined,
-) {
-  const enrichedMintsRef = useRef<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (!tokens || tokens.length === 0) return;
-
-    const stubMints = tokens
-      .filter(
-        (t) =>
-          !enrichedMintsRef.current.has(t.mint) &&
-          !t.uri &&
-          (!t.pools || t.pools.length === 0),
-      )
-      .map((t) => t.mint);
-
-    if (stubMints.length === 0) return;
-
-    for (const m of stubMints) {
-      enrichedMintsRef.current.add(m);
-    }
-
-    let cancelled = false;
-    getTokens(stubMints)
-      .then((enriched) => {
-        if (cancelled || enriched.length === 0) return;
-        queryClient.setQueryData<TokenFull[]>(queryKey, (current) =>
-          mergeFreshTokens(current ?? null, enriched),
-        );
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
-  }, [queryKey, tokens]);
-}
-
 /**
  * Market data hooks — React Query wrappers around `market.api.ts`.
  *
@@ -138,7 +106,14 @@ export type TokenCandleFilters = {
 export type QueryOptions = { enabled?: boolean };
 
 /** Shape of the query the market views receive as a prop (token list + loading/error state). */
-export type TokenQuery = UseQueryResult<TokenFull[], Error>;
+export type TokenQuery = {
+  data: TokenFull[] | null;
+  isPending: boolean;
+  isError: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+  status?: "pending" | "error" | "success";
+};
 
 /** One query per radar column ("fresh", "heatingUp", "graduated"). */
 export type RadarQueries = {
@@ -168,12 +143,41 @@ export function useTokens(mints: string[]) {
 export function useTrendingTokens(
   filters: TrendingFilters,
   options?: QueryOptions & { view?: MarketView },
-) {
+): TokenQuery {
   const activeView = options?.view ?? "trending";
-  const queryKey = ["market", "trending", activeView, filters] as const;
-  const query = useQuery({
-    queryKey,
-    queryFn: async () => {
+  const enabled = options?.enabled !== false;
+
+  // Stablecoin / stocks - Leave out for now
+  const isExcluded = activeView === "stock" || activeView === "stablecoin";
+
+  const trendingTokens = useTrending((s) => s.tokens);
+  const latestTokens = useLatest((s) => s.tokens);
+  const topGainerTokens = useTopGainer((s) => s.tokens);
+
+  const activeStoreTokens =
+    activeView === "latest"
+      ? latestTokens
+      : activeView === "top-gainers"
+        ? topGainerTokens
+        : trendingTokens;
+
+  const [isPending, setIsPending] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const inFlightRef = useRef(false);
+  const lastFetchedKeyRef = useRef<string>("");
+
+  const fetchDirect = useCallback(async () => {
+    if (isExcluded || inFlightRef.current) return;
+    inFlightRef.current = true;
+    if (!activeStoreTokens) {
+      setIsPending(true);
+    }
+    setIsError(false);
+    setError(null);
+
+    try {
       let httpTokens: TokenFull[] = [];
       if (activeView === "latest") {
         httpTokens = await getRadarTokens({
@@ -183,80 +187,246 @@ export function useTrendingTokens(
           quickBuy: filters.quickBuy,
           quickSell: filters.quickSell,
         });
+        const current = useLatest.getState().tokens;
+        const reconciled = await reconcileWithHttp(current, httpTokens);
+        useLatest.getState().setTokens(reconciled);
       } else if (activeView === "top-gainers") {
         httpTokens = await getSurgeTokens({ direction: "gainers", limit: 50 });
+        const current = useTopGainer.getState().tokens;
+        const reconciled = await reconcileWithHttp(current, httpTokens);
+        useTopGainer.getState().setTokens(reconciled);
       } else {
         httpTokens = await getTrendingTokens(filters);
+        const current = useTrending.getState().tokens;
+        const reconciled = await reconcileWithHttp(current, httpTokens);
+        useTrending.getState().setTokens(reconciled);
       }
-      const existing = queryClient.getQueryData<TokenFull[]>(queryKey);
-      return reconcileWithHttp(existing, httpTokens);
-    },
-    enabled: options?.enabled,
-    staleTime: 5_000,
-    refetchInterval: 15_000,
-  });
+    } catch (err) {
+      setIsError(true);
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setIsPending(false);
+      inFlightRef.current = false;
+    }
+  }, [activeView, filters, isExcluded, activeStoreTokens]);
 
-  useEnrichQueryTokens(queryKey, query.data);
+  const requestKey = `${activeView}:${JSON.stringify(filters)}`;
 
-  return query;
+  useEffect(() => {
+    if (!enabled || isExcluded) return;
+    if (lastFetchedKeyRef.current === requestKey && activeStoreTokens) {
+      return;
+    }
+    lastFetchedKeyRef.current = requestKey;
+    fetchDirect();
+  }, [enabled, isExcluded, requestKey, fetchDirect, activeStoreTokens]);
+
+  return {
+    data: activeStoreTokens,
+    isPending: activeStoreTokens ? false : isPending,
+    isError,
+    error,
+    refetch: fetchDirect,
+    status: isError ? "error" : activeStoreTokens ? "success" : "pending",
+  };
 }
 
-export function useWatchlistTokens(mints: string[], options?: QueryOptions) {
-  return useQuery({
-    queryKey: ["tokens", [...mints].sort().join(",")],
-    queryFn: () => getTokens(mints),
-    // Don't fetch when the watchlist is empty or the view is hidden.
-    enabled: options?.enabled && mints.length > 0,
-  });
+export function useWatchlistTokens(
+  mints: string[],
+  options?: QueryOptions,
+): TokenQuery {
+  const enabled = options?.enabled !== false && mints.length > 0;
+  const storeTokens = useWatchList((s) => s.tokens);
+
+  const [isPending, setIsPending] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const inFlightRef = useRef(false);
+  const lastFetchedKeyRef = useRef<string>("");
+
+  const fetchDirect = useCallback(async () => {
+    if (!mints.length || inFlightRef.current) return;
+    inFlightRef.current = true;
+    if (!storeTokens) {
+      setIsPending(true);
+    }
+    setIsError(false);
+    setError(null);
+
+    try {
+      const httpTokens = await getTokens(mints);
+      const current = useWatchList.getState().tokens;
+      const reconciled = await reconcileWithHttp(current, httpTokens);
+      useWatchList.getState().setTokens(reconciled);
+    } catch (err) {
+      setIsError(true);
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setIsPending(false);
+      inFlightRef.current = false;
+    }
+  }, [mints, storeTokens]);
+
+  const requestKey = [...mints].sort().join(",");
+
+  useEffect(() => {
+    if (!enabled) return;
+    if (lastFetchedKeyRef.current === requestKey && storeTokens) {
+      return;
+    }
+    lastFetchedKeyRef.current = requestKey;
+    fetchDirect();
+  }, [enabled, requestKey, fetchDirect, storeTokens]);
+
+  return {
+    data: storeTokens,
+    isPending: storeTokens ? false : isPending,
+    isError,
+    error,
+    refetch: fetchDirect,
+    status: isError ? "error" : storeTokens ? "success" : "pending",
+  };
 }
 
 export function useRadarTokens(
   filters: RadarFilters[keyof RadarFilters] & { type: keyof RadarFilters },
   options?: QueryOptions,
-) {
-  const queryKey = ["market", "radar", filters.type, filters] as const;
-  const query = useQuery({
-    queryKey,
-    queryFn: async () => {
+): TokenQuery {
+  const enabled = options?.enabled !== false;
+
+  const freshTokens = useFresh((s) => s.tokens);
+  const heatingUpTokens = useHeatingUp((s) => s.tokens);
+  const graduatedTokens = useGraduated((s) => s.tokens);
+
+  const storeTokens =
+    filters.type === "fresh"
+      ? freshTokens
+      : filters.type === "heatingUp"
+        ? heatingUpTokens
+        : graduatedTokens;
+
+  const [isPending, setIsPending] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const inFlightRef = useRef(false);
+  const lastFetchedKeyRef = useRef<string>("");
+
+  const fetchDirect = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    if (!storeTokens) {
+      setIsPending(true);
+    }
+    setIsError(false);
+    setError(null);
+
+    try {
       const httpTokens = await getRadarTokens(filters);
-      const existing = queryClient.getQueryData<TokenFull[]>(queryKey);
-      return reconcileWithHttp(existing, httpTokens);
-    },
-    enabled: options?.enabled,
-    staleTime: 5_000,
-    refetchInterval: 15_000,
-  });
+      if (filters.type === "fresh") {
+        const current = useFresh.getState().tokens;
+        const reconciled = await reconcileWithHttp(current, httpTokens);
+        useFresh.getState().setTokens(reconciled);
+      } else if (filters.type === "heatingUp") {
+        const current = useHeatingUp.getState().tokens;
+        const reconciled = await reconcileWithHttp(current, httpTokens);
+        useHeatingUp.getState().setTokens(reconciled);
+      } else if (filters.type === "graduated") {
+        const current = useGraduated.getState().tokens;
+        const reconciled = await reconcileWithHttp(current, httpTokens);
+        useGraduated.getState().setTokens(reconciled);
+      }
+    } catch (err) {
+      setIsError(true);
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setIsPending(false);
+      inFlightRef.current = false;
+    }
+  }, [filters, storeTokens]);
 
-  useEnrichQueryTokens(queryKey, query.data);
+  const requestKey = `${filters.type}:${JSON.stringify(filters)}`;
 
-  return query;
+  useEffect(() => {
+    if (!enabled) return;
+    if (lastFetchedKeyRef.current === requestKey && storeTokens) {
+      return;
+    }
+    lastFetchedKeyRef.current = requestKey;
+    fetchDirect();
+  }, [enabled, requestKey, fetchDirect, storeTokens]);
+
+  return {
+    data: storeTokens,
+    isPending: storeTokens ? false : isPending,
+    isError,
+    error,
+    refetch: fetchDirect,
+    status: isError ? "error" : storeTokens ? "success" : "pending",
+  };
 }
 
 export function useSurgeTokens(
   filters: SurgeFiltersInput,
   options?: QueryOptions,
-) {
+): TokenQuery {
   const params = SurgeFilters.parse(filters);
-  const queryKey = ["market", "surge", params] as const;
+  const enabled = options?.enabled !== false;
+  const storeTokens = useSurge((s) => s.tokens);
 
-  const query = useQuery({
-    queryKey,
-    queryFn: async () => {
+  const [isPending, setIsPending] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const inFlightRef = useRef(false);
+  const lastFetchedKeyRef = useRef<string>("");
+
+  const fetchDirect = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    if (!storeTokens) {
+      setIsPending(true);
+    }
+    setIsError(false);
+    setError(null);
+
+    try {
       const httpTokens = await getSurgeTokens({
         direction: params.direction === "down" ? "losers" : "gainers",
         limit: 50,
       });
-      const existing = queryClient.getQueryData<TokenFull[]>(queryKey);
-      return reconcileWithHttp(existing, httpTokens);
-    },
-    enabled: options?.enabled,
-    staleTime: 5_000,
-    refetchInterval: 15_000,
-  });
+      const current = useSurge.getState().tokens;
+      const reconciled = await reconcileWithHttp(current, httpTokens);
+      useSurge.getState().setTokens(reconciled);
+    } catch (err) {
+      setIsError(true);
+      setError(err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      setIsPending(false);
+      inFlightRef.current = false;
+    }
+  }, [params.direction, storeTokens]);
 
-  useEnrichQueryTokens(queryKey, query.data);
+  const requestKey = JSON.stringify(params);
 
-  return query;
+  useEffect(() => {
+    if (!enabled) return;
+    if (lastFetchedKeyRef.current === requestKey && storeTokens) {
+      return;
+    }
+    lastFetchedKeyRef.current = requestKey;
+    fetchDirect();
+  }, [enabled, requestKey, fetchDirect, storeTokens]);
+
+  return {
+    data: storeTokens,
+    isPending: storeTokens ? false : isPending,
+    isError,
+    error,
+    refetch: fetchDirect,
+    status: isError ? "error" : storeTokens ? "success" : "pending",
+  };
 }
 
 /**

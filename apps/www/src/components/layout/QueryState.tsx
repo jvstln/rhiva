@@ -17,11 +17,21 @@ import {
   EmptyDescription,
 } from "../ui/empty";
 
+export type QueryLike<TData = unknown> = {
+  data?: TData;
+  isPending?: boolean;
+  isLoading?: boolean;
+  isError?: boolean;
+  error?: { message?: string } | Error | null;
+  refetch?: () => unknown;
+  status?: string;
+};
+
 type QueryStateProps<
   TData = unknown,
-  TQuery extends Partial<UseQueryResult<TData>> | undefined = Partial<
-    UseQueryResult<TData>
-  >,
+  TQuery extends QueryLike<TData> | Partial<UseQueryResult<TData>> | undefined =
+    | QueryLike<TData>
+    | Partial<UseQueryResult<TData>>,
 > = {
   query: TQuery;
   children?:
@@ -125,11 +135,17 @@ const LoadingState = ({ classNames, loadingText }: LoadingStateProps) => {
 
 function hasData<
   TData,
-  TQuery extends Partial<UseQueryResult<TData>> = Partial<
-    UseQueryResult<TData>
-  >,
->(query: TQuery): query is TQuery & { data: NonNullable<TData> } {
-  return query.data !== undefined && query.data !== null;
+  TQuery extends QueryLike<TData> | Partial<UseQueryResult<TData>> | undefined =
+    | QueryLike<TData>
+    | Partial<UseQueryResult<TData>>
+    | undefined,
+>(query: TQuery): query is NonNullable<TQuery> & { data: NonNullable<TData> } {
+  return (
+    query !== undefined &&
+    query !== null &&
+    query.data !== undefined &&
+    query.data !== null
+  );
 }
 
 /**
@@ -178,8 +194,10 @@ const AuthRequiredState = () => {
  * - Renders children or custom builder functions otherwise.
  */
 export function QueryState<
-  TData,
-  TQuery extends Partial<UseQueryResult<TData>>,
+  TData = unknown,
+  TQuery extends QueryLike<TData> | Partial<UseQueryResult<TData>> | undefined =
+    | QueryLike<TData>
+    | Partial<UseQueryResult<TData>>,
 >({
   query,
   getIsLoading,

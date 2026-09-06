@@ -9,7 +9,7 @@ import { useLogin, usePrivy, useSigners } from "@privy-io/react-auth";
 import { Bell, MenuIcon, Search, Settings, Wallet, XIcon } from "lucide-react";
 
 import { env } from "@/lib/env";
-import { useAuth, useBreakpoint } from "@/hooks";
+import { useAuth, useBreakpoint, useNotifications } from "@/hooks";
 import { LogoIcon } from "@/public/logo-icon";
 import logo from "@/public/logo.svg";
 import RewardButton from "./RewardButton";
@@ -71,6 +71,9 @@ export function Navbar() {
       } else createWallet({ signers: [{ signerId: env.privyAppId }] });
     },
   });
+
+  const { notifications } = useNotifications();
+  const hasUnread = notifications.some((n) => !n.readAt);
 
   const isAuthProtected = (url: string) =>
     url === "/portfolio" || url === "/rewards";
@@ -257,15 +260,21 @@ export function Navbar() {
             {lgUp && <span>Search</span>}
           </Button>
         </SearchTokenDialog>
-        <NotificationPopover>
-          <Button
-            variant={"ghost"}
-            size="icon"
-            aria-label="Notifications"
-          >
-            <Bell />
-          </Button>
-        </NotificationPopover>
+        {auth.authenticated && (
+          <NotificationPopover>
+            <Button
+              variant={"ghost"}
+              size="icon"
+              aria-label="Notifications"
+              className="relative"
+            >
+              <Bell />
+              {hasUnread && (
+                <span className="absolute top-2 right-2 size-2 rounded-full bg-primary" />
+              )}
+            </Button>
+          </NotificationPopover>
+        )}
         <SettingsDialog>
           <Button
             variant={"ghost"}

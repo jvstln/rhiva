@@ -1,12 +1,13 @@
 import type { TokenFull, WsGraduationEvent } from "@rhivadotfun/dataapi";
 
+import { _metadataCache } from "@/cache";
 import type { AddToTop, State } from "./utils";
 import { createPool, createScreener, createTokenFull } from "../defaults/token";
 
 export const onGraduation = <T extends State>(
   state: T,
   event: WsGraduationEvent,
-  addToTop?: AddToTop<T>,
+  addToTop?: AddToTop<T> | boolean,
 ) => {
   const tokens = state.tokens ? [...state.tokens] : [];
   const index = tokens.findIndex((token) => token.mint === event.mint);
@@ -47,24 +48,26 @@ export const onGraduation = <T extends State>(
     }
 
     tokens[index] = token;
-    return { tokens };
-  } else {
-    if (addToTop) {
-      const token = createTokenFull({
-        mint: event.mint,
+    return { ...state, tokens };
+  } else if (addToTop) {
+    const cachedMeta = _metadataCache.get(event.mint);
+    const token = createTokenFull({
+      mint: event.mint,
+      name: cachedMeta?.name || "",
+      symbol: cachedMeta?.symbol || "",
+      image: cachedMeta?.logo_uri || null,
+      launchpad: event.launchpad,
+      creator: event.creator,
+      created_time: event.created_time,
+      screener: createScreener({
+        is_graduated: true,
+        bonding_pct: 100,
         launchpad: event.launchpad,
-        creator: event.creator,
-        created_time: event.created_time,
-        screener: createScreener({
-          is_graduated: true,
-          bonding_pct: 100,
-          launchpad: event.launchpad,
-        }),
-      });
+      }),
+    });
 
-      tokens.unshift(token);
-      return { tokens };
-    }
+    tokens.unshift(token);
+    return { ...state, tokens };
   }
 
   return state;

@@ -122,7 +122,7 @@ export const useGraduated = create<State & Action>((set) => {
           case "graduated":
             return onGraduated(state, event);
           case "graduation":
-            return onGraduation(state, event);
+            return onGraduation(state, event, true);
           case "token_update":
             return onTokenUpdate(state, event);
           default:

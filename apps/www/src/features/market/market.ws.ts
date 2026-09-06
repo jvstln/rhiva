@@ -3,6 +3,8 @@ import { dataapi } from "@/lib/dataapi";
 import type { TokenFull, TokenTrade } from "@rhivadotfun/dataapi";
 import { produce } from "immer";
 import { useEffect } from "react";
+import { _metadataCache } from "@/cache";
+import { applyMetadataToToken } from "@/states/token/on-metadata";
 import {
   useFresh,
   useGraduated,
@@ -15,8 +17,6 @@ import {
   useTrending,
   useWatchList,
 } from "@/states";
-import stocks from "../../../stocks.json";
-import stablecoins from "../../../stablecoins.json";
 
 const MAX_LIVE_TRADES = 100;
 
@@ -46,7 +46,7 @@ const updateToken = (mint: string, apply: (draft: TokenFull) => void) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* Per-view WebSocket Registration Hooks                              */
+/* Per-view Dedicated WebSocket Hooks (Single event, unsubs on leave) */
 /* ------------------------------------------------------------------ */
 
 export const useTrendingWebSocket = ({
@@ -62,28 +62,9 @@ export const useTrendingWebSocket = ({
       registerSubscription(p, unsubs, () => cancelled);
 
     reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "graduation",
-            "graduated",
-            "graduating",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "surge",
-            "radar",
-            "meme",
-            "token_create",
-            "launches",
-            "token_update",
-            "movers",
-          ],
-        },
-        (event) => useTrending.getState().onWsEvent(event),
-      ),
+      dataapi.ws.subscribe({ type: "movers" }, (event) => {
+        useTrending.getState().onWsEvent(event);
+      }),
     );
 
     return () => {
@@ -106,27 +87,9 @@ export const useSurgeWebSocket = ({
       registerSubscription(p, unsubs, () => cancelled);
 
     reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "graduation",
-            "graduated",
-            "graduating",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "surge",
-            "radar",
-            "meme",
-            "token_create",
-            "launches",
-            "movers",
-          ],
-        },
-        (event) => useSurge.getState().onWsEvent(event),
-      ),
+      dataapi.ws.subscribe({ type: ["surge", "movers"] }, (event) => {
+        useSurge.getState().onWsEvent(event);
+      }),
     );
 
     return () => {
@@ -149,27 +112,9 @@ export const useLatestWebSocket = ({
       registerSubscription(p, unsubs, () => cancelled);
 
     reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "graduation",
-            "graduated",
-            "graduating",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "surge",
-            "radar",
-            "meme",
-            "token_create",
-            "launches",
-            "movers",
-          ],
-        },
-        (event) => useLatest.getState().onWsEvent(event),
-      ),
+      dataapi.ws.subscribe({ type: "launches" }, (event) => {
+        useLatest.getState().onWsEvent(event);
+      }),
     );
 
     return () => {
@@ -192,26 +137,9 @@ export const useTopGainersWebSocket = ({
       registerSubscription(p, unsubs, () => cancelled);
 
     reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "graduation",
-            "graduated",
-            "graduating",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "surge",
-            "radar",
-            "meme",
-            "token_create",
-            "movers",
-          ],
-        },
-        (event) => useTopGainer.getState().onWsEvent(event),
-      ),
+      dataapi.ws.subscribe({ type: "movers" }, (event) => {
+        useTopGainer.getState().onWsEvent(event);
+      }),
     );
 
     return () => {
@@ -222,118 +150,26 @@ export const useTopGainersWebSocket = ({
 };
 
 export const useStockWebSocket = ({
-  enabled = true,
+  enabled: _enabled = true,
 }: {
   enabled?: boolean;
 } = {}) => {
-  useEffect(() => {
-    if (!enabled || !stocks.length) return;
-    let cancelled = false;
-    const unsubs: (() => void)[] = [];
-    const reg = (p: Promise<() => void>) =>
-      registerSubscription(p, unsubs, () => cancelled);
-
-    reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "surge",
-            "radar",
-            "launches",
-          ],
-          address: stocks,
-        },
-        (event) => useStock.getState().onWsEvent(event),
-      ),
-    );
-
-    return () => {
-      cancelled = true;
-      for (const unsub of unsubs) unsub();
-    };
-  }, [enabled]);
+  // Stock state is kept real-time via useGlobalMarketWebSocket
 };
 
 export const useStablecoinWebSocket = ({
-  enabled = true,
+  enabled: _enabled = true,
 }: {
   enabled?: boolean;
 } = {}) => {
-  useEffect(() => {
-    if (!enabled || !stablecoins.length) return;
-    let cancelled = false;
-    const unsubs: (() => void)[] = [];
-    const reg = (p: Promise<() => void>) =>
-      registerSubscription(p, unsubs, () => cancelled);
-
-    reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "launches",
-          ],
-          address: stablecoins,
-        },
-        (event) => useStableCoin.getState().onWsEvent(event),
-      ),
-    );
-
-    return () => {
-      cancelled = true;
-      for (const unsub of unsubs) unsub();
-    };
-  }, [enabled]);
+  // Stablecoin state is kept real-time via useGlobalMarketWebSocket
 };
 
 export const useWatchlistWebSocket = (
-  mints: string[],
-  { enabled = true }: { enabled?: boolean } = {},
+  _mints: string[],
+  { enabled: _enabled = true }: { enabled?: boolean } = {},
 ) => {
-  useEffect(() => {
-    if (!enabled || !mints.length) return;
-    let cancelled = false;
-    const unsubs: (() => void)[] = [];
-    const reg = (p: Promise<() => void>) =>
-      registerSubscription(p, unsubs, () => cancelled);
-
-    reg(
-      dataapi.ws.subscribe(
-        {
-          type: [
-            "metadata",
-            "graduation",
-            "graduated",
-            "graduating",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
-            "radar",
-            "surge",
-            "meme",
-            "token_create",
-          ],
-          address: mints,
-        },
-        (event) => useWatchList.getState().onWsEvent(event),
-      ),
-    );
-
-    return () => {
-      cancelled = true;
-      for (const unsub of unsubs) unsub();
-    };
-  }, [enabled, mints]);
+  // Watchlist state is kept real-time via useGlobalMarketWebSocket
 };
 
 export const useRadarWebSocket = ({
@@ -352,21 +188,12 @@ export const useRadarWebSocket = ({
       dataapi.ws.subscribe(
         {
           type: [
-            "metadata",
             "graduation",
             "graduated",
             "graduating",
-            "liquidity",
-            "stats",
-            "swap",
-            "pool_create",
             "radar",
-            "surge",
-            "meme",
-            "token_create",
-            "launches",
-            "token_update",
             "movers",
+            "launches",
           ],
         },
         (event) => {
@@ -472,4 +299,159 @@ export const useTokenWebSocket = (mint: string) => {
       }
     };
   }, [mint]);
+};
+
+/* ------------------------------------------------------------------ */
+/* Global Metadata WebSocket Hook                                      */
+/* ------------------------------------------------------------------ */
+
+export const useGlobalMetadataWebSocket = ({
+  enabled = true,
+}: {
+  enabled?: boolean;
+} = {}) => {
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    let unsubscriber: (() => void) | null = null;
+
+    dataapi.ws
+      .subscribe({ type: "metadata" }, (event) => {
+        if (cancelled || event.type !== "metadata") return;
+
+        // Always cache metadata for later use by meme and co.
+        _metadataCache.set(event.mint, event);
+
+        // Update all states that require metadata if the token exists in that state
+        const stores = [
+          useTrending,
+          useSurge,
+          useLatest,
+          useTopGainer,
+          useStock,
+          useStableCoin,
+          useFresh,
+          useHeatingUp,
+          useGraduated,
+          useWatchList,
+        ];
+
+        for (const store of stores) {
+          const tokens = store.getState().tokens;
+          if (tokens?.some((t) => t.mint === event.mint)) {
+            const current = tokens.find((t) => t.mint === event.mint);
+            if (current) {
+              const updated = applyMetadataToToken(current, event);
+              store.getState().updateToken(updated);
+            }
+          }
+        }
+
+        // Also update token cache in React Query if active
+        queryClient.setQueryData(
+          ["token", event.mint],
+          (old: TokenFull | undefined) =>
+            old ? applyMetadataToToken(old, event) : old,
+        );
+      })
+      .then((unsub) => {
+        if (cancelled) {
+          unsub();
+        } else {
+          unsubscriber = unsub;
+        }
+      })
+      .catch((err) => {
+        console.warn("[Global Metadata WS Error]", err);
+      });
+
+    return () => {
+      cancelled = true;
+      if (unsubscriber) unsubscriber();
+    };
+  }, [enabled]);
+};
+
+/* ------------------------------------------------------------------ */
+/* Global Market Events WebSocket Hook                                */
+/* Groups common high-throughput events and dispatches to all states  */
+/* ------------------------------------------------------------------ */
+
+export const useGlobalMarketWebSocket = ({
+  enabled = true,
+}: {
+  enabled?: boolean;
+} = {}) => {
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    let unsubscriber: (() => void) | null = null;
+
+    dataapi.ws
+      .subscribe(
+        {
+          type: [
+            "swap",
+            "liquidity",
+            "stats",
+            "pool_create",
+            "token_create",
+            "token_update",
+            "meme",
+          ],
+        },
+        (event) => {
+          if (cancelled) return;
+
+          // Dispatch high-throughput grouped events to all token states
+          useTrending.getState().onWsEvent(event);
+          useSurge.getState().onWsEvent(event);
+          useLatest.getState().onWsEvent(event);
+          useTopGainer.getState().onWsEvent(event);
+          useFresh.getState().onWsEvent(event);
+          useHeatingUp.getState().onWsEvent(event);
+          useGraduated.getState().onWsEvent(event);
+          useStock.getState().onWsEvent(event);
+          useStableCoin.getState().onWsEvent(event);
+          useWatchList.getState().onWsEvent(event);
+
+          if ("mint" in event && event.mint) {
+            if (event.type === "swap") {
+              updateToken(event.mint, (draft) => {
+                draft.price_usd = event.price_usd;
+              });
+            } else if (event.type === "meme") {
+              updateToken(event.mint, (draft) => {
+                draft.price_usd = event.price_usd;
+                if (draft.screener) {
+                  draft.screener.bonding_pct = event.progress_pct;
+                }
+              });
+            } else if (event.type === "token_update") {
+              updateToken(event.mint, (draft) => {
+                draft.price_usd = event.price_usd;
+                if (event.mcap_usd) draft.market_cap_usd = event.mcap_usd;
+                if (event.liquidity_usd)
+                  draft.liquidity_usd = event.liquidity_usd;
+              });
+            }
+          }
+        },
+      )
+      .then((unsub) => {
+        if (cancelled) {
+          unsub();
+        } else {
+          unsubscriber = unsub;
+        }
+      })
+      .catch((err) => {
+        console.warn("[Global Market WS Error]", err);
+      });
+
+    return () => {
+      cancelled = true;
+      if (unsubscriber) unsubscriber();
+    };
+  }, [enabled]);
 };

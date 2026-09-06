@@ -18,17 +18,7 @@ type Action = {
   addTokens(...value: TokenFull[]): void;
   removeToken(id: TokenFull["mint"]): void;
   updateToken(value: Partial<TokenFull> & { mint: string }): void;
-  onWsEvent: (
-    event: Extract<
-      WsEvent,
-      | { type: "metadata" }
-      | { type: "liquidity" }
-      | { type: "stats" }
-      | { type: "swap" }
-      | { type: "pool_create" }
-      | { type: "launches" }
-    >,
-  ) => void;
+  onWsEvent: (event: WsEvent) => void;
 };
 
 export const useStableCoin = create<State & Action>((set) => {

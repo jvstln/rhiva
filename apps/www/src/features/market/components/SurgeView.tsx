@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { TokenFull } from "@rhivadotfun/dataapi";
 
@@ -250,14 +249,6 @@ export function SurgeTable({ query }: { query: TokenQuery }) {
   useSurgeWebSocket({ enabled: true });
 
   const storeTokens = useSurge((state) => state.tokens);
-  const setTokens = useSurge((state) => state.setTokens);
-
-  useEffect(() => {
-    if (query.data?.length) {
-      setTokens(query.data);
-    }
-  }, [query.data, setTokens]);
-
   const displayTokens = storeTokens ?? query.data ?? [];
 
   return (

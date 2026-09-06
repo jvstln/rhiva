@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { capitalize, cn } from "@/lib/utils";
 import { useFresh, useGraduated, useHeatingUp } from "@/states";
 import { useRadarWebSocket } from "../market.ws";
@@ -27,23 +27,8 @@ export const RadarView = ({ queries }: { queries: RadarQueries }) => {
   const graduatedQuery = queries.graduated;
 
   const freshTokens = useFresh((s) => s.tokens);
-  const setFreshTokens = useFresh((s) => s.setTokens);
   const heatingTokens = useHeatingUp((s) => s.tokens);
-  const setHeatingTokens = useHeatingUp((s) => s.setTokens);
   const graduatedTokens = useGraduated((s) => s.tokens);
-  const setGraduatedTokens = useGraduated((s) => s.setTokens);
-
-  useEffect(() => {
-    if (freshQuery.data?.length) setFreshTokens(freshQuery.data);
-  }, [freshQuery.data, setFreshTokens]);
-
-  useEffect(() => {
-    if (heatingQuery.data?.length) setHeatingTokens(heatingQuery.data);
-  }, [heatingQuery.data, setHeatingTokens]);
-
-  useEffect(() => {
-    if (graduatedQuery.data?.length) setGraduatedTokens(graduatedQuery.data);
-  }, [graduatedQuery.data, setGraduatedTokens]);
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col rounded-xl border">

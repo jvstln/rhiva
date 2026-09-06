@@ -17,6 +17,12 @@ export default class NotificationAPI extends ApiImpl {
     );
   }
 
+  getNotifications(
+    params?: ReturnType<typeof notificationQueryParamsSchema.encode>,
+  ) {
+    return this.getQuote(params ?? {});
+  }
+
   batchUpdates(updates: ReturnType<typeof notificationUpdateSchema.encode>[]) {
     return ApiImpl.getData(
       this.xior.post<ReturnType<typeof notificationSchema.encode>[]>(

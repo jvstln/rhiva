@@ -20,6 +20,7 @@ import {
   onPoolCreate,
   onTokenCreate,
   onTokenUpdate,
+  onMover,
   mergeFreshTokens,
 } from "./token/actions";
 
@@ -125,6 +126,8 @@ export const useHeatingUp = create<State & Action>((set) => {
             return onGraduating(state, event);
           case "token_update":
             return onTokenUpdate(state, event);
+          case "movers":
+            return onMover(state, event);
           default:
             return state;
         }
