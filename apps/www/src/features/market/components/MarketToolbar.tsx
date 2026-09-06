@@ -1,26 +1,34 @@
 "use client";
 
-import Link from "next/link";
 import { Fragment } from "react";
-import { useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { capitalize, cn } from "@/lib/utils";
 import { MarketView } from "../market.schema";
+import { useMarketStore } from "../market.store";
 import { RadarToolbar } from "./RadarToolbar";
 import { SurgeToolbar } from "./SurgeToolbar";
 import { TrendingToolbar } from "./TrendingToolbar";
 import { buttonVariants } from "@/components/ui/button";
+import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type MarketToolbarProps = { exclude?: MarketView[]; include?: MarketView[] };
 
 export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
-  const searchParams = useSearchParams();
   const pathname = usePathname();
-  const view: MarketView =
-    pathname === "/radar"
-      ? "radar"
-      : MarketView.parse(searchParams.get("view"));
+  const router = useRouter();
+  const activeView = useMarketStore((state) => state.activeView);
+  const setActiveView = useMarketStore((state) => state.setActiveView);
+
+  const view: MarketView = pathname === "/radar" ? "radar" : activeView;
+
+  const handleTabClick = (tab: MarketView) => {
+    setActiveView(tab);
+    if (pathname === "/radar" && tab !== "radar") {
+      router.push("/");
+    }
+  };
 
   return (
     <div
@@ -29,8 +37,9 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
       )}
     >
       <ScrollArea className={"min-w-0 basis-1/2"}>
-        <nav
-          className="flex w-max items-center gap-0.5 py-2"
+        <TabsList
+          variant="ghost"
+          className="flex h-auto w-max items-center gap-0.5 bg-transparent p-0 py-2"
           aria-label="Market sections"
         >
           {MarketView.unwrap().options.map((tab, index) => {
@@ -42,14 +51,18 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
 
             return (
               <Fragment key={tab}>
-                <Link
-                  href={`?view=${tab}`}
-                  data-active={view === tab || pathname.includes(tab)}
-                  className={buttonVariants({ variant: "ghost" })}
+                <TabsTrigger
+                  value={tab}
+                  onClick={() => handleTabClick(tab)}
+                  data-active={view === tab}
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "cursor-pointer data-active:bg-muted data-active:text-foreground",
+                  )}
                   aria-current={view === tab ? "page" : undefined}
                 >
                   {capitalize(tab)}
-                </Link>
+                </TabsTrigger>
                 {index === 0 && (
                   <span
                     className="h-4 w-px bg-white/30"
@@ -59,7 +72,7 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
               </Fragment>
             );
           })}
-        </nav>
+        </TabsList>
         <ScrollBar
           orientation="horizontal"
           showIndicator

@@ -42,6 +42,9 @@ export const useSwap = () => {
 
   return useMutation({
     mutationFn: async (params: SwapParams) => {
+      if (!userApi) {
+        throw new Error("Please connect your wallet first");
+      }
       const preset =
         params.action === "buy" ? activePreset.buy : activePreset.sell;
       const slippageBps = params.slippage

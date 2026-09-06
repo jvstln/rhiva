@@ -4,8 +4,6 @@ import type { TokenFull, WsEvent } from "@rhivadotfun/dataapi";
 import {
   onSwap,
   onStats,
-  onCandle,
-  onTransfer,
   onMetadata,
   onLiquidity,
   onPoolCreate,
@@ -27,9 +25,7 @@ type Action = {
       | { type: "liquidity" }
       | { type: "stats" }
       | { type: "swap" }
-      | { type: "candle" }
       | { type: "pool_create" }
-      | { type: "transfer" }
       | { type: "launches" }
     >,
   ) => void;
@@ -79,12 +75,8 @@ export const useStableCoin = create<State & Action>((set) => {
             return onStats(state, event);
           case "swap":
             return onSwap(state, event);
-          case "candle":
-            return onCandle(state, event);
           case "pool_create":
             return onPoolCreate(state, event);
-          case "transfer":
-            return onTransfer(state, event);
           default:
             return state;
         }

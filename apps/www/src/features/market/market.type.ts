@@ -3,6 +3,7 @@ import type {
   Timeframe,
   RadarColumns,
   SurgeFiltersInput,
+  MarketView,
 } from "./market.schema";
 
 export type { SurgeFiltersInput };
@@ -10,6 +11,9 @@ export type { SurgeFiltersInput };
 type Sort = "asc" | "desc" | null;
 
 export type MarketState = {
+  activeView: MarketView;
+  setActiveView: (view: MarketView) => void;
+
   radarFilters: RadarFilters;
   setRadarFilters: (columns: Partial<RadarFilters>) => void;
 

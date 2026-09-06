@@ -1,7 +1,7 @@
 import type { TokenFull, TokenTrending } from "@rhivadotfun/dataapi";
 
 import { createTokenFull } from "../defaults/token";
-import { type State, type AddToTop, lazyFetchToken } from "./utils";
+import type { State, AddToTop } from "./utils";
 
 export const onTrending = <T extends State>(
   state: T,
@@ -40,8 +40,6 @@ export const onTrending = <T extends State>(
         liquidity_usd: event.liquidity_usd,
         image: "image" in event && event.image ? event.image : null,
       });
-
-      lazyFetchToken(event.mint, addToTop);
 
       tokens.unshift(token);
       return { tokens };

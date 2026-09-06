@@ -15,8 +15,11 @@ import {
 
 export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
   const t = useTranslations("metrics.dev");
-  const devHoldPercent = token.intel?.dev?.held_pct ?? 0;
-  const hasDevSoldAll = devHoldPercent === 0;
+  const hasIntelDev = token.intel?.dev != null;
+  const devHoldPercent = hasIntelDev
+    ? token.intel!.dev.held_pct
+    : (token.screener?.dev_pct ?? null);
+  const hasDevSoldAll = hasIntelDev ? devHoldPercent === 0 : false;
   const devWallet = token.creator || token.dev?.wallet;
   const _funderWallet = null;
 
@@ -105,7 +108,9 @@ export const DevHoldOrDevSell = ({ token, ...props }: TokenInfoProps) => {
         ? props.children
         : hasDevSoldAll
           ? t("ds")
-          : `${formatCompactNumber(devHoldPercent)}%`}
+          : devHoldPercent != null
+            ? `${formatCompactNumber(devHoldPercent)}%`
+            : "--"}
     </InfoBadge>
   );
 };

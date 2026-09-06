@@ -1,14 +1,13 @@
 import type { TokenFull, WsSurgeEvent } from "@rhivadotfun/dataapi";
 
 import { createTokenFull } from "../defaults/token";
-import { type State, type AddToTop, lazyFetchToken } from "./utils";
+import { type State, insertOrMoveByRank } from "./utils";
 
 export const onSurge = <T extends State>(
   state: T,
-  event: WsSurgeEvent,
-  addToTop?: AddToTop<T>,
+  event: WsSurgeEvent & { rank?: number },
 ) => {
-  const tokens = state.tokens ? [...state.tokens] : [];
+  let tokens = state.tokens ? [...state.tokens] : [];
   const index = tokens.findIndex((token) => token.mint === event.mint);
 
   if (index > -1) {
@@ -40,30 +39,34 @@ export const onSurge = <T extends State>(
       },
     };
 
-    tokens[index] = token;
-    return { tokens };
+    tokens = insertOrMoveByRank(
+      tokens,
+      token,
+      event.rank,
+      (t) => t.mint === event.mint,
+    );
+    return { ...state, tokens };
   } else {
-    if (addToTop) {
-      const token = createTokenFull({
-        mint: event.mint,
-        price_usd: event.price_at_trigger,
-        market_cap_usd: event.mcap_at_trigger,
-        fdv_usd: event.mcap_at_trigger,
-        surge: {
-          trigger_time: event.trigger_time,
-          mcap_at_trigger: event.mcap_at_trigger,
-          multiple: event.multiple,
-          mcap_change_since_trigger_pct: 0,
-          ath_change_since_trigger_pct: 0,
-        },
-      });
+    const token = createTokenFull({
+      mint: event.mint,
+      price_usd: event.price_at_trigger,
+      market_cap_usd: event.mcap_at_trigger,
+      fdv_usd: event.mcap_at_trigger,
+      surge: {
+        trigger_time: event.trigger_time,
+        mcap_at_trigger: event.mcap_at_trigger,
+        multiple: event.multiple,
+        mcap_change_since_trigger_pct: 0,
+        ath_change_since_trigger_pct: 0,
+      },
+    });
 
-      lazyFetchToken(event.mint, addToTop);
-
-      tokens.unshift(token);
-      return { tokens };
-    }
+    tokens = insertOrMoveByRank(
+      tokens,
+      token,
+      event.rank,
+      (t) => t.mint === event.mint,
+    );
+    return { ...state, tokens };
   }
-
-  return state;
 };

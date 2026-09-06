@@ -1,7 +1,7 @@
 import type { TokenFull, WsTokenCreateEvent } from "@rhivadotfun/dataapi";
 
 import { createTokenFull } from "../defaults/token";
-import { type State, type AddToTop, lazyFetchToken } from "./utils";
+import type { State, AddToTop } from "./utils";
 
 export const onTokenCreate = <T extends State>(
   state: T,
@@ -35,8 +35,6 @@ export const onTokenCreate = <T extends State>(
         created_time: event.block_time,
         created_slot: event.slot,
       });
-
-      lazyFetchToken(event.mint, addToTop);
 
       tokens.unshift(token);
       return { tokens };

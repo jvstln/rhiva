@@ -17,7 +17,7 @@ export function AuthProtection() {
       if (requireAuthElement && !auth.authenticated) {
         event.preventDefault();
         event.stopPropagation();
-        login({ walletChainType: "solana-only" });
+        login();
       }
     };
 

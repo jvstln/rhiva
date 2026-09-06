@@ -1,4 +1,5 @@
 import type { TokenFull } from "@rhivadotfun/dataapi";
+import { useBlacklistStore } from "@/features/market/blacklist.store";
 
 export type State = { tokens: TokenFull[] | null };
 
@@ -71,25 +72,80 @@ export const deepMergeNonNullNonZero = <T>(target: T, source: unknown): T => {
   return result as T;
 };
 
-export const lazyFetchToken = <T extends State>(
-  _mint: string,
-  _addToTop: AddToTop<T>,
-) => {
-  return;
-  // dataapi.token
-  //   .getToken({ address: mint })
-  //   .then((value) => {
-  //     addToTop.set((state) => {
-  //       if (!state.tokens) return state;
-  //       const index = state.tokens.findIndex((token) => token.mint === mint);
-  //       if (index === -1) return state;
+export const insertOrMoveByRank = <T>(
+  list: T[],
+  item: T,
+  rank: number | undefined,
+  matchFn: (a: T) => boolean,
+): T[] => {
+  const nextList = [...list];
+  const existingIndex = nextList.findIndex(matchFn);
+  if (existingIndex > -1) {
+    nextList.splice(existingIndex, 1);
+  }
 
-  //       const tokens = [...state.tokens];
-  //       tokens[index] = deepMergeNonNullNonZero(tokens[index], value);
-  //       return { ...state, tokens };
-  //     });
-  //   })
-  //   .catch((error) => {
-  //     console.error(error, "lazy fetching token failed for", mint);
-  //   });
+  if (typeof rank === "number" && !Number.isNaN(rank) && rank > 0) {
+    const targetIndex = Math.max(0, Math.min(rank - 1, nextList.length));
+    nextList.splice(targetIndex, 0, item);
+  } else {
+    nextList.unshift(item);
+  }
+
+  return nextList;
+};
+
+export const mergeFreshTokens = (
+  existingTokens: TokenFull[] | null,
+  incomingTokens: TokenFull[],
+): TokenFull[] => {
+  const blacklistFilter = (t: TokenFull) => {
+    try {
+      return !useBlacklistStore.getState().isTokenBlacklisted(t);
+    } catch {
+      return true;
+    }
+  };
+
+  const validIncoming = incomingTokens.filter(blacklistFilter);
+  const validExisting = existingTokens
+    ? existingTokens.filter(blacklistFilter)
+    : null;
+
+  if (!validExisting || validExisting.length === 0) {
+    return validIncoming;
+  }
+  if (!validIncoming || validIncoming.length === 0) {
+    return validExisting;
+  }
+  const incomingMap = new Map(validIncoming.map((t) => [t.mint, t]));
+  const existingMints = new Set(validExisting.map((t) => t.mint));
+
+  const mergedExisting: TokenFull[] = validExisting.map((existing) => {
+    const incoming = incomingMap.get(existing.mint);
+    if (!incoming) return existing;
+
+    return {
+      ...incoming,
+      ...existing,
+      name: existing.name || incoming.name,
+      symbol: existing.symbol || incoming.symbol,
+      image_uri: existing.image || incoming.image,
+      price_usd: existing.price_usd || incoming.price_usd,
+      price_native: existing.price_native || incoming.price_native,
+      market_cap_usd: existing.market_cap_usd || incoming.market_cap_usd,
+      fdv_usd: existing.fdv_usd || incoming.fdv_usd,
+      liquidity_usd:
+        existing.liquidity_usd !== undefined
+          ? existing.liquidity_usd
+          : incoming.liquidity_usd,
+      stats: deepMergeNonNullNonZero(incoming.stats, existing.stats),
+      screener: deepMergeNonNullNonZero(incoming.screener, existing.screener),
+      pools: incoming.pools?.length ? incoming.pools : existing.pools,
+      surge: deepMergeNonNullNonZero(incoming.surge, existing.surge),
+    };
+  });
+
+  const newIncoming = validIncoming.filter((t) => !existingMints.has(t.mint));
+
+  return [...mergedExisting, ...newIncoming];
 };

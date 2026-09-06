@@ -4,99 +4,103 @@ import type {
   WsGraduatedEvent,
 } from "@rhivadotfun/dataapi";
 
-import { lazyFetchToken, type AddToTop, type State } from "./utils";
+import { type State, insertOrMoveByRank } from "./utils";
 import { createPool, createScreener, createTokenFull } from "../defaults/token";
 
 export const onGraduated = <T extends State>(
   state: T,
   event: WsGraduatedEvent,
-  addToTop?: AddToTop<T>,
 ) => {
-  const tokens = state.tokens ? [...state.tokens] : [];
+  let tokens = state.tokens ? [...state.tokens] : [];
 
-  const updateToken = (event: BaseWsGraduatedEvent) => {
-    const index = tokens.findIndex((token) => token.mint === event.mint);
+  const updateToken = (row: BaseWsGraduatedEvent, rank?: number) => {
+    const index = tokens.findIndex((token) => token.mint === row.mint);
 
     if (index > -1) {
       const current = tokens[index];
       const token: TokenFull = {
         ...current,
-        name: event.name ? event.name : current.name,
-        symbol: event.symbol ? event.symbol : current.symbol,
-        launchpad: event.launchpad ? event.launchpad : current.launchpad,
-        price_usd: event.price_usd ? event.price_usd : current.price_usd,
-        liquidity_usd: event.liquidity_usd
-          ? event.liquidity_usd
+        name: row.name ? row.name : current.name,
+        symbol: row.symbol ? row.symbol : current.symbol,
+        launchpad: row.launchpad ? row.launchpad : current.launchpad,
+        price_usd: row.price_usd ? row.price_usd : current.price_usd,
+        liquidity_usd: row.liquidity_usd
+          ? row.liquidity_usd
           : current.liquidity_usd,
         screener: createScreener({
           ...current.screener,
           is_graduated: true,
           bonding_pct: 100,
-          launchpad: event.launchpad || current.screener?.launchpad,
+          launchpad: row.launchpad || current.screener?.launchpad,
         }),
       };
 
-      if (event.pool && !token.pools.some((pool) => pool.pool === event.pool)) {
+      if (row.pool && !token.pools.some((pool) => pool.pool === row.pool)) {
         token.pools = [
           ...token.pools,
           createPool({
-            pool: event.pool,
-            dex: event.dex,
-            price_usd: event.price_usd,
+            pool: row.pool,
+            dex: row.dex,
+            price_usd: row.price_usd,
             quote_mint: token.quote_mint,
-            liquidity_usd: event.liquidity_usd,
-            created_time: event.graduated_time,
+            liquidity_usd: row.liquidity_usd,
+            created_time: row.graduated_time,
           }),
         ];
       }
 
-      tokens[index] = token;
-      return { tokens };
+      tokens = insertOrMoveByRank(
+        tokens,
+        token,
+        rank,
+        (t) => t.mint === row.mint,
+      );
     } else {
-      if (addToTop) {
-        const token = createTokenFull({
-          mint: event.mint,
-          name: event.name,
-          symbol: event.symbol,
-          launchpad: event.launchpad,
-          price_usd: event.price_usd,
-          liquidity_usd: event.liquidity_usd,
-          created_time: event.graduated_time,
-          screener: createScreener({
-            is_graduated: true,
-            bonding_pct: 100,
-            launchpad: event.launchpad,
+      // Create token even if it doesn't exist yet to make list real-time
+      const token = createTokenFull({
+        mint: row.mint,
+        name: row.name,
+        symbol: row.symbol,
+        launchpad: row.launchpad,
+        price_usd: row.price_usd,
+        liquidity_usd: row.liquidity_usd,
+        created_time: row.graduated_time,
+        screener: createScreener({
+          is_graduated: true,
+          bonding_pct: 100,
+          launchpad: row.launchpad,
+        }),
+      });
+
+      if (row.pool) {
+        token.pools = [
+          createPool({
+            pool: row.pool,
+            dex: row.dex,
+            price_usd: row.price_usd,
+            quote_mint: token.quote_mint,
+            liquidity_usd: row.liquidity_usd,
+            created_time: row.graduated_time,
           }),
-        });
-
-        if (event.pool) {
-          token.pools = [
-            createPool({
-              pool: event.pool,
-              dex: event.dex,
-              price_usd: event.price_usd,
-              quote_mint: token.quote_mint,
-              liquidity_usd: event.liquidity_usd,
-              created_time: event.graduated_time,
-            }),
-          ];
-        }
-
-        lazyFetchToken(event.mint, addToTop);
-
-        tokens.unshift(token);
-        return { tokens };
+        ];
       }
+
+      tokens = insertOrMoveByRank(
+        tokens,
+        token,
+        rank,
+        (t) => t.mint === row.mint,
+      );
     }
   };
 
   if (event.event === "snapshot") {
-    for (const row of event.rows) updateToken(row);
-    return { tokens };
+    for (let i = 0; i < event.rows.length; i++) {
+      updateToken(event.rows[i], i + 1);
+    }
+    return { ...state, tokens };
   } else {
-    const state = updateToken(event);
-    if (state) return state;
+    updateToken(event, event.rank);
+    return { ...state, tokens };
   }
-
-  return state;
 };

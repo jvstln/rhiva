@@ -1,11 +1,8 @@
 "use client";
 
-import { use } from "react";
-
-import { MarketView } from "@/features/market/market.schema";
+import type { MarketView } from "@/features/market/market.schema";
 import { useMarketStore } from "@/features/market/market.store";
 import {
-  useMarketFiltersFromSearchParams,
   useRadarTokens,
   useSurgeTokens,
   useTrendingTokens,
@@ -24,23 +21,9 @@ const TRENDING_VIEWS: readonly MarketView[] = [
 const isTrendingView = (view: MarketView): boolean =>
   TRENDING_VIEWS.includes(view);
 
-/**
- * Market page data owner.
- *
- * This is the ONLY place that fetches market data. It renders `<MarketPage>`
- * (pure UI) and passes every query result to it as props.
- * To integrate a real API, edit the data functions in `market.api.ts` — the
- * component tree below is just plumbing and never needs to change.
- *
- * The `enabled` flags gate each query so only the ACTIVE view's data is
- * fetched (e.g. the surge list only loads while the surge tab is open).
- */
-export default function MarketRoute({ searchParams }: PageProps<"/market">) {
-  const params = use(searchParams);
-
-  useMarketFiltersFromSearchParams(params);
-
-  const view = MarketView.parse(params.view);
+export default function RootMarketPage() {
+  const view = useMarketStore((state) => state.activeView);
+  const setView = useMarketStore((state) => state.setActiveView);
 
   const trendingFilters = useMarketStore((state) => state.trendingFilters);
   const surgeFilters = useMarketStore((state) => state.surgeFilters);
@@ -54,6 +37,7 @@ export default function MarketRoute({ searchParams }: PageProps<"/market">) {
 
   const trendingQuery = useTrendingTokens(trendingFilters, {
     enabled: showTrending,
+    view,
   });
   const watchlistQuery = useWatchlistTokens(watchlistItems, {
     enabled: showWatchlist,
@@ -77,6 +61,7 @@ export default function MarketRoute({ searchParams }: PageProps<"/market">) {
   return (
     <MarketPage
       view={view}
+      onViewChange={setView}
       queries={{
         trending: trendingQuery,
         watchlist: watchlistQuery,

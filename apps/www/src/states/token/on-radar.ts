@@ -1,7 +1,7 @@
 import type { TokenFull, WsRadarEvent } from "@rhivadotfun/dataapi";
 
 import { createTokenFull } from "../defaults/token";
-import { type State, type AddToTop, lazyFetchToken } from "./utils";
+import type { State, AddToTop } from "./utils";
 
 export const onRadar = <T extends State>(
   state: T,
@@ -37,8 +37,6 @@ export const onRadar = <T extends State>(
         market_cap_usd: event.mcap_at_trigger,
         fdv_usd: event.mcap_at_trigger,
       });
-
-      lazyFetchToken(event.mint, addToTop);
 
       tokens.unshift(token);
       return { tokens };

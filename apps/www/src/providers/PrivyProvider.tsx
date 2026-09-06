@@ -1,9 +1,9 @@
 "use client";
 
 import { createContext, useEffect, useMemo } from "react";
-import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
 import {
   useUser,
+  usePrivy,
   useSigners,
   PrivyProvider as PrivyProviderPrimitive,
   type WalletWithMetadata,
@@ -15,18 +15,21 @@ type PrivyProviderProps = Partial<
   React.ComponentProps<typeof PrivyProviderPrimitive>
 >;
 
-const solanaConnectors = toSolanaWalletConnectors({ shouldAutoConnect: true });
-
 export type TAuthContext =
   | {
+      ready: boolean;
       authenticated: true;
       activeWallet: WalletWithMetadata;
     }
-  | { authenticated: false };
+  | {
+      ready: boolean;
+      authenticated: false;
+    };
 
 export const AuthContext = createContext<TAuthContext | null>(null);
 
 const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
+  const { ready } = usePrivy();
   const { user } = useUser();
   const { addSigners } = useSigners();
 
@@ -34,8 +37,13 @@ const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
     () =>
       user?.linkedAccounts.find(
         (account): account is WalletWithMetadata =>
-          account.type === "wallet" && account.delegated,
-      ),
+          account.type === "wallet" && Boolean(account.delegated),
+      ) ??
+      user?.linkedAccounts.find(
+        (account): account is WalletWithMetadata => account.type === "wallet",
+      ) ??
+      (user?.wallet as WalletWithMetadata | undefined) ??
+      null,
     [user],
   );
 
@@ -59,6 +67,7 @@ const InnerPrivyProvider = ({ children }: React.PropsWithChildren) => {
   return (
     <AuthContext.Provider
       value={{
+        ready,
         authenticated: Boolean(activeWallet),
         activeWallet: activeWallet!,
       }}
@@ -73,23 +82,11 @@ export function PrivyProvider({ children, ...props }: PrivyProviderProps) {
     <PrivyProviderPrimitive
       appId={env.privyAppId}
       config={{
-        loginMethods: ["email", "google", "twitter", "apple", "wallet"],
+        loginMethods: ["email", "google"],
         appearance: {
           theme: "dark",
-          showWalletLoginFirst: true,
-          walletChainType: "solana-only",
-          walletList: [
-            "phantom",
-            "solflare",
-            "backpack",
-            "jupiter",
-            "coinbase_wallet",
-            "okx_wallet",
-            "wallet_connect",
-          ],
+          showWalletLoginFirst: false,
         },
-
-        externalWallets: { solana: { connectors: solanaConnectors } },
         embeddedWallets: {
           solana: { createOnLogin: "all-users" },
         },

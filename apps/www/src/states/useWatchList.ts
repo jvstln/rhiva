@@ -7,8 +7,6 @@ import {
   onStats,
   onRadar,
   onSurge,
-  onCandle,
-  onTransfer,
   onMetadata,
   onLiquidity,
   onGraduated,
@@ -100,14 +98,10 @@ export const useWatchList = create<State & Action>((set) => {
             return onStats(state, event);
           case "swap":
             return onSwap(state, event);
-          case "candle":
-            return onCandle(state, event);
           case "pool_create":
             return onPoolCreate(state, event);
           case "radar":
             return onRadar(state, event);
-          case "transfer":
-            return onTransfer(state, event);
           case "surge":
             return onSurge(state, event);
           case "meme":

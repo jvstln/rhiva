@@ -1,6 +1,6 @@
 import type { TokenFull, WsGraduationEvent } from "@rhivadotfun/dataapi";
 
-import { type AddToTop, type State, lazyFetchToken } from "./utils";
+import type { AddToTop, State } from "./utils";
 import { createPool, createScreener, createTokenFull } from "../defaults/token";
 
 export const onGraduation = <T extends State>(
@@ -61,8 +61,6 @@ export const onGraduation = <T extends State>(
           launchpad: event.launchpad,
         }),
       });
-
-      lazyFetchToken(event.mint, addToTop);
 
       tokens.unshift(token);
       return { tokens };

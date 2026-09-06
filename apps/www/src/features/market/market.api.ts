@@ -77,7 +77,6 @@ export const getRadarTokens = async (
   if (filters.type === "graduated") {
     const graduated = await dataapi.token.getGraduated({
       enrich: true,
-      launchpad: "pumpfun",
       limit: 50,
     });
     const enriched = graduated
@@ -86,6 +85,7 @@ export const getRadarTokens = async (
     if (enriched.length > 0) return enriched;
     return await getTokens(graduated.map((g) => g.mint));
   }
+
   return [];
 };
 

@@ -114,8 +114,8 @@ export type BaseTokenFilterParams = {
   max_liquidity_usd?: number;
   min_volume_usd?: number;
   max_volume_usd?: number;
-  min_holdsers?: number;
-  max_holdsers?: number;
+  min_holders?: number;
+  max_holders?: number;
   min_top10_pct?: number;
   max_top10_pct?: number;
   min_dev_pct?: number;

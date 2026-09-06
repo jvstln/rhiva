@@ -2,6 +2,7 @@ import type { TokenTrade } from "@rhivadotfun/dataapi";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { useTokenTrades } from "../market.hook";
+import { useTokenWebSocket } from "../market.ws";
 import { CopyButton } from "@/components/ui/button";
 import { InfoBadge } from "@/components/ui/info-badge";
 import { QueryState } from "@/components/layout/QueryState";
@@ -108,6 +109,7 @@ type TokenDetailTradesTableProps = { mint: string };
 export const TokenDetailTradesTable = ({
   mint,
 }: TokenDetailTradesTableProps) => {
+  useTokenWebSocket(mint);
   const trades = useTokenTrades(mint);
 
   const table = useDataTable({

@@ -1,6 +1,6 @@
 import type { Window, TokenFull, WsMemeEvent } from "@rhivadotfun/dataapi";
 
-import { type AddToTop, type State, lazyFetchToken } from "./utils";
+import type { AddToTop, State } from "./utils";
 import {
   createScreener,
   createTokenFull,
@@ -146,8 +146,6 @@ export const onMeme = <T extends State>(
           launchpad: event.launchpad,
         }),
       });
-
-      lazyFetchToken(event.mint, addToTop);
 
       tokens.unshift(token);
       return { tokens };

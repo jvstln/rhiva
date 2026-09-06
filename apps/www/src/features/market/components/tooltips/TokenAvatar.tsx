@@ -14,8 +14,11 @@ import {
   User,
 } from "lucide-react";
 
+import { toast } from "sonner";
+
 import { cn, getInitials } from "@/lib/utils";
 import { getTokenBondingPct } from "../../market.schema";
+import { useBlacklistStore } from "../../blacklist.store";
 import { Button } from "@/components/ui/button";
 import { gsap, useGSAP } from "@/lib/gsap.util";
 import { useCopyToClipboard } from "@/hooks/use-clipboard";
@@ -120,6 +123,19 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
               size="icon-xs"
               variant="outline"
               tooltip="Hide token"
+              onClick={(e) => {
+                e.stopPropagation();
+                const added = useBlacklistStore
+                  .getState()
+                  .addItem("ca", token.mint);
+                if (added) {
+                  toast.success(
+                    `Token ${token.symbol || token.name || token.mint.slice(0, 6)} hidden`,
+                  );
+                } else {
+                  toast.info("Token is already hidden");
+                }
+              }}
             >
               <EyeOff />
             </Button>
@@ -127,6 +143,23 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
               size="icon-xs"
               variant="outline"
               tooltip="Blacklist dev"
+              onClick={(e) => {
+                e.stopPropagation();
+                const dev =
+                  token.creator ||
+                  token.dev?.wallet ||
+                  (token as { screener?: { dev?: string } })?.screener?.dev;
+                if (!dev) {
+                  toast.error("Dev address not available for this token");
+                  return;
+                }
+                const added = useBlacklistStore.getState().addItem("dev", dev);
+                if (added) {
+                  toast.success(`Dev ${dev.slice(0, 6)}... blacklisted`);
+                } else {
+                  toast.info("Dev is already blacklisted");
+                }
+              }}
             >
               <ChefHat />
             </Button>
@@ -134,6 +167,25 @@ export function TokenAvatar({ token, size = "default" }: TokenAvatarProps) {
               size="icon-xs"
               variant="outline"
               tooltip="Blacklist handle"
+              onClick={(e) => {
+                e.stopPropagation();
+                const twitter =
+                  token.socials?.x ||
+                  (token as { screener?: { twitter?: string } })?.screener
+                    ?.twitter;
+                if (!twitter) {
+                  toast.error("Twitter handle not available for this token");
+                  return;
+                }
+                const added = useBlacklistStore
+                  .getState()
+                  .addItem("twitter", twitter);
+                if (added) {
+                  toast.success(`Twitter handle ${twitter} blacklisted`);
+                } else {
+                  toast.info("Twitter handle is already blacklisted");
+                }
+              }}
             >
               <AtSign />
             </Button>

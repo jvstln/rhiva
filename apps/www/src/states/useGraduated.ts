@@ -5,14 +5,13 @@ import type {
   BaseTokenFilterParams,
 } from "@rhivadotfun/dataapi";
 
+import { queryClient } from "@/lib";
 import {
   onMeme,
   onSwap,
   onStats,
   onRadar,
   onSurge,
-  onCandle,
-  onTransfer,
   onMetadata,
   onLiquidity,
   onGraduated,
@@ -20,6 +19,8 @@ import {
   onGraduation,
   onPoolCreate,
   onTokenCreate,
+  onTokenUpdate,
+  mergeFreshTokens,
 } from "./token/actions";
 
 type State = {
@@ -43,14 +44,14 @@ type Action = {
       | { type: "liquidity" }
       | { type: "stats" }
       | { type: "swap" }
-      | { type: "candle" }
       | { type: "pool_create" }
-      | { type: "transfer" }
       | { type: "surge" }
       | { type: "radar" }
       | { type: "meme" }
       | { type: "token_create" }
       | { type: "launches" }
+      | { type: "token_update" }
+      | { type: "movers" }
     >,
   ) => void;
 };
@@ -69,7 +70,7 @@ export const useGraduated = create<State & Action>((set) => {
       set((state) => ({ tokens: [...state.tokens!, ...tokens] }));
     },
     setTokens(tokens: TokenFull[]) {
-      set(() => ({ tokens }));
+      set((state) => ({ tokens: mergeFreshTokens(state.tokens, tokens) }));
     },
     removeToken(mint: TokenFull["mint"]) {
       set((state) => {
@@ -108,14 +109,10 @@ export const useGraduated = create<State & Action>((set) => {
             return onStats(state, event);
           case "swap":
             return onSwap(state, event);
-          case "candle":
-            return onCandle(state, event);
           case "pool_create":
             return onPoolCreate(state, event);
           case "radar":
             return onRadar(state, event);
-          case "transfer":
-            return onTransfer(state, event);
           case "surge":
             return onSurge(state, event);
           case "meme":
@@ -123,13 +120,24 @@ export const useGraduated = create<State & Action>((set) => {
           case "token_create":
             return onTokenCreate(state, event);
           case "graduated":
-            return onGraduated(state, event, { set });
+            return onGraduated(state, event);
           case "graduation":
-            return onGraduation(state, event, { set });
+            return onGraduation(state, event);
+          case "token_update":
+            return onTokenUpdate(state, event);
           default:
             return state;
         }
       });
     },
   };
+});
+
+useGraduated.subscribe((state) => {
+  if (state.tokens && state.tokens.length > 0) {
+    queryClient.setQueriesData<TokenFull[]>(
+      { queryKey: ["market", "radar", "graduated"] },
+      state.tokens,
+    );
+  }
 });

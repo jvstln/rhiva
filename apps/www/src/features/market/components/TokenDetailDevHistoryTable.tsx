@@ -64,38 +64,58 @@ const columns = [
   }),
   columnHelper.accessor("ath_mcap_usd", {
     header: "ATH MC",
-    cell: ({ getValue }) => (
-      <span className="text-white text-xs">
-        {formatCompactCurrency(getValue())}
-      </span>
-    ),
+    cell: ({ getValue }) => {
+      const val = getValue();
+      return (
+        <span className="text-white text-xs">
+          {val != null && val > 0 ? formatCompactCurrency(val) : "--"}
+        </span>
+      );
+    },
     size: 100,
   }),
   columnHelper.accessor("price_usd", {
     header: "Price (USD)",
-    cell: ({ getValue }) => (
-      <span className="text-xs">{formatCompactCurrency(getValue())}</span>
-    ),
+    cell: ({ getValue }) => {
+      const val = getValue();
+      return (
+        <span className="text-xs">
+          {val != null && val > 0 ? formatCompactCurrency(val) : "--"}
+        </span>
+      );
+    },
     size: 100,
   }),
   columnHelper.accessor("liquidity_usd", {
     header: "Liquidity",
-    cell: ({ getValue }) => (
-      <span className="text-xs">{formatCompactCurrency(getValue())}</span>
-    ),
+    cell: ({ getValue }) => {
+      const val = getValue();
+      return (
+        <span className="text-xs">
+          {val != null && val > 0 ? formatCompactCurrency(val) : "--"}
+        </span>
+      );
+    },
     size: 100,
   }),
   columnHelper.accessor("holders", {
     header: "Holders",
-    cell: ({ getValue }) => (
-      <span className="text-xs">{formatCompactNumber(getValue())}</span>
-    ),
+    cell: ({ getValue }) => {
+      const val = getValue();
+      return (
+        <span className="text-xs">
+          {val != null ? formatCompactNumber(val) : "--"}
+        </span>
+      );
+    },
     size: 80,
   }),
   columnHelper.accessor("created_time", {
     header: "Created",
     cell: ({ getValue }) => {
       const val = getValue();
+      if (!val)
+        return <span className="text-muted-foreground text-xs">--</span>;
       const timestamp = val > 1_000_000_000_000 ? val : val * 1000;
       return (
         <span className="text-muted-foreground text-xs">

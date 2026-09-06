@@ -156,13 +156,13 @@ const AuthRequiredState = () => {
             />
             <div className="absolute inset-0 rounded-full bg-primary/5 blur-xl" />
           </EmptyMedia>
-          <EmptyTitle>Connect your wallet to view this data</EmptyTitle>
+          <EmptyTitle>Log in to view this data</EmptyTitle>
           <EmptyDescription>
-            This data requires a connected wallet.
+            This data requires you to be logged in.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button data-require-auth>Connect Wallet</Button>
+          <Button data-require-auth>Login</Button>
         </EmptyContent>
       </Empty>
     </div>
@@ -257,7 +257,10 @@ export function QueryState<
     );
   }
 
-  if (!hasData<TData>(query)) return null;
+  if (typeof children === "function") {
+    if (!hasData<TData>(query)) return null;
+    return children(query);
+  }
 
-  return typeof children === "function" ? children(query) : children;
+  return children;
 }

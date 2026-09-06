@@ -328,6 +328,74 @@ export type WsMetadataEvent = {
   catchup: boolean;
 };
 
+export type WsTokenUpdateEvent = {
+  type: "token_update";
+  mint: string;
+  pool?: string;
+  dex?: Dex;
+  quote_mint?: string;
+  slot?: number;
+  block_time?: number;
+  side?: "buy" | "sell";
+  price_usd: number;
+  price_native?: number;
+  mcap_usd?: number;
+  liquidity_usd?: number;
+  volume_usd?: number;
+  volume_5m_usd?: number;
+  trades_5m?: number;
+  buys_5m?: number;
+  sells_5m?: number;
+  volume_1h_usd?: number;
+  trades_1h?: number;
+};
+
+export type WsMoverEvent =
+  | {
+      type: "movers";
+      event: "snapshot";
+      window: number;
+      direction: "gainers" | "losers";
+      generated_at: number;
+      rows: {
+        mint: string;
+        name: string;
+        symbol: string;
+        image: string;
+        price_usd: number;
+        price_change_pct: number;
+        volume_usd: number;
+        trades: number;
+        buys: number;
+        sells: number;
+        traders: number;
+        liquidity_usd: number;
+        market_cap_usd: number;
+        created_time: number;
+      }[];
+    }
+  | {
+      type: "movers";
+      event: "update";
+      window: number;
+      direction: "losers" | "gainers";
+      rank: number;
+      mint: string;
+      name: string;
+      symbol: string;
+      image: string;
+      price_usd: number;
+      price_change_pct: number;
+      volume_usd: number;
+      trades: number;
+      buys: number;
+      sells: number;
+      traders: number;
+      liquidity_usd: number;
+      market_cap_usd: number;
+      created_time: number;
+    };
+
 export type WsEvent =
   | WsSwapEvent
   | WsLiquidityEvent
@@ -343,4 +411,6 @@ export type WsEvent =
   | WsMetadataEvent
   | WsGraduatedEvent
   | WsGraduatingEvent
-  | WsLaunchEvent;
+  | WsLaunchEvent
+  | WsTokenUpdateEvent
+  | WsMoverEvent;

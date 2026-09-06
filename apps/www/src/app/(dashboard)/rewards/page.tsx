@@ -1,16 +1,29 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { RewardsPage } from "@/features/reward/components/RewardsPage";
 import {
   useLeaderboard,
   useRewardProfile,
 } from "@/features/reward/reward.hook";
+import { useAuth } from "@/hooks";
 
-/**
- * Rewards page data owner: fetches the user's rewards profile and the global
- * leaderboard, then renders the pure-UI `<RewardsPage>` with both as props.
- */
 export default function Rewards() {
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (auth.ready && !auth.authenticated) {
+      router.replace("/");
+    }
+  }, [auth.ready, auth.authenticated, router]);
+
+  if (!auth.authenticated) {
+    return null;
+  }
+
   const rewardProfile = useRewardProfile();
   const leaderboard = useLeaderboard();
 

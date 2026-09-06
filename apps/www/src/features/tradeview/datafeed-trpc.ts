@@ -1,3 +1,4 @@
+import { dataapi } from "@/lib/dataapi";
 import { mapResolutionToTimeframe } from "./tradeview.util";
 import type {
   Aggregrate,
@@ -40,6 +41,7 @@ type Subscription = {
   isFetching: boolean;
   lastBarTimestamp: number | null;
   interval: NodeJS.Timeout | null;
+  unsubscribeWs: (() => void) | null;
 };
 
 export function createDatafeed({
@@ -206,9 +208,47 @@ export function createDatafeed({
       const { timeframe, aggregate } = mapResolutionToTimeframe(resolution);
       const subscription: Subscription = {
         interval: null,
+        unsubscribeWs: null,
         isFetching: false,
         lastBarTimestamp: null,
       };
+
+      const customFields = symbolInfo.library_custom_fields as
+        | Record<string, any>
+        | undefined;
+      const tokenAddress =
+        symbolInfo.subsession_id ||
+        (customFields?.address as string | undefined) ||
+        (customFields?.base_token?.address as string | undefined) ||
+        symbolInfo.name;
+
+      if (tokenAddress) {
+        const cancelled = false;
+        dataapi.ws
+          .subscribe({ type: ["candle"], address: [tokenAddress] }, (event) => {
+            if (cancelled || event.type !== "candle") return;
+            const barTime = event.time > 1e12 ? event.time : event.time * 1000;
+            onTick({
+              time: barTime,
+              open: event.open,
+              high: event.high,
+              low: event.low,
+              close: event.close,
+              volume: event.volume,
+            });
+            subscription.lastBarTimestamp = barTime;
+          })
+          .then((unsub) => {
+            if (cancelled) {
+              unsub();
+            } else {
+              subscription.unsubscribeWs = unsub;
+            }
+          })
+          .catch((err) => {
+            console.warn("[TradingView WS Candle Error]", err);
+          });
+      }
 
       const poll = async () => {
         if (subscription.isFetching) return;
@@ -258,6 +298,11 @@ export function createDatafeed({
       if (subscription?.interval) {
         clearInterval(subscription.interval);
         subscription.interval = null;
+      }
+
+      if (subscription?.unsubscribeWs) {
+        subscription.unsubscribeWs();
+        subscription.unsubscribeWs = null;
       }
 
       subscriptions.delete(listenerGuid);

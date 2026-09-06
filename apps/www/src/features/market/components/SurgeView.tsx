@@ -264,7 +264,9 @@ export function SurgeTable({ query }: { query: TokenQuery }) {
     <div className="w-full">
       <QueryState
         query={query}
-        getIsLoading={(q) => q.isPending}
+        getIsLoading={() =>
+          displayTokens.length > 0 ? false : query.isPending
+        }
       >
         {displayTokens.map((token) => (
           <TokenRow

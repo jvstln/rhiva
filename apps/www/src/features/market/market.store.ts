@@ -9,6 +9,13 @@ export const useMarketStore = create<MarketState>()(
   persist(
     immer(
       (set, get): MarketState => ({
+        activeView: "trending",
+        setActiveView(view) {
+          set((state) => {
+            state.activeView = view;
+          });
+        },
+
         radarFilters: {
           fresh: {
             search: "",

@@ -15,3 +15,5 @@ export * from "./on-graduation";
 export * from "./on-pool-create";
 export * from "./on-token-create";
 export * from "./on-launches";
+export * from "./on-token-update";
+export * from "./on-mover";

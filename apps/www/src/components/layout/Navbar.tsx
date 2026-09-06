@@ -39,7 +39,7 @@ import {
 } from "../ui/sheet";
 
 const NAV_LINKS = [
-  { label: "Market", url: "/market" },
+  { label: "Market", url: "/" },
   { label: "Radar", url: "/radar" },
   { label: "Reward", url: "/rewards" },
   { label: "Portfolio", url: "/portfolio" },
@@ -71,6 +71,16 @@ export function Navbar() {
       } else createWallet({ signers: [{ signerId: env.privyAppId }] });
     },
   });
+
+  const isAuthProtected = (url: string) =>
+    url === "/portfolio" || url === "/rewards";
+
+  const handleLinkClick = (e: React.MouseEvent, url: string) => {
+    if (isAuthProtected(url) && !auth.authenticated) {
+      e.preventDefault();
+      login();
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 flex h-(--header-height) shrink-0 items-center gap-2 border-border border-b bg-background/95 px-3 backdrop-blur lg:gap-6 lg:px-6">
@@ -111,8 +121,16 @@ export function Navbar() {
                   render={
                     <Link
                       href={link.url}
+                      onClick={(e) => handleLinkClick(e, link.url)}
+                      data-require-auth={
+                        isAuthProtected(link.url) ? true : undefined
+                      }
                       data-active={
-                        pathname.startsWith(link.url) ? true : undefined
+                        link.url === "/"
+                          ? pathname === "/"
+                          : pathname.startsWith(link.url)
+                            ? true
+                            : undefined
                       }
                       className="w-full rounded-lg px-3 py-2 font-medium text-base transition-colors hover:bg-muted data-active:text-primary"
                     />
@@ -160,8 +178,22 @@ export function Navbar() {
               value={link.label}
             >
               <NavigationMenuLink
-                render={<Link href={link.url} />}
-                data-active={pathname.startsWith(link.url) ? true : undefined}
+                render={
+                  <Link
+                    href={link.url}
+                    onClick={(e) => handleLinkClick(e, link.url)}
+                    data-require-auth={
+                      isAuthProtected(link.url) ? true : undefined
+                    }
+                  />
+                }
+                data-active={
+                  link.url === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(link.url)
+                      ? true
+                      : undefined
+                }
               >
                 {link.label}
               </NavigationMenuLink>
@@ -264,10 +296,10 @@ export function Navbar() {
           ) : (
             <Button
               variant="outline"
-              onClick={() => login({ walletChainType: "solana-only" })}
+              onClick={() => login()}
               data-active
             >
-              Connect wallet
+              Login
             </Button>
           )
         ) : (

@@ -5,14 +5,13 @@ import type {
   WsEvent,
 } from "@rhivadotfun/dataapi";
 
+import { queryClient } from "@/lib";
 import {
   onMeme,
   onSwap,
   onStats,
   onRadar,
   onSurge,
-  onCandle,
-  onTransfer,
   onMetadata,
   onLiquidity,
   onGraduated,
@@ -20,6 +19,8 @@ import {
   onGraduation,
   onPoolCreate,
   onTokenCreate,
+  onMover,
+  mergeFreshTokens,
 } from "./token/actions";
 
 type State = {
@@ -43,14 +44,13 @@ type Action = {
       | { type: "liquidity" }
       | { type: "stats" }
       | { type: "swap" }
-      | { type: "candle" }
       | { type: "pool_create" }
-      | { type: "transfer" }
       | { type: "surge" }
       | { type: "radar" }
       | { type: "meme" }
       | { type: "token_create" }
       | { type: "launches" }
+      | { type: "movers" }
     >,
   ) => void;
 };
@@ -69,7 +69,7 @@ export const useSurge = create<State & Action>((set) => {
       set((state) => ({ tokens: [...state.tokens!, ...tokens] }));
     },
     setTokens(tokens: TokenFull[]) {
-      set(() => ({ tokens }));
+      set((state) => ({ tokens: mergeFreshTokens(state.tokens, tokens) }));
     },
     removeToken(mint: TokenFull["mint"]) {
       set((state) => {
@@ -112,24 +112,31 @@ export const useSurge = create<State & Action>((set) => {
             return onStats(state, event);
           case "swap":
             return onSwap(state, event);
-          case "candle":
-            return onCandle(state, event);
           case "pool_create":
             return onPoolCreate(state, event);
           case "radar":
             return onRadar(state, event);
-          case "transfer":
-            return onTransfer(state, event);
           case "meme":
             return onMeme(state, event);
           case "token_create":
             return onTokenCreate(state, event);
           case "surge":
-            return onSurge(state, event, { set });
+            return onSurge(state, event);
+          case "movers":
+            return onMover(state, event);
           default:
             return state;
         }
       });
     },
   };
+});
+
+useSurge.subscribe((state) => {
+  if (state.tokens && state.tokens.length > 0) {
+    queryClient.setQueriesData<TokenFull[]>(
+      { queryKey: ["market", "surge"] },
+      state.tokens,
+    );
+  }
 });

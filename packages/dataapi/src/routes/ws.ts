@@ -31,7 +31,9 @@ export type SubscriptionType =
   | "surge"
   | "radar"
   | "metadata"
-  | "launches";
+  | "launches"
+  | "token_update"
+  | "movers";
 
 export type WsSubscribeQueryParams<
   T extends SubscriptionType | SubscriptionType[],

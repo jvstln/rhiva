@@ -72,13 +72,14 @@ export const useTrendingWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
-            "transfer",
             "surge",
             "radar",
             "meme",
             "token_create",
+            "launches",
+            "token_update",
+            "movers",
           ],
         },
         (event) => useTrending.getState().onWsEvent(event),
@@ -115,14 +116,13 @@ export const useSurgeWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
-            "transfer",
             "surge",
             "radar",
             "meme",
             "token_create",
             "launches",
+            "movers",
           ],
         },
         (event) => useSurge.getState().onWsEvent(event),
@@ -159,14 +159,13 @@ export const useLatestWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
-            "transfer",
             "surge",
             "radar",
             "meme",
             "token_create",
             "launches",
+            "movers",
           ],
         },
         (event) => useLatest.getState().onWsEvent(event),
@@ -203,13 +202,12 @@ export const useTopGainersWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
-            "transfer",
             "surge",
             "radar",
             "meme",
             "token_create",
+            "movers",
           ],
         },
         (event) => useTopGainer.getState().onWsEvent(event),
@@ -243,11 +241,9 @@ export const useStockWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
             "surge",
             "radar",
-            "transfer",
             "launches",
           ],
           address: stocks,
@@ -283,9 +279,7 @@ export const useStablecoinWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
-            "transfer",
             "launches",
           ],
           address: stablecoins,
@@ -323,10 +317,8 @@ export const useWatchlistWebSocket = (
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
             "radar",
-            "transfer",
             "surge",
             "meme",
             "token_create",
@@ -367,14 +359,14 @@ export const useRadarWebSocket = ({
             "liquidity",
             "stats",
             "swap",
-            "candle",
             "pool_create",
             "radar",
-            "transfer",
             "surge",
             "meme",
             "token_create",
             "launches",
+            "token_update",
+            "movers",
           ],
         },
         (event) => {
@@ -449,13 +441,13 @@ export const useTokenWebSocket = (mint: string) => {
 
             queryClient.setQueryData(
               ["token", mint, "trades"],
-              (oldData: TokenTrade[] | undefined) =>
-                produce(oldData ?? [], (draft) => {
-                  draft.unshift(row);
-                  if (draft.length > MAX_LIVE_TRADES) {
-                    draft.length = MAX_LIVE_TRADES;
-                  }
-                }),
+              (oldData: TokenTrade[] | undefined) => {
+                const existing = oldData ?? [];
+                if (existing.some((t) => t.signature === row.signature)) {
+                  return existing;
+                }
+                return [row, ...existing].slice(0, MAX_LIVE_TRADES);
+              },
             );
 
             updateToken(mint, (draft) => {

@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { TokenFull } from "@rhivadotfun/dataapi";
 
 import type { SearchParams } from "@/types";
-import { Preset, SurgeFilters, Timeframe } from "./market.schema";
+import {
+  type MarketView,
+  Preset,
+  SurgeFilters,
+  Timeframe,
+} from "./market.schema";
 import { useMarketStore } from "./market.store";
 import type {
   MarketState,
@@ -14,6 +19,9 @@ import type {
   SurgeFiltersInput,
   TrendingFilters,
 } from "./market.type";
+import { queryClient } from "@/lib";
+import { mergeFreshTokens } from "@/states/token/utils";
+import { useBlacklistStore } from "./blacklist.store";
 import {
   getTokens,
   getRadarTokens,
@@ -29,6 +37,80 @@ import {
   getTrendingTokens,
   getSearchTokens,
 } from "./market.api";
+
+async function reconcileWithHttp(
+  existing: TokenFull[] | undefined | null,
+  httpTokens: TokenFull[],
+): Promise<TokenFull[]> {
+  const isBlacklisted = (t: TokenFull) => {
+    try {
+      return useBlacklistStore.getState().isTokenBlacklisted(t);
+    } catch {
+      return false;
+    }
+  };
+  const filteredHttp = httpTokens.filter((t) => !isBlacklisted(t));
+  if (!existing || existing.length === 0) return filteredHttp;
+
+  // Find any tokens in existing that came from WebSocket and aren't in httpTokens yet
+  const httpMints = new Set(httpTokens.map((t) => t.mint));
+  const wsOnlyMints = existing
+    .filter((t) => !httpMints.has(t.mint))
+    .map((t) => t.mint);
+
+  // If there are WS-only tokens, enrich them top-level via getTokens
+  let enrichedWsTokens: TokenFull[] = [];
+  if (wsOnlyMints.length > 0) {
+    try {
+      enrichedWsTokens = await getTokens(wsOnlyMints);
+    } catch {
+      enrichedWsTokens = [];
+    }
+  }
+
+  const allIncoming = [...httpTokens, ...enrichedWsTokens];
+  return mergeFreshTokens(existing, allIncoming);
+}
+
+function useEnrichQueryTokens(
+  queryKey: readonly unknown[],
+  tokens: TokenFull[] | undefined,
+) {
+  const enrichedMintsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!tokens || tokens.length === 0) return;
+
+    const stubMints = tokens
+      .filter(
+        (t) =>
+          !enrichedMintsRef.current.has(t.mint) &&
+          !t.uri &&
+          (!t.pools || t.pools.length === 0),
+      )
+      .map((t) => t.mint);
+
+    if (stubMints.length === 0) return;
+
+    for (const m of stubMints) {
+      enrichedMintsRef.current.add(m);
+    }
+
+    let cancelled = false;
+    getTokens(stubMints)
+      .then((enriched) => {
+        if (cancelled || enriched.length === 0) return;
+        queryClient.setQueryData<TokenFull[]>(queryKey, (current) =>
+          mergeFreshTokens(current ?? null, enriched),
+        );
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [queryKey, tokens]);
+}
 
 /**
  * Market data hooks — React Query wrappers around `market.api.ts`.
@@ -85,13 +167,38 @@ export function useTokens(mints: string[]) {
 
 export function useTrendingTokens(
   filters: TrendingFilters,
-  options?: QueryOptions,
+  options?: QueryOptions & { view?: MarketView },
 ) {
-  return useQuery({
-    queryKey: ["market", "trending"],
-    queryFn: () => getTrendingTokens(filters),
+  const activeView = options?.view ?? "trending";
+  const queryKey = ["market", "trending", activeView, filters] as const;
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      let httpTokens: TokenFull[] = [];
+      if (activeView === "latest") {
+        httpTokens = await getRadarTokens({
+          type: "fresh",
+          preset: filters.preset,
+          search: "",
+          quickBuy: filters.quickBuy,
+          quickSell: filters.quickSell,
+        });
+      } else if (activeView === "top-gainers") {
+        httpTokens = await getSurgeTokens({ direction: "gainers", limit: 50 });
+      } else {
+        httpTokens = await getTrendingTokens(filters);
+      }
+      const existing = queryClient.getQueryData<TokenFull[]>(queryKey);
+      return reconcileWithHttp(existing, httpTokens);
+    },
     enabled: options?.enabled,
+    staleTime: 5_000,
+    refetchInterval: 15_000,
   });
+
+  useEnrichQueryTokens(queryKey, query.data);
+
+  return query;
 }
 
 export function useWatchlistTokens(mints: string[], options?: QueryOptions) {
@@ -107,11 +214,22 @@ export function useRadarTokens(
   filters: RadarFilters[keyof RadarFilters] & { type: keyof RadarFilters },
   options?: QueryOptions,
 ) {
-  return useQuery({
-    queryKey: ["market", "radar", filters.type],
-    queryFn: () => getRadarTokens(filters),
+  const queryKey = ["market", "radar", filters.type, filters] as const;
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const httpTokens = await getRadarTokens(filters);
+      const existing = queryClient.getQueryData<TokenFull[]>(queryKey);
+      return reconcileWithHttp(existing, httpTokens);
+    },
     enabled: options?.enabled,
+    staleTime: 5_000,
+    refetchInterval: 15_000,
   });
+
+  useEnrichQueryTokens(queryKey, query.data);
+
+  return query;
 }
 
 export function useSurgeTokens(
@@ -119,16 +237,26 @@ export function useSurgeTokens(
   options?: QueryOptions,
 ) {
   const params = SurgeFilters.parse(filters);
+  const queryKey = ["market", "surge", params] as const;
 
-  return useQuery({
-    queryKey: ["market", "surge", params],
-    queryFn: () =>
-      getSurgeTokens({
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const httpTokens = await getSurgeTokens({
         direction: params.direction === "down" ? "losers" : "gainers",
         limit: 50,
-      }),
+      });
+      const existing = queryClient.getQueryData<TokenFull[]>(queryKey);
+      return reconcileWithHttp(existing, httpTokens);
+    },
     enabled: options?.enabled,
+    staleTime: 5_000,
+    refetchInterval: 15_000,
   });
+
+  useEnrichQueryTokens(queryKey, query.data);
+
+  return query;
 }
 
 /**
@@ -181,6 +309,7 @@ export function useTokenTrades(mint: string) {
   return useQuery({
     queryKey: ["token", mint, "trades"],
     queryFn: () => getTokenTrades(mint),
+    refetchInterval: 3_000,
   });
 }
 

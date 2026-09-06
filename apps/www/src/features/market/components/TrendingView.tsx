@@ -442,7 +442,10 @@ export function TrendingView({ query, view = "trending" }: TrendingViewProps) {
   const displayTokens = activeStoreTokens ?? query.data ?? [];
 
   return (
-    <QueryState query={query}>
+    <QueryState
+      query={query}
+      getIsLoading={() => (displayTokens.length > 0 ? false : query.isPending)}
+    >
       <TrendingTable tokens={displayTokens} />
     </QueryState>
   );
@@ -464,8 +467,11 @@ export function WatchlistView({ query }: { query: TokenQuery }) {
   const displayTokens = storeTokens ?? query.data ?? [];
 
   return (
-    <QueryState query={query}>
-      {() => <TrendingTable tokens={displayTokens} />}
+    <QueryState
+      query={query}
+      getIsLoading={() => (displayTokens.length > 0 ? false : query.isPending)}
+    >
+      <TrendingTable tokens={displayTokens} />
     </QueryState>
   );
 }

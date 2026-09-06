@@ -107,7 +107,9 @@ export const RadarView = ({ queries }: { queries: RadarQueries }) => {
               <ScrollArea className="h-full min-h-0 flex-1">
                 <QueryState
                   query={query}
-                  getIsLoading={(q) => q.isPending}
+                  getIsLoading={() =>
+                    columnTokens.length > 0 ? false : query.isPending
+                  }
                 >
                   {columnTokens.map((token) => (
                     <RadarTokenCard
