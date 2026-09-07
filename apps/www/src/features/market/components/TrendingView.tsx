@@ -356,7 +356,7 @@ export function TrendingTable({ tokens }: { tokens: TokenFull[] }) {
         key={tokens[0]?.mint}
         table={table}
         classNames={{
-          table: "size-full table-fixed",
+          table: "w-full min-w-[1100px] table-auto",
           tr: "cursor-pointer",
           td: pinnedColumnClassName,
           th: pinnedColumnClassName,

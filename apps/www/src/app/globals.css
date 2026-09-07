@@ -250,6 +250,7 @@
   }
   html {
     @apply font-sans;
+    -webkit-text-size-adjust: 100%;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -257,5 +258,21 @@
   }
   .link {
     @apply text-primary underline-offset-4 transition-colors hover:underline;
+  }
+}
+
+/* Small screens: compact scale + mobile input fixes.
+   Scales every rem-based token (type scale, spacing, controls) together,
+   which tightens the dense trading tables on phones. */
+@media (max-width: 640px) {
+  html {
+    font-size: 87.5%;
+  }
+
+  /* ≥16px inputs prevent iOS Safari from auto-zooming into fields on focus */
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
   }
 }

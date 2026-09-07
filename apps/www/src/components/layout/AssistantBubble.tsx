@@ -35,7 +35,9 @@ export function AssistantBubble() {
           <Button
             ref={containerRef}
             size="icon-lg"
-            className={"fixed right-8 bottom-8 z-50 size-14"}
+            className={
+              "fixed right-8 bottom-8 z-50 size-14 max-sm:right-4 max-sm:bottom-[calc(1rem+env(safe-area-inset-bottom))] max-sm:size-12"
+            }
             style={{ boxShadow: "0 0 24px var(--color-primary)" }}
           />
         }

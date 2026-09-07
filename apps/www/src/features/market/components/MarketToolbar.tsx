@@ -36,10 +36,10 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
         "flex max-sm:flex-col sm:w-full sm:items-center sm:justify-between sm:border-b sm:px-4 sm:pt-2 md:gap-12",
       )}
     >
-      <ScrollArea className={"min-w-0 basis-1/2"}>
+      <ScrollArea className={"min-w-0 basis-1/2 py-2"}>
         <TabsList
           variant="ghost"
-          className="flex h-auto w-max items-center gap-0.5 bg-transparent p-0 py-2"
+          className="flex h-auto w-max items-center gap-0.5 bg-transparent p-0"
           aria-label="Market sections"
         >
           {MarketView.unwrap().options.map((tab, index) => {
@@ -76,7 +76,7 @@ export function MarketToolbar({ exclude = [], include }: MarketToolbarProps) {
         <ScrollBar
           orientation="horizontal"
           showIndicator
-          showScrollBar
+          showScrollBar={false}
         />
       </ScrollArea>
 
